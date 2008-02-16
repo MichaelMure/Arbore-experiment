@@ -40,12 +40,6 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		T_NONE
 	},
 
-	/* NET_GET_STRUCT_DIFF */
-	{
-		/* NET_GET_STRUCT_DIFF_LAST_CONNECTION */ T_UINT32,
-		T_NONE
-	},
-
 	/* NET_MKFILE */
 	{
 		/* NET_MKFILE_PATH */        T_STR,
@@ -79,12 +73,6 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	// NET_END_OF_MERGE_ACK
 	{ T_NONE},
-
-	/* NET_CHANGE_YOUR_ID */
-	{
-		/* NET_CHANGE_YOUR_ID_ID */ T_UINT32,
-		T_NONE
-	},
 
 };
 

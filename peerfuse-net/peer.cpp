@@ -90,39 +90,21 @@ void Peer::SendHello()
 	SendMsg(pckt);
 }
 
-void Peer::Send_net_get_struct_diff()
+void Peer::Send_net_peer_list(PeerList peers)
 {
-	Packet pckt(NET_GET_STRUCT_DIFF, net.GetMyID(), addr.id);
-	uint32_t last_v = 0;
-	session_cfg.Get("last_view", last_v);
-	pckt.SetArg(NET_GET_STRUCT_DIFF_LAST_CONNECTION, last_v);
-	SendMsg(pckt);
-}
-
-void Peer::Send_net_peer_list_rec(PeerList peers, std::vector<Packet>& packets)
-{
-	AddrList addr_list;
 	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
-		if(*it != this)
-		{
-			addr_list.push_back((*it)->GetAddr());
-			Send_net_peer_list_rec((*it)->downlinks, packets);
-		}
+	{
+		id_t id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
 
-	if(addr_list.empty() == false)
-		packets.push_back(dynamic_cast<const Packet&>(
-		                        Packet(NET_PEER_CONNECTION,
-		                               net.GetMyID(),
-		                               0).SetArg(NET_PEER_CONNECTION_ADDRESSES,
-		                                         addr_list)));
-}
+		Packet pckt(NET_PEER_CONNECTION, id, 0);
+		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
 
-void Peer::Send_net_peer_list()
-{
-	std::vector<Packet> packets;
+		SendMsg(pckt);
 
-	Send_net_peer_list_rec(net.GetDirectHighLinks(), packets);
-
+		if((*it)->downlinks.empty() == false)
+			Send_net_peer_list((*it)->downlinks);
+	}
 }
 
 /*******************************
@@ -145,9 +127,13 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		throw MustDisconnect();
 	}
 
+	/* Set timestamp diff between this peer and me. */
 	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
+
+	/* What is port listened by peer */
 	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
+	/* Flags */
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
@@ -161,18 +147,9 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	{
 		/* CLIENT SIDE */
 
-		/* If this is a highlink, I ask for merge */
+		/* If this is a highlink, I'm waiting for merge */
 		if(IsHighLink())
-		{
-			/* First we send all of our peers,
-			 * then, we ask give his peers
-			 */
 			SetFlag(MERGING);
-			net.Broadcast(Packet(NET_START_MERGE, net.GetMyID(), this->GetID()));
-
-			Send_net_peer_list();
-			SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), GetID()));
-		}
 	}
 	else
 	{
@@ -181,6 +158,12 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		/* TODO: check if ID is already used */
 
 		SendHello();
+
+		if(IsHighLink())
+		{
+			SetFlag(MERGING);
+			net.Broadcast(Packet(NET_START_MERGE, net.GetMyID(), 0));
+		}
 	}
 
 	/* Change dst ID of packet to NOT broadcast it. */
@@ -194,7 +177,8 @@ void Peer::Handle_net_start_merge(struct Packet* pckt)
 
 void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
-	AddrList addr_list = msg->GetArg<AddrList>(NET_PEER_CONNECTION_ADDRESSES);
+	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
+#if 0
 	AddrList my_addr_list;
 	PeerList peers = net.GetPeerList();
 
@@ -238,23 +222,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 		msg->SetSrcID(net.GetMyID());
 		msg->SetArg(NET_PEER_CONNECTION_ADDRESSES, addr_list);
 	}
-}
-
-void Peer::Handle_net_get_struct_diff(struct Packet* pckt)
-{
-	time_t last_view = Timestamp(pckt->GetArg<uint32_t>(NET_GET_STRUCT_DIFF_LAST_CONNECTION));
-
-	/* Peer wants to merge, so it is a high link */
-	SetHighLink();
-
-	cache.SendChanges(this, last_view);
-
-}
-
-void Peer::Handle_net_end_of_diff(struct Packet* pckt)
-{
-	/* TODO: send my own modifications */
-	SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), this->GetID()));
+#endif
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
@@ -323,8 +291,6 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 	DelFlag(MERGING);
 }
 
-void Peer::Handle_net_change_your_id(struct Packet* pckt) {}
-
 void Peer::HandleMsg(Packet* pckt)
 {
 	struct
@@ -338,14 +304,11 @@ void Peer::HandleMsg(Packet* pckt)
 		{ NULL,                               0              },
 		{ &Peer::Handle_net_hello,            PERM_ANONYMOUS },
 		{ &Peer::Handle_net_start_merge,      PERM_HIGHLINK  },
-		{ &Peer::Handle_net_get_struct_diff,  PERM_HIGHLINK  },
 		{ &Peer::Handle_net_mkfile,           PERM_HIGHLINK  },
 		{ &Peer::Handle_net_rmfile,           PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_connection,  PERM_HIGHLINK  },
-		{ &Peer::Handle_net_end_of_diff,      PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
-		{ &Peer::Handle_net_change_your_id,   PERM_HIGHLINK  },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

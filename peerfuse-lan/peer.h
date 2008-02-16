@@ -27,6 +27,10 @@
 
 class FileEntry;
 
+class Peer;
+
+typedef std::vector<Peer*> PeerList;
+
 class Peer
 {
 	int fd;

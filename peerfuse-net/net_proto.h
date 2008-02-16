@@ -27,14 +27,12 @@ enum msg_type
 	NET_NONE = 0,
 	NET_HELLO,
 	NET_START_MERGE,
-	NET_GET_STRUCT_DIFF, // TODO! remove it!
 	NET_MKFILE,
 	NET_RMFILE,
 	NET_PEER_CONNECTION,
 	NET_END_OF_DIFF,
 	NET_END_OF_MERGE,
 	NET_END_OF_MERGE_ACK,
-	NET_CHANGE_YOUR_ID, // TODO! remove it?
 
 	NET_NB_MESSAGES
 };
@@ -49,10 +47,10 @@ enum net_hello_args
 	NET_HELLO_ARG_SIZE
 };
 
-enum net_get_struct_diff_args
+enum net_peer_connection
 {
-	NET_GET_STRUCT_DIFF_LAST_CONNECTION, // T_INT
-	NET_GET_STRUCT_DIFF_ARG_SIZE
+	NET_PEER_CONNECTION_ADDRESS,     /* T_ADDR */
+	NET_PEER_CONNECTION_CERTIFICATE, /* T_STR */
 };
 
 // NET_MKFILE
@@ -74,16 +72,6 @@ enum net_rmfile
 {
 	NET_RMFILE_PATH
 	// ...
-};
-
-enum net_peer_connection
-{
-	NET_PEER_CONNECTION_ADDRESSES,
-};
-
-enum net_change_you_id
-{
-	NET_CHANGE_YOUR_ID_ID,
 };
 
 #endif /* NETPROTO_H */

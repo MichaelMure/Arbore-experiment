@@ -25,6 +25,9 @@
 #include <queue>
 
 class FileEntry;
+class Peer;
+
+typedef std::vector<Peer*> PeerList;
 
 class Peer
 {
@@ -51,20 +54,15 @@ class Peer
 	unsigned int flags;
 
 	// Sending functions
-	void Send_net_get_struct_diff();
-	void Send_net_peer_list_rec(std::vector<Peer*> peers, std::vector<Packet>& packets);
-	void Send_net_peer_list();
+	void Send_net_peer_list(PeerList list);
 	// Receiving functions
 	void Handle_net_hello(struct Packet* pckt);
-	void Handle_net_get_struct_diff(struct Packet* pckt);
 	void Handle_net_mkfile(struct Packet* pckt);
 	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
-	void Handle_net_end_of_diff(struct Packet* pckt);
 	void Handle_net_start_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
-	void Handle_net_change_your_id(struct Packet* pckt);
 public:
 
 	/* Exceptions */

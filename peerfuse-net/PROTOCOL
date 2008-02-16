@@ -32,24 +32,35 @@ Messages
 		port: port which I listen
 		version: peerfuse version string
 
-	PEER_CONNECTION
-	~~~~~~~~~~~~~~~
-
-		.------------.------------.------------.------------.
-		|   srcID    |   dstID    |    type    |    size    |
-		|------------+------------'------------'------------|
-		| list size  |   addresses list ...                 |
-		|  (uint32)  |              (p2pfs_addr[])          |
-		'------------'--------------------------------------'
-
-	END_OF_INIT
+	START_MERGE
 	~~~~~~~~~~~
 
 		.------------.------------.------------.------------.
 		|   srcID    |   dstID    |    type    |    size    |
 		'------------'------------'------------'------------'
 
-	END_OF_INIT_ACK
+
+	PEER_CONNECTION
+	~~~~~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------'------------'------------|
+		|  up link   |           id + address + port        |
+		|  (uint32)  |               (pf_addr)              |
+		|------------'--------------------------------------|
+		|                     certificate                   |
+		|                      (char[])                     |
+		'---------------------------------------------------'
+
+	END_OF_MERGE
+	~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		'------------'------------'------------'------------'
+
+	END_OF_MERGE_ACK
 	~~~~~~~~~~~~~~~
 
 		.------------.------------.------------.------------.
@@ -96,7 +107,7 @@ Connection
 		Le serveur donne son heure locale et attribue éventuellement
 		un identifiant au client.
 
-	Client - START_MERGE
+	Server - START_MERGE
 
 		Annonce qu'on entre dans un merge. Passage de l'etat du link à HIGHLINK
 
@@ -109,6 +120,8 @@ Connection
 		Ensuite, il tente de s'y connecter.
 
 		Enfin, il broadcast la liste des peers.
+
+	Server - END_OF_MERGE
 
 	Client - PEER_CONNECTION <peers>
 

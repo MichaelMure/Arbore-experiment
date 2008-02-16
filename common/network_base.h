@@ -33,7 +33,6 @@
 #include "peer.h"
 #include "pf_types.h"
 
-typedef std::vector<Peer*> PeerList;
 typedef std::map<unsigned int, Peer*> PeerMap;
 class MyConfig;
 
