@@ -94,6 +94,10 @@ void Peer::Send_net_peer_list(PeerList peers)
 {
 	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
 	{
+		/* Do not send information about himself! */
+		if(*it == this)
+			continue;
+
 		id_t id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
 
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
@@ -173,6 +177,32 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 void Peer::Handle_net_start_merge(struct Packet* pckt)
 {
 	SetFlag(MERGING);
+
+	if(IsDirectLink())
+	{
+		/* This peer is directly connected to me, so I
+		 * think this is me who merge with him.
+		 */
+
+		Send_net_peer_list(net.GetDirectHighLinks());
+
+		SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
+	}
+}
+
+void Peer::Handle_net_end_of_merge(struct Packet* msg)
+{
+	DelFlag(MERGING);
+	if(IsClient())
+	{
+		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), this->GetID()));
+		session_cfg.Set("last_view", time(NULL));
+	}
+}
+
+void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
+{
+	DelFlag(MERGING);
 }
 
 void Peer::Handle_net_peer_connection(struct Packet* msg)
@@ -274,21 +304,6 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 		/* TODO: Desynch, DO SOMETHING */
 	}
 	cache.Unlock();
-}
-
-void Peer::Handle_net_end_of_merge(struct Packet* msg)
-{
-	DelFlag(MERGING);
-	if(IsClient())
-	{
-		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), this->GetID()));
-		session_cfg.Set("last_view", time(NULL));
-	}
-}
-
-void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
-{
-	DelFlag(MERGING);
 }
 
 void Peer::HandleMsg(Packet* pckt)

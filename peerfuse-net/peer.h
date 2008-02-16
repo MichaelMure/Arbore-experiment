@@ -93,6 +93,8 @@ public:
 	bool IsServer() const { return (flags & SERVER); }
 	bool IsClient() const { return !(flags & SERVER); }
 
+	bool IsDirectLink() const { return !uplink; }
+
 	void SetFlag(unsigned int f) { flags |= f; }
 	void DelFlag(unsigned int f) { flags &= ~f; }
 	bool HasFlag(unsigned int f) { return flags & f; }
