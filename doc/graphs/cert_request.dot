@@ -1,0 +1,23 @@
+digraph G {
+overlap="scale";
+labelfloat="true";
+splines="true";
+   subgraph cluster1 {
+   label="CA";
+      ca_priv_key [label="Private key", shapefile="img/priv_key.png", color="white"];
+      ca_pub_key [label="Certificate\n(Public key)", shapefile="img/pub_key.png", color="white"];
+   }
+   subgraph cluster2 {
+   label="User";
+      user_priv_key [label="Private key", shapefile="img/priv_key.png", color="white"];
+      user_pub_key [label="Public key", shapefile="img/pub_key.png", color="white"];
+      user_cert [label="Certificate", shapefile="img/cert.png", color="white"];
+   }
+   cert_req [label="Certificate request\n(contains the public key)"];
+   cert [label="Certificate\n(public key signed by the CA)", shapefile="img/cert.png", color="white"];
+
+   user_pub_key->cert_req;
+   ca_priv_key->cert_req [label="the CA signs the\npub. key"];
+   cert_req->cert;
+   cert->user_cert;
+}

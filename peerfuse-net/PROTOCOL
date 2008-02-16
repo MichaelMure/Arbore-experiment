@@ -1,0 +1,128 @@
+Packets
+-------
+
+	Packets are built like this:
+
+	.------------.------------.------------.------------.
+	|   srcID    |   dstID    |    type    |    size    |
+	|  (uint32)  |  (uint32)  |  (uint32)  |  (uint32)  |
+	|------------+------------+------------+------------|
+	|                                                   |
+	|                        BODY                       |
+	|                       (size)                      |
+	|                                                   |
+	'---------------------------------------------------'
+
+Messages
+--------
+
+	HELLO
+	~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------+------------'------------|
+		|    Now     |   flags    |  port      | version .. |
+		|  (uint32)  |  (uint32)  |  (uint32)  |  (char[])  |
+		'------------'------------'-------------------------'
+
+		Now: local time
+		flags: Flags are:
+			0x01: highlink
+		port: port which I listen
+		version: peerfuse version string
+
+	PEER_CONNECTION
+	~~~~~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------'------------'------------|
+		| list size  |   addresses list ...                 |
+		|  (uint32)  |              (p2pfs_addr[])          |
+		'------------'--------------------------------------'
+
+	END_OF_INIT
+	~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		'------------'------------'------------'------------'
+
+	END_OF_INIT_ACK
+	~~~~~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		'------------'------------'------------'------------'
+
+	MKFILE
+	~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------'------------'------------|
+		| path size  |    path ...             |   modes    |
+		|  (uint32)  |                (char[]) |  (uint32)  |
+		|------------+------------.------------+------------|
+		|     UID    |     GID    |       file   size       |
+		|  (uint32)  |  (uint32)  |         (uint64)        |
+		|------------+------------+------------+------------'
+		|   access   |  creation  |    modif   |
+		|  (uint32)  |  (uint32)  |  (uint32)  |
+		'------------'------------'------------'
+
+	RMFILE
+	~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------'------------'------------|
+		| path size  |  path ...                            |
+		|  (uint32)  |                (char[])              |
+		'------------'--------------------------------------'
+
+Connection
+----------
+
+	Client - HELLO <local time> <listening port> <version>
+
+		Annonce de la connexion du client, un identifiant
+		(nul), le numero de version, et l'heure locale pour
+		les synchronisations.
+
+	Server - HELLO <local time> <listening port> <version>
+
+		Le serveur donne son heure locale et attribue éventuellement
+		un identifiant au client.
+
+	Client - START_MERGE
+
+		Annonce qu'on entre dans un merge. Passage de l'etat du link à HIGHLINK
+
+	Server - PEER_CONNECTION <peers>
+
+		Le serveur annonce ses propres peers en premier.
+		Pour chaque peer, tout d'abord le client vérifie qu'il n'y a pas
+		conflit avec un peer local. Si tel est le cas, Client envoie au peer
+		qui se trouve de son coté, un CHANGE_YOUR_ID <id>.
+		Ensuite, il tente de s'y connecter.
+
+		Enfin, il broadcast la liste des peers.
+
+	Client - PEER_CONNECTION <peers>
+
+		Le client annonce ses peers.
+
+		Le message est facultatif dans le cas où le client est seul.
+
+	Client - END_OF_MERGE
+
+		Le client envoie lui même ses modifications entre temps.
+		Il ne commit bien sur que ce qui a un timestamp supérieur à
+		celui des fichiers mis à jours par le GET_STRUCT_DIFF.
+
+	Server - END_OF_MERGE_ACK
+
+		Le serveur annonce que c'est bien fini.
+

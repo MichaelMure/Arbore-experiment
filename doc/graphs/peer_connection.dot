@@ -1,0 +1,39 @@
+digraph G {
+compound="true";
+overlap="scale";
+labelfloat="true";
+splines="true";
+   subgraph cluster1 {
+   label="CA";
+      ca_cert[label="Certificate", shapefile="img/pub_key.png", color="white"];
+      ca_crl[label="Certificate\nrevocation list" , shapefile="img/crl.png", color="white"];
+   }
+   subgraph cluster2 {
+   label="User 1";
+      //user1_key [label="Private key", shapefile="img/priv_key.png", color="white"];
+      user1_cert [label="Certificate", shapefile="img/cert.png", color="white"];
+      user1_ca_cert[label="CA Cert.", shapefile="img/pub_key.png", color="white"];
+   }
+
+   subgraph cluster3 {
+   label="User 2";
+      //user2_key [label="Private key", shapefile="img/priv_key.png", color="white"];
+      user2_cert [label="Certificate", shapefile="img/cert.png", color="white"];
+      user2_ca_cert[label="CA Cert.", shapefile="img/pub_key.png", color="white"];
+   }
+
+
+   user1_cert_verif [label="Cert. verification\nagainst the CA cert.\nand the CRL.", shapefile="img/cert.png", color="white"];
+   user2_cert_verif [label="Cert. verification\nagainst the CA cert.\nand the CRL", shapefile="img/cert.png", color="white"];
+
+
+   user1_cert->user1_cert_verif;
+   user1_cert_verif->user2_ca_cert [lhead=cluster3];
+   user1_ca_cert->user2_cert_verif;
+   user1_cert_verif->ca_crl;
+
+   user2_cert->user2_cert_verif;
+   user2_cert_verif->user1_ca_cert [lhead=cluster2];
+   user2_ca_cert->user1_cert_verif;
+   user2_cert_verif->ca_crl;
+}

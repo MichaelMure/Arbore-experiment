@@ -1,0 +1,23 @@
+Network:
+- handle all network stuffs
+- handle routing
+- bandwidth measurement
+
+Peer class:
+- handle messages from Network
+
+FileEntry class:
+- perms
+- name
+
+DirEntry (derived from FileEntry) class:
+- filelist
+
+Cache class:
+- containt the '/' DirEntry
+- does all I/O to the HDD
+- interface to fuse
+
+Config class:
+- store the ip of one peer
+-

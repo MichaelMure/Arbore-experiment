@@ -1,0 +1,358 @@
+PFNet proto
+===========
+
+Permission handling
+-------------------
+
+Main goal
+~~~~~~~~~
+
+ * 1 uid and the same gid per user.
+ * UNIX style permission based on those uid/gid.
+ * an ls show PFnet's UID/GID.
+
+Implementation
+~~~~~~~~~~~~~~
+
+Each user have one pair of key corresponding to his UID, and an other pair corresponding to his GID.
+This system allows to handle all type UNIX permissions in a peer to peer environnement:
+
+TODO: fill the tableau
+
+ +----------+------------------------+-------------------------+
+ |  Perms   | Cryptage               | Signature               |
+ +----------+------------------------+-------------------------+
+ | RW       | User key               | No                      |
+ +----------+------------------------+-------------------------+
+ | RW R     | Group key              | User key                |
+ +----------+------------------------+-------------------------+
+ | RW R  R  | No                     | User key                |
+ +----------+------------------------+-------------------------+
+ | RW RW    | Group key              | No                      |
+ +----------+------------------------+-------------------------+
+ | RW RW R  | No                     | Group key               |
+ +----------+------------------------+-------------------------+
+ | RW RW RW | No                     | No                      |
+ +----------+------------------------+-------------------------+
+
+Crypted tree
+~~~~~~~~~~~~
+
+Considering such a structure::
+
+	/  rw-rw-rw- all all
+	  blah/ rw-rw---- user1 group1
+	     foo/  rw-r----- user1 group1
+		file1 ''
+		file2 ''
+	     bar/  rw------- user1 group1
+		file3 ''
+		file4 ''
+
+The same type of permission handling as for files is applied to path description:
+refering to file3 looks will use messages like:
+
+[ Header ][                    Path Description             ][ Operation]
+[ Header ][ (clear)blah/ ][ (g1 key)bar/ ][ (u1 key)file3     Operation ]
+
+Depending on which group a user belongs to, he sees the tree as:
+
+user2 (not in group1)::
+
+	/
+	   blah/
+	      crypt(foo/):	crypt(content)
+	      crypt(foo/file1):	crypt(content)
+	      crypt(foo/file2):	crypt(content)
+	      crypt(bar/):	crypt(content)
+	      crypt(bar/file3):	crypt(content)
+	      crypt(bar/file4):	crypt(content)
+
+user3 (in group1)::
+
+	/
+	   blah/
+	      foo/
+	         file1:	content
+	         file2:	content
+	      bar/
+	         crypt(file3):	crypt(content)
+	         crypt(file4):	crypt(content)
+
+
+Filesystem structure
+--------------------
+
+Main goal
+~~~~~~~~~
+
+ * Synchronized tree
+   * Advantages
+     * Easy file lookup
+   * Inconvenient
+     * Merge
+ * Distributed tree
+   * Advantages
+     * No merge
+   * Inconvenient
+     * Hard file lookup
+
+
+
+FUSE functions handling
+-----------------------
+
+Mkdir handling
+~~~~~~~~~~~~~~
+
+chmod handling
+~~~~~~~~~~~~~~
+
+chown handling
+~~~~~~~~~~~~~~
+
+create handling
+~~~~~~~~~~~~~~~
+
+flush handling
+~~~~~~~~~~~~~~
+
+getattr handling
+~~~~~~~~~~~~~~~~
+
+mkdir handling
+~~~~~~~~~~~~~~
+
+chmod handling
+~~~~~~~~~~~~~~
+
+readdir handling
+~~~~~~~~~~~~~~~~
+
+rmdir handling
+~~~~~~~~~~~~~~
+
+unlink handling
+~~~~~~~~~~~~~~~
+
+utimens handling
+~~~~~~~~~~~~~~~~
+
+File handling
+-------------
+
+0 /  rw-rw-rw- all all
+1	blah/ rw-rw---- user1 group1
+2		foo/  rw-r----- user1 group1
+3			file1 ''
+4			file2 ''
+8			file3 ''
+5		bar/  rw------- user1 group1
+6			file3 ''
+7			file4 ''
+
+
+chaque user gère les fichiers vérifiant:
+ * no_fichier % nbr_user_sur_le_reseau == user_id % nbr_user_sur_le_reseau
+ * no_fichier % nbr_user_sur_le_reseau == (user_id + 1) % nbr_user_sur_le_reseau
+
+nbr_user_du_reseau = 3
+user1: 02542/3: 1 2 4 5 7 8 10 11 13 14 16 17 19
+user2: 14838/3: 1 3 4 6 7 9 10 12 13 15 16 18 19
+user3: 31676/3: 2 3 5 6 8 9 11 12 14 15 17 18
+
+Accès au fichiers:
+~~~~~~~~~~~~~~~~~~
+
+#user3 veux accéder au fichier 4 (/blah/foo/file2):
+#- 0 contient l'info blah <-> 1						/blah/
+#- avec la supeer formule, on arrive à determiner que user1 et user2 	/blah/
+#  possèdent les infos sur le contenu de 1
+#- user3 demande à user1 ou user2 le contenu de 1			/blah/foo/
+#- user3 connait le contenu de 2 et donc sait que file2 <-> 4
+
+Connexion d'un peer:
+~~~~~~~~~~~~~~~~~~~~
+
+user1: 02542/4: 2 3 6 7 10 11 14 15 18 19
+user2: 14838/4: 2 3 6 7 10 11 14 15 18 19
+user3: 31676/4: 1 4 5 8 9  12 13 16 17
+user4: 23784/4: 1 4 5 8 9  12 13 16 17
+
+#user1 abandonne: 1, 		récupère: 3
+#user2 abandonne: 4, 6		récupère: 1, 5
+#user3 abandonne: 3, 5, 7	récupère: 2
+#
+#- user1 envoie 1 et 5 à user2
+#- user2 envoie 2 à user3
+#- user3 envoie 0,2,4,6 à user4
+#- user3 envoie 3 à user1
+#- user4 envoie ses modifs sur 3 à user1 ou user2 <--- en cas de modif en local sur user4
+#
+#(7 gestions de fichiers tournent sur le réseau:
+#		max de 2 pour les peers présents
+#		4 pour le nouveau peer)
+
+Déconnexion d'un peer:
+~~~~~~~~~~~~~~~~~~~~~~
+
+user1 02542/4: 2 3 6 7 10 11 14 15 18 19
+user2 14838/4: 2 3 6 7 10 11 14 15 18 19
+user4 23784/4: 1 4 5 8 9  12 13 16 17
+
+Création d'un fichier:
+~~~~~~~~~~~~~~~~~~~~~~
+
+user1 02542/4: 2 3 6 7 (10 11 14 15 18 19)
+user2 14838/4: 2 3 6 7 (10 11 14 15 18 19)
+user3 31676/4: 1 4 5 8*(9  12 13 16 17)
+user4 23784/4: 1 4 5 8*(9  12 13 16 17)
+
+0 /  rw-rw-rw- all all
+1	blah/ rw-rw---- user1 group1
+2		foo/  rw-r----- user1 group1
+8			file3 ''
+
+user4 veut créer file3:
+- user4 trouve que user1 et user2 sont responsable de /blah/foo/
+- user4 lock le dossier 2
+- user4 cherche un numéro de fichier dispo dans la liste qu'il gère -> il choisit 8
+- user4 lock 8 sur user3 et lui-même
+- user4 crée le fichier 8 dans le rep 2
+
+Gestion des locks:
+~~~~~~~~~~~~~~~~~~
+
+user1 veut lock le fichier A pour y effectuer l'opération de X. user2 et user3 sont responsable de A:
+
+1) user1 demande un lock sur A à user2
+2) user2 répond qu'il accepte le lock (c'est locké par personne d'autre selon lui)
+3) user1 demande un lock sur A à user3
+4) user3 répond qu'il accepte le lock (c'est locké par personne d'autre selon lui)
+5) user1 envoie la création de fichier à user2
+6) user2 réponds qu'il est content
+7) user1 envoie la création de fichier à user3
+8) user3 réponds qu'il est content
+9) user1 envoie à user2 et user3 qu'il relache le lock sur A
+
+En cas de refus aux opérations 2) ou 4):
+- user1 annule le lock là où il a été accepté
+- user1 attend n secondes avant de recommencer
+- n = n * 2 à chaque nouvelle tentative
+
+Protocole de connexion
+----------------------
+
+Réseau 1             Réseau 2
+A-----.          .------E-------G
+      |          |
+      |--C    D--|
+      |          |
+B-----'          '------F
+
+C initie la connexion à D.
+
+- C envoie son certificat à D et inversement,
+  chacun a connaissance de la clef publique et de l'ID
+u de l'autre
+- C -> D : NET_HELLO <localtime> <port> <flags> <versions>
+- D -> C : NET_HELLO <localtmie> <port> <flags> <version>
+- C -> D : NET_START_MERGE
+- D -> C : NET_PEER_LIST [<peer1> [<peer2> ..]]
+
+	<peer> is: <parent(ID)> <p2pfs_addr> <certificate>
+
+	   NET_PEER_LIST {E} {F} {G}
+
+C propage à A et B:
+- C -> A : NET_PEER_LIST {D} {E} {F} {G}
+- C -> B : NET_PEER_LIST {D} {E} {F} {G}
+
+Le merge C <-> D continue:
+- C -> D : NET_PEER_LIST {A} {B}
+- D -> E : NET_PEER_LIST {A} {B} {C}
+- E -> G : NET_PEER_LIST {A} {B} {C}
+- D -> F : NET_PEER_LIST {A} {B} {C}
+
+Réseau 1             Réseau 2
+A-----.          .------E-------G
+      |          |
+      |--C××××D--|
+      |          |
+B-----'          '------F
+
+Le nombre de users sur le réseau a changé, chaque peer est responsable de nouveaux fichiers.
+
++---+---+---+---+---+---+---+-----------------+---+---+---+---+---+---+---+
+|   | 1 | 2 | 3 | 4 | 5 | 6 |      DIFF       | 1 | 2 | 3 | 4 | 5 | 6 |   |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| A | 1 | 2 |   | 3 | 1 |   | -2 5   |        | X | - |   | X!| - |   | A |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| B | 1 |   | 1 | 3 |   | 1 | -3 4 6 | + 5    | X |   | - | - |+X | - | B |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| C |   | 2 | 1 |   | 1 | 1 | -3 6   |        |   | X!| - |   | X | - | C |
++===+===+===+===+===+===+===+========+========+===+===+===+===+===+===+===+
+| D | 1 |   | 1 |   | 3 |   | -1 3 5 | +2 6   | - |+X!| - |   | - |+X | D |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| E | 1 |   | 1 |   | 3 |   | -1 5   | +6     | - |   | X |   | - |+X | E |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| F |   | 3 |   | 2 |   | 1 | -2 4 6 | +3     |   | - |+X | - |   | - | F |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+| G |   | 3 |   | 2 |   | 1 | -2 6   |        |   | - |   | X!|   | - | G |
++---+---+---+---+---+---+---+--------+--------+---+---+---+---+---+---+---+
+
+Plusieurs ca se présentent:
+1) B doit gérer file5 qu'il ne possédait pas précédement. file1 en est à la même version des 2 côtés du réseau. A, C, D, E possédaient le fichier, et seul C le garde
+2) A doit gérer file4 qu'il possédait précedement. file4 était aussi géré par *G*, leurs versions sont différentes
+3) D doit gérer file2 qu'il ne possédait pas précedement. file2 était précédement géré par *A*, *F* et *G*, leurs versions sont différentes
+
+Merge:
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Tout le monde a reçu la liste des peers, actualisé sa liste de fichiers gérés, et va maintenant demander l'échange des informations                                                               |
++---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+|            A              |            B              |            C              |            D              |            E              |            F              |            G              |
++---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+| Fichier1 sans changement  | Fichier1 sans changement  |                           | Perte fichier 1           | Perte fichier 1           |                           |                           |
+|                           |                           |                           | - j'envoie à A et B       | - j'envoie à A et B       |                           |                           |
+| Perte du fichier 2        |                           | Arrivant fichier 2        | Gain fichier 2            |                           | Perte fichier 2           | Perte fichier 2           |
+| - C était synch sur le    |                           | - j'envoie le fichier à D | - j'attends les infos     |                           | - j'envoie à C et D       | - j'envoie à C et D       |
+|   fichier avec moi avant. |                           |                           |                           |                           |                           |                           |
+| - j'envoie le fichier à D |                           |                           |                           |                           |                           |                           |
+|                           | Perte fichier 3           | Perte fichier 3           | Perte fichier 3           | Arrivant fichier 3        | Gain fichier 3            |                           |
+|                           | - j'envoie à E et F       | - j'envoie à E et F       | - j'envoie le fichier à F | - j'envoie le fichier à F | - attente des infos       |                           |
+| Arrivant fichier 4        | Perte du fichier 4        |                           |                           |                           | Perte du fichier 4        | Arrivant fichier 4        |
+| - j'envoie le fichier à G | - j'envoie le fichier à G |                           |                           |                           | - envoie des infos à A    | - envoie des infos à A    |
+| Perte du fichier 5        | Gain du fichier 5         | Arrivant fichier 5        | Perte fichier 5           | Perte fichier 5           |                           |                           |
+| - C était synch sur le    | - j'attends les infos     | - j'envoie à B            | - j'envoie à B et C       | - j'envoie à B et C       |                           |                           |
+|   fichier avec moi avant. |                           |                           |                           |                           |                           |                           |
+| - j'envoie le fichier à B |                           |                           |                           |                           |                           |                           |
+|                           | Perte du fichier 6        | Perte fichier 6           | Gain fichier 6            | Gain fichier 6            | Perte fichier 6           | Perte fichier 6           |
+|                           | - j'envoie à D et E       | - j'envoie à D et E       | - attente des infos       | - attente des infos       | - envoie à D et E         | - envoie à D et E         |
++---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+| D> FILE 1 (v1)            | D> FILE 1 (v1)            | F> FILE 2 (v3)            | A> FILE 2 (v2)            | B> FILE 3 (v1)            | B> FILE 3 (v1)            | A> FILE 4 (v3)            |
+|    même version que moi,  |    même version que moi,  |    version plus récente,  |    j'avais pas le fichier |    même version que moi,  |    j'avais pas le fichier |    version plus récente   |
+|    on ne fait rien        |    on ne fait rien        |    je mets à jour         |    je mets à jour         |    on ne fait rien        |    je mets à jour         |    je mets à jour         |
+|!E> FILE 1 (v1)            |!E> FILE 1 (v1)            |!G> FILE 2 (v3)            |!C> FILE 2 (v2)            |!C> FILE 3 (v1)            |!C> FILE 3 (v1)            |!B> FILE 4 (v3)            |
+|    même version que moi,  |    même version que moi,  |    même version que moi,  |    même version que moi   |    même version que moi,  |    même version que moi   |    même version que moi   |
+|    on ne fait rien        |    on ne fait rien        |    on ne fait rien        |    on ne fait rien        |    on ne fait rien        |!D> FILE 3 (v1)            |                           |
+| F> FILE 4 (v2)            | A> FILE5 5 (v1)           | D> FILE 5 (v3)            | F> FILE 2 (v3)            | B> FILE 6 (v1)            |    même version que moi   |                           |
+|    version antérieure,    |    j'avais pas le fichier |    version plus récente,  |    version plus récente,  |    j'avais pas le fichier |!E> FILE 3 (v1)            |                           |
+|    on ne fait rien        |    je le rajoute          |    on met à jour          |    je mets à jour         |    je mets à jour         |    même version que moi   |                           |
+|!G> FILE 4 (v2)            |!C> FILE 5 (v1)            |!E> FILE 5 (v3)            |!G> FILE 2 (v3)            |!C> FILE 6 (v1)            |                           |                           |
+[    version antérieure,    |    même version que moi,  |    même version que moi,  |    même version que moi   |    même version           |                           |                           |
+|    on ne fait rien        |    on ne fait rien        |    on ne fait rien        |    on ne fait rien        |!F> FILE 6 (v1)            |                           |                           |
+|                           | D> FILE 5 (v3)            |                           | B> FILE 6 (v1)            |    même version           |                           |                           |
+|                           |    version plus récente,  |                           |    j'avais pas le fichier |!G> FILE 6 (v1)            |                           |                           |
+|                           |    je mets à jour         |                           |    je mets à jour         |    même version           |                           |                           |
+|                           |!E> FILE 5 (v3)            |                           |!C> FILE 6 (v1)            |                           |                           |                           |
+|                           |    même version que moi,  |                           |    j'avais pas le fichier |                           |                           |                           |
+|                           |    on ne fait rien        |                           |    je mets à jour         |                           |                           |                           |
+|                           |                           |                           |!F> FILE 6 (v1)            |                           |                           |                           |
+|                           |                           |                           |    j'avais pas le fichier |                           |                           |                           |
+|                           |                           |                           |    je mets à jour         |                           |                           |                           |
+|                           |                           |                           |!G> FILE 6 (v1)            |                           |                           |                           |
+|                           |                           |                           |    j'avais pas le fichier |                           |                           |                           |
+|                           |                           |                           |    je mets à jour         |                           |                           |                           |
++---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+---------------------------+
+
+Il y a actuellement une vingtaine de messages inutiles (marqués d'un !).
