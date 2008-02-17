@@ -150,11 +150,20 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	{
 		SetFlag(MERGING);
 
-		/* If I'm server, I tell client that merge is starting... He can give
-		 * me all of his links.
-		 */
 		if(IsClient())
+		{
+
+			/* If I'm server, I tell client that merge is starting... He can give
+			 * me all of his links.
+			 */
 			SendMsg(Packet(NET_START_MERGE, net.GetMyID(), GetID()));
+
+			/* Step 1: I send all of my links */
+			log[W_DEBUG] << "Starting merge with " << this;
+
+			Send_net_peer_list(net.GetDirectHighLinks());
+			SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
+		}
 
 		/* Tell to all of my other links that this peer is connected. */
 		Packet pckt(NET_PEER_CONNECTION, net.GetMyID(), 0);
@@ -177,6 +186,9 @@ void Peer::Handle_net_start_merge(struct Packet* pckt)
 	/* Step 2: client sends all of his links.
 	 * Note: this is a broadcast to this part of network (new part).
 	 */
+
+	log[W_DEBUG] << "Starting merge with " << this;
+
 	Send_net_peer_list(net.GetDirectHighLinks());
 
 	SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
@@ -186,26 +198,14 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 {
 	if(HasFlag(MERGING))
 	{
-		if(IsClient())
-		{
-			/* Step 3: I send all of my own links */
-
-			Send_net_peer_list(net.GetDirectHighLinks());
-			SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
-		}
-		else
-		{
-			SetFlag(MERGING_ACK);
-			SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), GetID()));
-		}
-
-		DelFlag(MERGING);
+		SetFlag(MERGING_ACK);
+		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), GetID()));
 	}
 }
 
 void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 {
-	DelFlag(MERGING);
+	DelFlag(MERGING_ACK);
 }
 
 /** NET_PEER_CONNECTION

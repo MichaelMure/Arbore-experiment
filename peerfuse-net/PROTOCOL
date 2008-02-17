@@ -96,46 +96,76 @@ Messages
 Connection
 ----------
 
-	Client - HELLO <local time> <listening port> <version>
+	A---.           .---E
+	    |--C ==> D--|
+	B---'           '---F
 
-		Annonce de la connexion du client, un identifiant
-		(nul), le numero de version, et l'heure locale pour
-		les synchronisations.
+	C -> D - HELLO <local time> <flags> <listening port> <version>
 
-	Server - HELLO <local time> <listening port> <version>
+		Send informations about me...
 
-		Le serveur donne son heure locale et attribue éventuellement
-		un identifiant au client.
+		Here "flags" has the "HIGHLINK" flag set to 1.
 
-	Server - START_MERGE
+		* D sets flag MERGING
 
-		Annonce qu'on entre dans un merge. Passage de l'etat du link à HIGHLINK
+	D -> (E,F) - PEER_CONNECTION {C}
 
-	Server - PEER_CONNECTION <peers>
+		D tells to his links the C connection.
 
-		Le serveur annonce ses propres peers en premier.
-		Pour chaque peer, tout d'abord le client vérifie qu'il n'y a pas
-		conflit avec un peer local. Si tel est le cas, Client envoie au peer
-		qui se trouve de son coté, un CHANGE_YOUR_ID <id>.
-		Ensuite, il tente de s'y connecter.
+	D -> C - HELLO <local time> <flags> <listening port> <version>
 
-		Enfin, il broadcast la liste des peers.
+		D sends his own hello message, with own caracteristics.
 
-	Server - END_OF_MERGE
+		* C sets flag MERGING
 
-	Client - PEER_CONNECTION <peers>
+	D -> C - START_MERGE
 
-		Le client annonce ses peers.
+		We start a merge. D asks C to begin merge.
 
-		Le message est facultatif dans le cas où le client est seul.
+	C -> D - PEER_CONNECTION <pf_addr> <certificate>
 
-	Client - END_OF_MERGE
+		For each peer (A and B), C will send a PEER_CONNECTION message.
 
-		Le client envoie lui même ses modifications entre temps.
-		Il ne commit bien sur que ce qui a un timestamp supérieur à
-		celui des fichiers mis à jours par le GET_STRUCT_DIFF.
+		Note that the sender (srcid) in header of packet, is the uplink
+		of this peer.
 
-	Server - END_OF_MERGE_ACK
+		pf_addr is the hostname, port and ID of peer.
 
-		Le serveur annonce que c'est bien fini.
+	D -> (E,F) - PEER_CONNECTION <pf_addr> <certificate>
+
+		D broadcast peer_connection
+
+	C -> D - END_OF_MERGE
+
+		End of his merge, ask D to send his own links.
+
+		* D clears MERGING flag
+		* D sets MERGING_ACK flag
+
+	D -> C - PEER_CONNECTION <pf_addr> <certificate>
+
+		Likewise for D connections.
+
+	C -> (A,B) - PEER_CONNECTION <pf_addr> <certificate>
+
+		Broadcast
+
+	D -> C - END_OF_MERGE
+
+		End of his merge.
+
+		* C clears flag MERGING
+		* C sets flag MERGING_ACK
+
+	C -> D - END_OF_MERGE_ACK
+
+		Acknowledge
+
+		* D clears flag MERGING_ACK
+
+	D -> C - END_OF_MERGE_ACK
+
+		Likewise
+
+		* C clears flag MERGING_ACK
 

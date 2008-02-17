@@ -98,6 +98,7 @@ public:
 
 	bool IsServer() const { return (flags & SERVER); }
 	bool IsClient() const { return !(flags & SERVER); }
+	bool IsAnonymous() const { return (flags & ANONYMOUS); }
 
 	bool IsDirectLink() const { return !uplink; }
 
