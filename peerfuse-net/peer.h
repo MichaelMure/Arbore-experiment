@@ -22,6 +22,7 @@
 
 #include "pf_types.h"
 #include "packet.h"
+#include "ssl/certificate.h"
 #include <queue>
 
 class FileEntry;
@@ -36,6 +37,8 @@ class Peer
 	int ts_diff; // diff between our timestamp and its timestamp */
 	Packet* incoming; // packet we are receiving
 	std::queue<Packet> send_queue; // packets we are sending (with flush)
+
+	Certificate cert;
 
 	/* Network is representer for me like this:
 	 *  me
@@ -70,10 +73,11 @@ public:
 
 	enum
 	{
-		SERVER     = 1 << 0,    /**< This peer is a server */
-		HIGHLINK   = 1 << 1,    /**< This peer is a highlink */
-		MERGING    = 1 << 2,    /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
-		ANONYMOUS  = 1 << 3,    /**< We don't know this peer (between connection and HELLO) */
+		SERVER      = 1 << 0,    /**< This peer is a server */
+		HIGHLINK    = 1 << 1,    /**< This peer is a highlink */
+		MERGING     = 1 << 2,    /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
+		MERGING_ACK = 1 << 3,    /**< We are waiting for an ACK */
+		ANONYMOUS   = 1 << 4,    /**< We don't know this peer (between connection and HELLO) */
 	};
 
 	/* Constructors */
@@ -83,6 +87,8 @@ public:
 	id_t GetID() const { return addr.id; }
 	int GetFd() const { return fd; }
 	pf_addr GetAddr() const { return addr; }
+
+	Certificate GetCertificate() const { return cert; }
 
 	time_t Timestamp(time_t ts) { return ts_diff + ts; }
 

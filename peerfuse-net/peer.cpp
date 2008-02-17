@@ -100,6 +100,7 @@ void Peer::Send_net_peer_list(PeerList peers)
 
 		id_t id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
 
+		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
@@ -131,43 +132,36 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		throw MustDisconnect();
 	}
 
-	/* Set timestamp diff between this peer and me. */
-	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
-
-	/* What is port listened by peer */
-	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
-
 	/* Flags */
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
-	/* TODO: we'll know ID with certificate, when connection is SSL. */
-	addr.id = pckt->GetSrcID();
+	addr.id = pckt->GetSrcID(); /* TODO: we'll know ID with certificate, when connection is SSL. */
+	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
+	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
-	/* Nous sommes maintenant intimes */
 	DelFlag(ANONYMOUS);
 
-	if(IsServer())
-	{
-		/* CLIENT SIDE */
-
-		/* If this is a highlink, I'm waiting for merge */
-		if(IsHighLink())
-			SetFlag(MERGING);
-	}
-	else
-	{
-		/* SERVER SIDE */
-
-		/* TODO: check if ID is already used */
-
+	/* If this is a client, we answer an HELLO message. */
+	if(IsClient())
 		SendHello();
 
-		if(IsHighLink())
-		{
-			SetFlag(MERGING);
-			net.Broadcast(Packet(NET_START_MERGE, net.GetMyID(), 0));
-		}
+	if(IsHighLink())
+	{
+		SetFlag(MERGING);
+
+		/* If I'm server, I tell client that merge is starting... He can give
+		 * me all of his links.
+		 */
+		if(IsClient())
+			SendMsg(Packet(NET_START_MERGE, net.GetMyID(), GetID()));
+
+		/* Tell to all of my other links that this peer is connected. */
+		Packet pckt(NET_PEER_CONNECTION, net.GetMyID(), 0);
+		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
+
+		net.Broadcast(pckt, this); /* Don't send to this peer a creation message about him! */
 	}
 
 	/* Change dst ID of packet to NOT broadcast it. */
@@ -176,27 +170,36 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 void Peer::Handle_net_start_merge(struct Packet* pckt)
 {
-	SetFlag(MERGING);
+	/* This peer is directly connected to me, so I
+	 * think this is me who merge with him.
+	 */
 
-	if(IsDirectLink())
-	{
-		/* This peer is directly connected to me, so I
-		 * think this is me who merge with him.
-		 */
+	/* Step 2: client sends all of his links.
+	 * Note: this is a broadcast to this part of network (new part).
+	 */
+	Send_net_peer_list(net.GetDirectHighLinks());
 
-		Send_net_peer_list(net.GetDirectHighLinks());
-
-		SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
-	}
+	SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
 {
-	DelFlag(MERGING);
-	if(IsClient())
+	if(HasFlag(MERGING))
 	{
-		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), this->GetID()));
-		session_cfg.Set("last_view", time(NULL));
+		if(IsClient())
+		{
+			/* Step 3: I send all of my own links */
+
+			Send_net_peer_list(net.GetDirectHighLinks());
+			SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
+		}
+		else
+		{
+			SetFlag(MERGING_ACK);
+			SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), GetID()));
+		}
+
+		DelFlag(MERGING);
 	}
 }
 
@@ -205,54 +208,37 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 	DelFlag(MERGING);
 }
 
+/** NET_PEER_CONNECTION
+ *
+ * NET_PEER_CONNECTION_ADDRESS
+ * NET_PEER_CONNECTION_CERTIFICATE
+ */
 void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
-#if 0
-	AddrList my_addr_list;
-	PeerList peers = net.GetPeerList();
+	Certificate cert;
 
-	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
-		if(*it != this)
-			my_addr_list.push_back((*it)->GetAddr());
+	Peer* already_connected = net.ID2Peer(addr.id);
 
-	for(AddrList::iterator it = addr_list.begin(); it != addr_list.end(); ++it)
+	if(already_connected)
 	{
-		Peer* already_peer = net.ID2Peer(it->id);
-		if(already_peer)
-		{
-			log[W_WARNING] << it->id << " already used! Ask him to change it!";
-			Packet change_id_pckt(NET_CHANGE_YOUR_ID, net.GetMyID(), already_peer->GetID());
-			change_id_pckt.SetArg(NET_CHANGE_YOUR_ID_ID, net.CreateID());
-			already_peer->SendMsg(change_id_pckt);
-			it->id = change_id_pckt.GetArg<uint32_t>(NET_CHANGE_YOUR_ID);
-			/* TODO: check and complete */
-		}
-
-		try
-		{
-			net.Connect(*it);
-		}
-		catch(Network::CantConnectTo &e)
-		{
-			/* TODO: do something (or not) */
-			net.AddPeer(new Peer(-1, *it));
-		}
+		if(cert == already_connected->GetCertificate())
+			return; /* I'm already connected to him. */
+		else
+			return; /* TODO: this is an other peer with same ID !? DO SOMETHING! */
 	}
 
-	if(HasFlag(MERGING))
+	try
 	{
-		if(IsServer())
-		{
-			SendMsg(Packet(NET_PEER_CONNECTION, net.GetMyID(), 0).SetArg(NET_PEER_CONNECTION_ADDRESSES, my_addr_list));
+		Peer* p = net.Connect(addr);
 
-			Send_net_get_struct_diff();
-		}
-		addr_list.push_back(this->GetAddr());
-		msg->SetSrcID(net.GetMyID());
-		msg->SetArg(NET_PEER_CONNECTION_ADDRESSES, addr_list);
+		p->SendHello();
+
 	}
-#endif
+	catch(Network::CantConnectTo &e)
+	{
+		net.AddPeer(new Peer(-1, addr));
+	}
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
