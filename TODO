@@ -16,10 +16,6 @@
 
 == Peerfuse NET ==
 
-* Implement invitation system
-
-* Usage of an UUID to prevent multi ids
-
 == Peerfuse LAN ==
 
 * Remove IDs usage in cache.cpp and peer.cpp

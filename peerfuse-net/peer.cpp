@@ -182,6 +182,9 @@ void Peer::Handle_net_start_merge(struct Packet* pckt)
 	/* This peer is directly connected to me, so I
 	 * think this is me who merge with him.
 	 */
+	assert(IsServer());
+	assert(HasFlag(MERGING));
+	assert(IsDirectLink());
 
 	/* Step 2: client sends all of his links.
 	 * Note: this is a broadcast to this part of network (new part).
