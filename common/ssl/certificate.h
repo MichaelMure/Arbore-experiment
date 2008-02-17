@@ -21,6 +21,9 @@
 #define PF_CERTIFICATE_H
 #include <exception>
 
+#include "public_key.h"
+#include "private_key.h"
+
 class Certificate
 {
 	int fd;
@@ -29,7 +32,7 @@ public:
 	class BadCertificate : public std::exception {};
 	class BadPassword : public std::exception {};
 
-	Certificate();
+	Certificate() {}
 
 	void LoadX509(std::string filename, std::string password="");
 	PrivateKey LoadPKCS12(std::string filename, std::string password);
@@ -38,6 +41,9 @@ public:
 
 	const std::string GetCertificateInfos();
 	const std::string GetIDFromCertificate();
+
+	bool operator==(const Certificate&) { return true; }
+
 };
 
 #endif // PF_CERTIFICATE_H
