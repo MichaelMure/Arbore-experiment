@@ -46,7 +46,7 @@ public:
 	void SetPrivateKey(PrivateKey _key) { key = _key; }
 
 	void HandShake(int fd);
-	std::list<Connection*> Select();
+	ConnectionSsl* GetConnection(int fd);
 
 	void Connect(std::string host, uint16_t port);
 	void Close(Connection* conn);

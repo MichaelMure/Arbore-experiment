@@ -46,5 +46,6 @@ int main(int argc, char* argv[])
 	close (listen_fd);
 
 	ssl.HandShake(cli_fd);
+	ConnectionSsl* conn = ssl.GetConnection(cli_fd);
 }
 

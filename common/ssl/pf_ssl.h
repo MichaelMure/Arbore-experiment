@@ -20,19 +20,21 @@
 #ifndef PF_SSL_H
 #define PF_SSL_H
 
-#include <list>
+#include <map>
 #include <exception>
 #include "connection.h"
 
 class Ssl
 {
+protected:
+	std::map<int, Connection*> fd_map;
 public:
 	class ConnectionError : public std::exception {};
 
 	Ssl() {}
 	virtual ~Ssl() {} /* Needed for abstract classes */
 
-	virtual std::list<Connection*> Select() = 0;
+	Connection* GetConnection(int fd);
 
 	virtual void Connect(std::string host, uint16_t port) = 0;
 	virtual void Close(Connection* conn) = 0;

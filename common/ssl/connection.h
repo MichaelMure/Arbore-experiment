@@ -28,7 +28,7 @@ class Connection
 public:
 	class ConnectionError : public std::exception {};
 
-	Connection(int _fd);
+	Connection(int _fd) : fd(_fd) {}
 
 	virtual void Write(const char* buf, size_t size) = 0;
 	virtual void Read(char** buf, size_t* size) = 0;

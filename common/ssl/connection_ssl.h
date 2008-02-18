@@ -21,19 +21,20 @@
 #define PF_CONNECTION_SSL_H
 
 #include <exception>
+#include "connection.h"
 
-class ConnectionSsl
+class ConnectionSsl : public Connection
 {
-	int fd;
+	SSL* ssl;
 public:
 	class ConnectionError : public std::exception {};
 
-	ConnectionSsl(int _fd);
+	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
 
-	void Write(const char* buf, size_t size);
-	void Read(char** buf, size_t* size);
+	void Write(const char* buf, size_t size) {}
+	void Read(char** buf, size_t* size) {}
 
-	Certificate GetCertificate();
+	//Certificate GetCertificate();
 };
 
 #endif // PF_CONNECTION_SSL_H

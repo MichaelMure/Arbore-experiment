@@ -49,10 +49,6 @@ SslSsl::~SslSsl()
 {
 }
 
-std::list<Connection*> SslSsl::Select()
-{
-}
-
 void SslSsl::HandShake(int fd)
 {
 	// TODO: check errors
@@ -60,10 +56,22 @@ void SslSsl::HandShake(int fd)
 	SSL_set_fd(ssl, fd);
 	SSL_accept(ssl);
 
+	fd_map[fd] = new ConnectionSsl(ssl, fd);
 //	X509* client_cert = SSL_get_peer_certificate (ssl);
 //	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
 //	printf ("\t subject: %s\n", str);
 //	OPENSSL_free (str);
+}
+
+ConnectionSsl* SslSsl::GetConnection(int fd)
+{
+	std::map<int, Connection*>::iterator c;
+	c = fd_map.find(fd);
+
+	if(c == fd_map.end())
+		return NULL;
+
+	return static_cast<ConnectionSsl*>(c->second);
 }
 
 void SslSsl::Connect(std::string host, uint16_t port)
