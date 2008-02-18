@@ -32,22 +32,20 @@ class SslSsl : public Ssl
 	// Context: holds default SSL values to use
 	SSL_CTX* ssl_ctx;
 
-	int fd;
-
 	Certificate cert;
 	Certificate cacert;
 	PrivateKey key;
 public:
 	class ConnectionError : public std::exception {};
 
-	SslSsl(int _fd);
+	SslSsl();
 	~SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }
 	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
 	void SetPrivateKey(PrivateKey _key) { key = _key; }
 
-	void Bind(std::string interface, uint16_t port);
+	void HandShake(int fd);
 	std::list<Connection*> Select();
 
 	void Connect(std::string host, uint16_t port);

@@ -1,0 +1,2 @@
+#!/bin/bash
+openssl s_client -showcerts -host localhost -port 8000 -key server-key.pem -cert server-cert.pem

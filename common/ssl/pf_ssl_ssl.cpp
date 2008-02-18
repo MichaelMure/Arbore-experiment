@@ -21,11 +21,12 @@
 #include <list>
 #include <exception>
 #include <openssl/ssl.h>
+#include <openssl/x509.h>
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl(int _fd) : Ssl(_fd)
+SslSsl::SslSsl()
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -48,12 +49,21 @@ SslSsl::~SslSsl()
 {
 }
 
-void SslSsl::Bind(std::string interface, uint16_t port)
+std::list<Connection*> SslSsl::Select()
 {
 }
 
-std::list<Connection*> SslSsl::Select()
+void SslSsl::HandShake(int fd)
 {
+	// TODO: check errors
+	SSL* ssl = SSL_new(ssl_ctx);
+	SSL_set_fd(ssl, fd);
+	SSL_accept(ssl);
+
+//	X509* client_cert = SSL_get_peer_certificate (ssl);
+//	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
+//	printf ("\t subject: %s\n", str);
+//	OPENSSL_free (str);
 }
 
 void SslSsl::Connect(std::string host, uint16_t port)
