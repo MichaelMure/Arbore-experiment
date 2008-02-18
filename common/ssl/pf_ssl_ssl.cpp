@@ -17,24 +17,38 @@
  * $Id$
  */
 
-#ifndef PF_PUBLIC_KEY_H
-#define PF_PUBLIC_KEY_H
+#include <list>
 #include <exception>
-#include <string>
+#include "pf_ssl_ssl.h"
+#include "certificate.h"
+#include "connection_ssl.h"
 
-class PublicKey
+SslSsl::SslSsl()
 {
+}
 
-public:
-	class BadPublicKey : public std::exception {};
+SslSsl::~SslSsl()
+{
+}
 
-	PublicKey();
+void SslSsl::Bind(std::string interface, uint16_t port)
+{
+}
 
-	void LoadPem(std::string filename);
-	void LoadBuf(const char* buf, size_t size);
+std::list<Connection*> SslSsl::Select()
+{
+}
 
-	void Crypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
-	bool CheckSignature(const char* buf, size_t but_size, const char* signature, size_t crypt_size);
-};
+void SslSsl::Connect(std::string host, uint16_t port)
+{
+}
 
-#endif // PF_PUBLIC_KEY_H
+void SslSsl::Close(Connection* conn)
+{
+}
+
+void SslSsl::CloseAll()
+{
+}
+
+

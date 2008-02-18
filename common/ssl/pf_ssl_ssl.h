@@ -22,28 +22,32 @@
 
 #include <list>
 #include <exception>
+#include "pf_ssl.h"
+#include "certificate.h"
+#include "connection_ssl.h"
 
-class SslSsl
+class SslSsl : public Ssl
 {
 	int fd;
 
 	Certificate cert;
-	Certificate ca_cert;
+	Certificate cacert;
 	PrivateKey key;
 public:
 	class ConnectionError : public std::exception {};
 
 	SslSsl();
+	~SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }
 	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
 	void SetPrivateKey(PrivateKey _key) { key = _key; }
 
 	void Bind(std::string interface, uint16_t port);
-	std::list<SslConnection*> Select();
+	std::list<Connection*> Select();
 
 	void Connect(std::string host, uint16_t port);
-	void Close(SslConnection* conn);
+	void Close(Connection* conn);
 	void CloseAll();
 };
 

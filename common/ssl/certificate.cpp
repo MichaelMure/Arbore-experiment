@@ -17,24 +17,8 @@
  * $Id$
  */
 
-#ifndef PF_PUBLIC_KEY_H
-#define PF_PUBLIC_KEY_H
-#include <exception>
-#include <string>
+#include "certificate.h"
 
-class PublicKey
+Certificate::Certificate()
 {
-
-public:
-	class BadPublicKey : public std::exception {};
-
-	PublicKey();
-
-	void LoadPem(std::string filename);
-	void LoadBuf(const char* buf, size_t size);
-
-	void Crypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
-	bool CheckSignature(const char* buf, size_t but_size, const char* signature, size_t crypt_size);
-};
-
-#endif // PF_PUBLIC_KEY_H
+}

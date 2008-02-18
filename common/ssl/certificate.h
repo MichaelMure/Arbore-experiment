@@ -32,9 +32,9 @@ public:
 	class BadCertificate : public std::exception {};
 	class BadPassword : public std::exception {};
 
-	Certificate() {}
+	Certificate();
 
-	void LoadX509(std::string filename, std::string password="");
+	void LoadX509(std::string filename, std::string password);
 	PrivateKey LoadPKCS12(std::string filename, std::string password);
 
 	PublicKey GetPublicKey();

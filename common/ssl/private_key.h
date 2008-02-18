@@ -20,6 +20,7 @@
 #ifndef PF_PRIVATE_KEY_H
 #define PF_PRIVATE_KEY_H
 #include <exception>
+#include <string>
 
 class PrivateKey
 {
@@ -30,7 +31,7 @@ public:
 
 	PrivateKey();
 
-	void LoadPem(std::string filename, std::string password="");
+	void LoadPem(std::string filename, std::string password);
 	void LoadBuf(const char* buf, size_t size);
 
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);

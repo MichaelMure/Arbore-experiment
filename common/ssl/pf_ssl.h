@@ -22,6 +22,7 @@
 
 #include <list>
 #include <exception>
+#include "connection.h"
 
 class Ssl
 {
