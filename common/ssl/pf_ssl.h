@@ -26,9 +26,11 @@
 
 class Ssl
 {
+	int fd;
 public:
 	class ConnectionError : public std::exception {};
 
+	Ssl(int _fd) { fd = _fd; }
 	virtual ~Ssl() {} /* Needed for abstract classes */
 
 	virtual void Bind(std::string interface, uint16_t port) = 0;

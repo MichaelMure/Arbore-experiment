@@ -17,14 +17,31 @@
  * $Id$
  */
 
+#include <stdio.h>
 #include <list>
 #include <exception>
+#include <openssl/ssl.h>
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl()
+SslSsl::SslSsl(int _fd) : Ssl(_fd)
 {
+	// TODO: handle return codes
+	SSL_load_error_strings();
+
+	SSLeay_add_ssl_algorithms();
+	SSL_METHOD* meth = SSLv23_server_method();
+	ssl_ctx = SSL_CTX_new(meth);
+
+	if(SSL_CTX_use_certificate_file(ssl_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_use_PrivateKey_file(ssl_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_check_private_key(ssl_ctx)	<= 0)
+	{
+		printf("Failed to initialize something\n");
+		exit(EXIT_FAILURE);
+	}
+
 }
 
 SslSsl::~SslSsl()

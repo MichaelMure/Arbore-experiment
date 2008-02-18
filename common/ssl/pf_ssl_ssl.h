@@ -22,12 +22,16 @@
 
 #include <list>
 #include <exception>
+#include <openssl/ssl.h>
 #include "pf_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
 
 class SslSsl : public Ssl
 {
+	// Context: holds default SSL values to use
+	SSL_CTX* ssl_ctx;
+
 	int fd;
 
 	Certificate cert;
@@ -36,7 +40,7 @@ class SslSsl : public Ssl
 public:
 	class ConnectionError : public std::exception {};
 
-	SslSsl();
+	SslSsl(int _fd);
 	~SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }
