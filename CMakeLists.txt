@@ -35,7 +35,8 @@ IF(PF_NET)
 		peerfuse-net/cache.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/net_proto.cpp
-		peerfuse-net/peer.cpp)
+		peerfuse-net/peer.cpp
+		common/ssl/certificate.cpp)
 	SET(BIN_NAME peerfuse-net)
 ELSE(PF_NET)
 	SET(SRC ${SRC}
