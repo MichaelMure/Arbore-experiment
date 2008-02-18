@@ -17,21 +17,21 @@
  * $Id$
  */
 
-#ifndef PF_SSL_NO_SSL_H
-#define PF_SSL_NO_SSL_H
+#ifndef PF_SSL_NOSSL_H
+#define PF_SSL_NOSSL_H
 
 #include <list>
 #include <exception>
-#include "pf_ssl_layer.h"
+#include "pf_ssl.h"
 
-class SslNoSsl : public SslLayer
+class SslNoSsl : public Ssl
 {
 	int fd;
 
 public:
 	class ConnectionError : public std::exception {};
 
-	SsliNoSsl();
+	SslNoSsl();
 
 	void Bind(std::string interface, uint16_t port);
 	std::list<SslConnection*> Select();
@@ -41,4 +41,4 @@ public:
 	void CloseAll();
 };
 
-#endif // PF_SSL_NO_SSL_H
+#endif // PF_SSL_NOSSL_H

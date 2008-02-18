@@ -17,13 +17,13 @@
  * $Id$
  */
 
-#ifndef PF_SSL_H
-#define PF_SSL_H
+#ifndef PF_SSL_SSL_H
+#define PF_SSL_SSL_H
 
 #include <list>
 #include <exception>
 
-class Ssl
+class SslSsl
 {
 	int fd;
 
@@ -33,7 +33,7 @@ class Ssl
 public:
 	class ConnectionError : public std::exception {};
 
-	Ssl();
+	SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }
 	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
@@ -47,4 +47,4 @@ public:
 	void CloseAll();
 };
 
-#endif // PF_SSL_H
+#endif // PF_SSLSSL_H

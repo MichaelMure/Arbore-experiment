@@ -17,25 +17,25 @@
  * $Id$
  */
 
-#ifndef PF_SSL_LAYER_H
-#define PF_SSL_LAYER_H
+#ifndef PF_SSL_H
+#define PF_SSL_H
 
 #include <list>
 #include <exception>
 
-class SslLayer
+class Ssl
 {
 public:
 	class ConnectionError : public std::exception {};
 
-	virtual ~SslLayer() {} /* Needed for abstract classes */
+	virtual ~Ssl() {} /* Needed for abstract classes */
 
 	virtual void Bind(std::string interface, uint16_t port) = 0;
-	virtual std::list<SslConnection*> Select() = 0;
+	virtual std::list<Connection*> Select() = 0;
 
 	virtual void Connect(std::string host, uint16_t port) = 0;
-	virtual void Close(SslConnection* conn) = 0;
+	virtual void Close(Connection* conn) = 0;
 	virtual void CloseAll() = 0;
 };
 
-#endif // PF_SSL_LAYER_H
+#endif // PF_SSL_H

@@ -17,18 +17,18 @@
  * $Id$
  */
 
-#ifndef PF_SSL_CONNECTION_H
-#define PF_SSL_CONNECTION_H
+#ifndef PF_CONNECTION_SSL_H
+#define PF_CONNECTION_SSL_H
 
 #include <exception>
 
-class SslConnection
+class ConnectionSsl
 {
 	int fd;
 public:
 	class ConnectionError : public std::exception {};
 
-	SslConnection(int _fd);
+	ConnectionSsl(int _fd);
 
 	void Write(const char* buf, size_t size);
 	void Read(char** buf, size_t* size);
@@ -36,4 +36,4 @@ public:
 	Certificate GetCertificate();
 };
 
-#endif // PF_SSL_CONNECTION_H
+#endif // PF_CONNECTION_SSL_H
