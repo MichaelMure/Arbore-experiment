@@ -30,7 +30,8 @@
 class SslSsl : public Ssl
 {
 	// Context: holds default SSL values to use
-	SSL_CTX* ssl_ctx;
+	SSL_CTX* server_ctx;
+	SSL_CTX* client_ctx;
 
 	Certificate cert;
 	Certificate cacert;
@@ -48,7 +49,7 @@ public:
 	void HandShake(int fd);
 	ConnectionSsl* GetConnection(int fd);
 
-	void Connect(std::string host, uint16_t port);
+	void Connect(int fd);
 	void Close(Connection* conn);
 	void CloseAll();
 };

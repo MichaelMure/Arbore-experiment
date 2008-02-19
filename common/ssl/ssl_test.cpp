@@ -4,6 +4,35 @@
 
 #include "pf_ssl_ssl.h"
 
+#define TEST_CLIENT
+//#define TEST_SERVER
+
+#ifdef TEST_CLIENT
+int main(int argc, char* argv[])
+{
+	SslSsl ssl;
+
+	int sd = socket (AF_INET, SOCK_STREAM, 0);
+	
+	struct sockaddr_in sa;
+	memset (&sa, '\0', sizeof(sa));
+	sa.sin_family      = AF_INET;
+	sa.sin_addr.s_addr = inet_addr ("127.0.0.1");
+	sa.sin_port        = htons     (8000);
+	
+	connect(sd, (struct sockaddr*) &sa, sizeof(sa));
+	ssl.Connect(sd);
+	ConnectionSsl* conn = ssl.GetConnection(sd);
+	conn->Write("Hello", sizeof("Hello"));
+
+	char buf[128];
+	memset(buf, 0, sizeof(buf));
+	conn->Read(buf, sizeof(buf));
+	printf("%s\n", buf);
+}
+#endif
+
+#ifdef TEST_SERVER
 int main(int argc, char* argv[])
 {
 	int listen_fd = socket (AF_INET, SOCK_STREAM, 0);
@@ -54,4 +83,5 @@ int main(int argc, char* argv[])
 	conn->Read(buf, sizeof(buf));
 	printf("%s\n", buf);
 }
+#endif
 

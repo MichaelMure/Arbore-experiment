@@ -1,0 +1,2 @@
+#!/bin/bash
+openssl s_server -accept 8000 -key server-key.pem -cert server-cert.pem

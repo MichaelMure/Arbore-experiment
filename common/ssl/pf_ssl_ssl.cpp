@@ -30,19 +30,31 @@ SslSsl::SslSsl()
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
-
 	SSLeay_add_ssl_algorithms();
-	SSL_METHOD* meth = SSLv23_server_method();
-	ssl_ctx = SSL_CTX_new(meth);
 
-	if(SSL_CTX_use_certificate_file(ssl_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_use_PrivateKey_file(ssl_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_check_private_key(ssl_ctx)	<= 0)
+	// Server part initialization
+	SSL_METHOD* meth = SSLv23_server_method();
+	server_ctx = SSL_CTX_new(meth);
+
+	if(SSL_CTX_use_certificate_file(server_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_use_PrivateKey_file(server_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_check_private_key(server_ctx)	<= 0)
 	{
 		printf("Failed to initialize something\n");
 		exit(EXIT_FAILURE);
 	}
 
+	// Client part initialization
+	meth = SSLv23_client_method();
+	client_ctx = SSL_CTX_new(meth);
+
+	if(SSL_CTX_use_certificate_file(client_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_use_PrivateKey_file(client_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
+	|| SSL_CTX_check_private_key(client_ctx)	<= 0)
+	{
+		printf("Failed to initialize something\n");
+		exit(EXIT_FAILURE);
+	}
 }
 
 SslSsl::~SslSsl()
@@ -52,7 +64,7 @@ SslSsl::~SslSsl()
 void SslSsl::HandShake(int fd)
 {
 	// TODO: check errors
-	SSL* ssl = SSL_new(ssl_ctx);
+	SSL* ssl = SSL_new(server_ctx);
 	SSL_set_fd(ssl, fd);
 	SSL_accept(ssl);
 
@@ -74,8 +86,13 @@ ConnectionSsl* SslSsl::GetConnection(int fd)
 	return static_cast<ConnectionSsl*>(c->second);
 }
 
-void SslSsl::Connect(std::string host, uint16_t port)
+void SslSsl::Connect(int fd)
 {
+	SSL* ssl = SSL_new(client_ctx);
+	SSL_set_fd(ssl, fd);
+	SSL_connect(ssl);
+
+	fd_map[fd] = new ConnectionSsl(ssl, fd);
 }
 
 void SslSsl::Close(Connection* conn)
