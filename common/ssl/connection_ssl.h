@@ -30,9 +30,10 @@ public:
 	class ConnectionError : public std::exception {};
 
 	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
+	~ConnectionSsl();
 
-	void Write(const char* buf, size_t size) {}
-	void Read(char** buf, size_t* size) {}
+	void Write(const char* buf, size_t size);
+	int Read(char* buf, size_t size);
 
 	//Certificate GetCertificate();
 };

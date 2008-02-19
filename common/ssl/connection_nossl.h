@@ -31,7 +31,7 @@ public:
 	ConnectionNoSsl(int _fd);
 
 	void Write(const char* buf, size_t size);
-	void Read(char** buf, size_t* size);
+	int Read(char* buf, size_t size);
 };
 
 #endif // CONNECTION_NOSSL_H

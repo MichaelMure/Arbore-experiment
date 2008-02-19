@@ -47,5 +47,11 @@ int main(int argc, char* argv[])
 
 	ssl.HandShake(cli_fd);
 	ConnectionSsl* conn = ssl.GetConnection(cli_fd);
+	conn->Write("Hello", sizeof("Hello"));
+
+	char buf[128];
+	memset(buf, 0, sizeof(buf));
+	conn->Read(buf, sizeof(buf));
+	printf("%s\n", buf);
 }
 
