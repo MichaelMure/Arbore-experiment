@@ -24,11 +24,17 @@
 
 class FileEntry : public FileEntryBase
 {
+	unsigned int path_serial;
+
 public:
 
 	FileEntry(std::string _name, DirEntry* parent)
-		: FileEntryBase(_name, parent)
+		: FileEntryBase(_name, parent),
+		  path_serial(0u)
 	{}
+
+	/* TODO: calculate this */
+	unsigned int GetPathSerial() const { return path_serial; }
 };
 
 #endif /* PFNET_FILE_H */

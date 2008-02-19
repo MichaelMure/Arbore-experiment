@@ -31,7 +31,6 @@ class Peer;
 
 class Cache : public Mutex
 {
-	std::string hdd_root;
 	DirEntry tree;
 	Hdd hdd;
 

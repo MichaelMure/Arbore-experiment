@@ -21,7 +21,6 @@
 #define FILEDIST_H
 
 #include <vector>
-#include "mutex.h"
 
 #include "pf_types.h"
 
@@ -30,7 +29,7 @@ class FileEntry;
 
 const size_t NB_PEERS_PER_FILE = 5;
 
-class FileDistribution : public Mutex
+class FileDistribution
 {
 	std::vector<id_t> peers;
 

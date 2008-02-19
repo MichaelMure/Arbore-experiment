@@ -26,14 +26,16 @@
 #include "pf_file.h"
 #include "packet.h"
 #include "hdd.h"
+#include "filedist.h"
 
 class Peer;
 
 class Cache : public Mutex
 {
-	std::string hdd_root;
 	DirEntry tree;
 	Hdd hdd;
+	FileDistribution filedist;
+	std::vector<FileEntry*> files;
 
 public:
 
@@ -55,6 +57,9 @@ public:
 
 	DirEntry* GetTree() { return &tree; }
 
+	/* This method will explore all arborescence. It can be
+	 * slow, so do NOT call this function too frequently.
+	 */
 	std::vector<FileEntry*> GetAllFiles();
 
 	FileEntry* Path2File(std::string path, std::string *filename = NULL);

@@ -22,7 +22,6 @@
 #include "cache.h"
 
 FileDistribution::FileDistribution()
-	: Mutex(RECURSIVE_MUTEX)
 {
 
 }
@@ -53,10 +52,9 @@ std::vector<FileEntry*> FileDistribution::GetFiles(id_t id) const
 	    it != files.end();
 	    ++it)
 	{
-		unsigned int file_number = 12345789;
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-		      (file_number % peers.size() != id_number % peers.size());
+		      ((*it)->GetPathSerial() % peers.size() != id_number % peers.size());
 		    ++i);
 
 		if(i < NB_PEERS_PER_FILE)
