@@ -113,10 +113,11 @@ Packet Cache::CreateRmFilePacket(FileEntry* f)
 	return pckt;
 }
 
-void Cache::SendChanges(Peer* p, time_t last_view)
+std::vector<FileEntry*> Cache::GetAllFiles()
 {
 	/* Stack used to store states of each directories */
 	std::stack<std::pair<FileMap::const_iterator, FileMap::const_iterator> > stack;
+	std::vector<FileEntry*> list;
 
 	Lock();
 	DirEntry* current_dir = GetTree();
@@ -125,18 +126,15 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 	FileMap::const_iterator it = current_dir->GetFiles().begin();
 	FileMap::const_iterator end = current_dir->GetFiles().end();
 
+	list.push_back(GetTree());
+
 	while(current_dir)
 	{
-		log[W_DEBUG] << "- We are in " << current_dir->GetFullName();
 		for(; it != end; ++it)
 		{
 			DirEntry* dir = dynamic_cast<DirEntry*>(it->second);
-			log[W_DEBUG] << " |- File " << it->second->GetName();
 
-			/* File is newer than Peer's */
-			if(it->second->stat.mtime > last_view)
-				p->SendMsg(CreateMkFilePacket(it->second)
-				                  .SetSrcID(net.GetMyID()));
+			list.push_back(it->second);
 
 			if(dir)
 			{
@@ -147,7 +145,6 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 		/* End of dir, we go back on top folder */
 		if(it == end)
 		{
-			log[W_DEBUG] << " `- end of dir, bye";
 			current_dir = current_dir->GetParent();
 			if(current_dir)
 			{
@@ -172,7 +169,8 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 	}
 
 	Unlock();
-	p->SendMsg(Packet(NET_END_OF_DIFF, net.GetMyID()));
+
+	return list;
 }
 
 FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)

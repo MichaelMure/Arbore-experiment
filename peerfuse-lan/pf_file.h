@@ -17,41 +17,18 @@
  * $Id$
  */
 
-#ifndef P2PFS_FILE_H
-#define P2PFS_FILE_H
+#ifndef PFNET_FILE_H
+#define PFNET_FILE_H
 
-#include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <time.h>
-#include "file_perms.h"
+#include "pf_filebase.h"
 
-class DirEntry;
-
-class pf_stat : public FilePermissions
+class FileEntry : public FileEntryBase
 {
 public:
-	off_t size;
-	time_t atime;
-	time_t mtime;
-	time_t ctime;
+
+	FileEntry(std::string _name, DirEntry* parent)
+		: FileEntryBase(_name, parent)
+	{}
 };
 
-class FileEntry
-{
-	const std::string name;
-	DirEntry* parent;
-
-public:
-
-	pf_stat stat;
-
-	FileEntry(std::string name, DirEntry* _parent);
-	virtual ~FileEntry();
-
-	DirEntry* GetParent() const { return parent; }
-	std::string GetName() const { return name; }
-	std::string GetFullName();
-};
-
-#endif /* P2PFS_FILE_H */
+#endif /* PFNET_FILE_H */

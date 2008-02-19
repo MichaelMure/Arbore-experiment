@@ -17,21 +17,18 @@
  * $Id$
  */
 
-#ifndef CONNECTION_NOSSL_H
-#define CONNECTION_NOSSL_H
-#include "connection.h"
-#include <exception>
+#ifndef PFNET_FILE_H
+#define PFNET_FILE_H
 
-class ConnectionNoSsl : public Connection
+#include "pf_filebase.h"
+
+class FileEntry : public FileEntryBase
 {
-	int fd;
 public:
-	class ConnectionError : public std::exception {};
 
-	ConnectionNoSsl(int _fd);
-
-	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
+	FileEntry(std::string _name, DirEntry* parent)
+		: FileEntryBase(_name, parent)
+	{}
 };
 
-#endif // CONNECTION_NOSSL_H
+#endif /* PFNET_FILE_H */

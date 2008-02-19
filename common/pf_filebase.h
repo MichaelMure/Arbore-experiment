@@ -17,21 +17,41 @@
  * $Id$
  */
 
-#ifndef CONNECTION_NOSSL_H
-#define CONNECTION_NOSSL_H
-#include "connection.h"
-#include <exception>
+#ifndef P2PFS_FILE_H
+#define P2PFS_FILE_H
 
-class ConnectionNoSsl : public Connection
+#include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include "file_perms.h"
+
+class DirEntry;
+
+class pf_stat : public FilePermissions
 {
-	int fd;
 public:
-	class ConnectionError : public std::exception {};
-
-	ConnectionNoSsl(int _fd);
-
-	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
+	off_t size;
+	time_t atime;
+	time_t mtime;
+	time_t ctime;
 };
 
-#endif // CONNECTION_NOSSL_H
+class FileEntryBase
+{
+	const std::string name;
+	DirEntry* parent;
+
+public:
+
+	pf_stat stat;
+
+	FileEntryBase(std::string name, DirEntry* _parent);
+	virtual ~FileEntryBase();
+
+	DirEntry* GetParent() const { return parent; }
+	std::string GetName() const { return name; }
+	std::string GetFullName();
+};
+
+#endif /* P2PFS_FILE_H */

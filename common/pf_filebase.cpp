@@ -20,10 +20,10 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/types.h>
-#include "pf_file.h"
+#include "pf_filebase.h"
 #include "pf_dir.h"
 
-FileEntry::FileEntry(std::string _name, DirEntry* _parent)
+FileEntryBase::FileEntryBase(std::string _name, DirEntry* _parent)
 	: name(_name), parent(_parent)
 {
 	stat.mode = S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO;     /* Protection */
@@ -37,12 +37,12 @@ FileEntry::FileEntry(std::string _name, DirEntry* _parent)
 	stat.ctime = time(NULL);    /* Heure dernier changement ?tat */
 }
 
-FileEntry::~FileEntry()
+FileEntryBase::~FileEntryBase()
 {
 
 }
 
-std::string FileEntry::GetFullName()
+std::string FileEntryBase::GetFullName()
 {
 	DirEntry* p = parent;
 	std::string path = "";

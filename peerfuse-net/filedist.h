@@ -17,21 +17,30 @@
  * $Id$
  */
 
-#ifndef CONNECTION_NOSSL_H
-#define CONNECTION_NOSSL_H
-#include "connection.h"
-#include <exception>
+#ifndef FILEDIST_H
+#define FILEDIST_H
 
-class ConnectionNoSsl : public Connection
+#include <vector>
+#include "mutex.h"
+
+#include "pf_types.h"
+
+class Peer;
+class FileEntry;
+
+const size_t NB_PEERS_PER_FILE = 5;
+
+class FileDistribution : public Mutex
 {
-	int fd;
+	std::vector<id_t> peers;
+
 public:
-	class ConnectionError : public std::exception {};
 
-	ConnectionNoSsl(int _fd);
+	FileDistribution();
 
-	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
+	std::vector<Peer*> GetPeers(const FileEntry* f) const;
+
+	std::vector<FileEntry*> GetFiles(id_t id) const;
 };
 
-#endif // CONNECTION_NOSSL_H
+#endif /* FILEDIST_H */

@@ -17,21 +17,3 @@
  * $Id$
  */
 
-#ifndef CONNECTION_NOSSL_H
-#define CONNECTION_NOSSL_H
-#include "connection.h"
-#include <exception>
-
-class ConnectionNoSsl : public Connection
-{
-	int fd;
-public:
-	class ConnectionError : public std::exception {};
-
-	ConnectionNoSsl(int _fd);
-
-	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
-};
-
-#endif // CONNECTION_NOSSL_H

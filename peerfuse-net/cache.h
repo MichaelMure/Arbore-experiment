@@ -55,6 +55,8 @@ public:
 
 	DirEntry* GetTree() { return &tree; }
 
+	std::vector<FileEntry*> GetAllFiles();
+
 	FileEntry* Path2File(std::string path, std::string *filename = NULL);
 
 	#define M_PROPAGATE   0x01
@@ -62,12 +64,8 @@ public:
 	void RmFile(std::string path, unsigned int flags = 0);
 	void ModFile(std::string path, unsigned int flags = 0);
 
-	void SendChanges(Peer* p, time_t last_view);
-
 	Packet CreateMkFilePacket(FileEntry* file);
 	Packet CreateRmFilePacket(FileEntry* file);
-
-	std::vector<FileEntry*> GetModifiedEntries(time_t last_conn);
 };
 
 extern Cache cache;

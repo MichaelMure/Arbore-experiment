@@ -8,7 +8,7 @@ SET(SRC
 	common/mutex.cpp
 	common/network_base.cpp
 	common/pf_dir.cpp
-	common/pf_file.cpp
+	common/pf_filebase.cpp
 	common/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
@@ -33,6 +33,8 @@ IF(PF_NET)
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp
 		peerfuse-net/cache.cpp
+		peerfuse-net/pf_file.cpp
+		peerfuse-net/filedist.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/net_proto.cpp
 		peerfuse-net/peer.cpp
