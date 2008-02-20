@@ -51,7 +51,9 @@ public:
 
 	DirEntry* GetParent() const { return parent; }
 	std::string GetName() const { return name; }
-	std::string GetFullName();
+	std::string GetFullName() const;
+
+	bool IsChildOf(const FileEntryBase* f) const;
 };
 
 #endif /* P2PFS_FILE_H */

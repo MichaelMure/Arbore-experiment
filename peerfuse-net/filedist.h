@@ -23,15 +23,17 @@
 #include <vector>
 
 #include "pf_types.h"
+#include "pf_file.h"
 
 class Peer;
-class FileEntry;
 
 const size_t NB_PEERS_PER_FILE = 5;
 
+
 class FileDistribution
 {
-	std::vector<id_t> peers;
+	std::vector<id_t> id_list;
+	FileList resp_files;
 
 public:
 
@@ -39,7 +41,11 @@ public:
 
 	std::vector<Peer*> GetPeers(const FileEntry* f) const;
 
-	std::vector<FileEntry*> GetFiles(id_t id) const;
+	FileList GetFiles(id_t id) const;
+
+	FileList GetMyRespFiles() const { return resp_files; }
+
+	void UpdateRespFiles();
 };
 
 #endif /* FILEDIST_H */

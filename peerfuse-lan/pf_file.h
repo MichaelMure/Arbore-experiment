@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef PFNET_FILE_H
-#define PFNET_FILE_H
+#ifndef PFLAN_FILE_H
+#define PFLAN_FILE_H
 
 #include "pf_filebase.h"
 
@@ -31,4 +31,4 @@ public:
 	{}
 };
 
-#endif /* PFNET_FILE_H */
+#endif /* PFLAN_FILE_H */

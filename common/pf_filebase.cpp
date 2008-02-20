@@ -42,7 +42,7 @@ FileEntryBase::~FileEntryBase()
 
 }
 
-std::string FileEntryBase::GetFullName()
+std::string FileEntryBase::GetFullName() const
 {
 	DirEntry* p = parent;
 	std::string path = "";
@@ -56,3 +56,13 @@ std::string FileEntryBase::GetFullName()
 	path = path + name;
 	return path;
 }
+
+bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
+{
+	DirEntry* p = parent;
+
+	while(p && p != f) p = p->parent;
+
+	return (p);
+}
+

@@ -30,8 +30,6 @@
 #include <time.h>
 
 #include "network_base.h"
-#include "scheduler.h"
-#include "peer.h"
 #include "pf_types.h"
 
 class Network: public NetworkBase

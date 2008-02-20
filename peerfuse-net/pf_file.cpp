@@ -17,3 +17,15 @@
  * $Id$
  */
 
+#include "pf_file.h"
+
+bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
+{
+	if(f1->IsChildOf(f2))
+		return false;
+	else if(f2->IsChildOf(f1))
+		return true;
+	else
+		return f1 < f2;
+}
+

@@ -33,32 +33,64 @@ std::vector<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
 	return list;
 }
 
-std::vector<FileEntry*> FileDistribution::GetFiles(id_t id) const
+void FileDistribution::UpdateRespFiles()
 {
-	std::vector<FileEntry*> files = cache.GetAllFiles();
-	std::vector<FileEntry*> result;
+	/* First set new list of id */
+	id_list.clear();
+	PeerList peers = net.GetPeerList();
+
+	id_list.push_back(net.GetMyID());
+	for(PeerList::const_iterator it = peers.begin(); it != peers.end(); ++it)
+		id_list.push_back((*it)->GetID());
+
+	/* Sort it */
+	std::sort(id_list.begin(), id_list.end());
+
+	FileList last_resp = resp_files;
+	resp_files.clear();
+
+	/* Get all new files I have responsible */
+	resp_files = GetFiles(net.GetMyID());
+
+	std::vector<FileEntry*> diff;
+
+	/* Store un last_resp all files I was responsible
+	 * but I am not anymore */
+	set_difference(last_resp.begin(), last_resp.end(),
+	               resp_files.begin(), resp_files.end(),
+		       diff.begin());
+
+	/* Now send all files to other peoples which now
+	 * have my old files.
+	 */
+}
+
+FileList FileDistribution::GetFiles(id_t id) const
+{
+	FileList files = cache.GetAllFiles();
+	FileList result;
 
 	size_t id_number;
 	std::vector<id_t>::const_iterator it;
-	std::vector<id_t>::const_iterator begin = peers.begin();
-	for(it = begin; it != peers.end() && *it != id;  ++it);
+	std::vector<id_t>::const_iterator begin = id_list.begin();
+	for(it = begin; it != id_list.end() && *it != id;  ++it);
 
-	if(it == peers.end())
+	if(it == id_list.end())
 		return files;
 
 	id_number = it - begin;
 
-	for(std::vector<FileEntry*>::iterator it = files.begin();
+	for(FileList::iterator it = files.begin();
 	    it != files.end();
 	    ++it)
 	{
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-		      ((*it)->GetPathSerial() % peers.size() != id_number % peers.size());
+		      ((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
 		    ++i);
 
 		if(i < NB_PEERS_PER_FILE)
-			result.push_back(*it);
+			result.insert(*it);
 	}
 
 	return result;

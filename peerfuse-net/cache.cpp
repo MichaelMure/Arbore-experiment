@@ -113,11 +113,11 @@ Packet Cache::CreateRmFilePacket(FileEntry* f)
 	return pckt;
 }
 
-std::vector<FileEntry*> Cache::GetAllFiles()
+FileList Cache::GetAllFiles()
 {
 	/* Stack used to store states of each directories */
 	std::stack<std::pair<FileMap::const_iterator, FileMap::const_iterator> > stack;
-	std::vector<FileEntry*> list;
+	FileList list;
 
 	Lock();
 	DirEntry* current_dir = GetTree();
@@ -126,7 +126,7 @@ std::vector<FileEntry*> Cache::GetAllFiles()
 	FileMap::const_iterator it = current_dir->GetFiles().begin();
 	FileMap::const_iterator end = current_dir->GetFiles().end();
 
-	list.push_back(GetTree());
+	list.insert(GetTree());
 
 	while(current_dir)
 	{
@@ -134,7 +134,7 @@ std::vector<FileEntry*> Cache::GetAllFiles()
 		{
 			DirEntry* dir = dynamic_cast<DirEntry*>(it->second);
 
-			list.push_back(it->second);
+			list.insert(it->second);
 
 			if(dir)
 			{

@@ -60,7 +60,7 @@ public:
 	/* This method will explore all arborescence. It can be
 	 * slow, so do NOT call this function too frequently.
 	 */
-	std::vector<FileEntry*> GetAllFiles();
+	FileList GetAllFiles();
 
 	FileEntry* Path2File(std::string path, std::string *filename = NULL);
 

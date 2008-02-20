@@ -20,7 +20,18 @@
 #ifndef PFNET_FILE_H
 #define PFNET_FILE_H
 
+#include <set>
+
 #include "pf_filebase.h"
+
+class FileEntry;
+
+struct CompFiles
+{
+	bool operator() (const FileEntry* f1, const FileEntry* f2) const;
+};
+
+typedef std::set<FileEntry*, CompFiles> FileList;
 
 class FileEntry : public FileEntryBase
 {
