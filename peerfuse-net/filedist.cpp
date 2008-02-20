@@ -30,39 +30,10 @@ std::vector<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
 {
 	std::vector<Peer*> list;
 
+	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
+		list.push_back(net.ID2Peer(id_list[(f->GetPathSerial()+i) % id_list.size()]));
+
 	return list;
-}
-
-void FileDistribution::UpdateRespFiles()
-{
-	/* First set new list of id */
-	id_list.clear();
-	PeerList peers = net.GetPeerList();
-
-	id_list.push_back(net.GetMyID());
-	for(PeerList::const_iterator it = peers.begin(); it != peers.end(); ++it)
-		id_list.push_back((*it)->GetID());
-
-	/* Sort it */
-	std::sort(id_list.begin(), id_list.end());
-
-	FileList last_resp = resp_files;
-	resp_files.clear();
-
-	/* Get all new files I have responsible */
-	resp_files = GetFiles(net.GetMyID());
-
-	std::vector<FileEntry*> diff;
-
-	/* Store un last_resp all files I was responsible
-	 * but I am not anymore */
-	set_difference(last_resp.begin(), last_resp.end(),
-	               resp_files.begin(), resp_files.end(),
-		       diff.begin());
-
-	/* Now send all files to other peoples which now
-	 * have my old files.
-	 */
 }
 
 FileList FileDistribution::GetFiles(id_t id) const
@@ -96,3 +67,34 @@ FileList FileDistribution::GetFiles(id_t id) const
 	return result;
 }
 
+void FileDistribution::UpdateRespFiles()
+{
+	/* First set new list of id */
+	id_list.clear();
+	PeerList peers = net.GetPeerList();
+
+	id_list.push_back(net.GetMyID());
+	for(PeerList::const_iterator it = peers.begin(); it != peers.end(); ++it)
+		id_list.push_back((*it)->GetID());
+
+	/* Sort it */
+	std::sort(id_list.begin(), id_list.end());
+
+	FileList last_resp = resp_files;
+	resp_files.clear();
+
+	/* Get all new files I have responsible */
+	resp_files = GetFiles(net.GetMyID());
+
+	std::vector<FileEntry*> diff;
+
+	/* Store un last_resp all files I was responsible
+	 * but I am not anymore */
+	set_difference(last_resp.begin(), last_resp.end(),
+	               resp_files.begin(), resp_files.end(),
+		       diff.begin());
+
+	/* Now send all files to other peoples which now
+	 * have my old files.
+	 */
+}
