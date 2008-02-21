@@ -31,7 +31,15 @@ std::vector<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
 	std::vector<Peer*> list;
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
-		list.push_back(net.ID2Peer(id_list[(f->GetPathSerial()+i) % id_list.size()]));
+	{
+		Peer* peer = net.ID2Peer(id_list[(f->GetPathSerial()+i) % id_list.size()]);
+
+		/* It is possible that there isn't any Peer object for this
+		 * ID. For example, for me.
+		 */
+		if(peer)
+			list.push_back(peer);
+	}
 
 	return list;
 }
@@ -97,4 +105,19 @@ void FileDistribution::UpdateRespFiles()
 	/* Now send all files to other peoples which now
 	 * have my old files.
 	 */
+	for(std::vector<FileEntry*>::iterator it = diff.begin();
+	    it != diff.end();
+	    ++it)
+	{
+		PeerList peers = GetPeers(*it);
+
+		Packet pckt = cache.CreateMkFilePacket(*it);
+
+		/* TODO do not send message to peers we know they have already this file version */
+		for(PeerList::iterator peer = peers.begin(); peer != peers.end(); ++peer)
+		{
+			pckt.SetDstID((*peer)->GetID());
+			(*peer)->SendMsg(pckt);
+		}
+	}
 }
