@@ -64,22 +64,26 @@ FileEntry* Cache::Path2File(std::string path, std::string* filename)
 		if(!tmp)
 		{
 			if(path.find('/') == std::string::npos && filename)
-			{
+			{ /* we are in last dir, but this file doesn't exist */
 				*filename = name;
 				Unlock();
 				return current_dir;
 			}
+			/* we aren't in last dir, so the path isn't found. */
 			Unlock();
 			return NULL;
 		}
 
 		if(!(current_dir = dynamic_cast<DirEntry*>(tmp)))
 		{
+			/* This isn't a directory. */
 			if(path.empty())
 			{
+				/* We are on last dir, so it is a file. */
 				Unlock();
 				return tmp;
 			}
+			/* it isn't a file in path, so the path isn't found. */
 
 			Unlock();
 			return NULL;
@@ -177,21 +181,20 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
 {
 	Lock();
 	std::string filename;
-	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path, &filename));
+	FileEntry* file = Path2File(path, &filename);
+	DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
-	if(!dir)
+	if(!file)
 	{
 		Unlock();
 		throw NoSuchFileOrDir();
 	}
 
-	if(filename.empty())
+	if(filename.empty() || !dir)
 	{
 		Unlock();
-		throw FileAlreadyExists();
+		throw FileAlreadyExists(file);
 	}
-
-	FileEntry* file;
 
 	if(mode & S_IFDIR)
 		file = new DirEntry(filename, dir);

@@ -41,7 +41,7 @@ public:
 
 	/* Exceptions */
 	class DirNotEmpty : public std::exception {};
-	class FileAlreadyExists : public std::exception {};
+	class FileAlreadyExists : public std::exception { public: FileAlreadyExists(FileEntry* f) : file(f) {} FileEntry* file; };
 	class NoSuchFileOrDir : public std::exception {};
 	class NoPermission : public std::exception {};
 

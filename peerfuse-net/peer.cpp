@@ -254,30 +254,55 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 {
 	cache.Lock();
 	std::string filename;
+
+	FileEntry* leaf;
+
 	try
 	{
 		filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
 		mode_t mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 
-		FileEntry* leaf = cache.MkFile(filename, mode);
+		leaf = cache.MkFile(filename, mode);
+	}
+	catch(Cache::FileAlreadyExists &e)
+	{
+		/* This file already exists, but do not panic! We take modifications only if
+		 * this file is more recent than mine.
+		 */
+		leaf = e.file;
 
-		leaf->stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
-		leaf->stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
-		leaf->stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
-		leaf->stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
-		leaf->stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
-		leaf->stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
+		time_t dist_ts = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+
+		/* TODO SEE WHAT THE FUCK TO DO WHEN TIMESTAMP ARE EQUAL
+		 * Note that we can consider this is the same version, so we do nothing.
+		 */
+		if(leaf->stat.mtime > dist_ts)
+		{
+			Packet pckt = cache.CreateMkFilePacket(leaf);
+			pckt.SetDstID(GetID());
+			SendMsg(pckt);
+		}
+		else if(leaf->stat.mtime == dist_ts)
+			return; /* same version, go out */
+
+		leaf->stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
 		log[W_DESYNCH] << "Unable to create " << filename << ": No such file or directory";
 		/* XXX: Desync DO SOMETHING */
+
+		cache.Unlock();
+		return;
 	}
-	catch(Cache::FileAlreadyExists &e)
-	{
-		log[W_DESYNCH] << "Unable to create " << filename << ": File already exists";
-		/* XXX: DO SOMETHING */
-	}
+
+	leaf->stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
+	leaf->stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
+	leaf->stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
+	leaf->stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
+	leaf->stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+	leaf->stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
+
 	cache.Unlock();
 }
 
