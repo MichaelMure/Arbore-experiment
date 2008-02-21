@@ -50,17 +50,14 @@ Log::flux::~flux()
 
 	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(flag & all_flags[i].flag); --i);
 
-#if 0
 	if(i < 0)
 		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", flag, str.c_str());
 	else
 	{
-		syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
-#endif
+		if(all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING)
+			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
 		(all_flags[i].level == LOG_ERR ? std::cerr : std::cout) << "[" << all_flags[i].s << "] " << str << std::endl;
-#if 0
 	}
-#endif
 }
 
 Log::Log()
