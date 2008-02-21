@@ -204,6 +204,12 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 		SetFlag(MERGING_ACK);
 		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), GetID()));
 	}
+
+	/* Now we can update resp files :)))))))
+	 * This function will send all messages to all new
+	 * responsibles of files I am not responsible anymore.
+	 */
+	cache.UpdateRespFiles();
 }
 
 void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
