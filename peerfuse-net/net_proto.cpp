@@ -65,9 +65,6 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		T_NONE
 	},
 
-	// NET_END_OF_DIFF
-	{ T_NONE},
-
 	// NET_END_OF_MERGE
 	{ T_NONE},
 

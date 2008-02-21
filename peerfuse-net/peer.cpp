@@ -209,6 +209,7 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	 * This function will send all messages to all new
 	 * responsibles of files I am not responsible anymore.
 	 */
+	log[W_DEBUG] << "End of merge... we send all files";
 	cache.UpdateRespFiles();
 }
 
