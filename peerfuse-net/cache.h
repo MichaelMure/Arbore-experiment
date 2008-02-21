@@ -71,6 +71,9 @@ public:
 
 	Packet CreateMkFilePacket(FileEntry* file);
 	Packet CreateRmFilePacket(FileEntry* file);
+
+	/* FileDistributino functions... */
+	void UpdateRespFiles();
 };
 
 extern Cache cache;

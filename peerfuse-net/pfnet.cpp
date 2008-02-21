@@ -81,11 +81,12 @@ public:
 			}
 			log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String());
 
+			session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
+
 			cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
+			cache.UpdateRespFiles();
 
 			net.Start(&conf);
-
-			session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
 
 			umask(0);
 			return fuse_main(argc-1, argv+1, &pf_oper, NULL);

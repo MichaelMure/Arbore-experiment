@@ -280,3 +280,7 @@ void Cache::ModFile(std::string path, unsigned int flags)
 	Unlock();
 }
 
+void Cache::UpdateRespFiles()
+{
+	filedist.UpdateRespFiles();
+}
