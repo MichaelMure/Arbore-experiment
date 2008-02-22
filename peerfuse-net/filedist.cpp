@@ -20,19 +20,48 @@
 #include "filedist.h"
 #include "network.h"
 #include "cache.h"
+#include "log.h"
 
 FileDistribution::FileDistribution()
 {
 
 }
 
+bool FileDistribution::_is_responsible(const Peer* peer, const FileEntry* file, const std::vector<id_t>& id_list) const
+{
+	size_t i = 0;
+	size_t id_n;
+	std::vector<id_t>::const_iterator it;
+	std::vector<id_t>::const_iterator begin = id_list.begin();
+	for(it = begin; it != id_list.end() && *it != peer->GetID(); ++it);
+
+	if(it == id_list.end())
+		return false;
+
+	id_n = it - begin;
+
+	for(; i < NB_PEERS_PER_FILE && file->GetPathSerial() % id_list.size() != id_n % id_list.size(); ++i);
+
+	return (i < NB_PEERS_PER_FILE);
+}
+
+bool FileDistribution::IsResponsible(const Peer* peer, const FileEntry* file) const
+{
+	return _is_responsible(peer, file, id_list);
+}
+
 std::vector<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
+{
+	return _get_peers_from_idlist(f, id_list);
+}
+
+std::vector<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
 {
 	std::vector<Peer*> list;
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
-		Peer* peer = net.ID2Peer(id_list[(f->GetPathSerial()+i) % id_list.size()]);
+		Peer* peer = net.ID2Peer(idl[(f->GetPathSerial()+i) % idl.size()]);
 
 		/* It is possible that there isn't any Peer object for this
 		 * ID. For example, for me.
@@ -77,6 +106,9 @@ FileList FileDistribution::GetFiles(id_t id) const
 
 void FileDistribution::UpdateRespFiles()
 {
+	/* Store last id list */
+	std::vector<id_t> last_id_list = id_list;
+
 	/* First set new list of id */
 	id_list.clear();
 	PeerList peers = net.GetPeerList();
@@ -88,36 +120,28 @@ void FileDistribution::UpdateRespFiles()
 	/* Sort it */
 	std::sort(id_list.begin(), id_list.end());
 
+	/* Get all new files I have responsible */
 	FileList last_resp = resp_files;
 	resp_files.clear();
 
-	/* Get all new files I have responsible */
 	resp_files = GetFiles(net.GetMyID());
 
-	std::vector<FileEntry*> diff;
-
-	/* Store un last_resp all files I was responsible
-	 * but I am not anymore */
-	set_difference(last_resp.begin(), last_resp.end(),
-	               resp_files.begin(), resp_files.end(),
-		       diff.begin());
-
-	/* Now send all files to other peoples which now
-	 * have my old files.
-	 */
-	for(std::vector<FileEntry*>::iterator it = diff.begin();
-	    it != diff.end();
-	    ++it)
+	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
-		PeerList peers = GetPeers(*it);
-
 		Packet pckt = cache.CreateMkFilePacket(*it);
+		PeerList peers = GetPeers(*it); // get actual peer list
+
+		log[W_DEBUG] << "- file " << (*it)->GetFullName();
 
 		/* TODO do not send message to peers we know they have already this file version */
 		for(PeerList::iterator peer = peers.begin(); peer != peers.end(); ++peer)
 		{
-			pckt.SetDstID((*peer)->GetID());
-			(*peer)->SendMsg(pckt);
+			log[W_DEBUG] << "  -> " << *peer;
+			if(!_is_responsible(*peer, *it, last_id_list))
+			{
+				pckt.SetDstID((*peer)->GetID());
+				(*peer)->SendMsg(pckt);
+			}
 		}
 	}
 }

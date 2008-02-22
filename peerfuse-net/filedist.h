@@ -35,11 +35,15 @@ class FileDistribution
 	std::vector<id_t> id_list;
 	FileList resp_files;
 
+	bool _is_responsible(const Peer* peer, const FileEntry* file, const std::vector<id_t>& id_list) const;
+	std::vector<Peer*> _get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
+
 public:
 
 	FileDistribution();
 
 	std::vector<Peer*> GetPeers(const FileEntry* f) const;
+	bool IsResponsible(const Peer* peer, const FileEntry* file) const;
 
 	FileList GetFiles(id_t id) const;
 
