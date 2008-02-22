@@ -6,16 +6,20 @@
 
 == Common ==
 
-* Save config when exiting
+	* Save config when exiting
 
-* Implement all FUSE functions
+	* Implement all FUSE functions
 
-* Forbid every commands when status is CONNECTING (before first HELLO message)
+	* Forbid every commands when status is CONNECTING (before first HELLO message)
 
-* Handle symbolic links
+	* Handle symbolic links
 
 == Peerfuse NET ==
 
+	* Fix the mutex problem
+
+	* Send only once the MKFILE for a specific file and peer, at net.merge
+
 == Peerfuse LAN ==
 
-* Remove IDs usage in cache.cpp and peer.cpp
+	* [DONE] Remove IDs usage in cache.cpp and peer.cpp
