@@ -284,7 +284,10 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 			SendMsg(pckt);
 		}
 		else if(leaf->stat.mtime == dist_ts)
+		{
+			cache.Unlock();
 			return; /* same version, go out */
+		}
 
 		leaf->stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 	}
