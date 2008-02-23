@@ -36,9 +36,9 @@ SslSsl::SslSsl()
 	SSL_METHOD* meth = SSLv23_server_method();
 	server_ctx = SSL_CTX_new(meth);
 
-	if(SSL_CTX_use_certificate_file(server_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_use_PrivateKey_file(server_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_check_private_key(server_ctx)	<= 0)
+	if(SSL_CTX_use_certificate_file(server_ctx, "server-cert.pem", SSL_FILETYPE_PEM)        <= 0
+		|| SSL_CTX_use_PrivateKey_file(server_ctx, "server-key.pem", SSL_FILETYPE_PEM)  <= 0
+		|| SSL_CTX_check_private_key(server_ctx)        <= 0)
 	{
 		printf("Failed to initialize something\n");
 		exit(EXIT_FAILURE);
@@ -48,9 +48,9 @@ SslSsl::SslSsl()
 	meth = SSLv23_client_method();
 	client_ctx = SSL_CTX_new(meth);
 
-	if(SSL_CTX_use_certificate_file(client_ctx, "server-cert.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_use_PrivateKey_file(client_ctx, "server-key.pem", SSL_FILETYPE_PEM)	<= 0
-	|| SSL_CTX_check_private_key(client_ctx)	<= 0)
+	if(SSL_CTX_use_certificate_file(client_ctx, "server-cert.pem", SSL_FILETYPE_PEM)        <= 0
+		|| SSL_CTX_use_PrivateKey_file(client_ctx, "server-key.pem", SSL_FILETYPE_PEM)  <= 0
+		|| SSL_CTX_check_private_key(client_ctx)        <= 0)
 	{
 		printf("Failed to initialize something\n");
 		exit(EXIT_FAILURE);
@@ -69,10 +69,10 @@ void SslSsl::HandShake(int fd)
 	SSL_accept(ssl);
 
 	fd_map[fd] = new ConnectionSsl(ssl, fd);
-//	X509* client_cert = SSL_get_peer_certificate (ssl);
-//	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
-//	printf ("\t subject: %s\n", str);
-//	OPENSSL_free (str);
+	//	X509* client_cert = SSL_get_peer_certificate (ssl);
+	//	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
+	//	printf ("\t subject: %s\n", str);
+	//	OPENSSL_free (str);
 }
 
 ConnectionSsl* SslSsl::GetConnection(int fd)
@@ -102,5 +102,3 @@ void SslSsl::Close(Connection* conn)
 void SslSsl::CloseAll()
 {
 }
-
-

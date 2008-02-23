@@ -38,25 +38,25 @@ enum msg_type
 
 enum net_hello_args
 {
-	NET_HELLO_NOW,     // T_UINT32
+	NET_HELLO_NOW,				  // T_UINT32
 	#define NET_HELLO_FLAGS_HIGHLINK 0x01
-	NET_HELLO_FLAGS,   // T_UINT32
-	NET_HELLO_PORT,    // T_UINT32
-	NET_HELLO_VERSION, // T_STR
+	NET_HELLO_FLAGS,			  // T_UINT32
+	NET_HELLO_PORT,				  // T_UINT32
+	NET_HELLO_VERSION,			  // T_STR
 	NET_HELLO_ARG_SIZE
 };
 
 enum net_peer_connection
 {
-	NET_PEER_CONNECTION_ADDRESS,     /* T_ADDR */
-	NET_PEER_CONNECTION_CERTIFICATE, /* T_STR */
+	NET_PEER_CONNECTION_ADDRESS,		  /* T_ADDR */
+	NET_PEER_CONNECTION_CERTIFICATE,	  /* T_STR */
 };
 
 // NET_MKFILE
 enum net_mkfile_args
 {
 	NET_MKFILE_PATH,
-	NET_MKFILE_MODE, // file, dir, symlink ... read/write permissions
+	NET_MKFILE_MODE,			  // file, dir, symlink ... read/write permissions
 	NET_MKFILE_UID,
 	NET_MKFILE_GID,
 	NET_MKFILE_SIZE,
@@ -72,5 +72,4 @@ enum net_rmfile
 	NET_RMFILE_PATH
 	// ...
 };
-
-#endif /* NETPROTO_H */
+#endif						  /* NETPROTO_H */

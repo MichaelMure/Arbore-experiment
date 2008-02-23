@@ -56,7 +56,7 @@ public:
 
 	FileEntry* Path2File(std::string path, std::string *filename = NULL);
 
-	#define M_PROPAGATE   0x01
+#define M_PROPAGATE   0x01
 	FileEntry* MkFile(std::string path, mode_t mode, unsigned int flags = 0);
 	void RmFile(std::string path, unsigned int flags = 0);
 	void ModFile(std::string path, unsigned int flags = 0);
@@ -70,5 +70,4 @@ public:
 };
 
 extern Cache cache;
-
 #endif

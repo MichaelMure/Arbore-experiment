@@ -56,13 +56,11 @@ class Deleter
 public:
 	explicit Deleter(T* _p)
 		: p(_p)
-	{}
+		{}
 	T* operator*() { return p; }
 	~Deleter()
 	{
 		delete p;
 	}
 };
-
-
-#endif /* P2PFS_TYPE_H */
+#endif						  /* P2PFS_TYPE_H */

@@ -23,12 +23,12 @@
 #include "network.h"
 
 JobOtherConnect::JobOtherConnect(Peer* _connect_to) : Job(time(NULL)),
-	connect_to(_connect_to)
+			connect_to(_connect_to)
 {
 }
 
 JobOtherConnect::JobOtherConnect(const JobOtherConnect* j) :
-	Job(time(NULL)+1)
+			Job(time(NULL)+1)
 {
 	connect_to = j->connect_to;
 	is_connecting = j->is_connecting;

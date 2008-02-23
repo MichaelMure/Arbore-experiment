@@ -35,11 +35,11 @@
 #include "tools.h"
 
 Peer::Peer(int _fd, pf_addr _addr)
-	: fd(_fd),
-	  addr(_addr),
-	  ts_diff(0),
-	  incoming(NULL),
-	  flags(0)
+			: fd(_fd),
+			addr(_addr),
+			ts_diff(0),
+			incoming(NULL),
+			flags(0)
 {
 }
 
@@ -73,7 +73,8 @@ void Peer::SendHello()
 {
 	// Make the message
 	Packet pckt(NET_HELLO);
-	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL)); // Time / now
+						  // Time / now
+	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
 	pckt.SetArg(NET_HELLO_PORT, (uint32_t)net.GetListeningPort());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
 	pckt.SetArg(NET_HELLO_MY_ID, net.GetMyID());
@@ -156,8 +157,8 @@ void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
 	std::list<Job*>& jobs = net.scheduler.GetQueue();
 
 	for(std::list<Job*>::iterator it = jobs.begin();
-			it != jobs.end();
-			++it)
+		it != jobs.end();
+		++it)
 	{
 		if((*it)->GetType() == JOB_OTHER_CONNECT)
 		{
@@ -174,8 +175,8 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 	std::list<Job*> jobs = net.scheduler.GetQueue();
 
 	for(std::list<Job*>::iterator it = jobs.begin();
-			it != jobs.end();
-			++it)
+		it != jobs.end();
+		++it)
 	{
 		if((*it)->GetType() == JOB_OTHER_CONNECT)
 		{
@@ -190,10 +191,10 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 
 	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
 		if((*it)->GetAddr() == new_peer)
-		{
-			(*it)->SendMsg(Packet(NET_PEER_CONNECTION_REJECTED).SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr()));
-			break;
-		}
+	{
+		(*it)->SendMsg(Packet(NET_PEER_CONNECTION_REJECTED).SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr()));
+		break;
+	}
 }
 
 void Peer::Handle_net_peer_connection_rejected(struct Packet* msg)
@@ -293,10 +294,10 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 	DelFlag(MERGING);
 }
 
-
 void Peer::HandleMsg(Packet* pckt)
 {
-	void (Peer::*handler[NET_NB_MESSAGES]) (Packet*) = {
+	void (Peer::*handler[NET_NB_MESSAGES]) (Packet*) =
+	{
 		NULL,
 		&Peer::Handle_net_hello,
 		&Peer::Handle_net_your_id,
@@ -341,7 +342,7 @@ void Peer::Receive()
 		incoming = new Packet(header);
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
-							   " size=" << incoming->GetDataSize();
+			" size=" << incoming->GetDataSize();
 
 		/* If there some data in packet, we wait for the rest on the next Receive() call.
 		 * In other case, it is because packet only contains headers and we can parse it.
@@ -359,4 +360,3 @@ void Peer::Receive()
 
 	HandleMsg(*packet);
 }
-

@@ -32,17 +32,17 @@ class Hdd
 public:
 	class HddWriteFailure : public std::exception
 	{
-	public:
-		std::string dir;
-		HddWriteFailure (std::string _dir) : dir(_dir) {};
-		~HddWriteFailure () throw() {};
+		public:
+			std::string dir;
+			HddWriteFailure (std::string _dir) : dir(_dir) {};
+			~HddWriteFailure () throw() {};
 	};
 	class HddAccessFailure : public std::exception
 	{
-	public:
-		std::string dir;
-		HddAccessFailure (std::string _dir) : dir(_dir) {};
-		~HddAccessFailure () throw() {};
+		public:
+			std::string dir;
+			HddAccessFailure (std::string _dir) : dir(_dir) {};
+			~HddAccessFailure () throw() {};
 	};
 
 	Hdd();
@@ -57,5 +57,4 @@ public:
 	void MkFile(FileEntry* f);
 	void RmFile(FileEntry* f);
 };
-
 #endif

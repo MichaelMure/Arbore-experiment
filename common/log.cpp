@@ -61,7 +61,7 @@ Log::flux::~flux()
 }
 
 Log::Log()
-	: logged_flags(DEFAULT_LOGGED_FLAGS)
+			: logged_flags(DEFAULT_LOGGED_FLAGS)
 {
 	openlog("P2Pfs", LOG_CONS, LOG_DAEMON);
 }

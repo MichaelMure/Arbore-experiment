@@ -72,5 +72,3 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 	{ T_NONE},
 
 };
-
-

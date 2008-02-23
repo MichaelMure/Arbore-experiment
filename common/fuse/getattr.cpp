@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -55,15 +54,15 @@ int pf_getattr(const char *path, struct stat *stbuf)
 		return -ENOENT;
 	}
 
-	stbuf->st_mode	= f->stat.mode;
-	stbuf->st_uid	= f->stat.uid;
-	stbuf->st_gid	= f->stat.gid;
-	stbuf->st_size	= f->stat.size;
-//	stbuf->st_blksize	= f->stat.blksize;
-//	stbuf->st_blocks	= f->stat.blocks;
-	stbuf->st_atime	= f->stat.atime;
-	stbuf->st_mtime	= f->stat.mtime;
-	stbuf->st_ctime	= f->stat.ctime;
+	stbuf->st_mode  = f->stat.mode;
+	stbuf->st_uid   = f->stat.uid;
+	stbuf->st_gid   = f->stat.gid;
+	stbuf->st_size  = f->stat.size;
+	//	stbuf->st_blksize	= f->stat.blksize;
+	//	stbuf->st_blocks	= f->stat.blocks;
+	stbuf->st_atime = f->stat.atime;
+	stbuf->st_mtime = f->stat.mtime;
+	stbuf->st_ctime = f->stat.ctime;
 	cache.Unlock();
 	return 0;
 }

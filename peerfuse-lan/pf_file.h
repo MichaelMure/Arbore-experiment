@@ -28,7 +28,6 @@ public:
 
 	FileEntry(std::string _name, DirEntry* parent)
 		: FileEntryBase(_name, parent)
-	{}
+		{}
 };
-
-#endif /* PFLAN_FILE_H */
+#endif						  /* PFLAN_FILE_H */

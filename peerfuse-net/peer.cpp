@@ -33,12 +33,12 @@
 #include "session_config.h"
 
 Peer::Peer(int _fd, pf_addr _addr, Peer* parent)
-	: fd(_fd),
-	  addr(_addr),
-	  ts_diff(0),
-	  incoming(NULL),
-	  uplink(parent),
-	  flags(_fd >= 0 ? ANONYMOUS : 0) /* anonymous is only when this is a real connection */
+			: fd(_fd),
+			addr(_addr),
+			ts_diff(0),
+			incoming(NULL),
+			uplink(parent),
+			flags(_fd >= 0 ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
 {
 }
 
@@ -80,7 +80,8 @@ void Peer::SendHello()
 {
 	// Make the message
 	Packet pckt(NET_HELLO, net.GetMyID(), addr.id);
-	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL)); // Time / now
+						  // Time / now
+	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
 	uint32_t flags = 0;
 	if(IsHighLink())
 		flags |= NET_HELLO_FLAGS_HIGHLINK;
@@ -136,7 +137,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
-	addr.id = pckt->GetSrcID(); /* TODO: we'll know ID with certificate, when connection is SSL. */
+	addr.id = pckt->GetSrcID();		  /* TODO: we'll know ID with certificate, when connection is SSL. */
 	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
 	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
@@ -170,7 +171,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
 
-		net.Broadcast(pckt, this); /* Don't send to this peer a creation message about him! */
+		net.Broadcast(pckt, this);	  /* Don't send to this peer a creation message about him! */
 	}
 
 	/* Change dst ID of packet to NOT broadcast it. */
@@ -233,9 +234,9 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	if(already_connected)
 	{
 		if(cert == already_connected->GetCertificate())
-			return; /* I'm already connected to him. */
+			return;			  /* I'm already connected to him. */
 		else
-			return; /* TODO: this is an other peer with same ID !? DO SOMETHING! */
+			return;			  /* TODO: this is an other peer with same ID !? DO SOMETHING! */
 	}
 
 	try
@@ -286,7 +287,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		else if(leaf->stat.mtime == dist_ts)
 		{
 			cache.Unlock();
-			return; /* same version, go out */
+			return;			  /* same version, go out */
 		}
 
 		leaf->stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
@@ -383,9 +384,9 @@ void Peer::Receive()
 		incoming = new Packet(header);
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
-			                                   " srcid=" << incoming->GetSrcID() << ", " <<
-							   " dstid=" << incoming->GetDstID() << ", " <<
-							   " size=" << incoming->GetDataSize();
+			" srcid=" << incoming->GetSrcID() << ", " <<
+			" dstid=" << incoming->GetDstID() << ", " <<
+			" size=" << incoming->GetDataSize();
 
 		/* If there some data in packet, we wait for the rest on the next Receive() call.
 		 * In other case, it is because packet only contains headers and we can parse it.
@@ -422,4 +423,3 @@ void Peer::Receive()
 	if((*packet)->GetDstID() == 0)
 		net.Broadcast(**packet, this);
 }
-

@@ -22,8 +22,7 @@
 
 #include "libconfig.h"
 
-#define PEERFUSE_VERSION	"peerfuse-net 0.1"
+#define PEERFUSE_VERSION        "peerfuse-net 0.1"
 
 extern MyConfig conf;
-
-#endif /* P2PFS_H */
+#endif						  /* P2PFS_H */

@@ -17,7 +17,6 @@
  * $Id$
  */
 
-
 #include <map>
 #include <stdio.h>
 #include <pthread.h>
@@ -34,18 +33,18 @@ void Mutex::Init(MutexType _type)
 
 	switch(type)
 	{
-	case NORMAL_MUTEX:
-//#ifdef DEBUG
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
-//#else
-//		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
-//#endif
-		break;
-	case RECURSIVE_MUTEX:
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-		break;
-	default:
-		assert(false);
+		case NORMAL_MUTEX:
+			//#ifdef DEBUG
+			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+			//#else
+			//		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
+			//#endif
+			break;
+		case RECURSIVE_MUTEX:
+			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+			break;
+		default:
+			assert(false);
 	}
 
 	int r = pthread_mutex_init(mutex, &attr );
@@ -82,5 +81,3 @@ void Mutex::Unlock()
 	int res = pthread_mutex_unlock(mutex);
 	assert(res == 0);
 }
-
-

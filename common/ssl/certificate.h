@@ -45,5 +45,4 @@ public:
 	bool operator==(const Certificate&) { return true; }
 
 };
-
-#endif // PF_CERTIFICATE_H
+#endif						  // PF_CERTIFICATE_H

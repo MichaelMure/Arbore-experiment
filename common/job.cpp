@@ -15,7 +15,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
-*/
+ */
 
 #include "job.h"
 #include "scheduler.h"
@@ -33,4 +33,3 @@ void JobNewConnection::Start()
 		net.scheduler.Queue(new JobNewConnection(this));
 	}
 }
-

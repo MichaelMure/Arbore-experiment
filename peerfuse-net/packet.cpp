@@ -18,17 +18,17 @@
  */
 
 #include "packet.h"
-#include <netinet/in.h> // htonl, ntohl
+#include <netinet/in.h>				  // htonl, ntohl
 
 Packet::Packet(msg_type _type, id_t src, id_t dst)
-	: PacketBase(_type),
-	  id_src(src),
-	  id_dst(dst)
+			: PacketBase(_type),
+			id_src(src),
+			id_dst(dst)
 {
 }
 
 Packet::Packet(char* header)
-	: PacketBase(NET_NONE)
+			: PacketBase(NET_NONE)
 {
 	uint32_t* h = (uint32_t*)header;
 	id_src = ntohl(h[0]);
@@ -40,9 +40,9 @@ Packet::Packet(char* header)
 }
 
 Packet::Packet(const Packet& p)
-	: PacketBase(p),
-	  id_src(p.id_src),
-	  id_dst(p.id_dst)
+			: PacketBase(p),
+			id_src(p.id_src),
+			id_dst(p.id_dst)
 {
 }
 
@@ -77,10 +77,10 @@ char* Packet::DumpBuffer() const
 
 uint32_t Packet::GetHeaderSize()
 {
-	return sizeof(id_t)		// id_src
-		+ sizeof(id_t)		// id_dst
-		+ sizeof(uint32_t)	// size of the packet
-		+ sizeof(uint32_t);	// size of the type
+	return sizeof(id_t)			  // id_src
+		+ sizeof(id_t)			  // id_dst
+		+ sizeof(uint32_t)		  // size of the packet
+		+ sizeof(uint32_t);		  // size of the type
 }
 
 uint32_t Packet::GetSize() const
@@ -92,6 +92,6 @@ void Packet::Send(int fd)
 {
 	PacketBase::Send(fd);
 	log[W_PARSE] << "                       srcid=" << id_src << ", " <<
-	                                       "dstid=" << id_dst << ", ";
+		"dstid=" << id_dst << ", ";
 
 }

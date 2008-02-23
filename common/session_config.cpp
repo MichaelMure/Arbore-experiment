@@ -58,11 +58,11 @@ SessionConfig::~SessionConfig()
 
 static ssize_t getline(std::string& line, std::fstream& file)
 {
-        line.clear();
-        std::getline(file, line);
+	line.clear();
+	std::getline(file, line);
 	if(file.eof())
 		return -1;
-        return line.size();
+	return line.size();
 }
 
 void SessionConfig::Load(const std::string& _filename)
@@ -109,13 +109,13 @@ void SessionConfig::Save()
 	}
 
 	for(std::map<std::string, std::string>::const_iterator it_str = opt_str.GetMap().begin();
-			it_str != opt_str.GetMap().end();
-			++it_str)
-		fout << opt_str.GetAsString(it_str->first) << std::endl;
+		it_str != opt_str.GetMap().end();
+		++it_str)
+	fout << opt_str.GetAsString(it_str->first) << std::endl;
 	for(std::map<std::string, uint32_t>::const_iterator it_uint = opt_uint.GetMap().begin();
-			it_uint != opt_uint.GetMap().end();
-			++it_uint)
-		fout << opt_uint.GetAsString(it_uint->first) << std::endl;
+		it_uint != opt_uint.GetMap().end();
+		++it_uint)
+	fout << opt_uint.GetAsString(it_uint->first) << std::endl;
 	fout.close();
 	log[W_INFO] << "SessionConfig: Config saved.";
 }
@@ -132,7 +132,7 @@ void SessionConfig::Parse(const std::string& line)
 	// val is considered to be an int if it doesn't contain
 	// a '.' (ip address have to be handled as string...
 	if(val.find('.',0) == std::string::npos
-	&& ((val.at(0) >= '0' && val.at(0) <= '9')))
+		&& ((val.at(0) >= '0' && val.at(0) <= '9')))
 	{
 		int nbr = atoi(val.c_str());
 		opt_uint.Set(opt, nbr);
@@ -140,4 +140,3 @@ void SessionConfig::Parse(const std::string& line)
 	else
 		opt_str.Set(opt, val);
 }
-

@@ -17,7 +17,6 @@
  * $Id$
  */
 
-
 #define FUSE_USE_VERSION 26
 
 #include <iostream>
@@ -65,11 +64,10 @@ int Application::main(int argc, char *argv[])
 	struct rlimit rlim;
 	if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
 	{
-	        rlim.rlim_cur = RLIM_INFINITY;
-	        rlim.rlim_max = RLIM_INFINITY;
-	        setrlimit(RLIMIT_CORE, &rlim);
+		rlim.rlim_cur = RLIM_INFINITY;
+		rlim.rlim_max = RLIM_INFINITY;
+		setrlimit(RLIMIT_CORE, &rlim);
 	}
-
 
 	try
 	{
@@ -132,4 +130,3 @@ int Application::main(int argc, char *argv[])
 	exit(EXIT_FAILURE);
 
 }
-

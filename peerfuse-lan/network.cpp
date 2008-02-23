@@ -36,11 +36,9 @@ Peer* Network::Connect(const pf_addr addr)
 	return p;
 }
 
-
 void Network::Broadcast(Packet pckt, const Peer* but_one)
 {
 	for(PeerMap::iterator it = fd2peer.begin(); it != fd2peer.end(); ++it)
 		if(it->second != but_one)
 			it->second->SendMsg(pckt);
 }
-

@@ -17,7 +17,6 @@
  * $Id$
  */
 
-
 #ifndef NETWORK_H
 #define NETWORK_H
 
@@ -58,5 +57,4 @@ public:
 };
 
 extern Network net;
-
 #endif

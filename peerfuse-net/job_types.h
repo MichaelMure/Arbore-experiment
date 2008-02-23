@@ -24,6 +24,4 @@ enum job_type
 {
 	JOB_NEW_CONNECT,
 };
-
 #endif
-

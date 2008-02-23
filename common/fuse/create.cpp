@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -44,15 +43,14 @@
 
 int pf_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 {
-/*	int fd;
+	/*	int fd;
 
-	fd = open(path, fi->flags, mode);
-	if (fd == -1)
-		return -errno;
+		fd = open(path, fi->flags, mode);
+		if (fd == -1)
+			return -errno;
 
-	fi->fh = fd;*/
+		fi->fh = fd;*/
 
 	cache.MkFile(path, mode, M_PROPAGATE);
 	return 0;
 }
-

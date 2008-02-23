@@ -27,8 +27,8 @@
 Cache cache;
 
 Cache::Cache()
-	: Mutex(RECURSIVE_MUTEX),
-	tree("", NULL)
+			: Mutex(RECURSIVE_MUTEX),
+			tree("", NULL)
 {
 }
 
@@ -44,7 +44,7 @@ void Cache::Load(std::string hd_path)
 		hdd.BuildTree(GetTree(), hd_path);
 	}
 	catch(...)
-	{ /* U G L Y, I think we MUST find a solution. */
+	{					  /* U G L Y, I think we MUST find a solution. */
 		Unlock();
 		throw;
 	}
@@ -280,4 +280,3 @@ void Cache::ModFile(std::string path, unsigned int flags)
 	}
 	Unlock();
 }
-

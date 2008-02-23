@@ -17,7 +17,6 @@
  * $Id$
  */
 
-
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
@@ -28,6 +27,4 @@ public:
 
 	int main(int argc, char *argv[]);
 };
-
 #endif
-

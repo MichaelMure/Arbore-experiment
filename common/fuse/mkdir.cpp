@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -54,7 +53,7 @@ int pf_mkdir(const char *path, mode_t mode)
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
-		return -ENOENT; /* No such file or directory */
+		return -ENOENT;			  /* No such file or directory */
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
@@ -63,4 +62,3 @@ int pf_mkdir(const char *path, mode_t mode)
 
 	return 0;
 }
-

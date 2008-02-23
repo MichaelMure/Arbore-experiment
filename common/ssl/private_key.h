@@ -37,5 +37,4 @@ public:
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 	void Sign(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 };
-
-#endif // PF_PRIVATE_KEY_H
+#endif						  // PF_PRIVATE_KEY_H

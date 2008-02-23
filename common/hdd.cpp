@@ -35,10 +35,10 @@ Hdd::~Hdd()
 }
 
 //void Hdd::DirEntry& GetTree()
-//{
-//	return tree;
-//}
-
+			//{
+			//	return tree;
+			//}
+			
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	root = _root;
@@ -77,7 +77,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 
 			struct stat stats;
 			if(lstat(f_path.c_str(), &stats))
-					throw HddAccessFailure(f_path);
+				throw HddAccessFailure(f_path);
 
 			f->stat.mode = stats.st_mode;
 			f->stat.uid = stats.st_uid;
@@ -110,7 +110,8 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 				continue;
 
 			if(!d)
-				throw HddAccessFailure(root); // If harddrive cache changed during reading it
+						  // If harddrive cache changed during reading it
+				throw HddAccessFailure(root);
 			path.pop();
 			cache_dir = cache_dir->GetParent();
 		}
@@ -123,7 +124,8 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 
 			d = opendir(fullpath.c_str());
 			if(!d)
-				throw HddAccessFailure(root); // If harddrive cache changed during reading it
+						  // If harddrive cache changed during reading it
+				throw HddAccessFailure(root);
 			cache_dir = static_cast<DirEntry*>(f);
 		}
 	}
@@ -170,4 +172,3 @@ void Hdd::RmFile(FileEntry* f)
 		log[W_INFO] << "unlink on " << path;
 	}
 }
-

@@ -45,22 +45,22 @@ enum msg_type
 
 enum net_hello_args
 {
-	NET_HELLO_NOW,		// T_INT
-	NET_HELLO_PORT,		// T_UINT32
-	NET_HELLO_VERSION,	// T_STR
-	NET_HELLO_MY_ID,	// T_UINT32
+	NET_HELLO_NOW,				  // T_INT
+	NET_HELLO_PORT,				  // T_UINT32
+	NET_HELLO_VERSION,			  // T_STR
+	NET_HELLO_MY_ID,			  // T_UINT32
 	NET_HELLO_ARG_SIZE
 };
 
 enum net_your_id_args
 {
-	NET_YOUR_ID_ID,		// T_UINT32
+	NET_YOUR_ID_ID,				  // T_UINT32
 	NET_YOUR_ID_ARG_SIZE
 };
 
 enum net_get_struct_diff_args
 {
-	NET_GET_STRUCT_DIFF_LAST_CONNECTION, // T_INT
+	NET_GET_STRUCT_DIFF_LAST_CONNECTION,	  // T_INT
 	NET_GET_STRUCT_DIFF_ARG_SIZE
 };
 
@@ -68,7 +68,7 @@ enum net_get_struct_diff_args
 enum net_mkfile_args
 {
 	NET_MKFILE_PATH,
-	NET_MKFILE_MODE, // file, dir, symlink ... read/write permissions
+	NET_MKFILE_MODE,			  // file, dir, symlink ... read/write permissions
 	NET_MKFILE_UID,
 	NET_MKFILE_GID,
 	NET_MKFILE_SIZE,
@@ -108,5 +108,4 @@ enum net_peer_connection_rejected
 enum net_peer_all_connected
 {
 };
-
-#endif /* NETPROTO_H */
+#endif						  /* NETPROTO_H */

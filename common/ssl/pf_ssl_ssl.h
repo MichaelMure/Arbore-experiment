@@ -53,5 +53,4 @@ public:
 	void Close(Connection* conn);
 	void CloseAll();
 };
-
-#endif // PF_SSLSSL_H
+#endif						  // PF_SSLSSL_H

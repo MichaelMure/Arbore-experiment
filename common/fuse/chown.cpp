@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -59,4 +58,3 @@ int pf_chown(const char *path, uid_t uid, gid_t gid)
 	cache.Unlock();
 	return 0;
 }
-

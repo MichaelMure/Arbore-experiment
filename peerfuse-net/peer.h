@@ -34,9 +34,9 @@ class Peer
 {
 	int fd;
 	pf_addr addr;
-	int ts_diff; // diff between our timestamp and its timestamp */
-	Packet* incoming; // packet we are receiving
-	std::queue<Packet> send_queue; // packets we are sending (with flush)
+	int ts_diff;				  // diff between our timestamp and its timestamp */
+	Packet* incoming;			  // packet we are receiving
+	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
 
 	Certificate cert;
 
@@ -51,8 +51,8 @@ class Peer
 	 *  If this Peer is "downpeer2", uplink points to "direct downpeer1",
 	 *  and downlinks contain "downpeer3".
 	 */
-	Peer* uplink;                            /**< Peer where this peer is connected */
-	std::vector<Peer*> downlinks;            /**< Peer connected to this one */
+	Peer* uplink;				  /**< Peer where this peer is connected */
+	std::vector<Peer*> downlinks;		  /**< Peer connected to this one */
 
 	unsigned int flags;
 
@@ -73,11 +73,11 @@ public:
 
 	enum
 	{
-		SERVER      = 1 << 0,    /**< This peer is a server */
-		HIGHLINK    = 1 << 1,    /**< This peer is a highlink */
-		MERGING     = 1 << 2,    /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
-		MERGING_ACK = 1 << 3,    /**< We are waiting for an ACK */
-		ANONYMOUS   = 1 << 4,    /**< We don't know this peer (between connection and HELLO) */
+		SERVER      = 1 << 0,	  /**< This peer is a server */
+		HIGHLINK    = 1 << 1,	  /**< This peer is a highlink */
+		MERGING     = 1 << 2,	  /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
+		MERGING_ACK = 1 << 3,	  /**< We are waiting for an ACK */
+		ANONYMOUS   = 1 << 4,	  /**< We don't know this peer (between connection and HELLO) */
 	};
 
 	/* Constructors */
@@ -113,5 +113,4 @@ public:
 	void SendHello();
 	void Receive();
 };
-
 #endif

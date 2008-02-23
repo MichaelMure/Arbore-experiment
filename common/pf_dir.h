@@ -42,5 +42,4 @@ public:
 
 	FileEntry* GetFile(std::string name) const;
 };
-
-#endif /* DIR_H */
+#endif						  /* DIR_H */

@@ -24,17 +24,18 @@
 #include "pf_dir.h"
 
 FileEntryBase::FileEntryBase(std::string _name, DirEntry* _parent)
-	: name(_name), parent(_parent)
+			: name(_name), parent(_parent)
 {
-	stat.mode = S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO;     /* Protection */
-	stat.uid = getuid();        /* UID propri?taire */
-	stat.gid = getgid();        /* GID propri?taire */
-	stat.size = 0;              /* Taille totale en octets */
-//	stat.blksize_t st_blksize;  /* Taille de bloc pour E/S */
-//	stat.blkcnt_t  st_blocks;   /* Nombre de blocs allou?s */
-	stat.atime = time(NULL);    /* Heure dernier acc?s */
-	stat.mtime = time(NULL);    /* Heure derni?re modification */
-	stat.ctime = time(NULL);    /* Heure dernier changement ?tat */
+						  /* Protection */
+	stat.mode = S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO;
+	stat.uid = getuid();			  /* UID propri?taire */
+	stat.gid = getgid();			  /* GID propri?taire */
+	stat.size = 0;				  /* Taille totale en octets */
+	//	stat.blksize_t st_blksize;  /* Taille de bloc pour E/S */
+	//	stat.blkcnt_t  st_blocks;   /* Nombre de blocs allou?s */
+	stat.atime = time(NULL);		  /* Heure dernier acc?s */
+	stat.mtime = time(NULL);		  /* Heure derni?re modification */
+	stat.ctime = time(NULL);		  /* Heure dernier changement ?tat */
 }
 
 FileEntryBase::~FileEntryBase()
@@ -65,4 +66,3 @@ bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
 
 	return (p);
 }
-

@@ -17,7 +17,6 @@
  * $Id$
  */
 
-
 #ifndef NETWORK_BASE_H
 #define NETWORK_BASE_H
 
@@ -45,17 +44,17 @@ public:
 	class CantOpenSock : public std::exception {};
 	class CantListen : public std::exception
 	{
-	public:
-		int port;
-		CantListen(int _port) : port(_port) {}
+		public:
+			int port;
+			CantListen(int _port) : port(_port) {}
 	};
 	class CantResolvHostname : public std::exception {};
 	class CantConnectTo : public std::exception
 	{
-	public:
-		int err;
-		pf_addr addr;
-		CantConnectTo(int _errno, const pf_addr _addr) : err(_errno),addr(_addr) {}
+		public:
+			int err;
+			pf_addr addr;
+			CantConnectTo(int _errno, const pf_addr _addr) : err(_errno),addr(_addr) {}
 	};
 
 private:
@@ -98,7 +97,6 @@ public:
 
 	uint16_t GetListeningPort() const { return listening_port; }
 
-
 	/* When a peer want to send a packet, set its fd on the
 	 * global_write_set to call peer->Flush() in Main() loop.
 	 */
@@ -126,9 +124,7 @@ public:
 	/* Create an ID not used by any other peer in network */
 	id_t CreateID();
 
-
 	virtual void AddDisconnected(const pf_addr& addr) {}
 	virtual void DelDisconnected(const pf_addr& addr) {}
 };
-
 #endif

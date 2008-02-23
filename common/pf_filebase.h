@@ -55,5 +55,4 @@ public:
 
 	bool IsChildOf(const FileEntryBase* f) const;
 };
-
-#endif /* P2PFS_FILE_H */
+#endif						  /* P2PFS_FILE_H */

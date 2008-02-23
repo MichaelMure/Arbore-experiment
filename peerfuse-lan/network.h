@@ -37,6 +37,4 @@ public:
 };
 
 extern Network net;
-
 #endif
-

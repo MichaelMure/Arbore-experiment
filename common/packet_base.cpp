@@ -19,7 +19,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <netinet/in.h> // htonl, ntohl
+#include <netinet/in.h>				  // htonl, ntohl
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "packet_base.h"
@@ -36,16 +36,16 @@
 #endif
 
 PacketBase::PacketBase(msg_type _type)
-	: type(_type),
-	  size(0),
-	  datas(NULL)
+			: type(_type),
+			size(0),
+			datas(NULL)
 {
 }
 
 PacketBase::PacketBase(const PacketBase& p)
-	: type(p.type),
-	  size(p.size),
-	  datas(NULL)
+			: type(p.type),
+			size(p.size),
+			datas(NULL)
 {
 	if(size)
 	{
@@ -108,8 +108,8 @@ char* PacketBase::DumpBuffer() const
 
 uint32_t PacketBase::GetHeaderSize()
 {
-	return sizeof(uint32_t)         // size of the packet
-		+ sizeof(uint32_t);     // size of the type
+	return sizeof(uint32_t)			  // size of the packet
+		+ sizeof(uint32_t);		  // size of the type
 }
 
 uint32_t PacketBase::GetSize() const
@@ -171,7 +171,6 @@ PacketBase& PacketBase::Write(pf_addr addr)
 	return *this;
 }
 
-
 PacketBase& PacketBase::Write(std::string str)
 {
 	uint32_t str_len = str.size();
@@ -215,7 +214,6 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	return *this;
 }
 
-
 void PacketBase::Send(int fd)
 {
 	BuildDataFromArgs();
@@ -224,9 +222,9 @@ void PacketBase::Send(int fd)
 	free(buf);
 
 	log[W_PARSE] << "Send a message header: type=" << GetType() << ", " <<
-		                               //"srcid=" << id_src << ", " <<
-					       //"dstid=" << id_dst << ", " <<
-					       "size=" << GetDataSize();
+	//"srcid=" << id_src << ", " <<
+	//"dstid=" << id_dst << ", " <<
+		"size=" << GetDataSize();
 }
 
 uint32_t PacketBase::ReadInt32()
@@ -394,4 +392,3 @@ void PacketBase::BuildDataFromArgs()
 			default: throw Malformated();
 		}
 }
-

@@ -18,10 +18,10 @@
  */
 
 #include "packet.h"
-#include <netinet/in.h> // htonl, ntohl
+#include <netinet/in.h>				  // htonl, ntohl
 
 Packet::Packet(char* header) :
-	PacketBase(NET_NONE)
+			PacketBase(NET_NONE)
 {
 	uint32_t* h = (uint32_t*)header;
 	type = (msg_type)ntohl(h[0]);
@@ -29,4 +29,3 @@ Packet::Packet(char* header) :
 
 	datas = (char*)malloc(size);
 }
-

@@ -33,5 +33,4 @@ pf_addr pf_addr_ton(pf_addr addr);
 
 extern uint64_t htonll(uint64_t number);
 extern uint64_t ntohll(uint64_t number);
-
-#endif /* TOOLS_H */
+#endif						  /* TOOLS_H */

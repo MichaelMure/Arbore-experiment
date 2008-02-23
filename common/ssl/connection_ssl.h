@@ -37,5 +37,4 @@ public:
 
 	//Certificate GetCertificate();
 };
-
-#endif // PF_CONNECTION_SSL_H
+#endif						  // PF_CONNECTION_SSL_H

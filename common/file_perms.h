@@ -28,5 +28,4 @@ public:
 	uid_t uid;
 	gid_t gid;
 };
-
-#endif /* FILE_PERMS_H */
+#endif						  /* FILE_PERMS_H */

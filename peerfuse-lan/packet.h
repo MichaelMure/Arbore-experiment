@@ -29,5 +29,4 @@ public:
 	Packet(const Packet& packet) : PacketBase(packet) {}
 	Packet(char* header);
 };
-
-#endif /* PACKET_H */
+#endif						  /* PACKET_H */

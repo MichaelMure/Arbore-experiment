@@ -36,11 +36,11 @@
 #include "scheduler.h"
 
 NetworkBase::NetworkBase() throw(CantRunThread)
-	: running(true),
-	  serv_sock(-1),
-	  highsock(-1),
-	  listening_port(0),
-	  my_id(0)
+			: running(true),
+			serv_sock(-1),
+			highsock(-1),
+			listening_port(0),
+			my_id(0)
 {
 	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
@@ -97,8 +97,8 @@ void NetworkBase::RemovePeer(Peer* peer)
 	for(PeerList::iterator it = peer_list.begin(); it != peer_list.end();)
 		if(*it == peer)
 			it = peer_list.erase(it);
-		else
-			++it;
+	else
+		++it;
 
 	if(FD_ISSET(peer->GetFd(), &global_read_set)) FD_CLR(peer->GetFd(), &global_read_set);
 	if(FD_ISSET(peer->GetFd(), &global_write_set)) FD_CLR(peer->GetFd(), &global_write_set);
@@ -134,7 +134,7 @@ void NetworkBase::Main()
 				break;
 			}
 		}
-		else if(events > 0) /* events = 0 means that there isn't any event (but timeout expired) */
+		else if(events > 0)		  /* events = 0 means that there isn't any event (but timeout expired) */
 		{
 			for(int i = 0;i <= highsock;++i)
 			{
@@ -265,7 +265,7 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 
 	struct timeval timeout;
 	memset(&timeout, 0, sizeof(timeout));
-	timeout.tv_sec = 2; // 2seconds timeout
+	timeout.tv_sec = 2;			  // 2seconds timeout
 	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 	setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
@@ -289,7 +289,7 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock, CantListen)
 {
 	unsigned int reuse_addr = 1;
-	struct sockaddr_in localhost; /* bind info structure */
+	struct sockaddr_in localhost;		  /* bind info structure */
 
 	/* Already listening */
 	if(serv_sock >= 0)
@@ -340,7 +340,7 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	ConfigSection* section = conf->GetSection("listen");
 
 	Listen(section->GetItem("port")->Integer(),
-	       section->GetItem("bind")->String().c_str());
+		section->GetItem("bind")->String().c_str());
 
 	/* Connect to other servers */
 	Peer* peer = 0;
@@ -374,8 +374,8 @@ id_t NetworkBase::CreateID()
 	{
 		new_id = rand();
 		for(PeerMap::iterator peer = fd2peer.begin();
-				peer != fd2peer.end();
-				++peer)
+			peer != fd2peer.end();
+			++peer)
 		{
 			if(new_id == peer->second->GetID())
 			{
@@ -387,5 +387,3 @@ id_t NetworkBase::CreateID()
 
 	return new_id;
 }
-
-

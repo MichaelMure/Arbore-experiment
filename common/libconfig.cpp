@@ -26,31 +26,31 @@
 /* Définition de quelques macros utiles */
 #undef FOR
 #define FOR(T, v, x) \
-                          T (x); \
-                          for(T::iterator x##it = (v).begin(); x##it != (v).end() && (x = x##it->second); ++x##it)
+	T (x); \
+	for(T::iterator x##it = (v).begin(); x##it != (v).end() && (x = x##it->second); ++x##it)
 #undef FORit
 #define FORit(T, v, x) \
-                          for(T::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
+	for(T::iterator (x) = (v).begin(); (x) != (v).end(); ++(x))
 #define FORmm(T, v, label, x) \
-                          T::iterator x##lb = v.lower_bound(label); \
-                          T::iterator x##ub = v.upper_bound(label); \
-                          for(T::iterator x = x##lb; x != x##ub; ++x)
+	T::iterator x##lb = v.lower_bound(label); \
+	T::iterator x##ub = v.upper_bound(label); \
+	for(T::iterator x = x##lb; x != x##ub; ++x)
 #define Error(x) do { std::cerr << path << ":" << line << ": " << x << std::endl ; error = true; } while(0)
-
+			
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n");
-
-/********************************************************************************************
- *                                Config                                                    *
- ********************************************************************************************/
-
+			
+			/********************************************************************************************
+			 *                                Config                                                    *
+			 ********************************************************************************************/
+			
 MyConfig::MyConfig(std::string _path)
-	: path(_path), loaded(false)
+			: path(_path), loaded(false)
 {
 
 }
 
 MyConfig::MyConfig()
-	: loaded(false)
+			: loaded(false)
 {
 
 }
@@ -142,7 +142,7 @@ bool MyConfig::Load(std::string _path)
 
 			if(!item->SetValue(value))
 				Error("'" << value << "' is an incorrect value for '" << item->Label() << "' item (type of value is " <<
-				      item->ValueType() << ")");
+					item->ValueType() << ")");
 			else if(item->CallBack())
 				item->CallBack() (item);
 		}
@@ -194,9 +194,9 @@ bool MyConfig::Load(std::string _path)
 
 	if(section)
 		Error("in «" + section->Label() + (section->Name().empty() ? "" : ("(" + section->Name() + ")")) +
-		      "»: '}' not found to close section !");
+		"»: '}' not found to close section !");
 
-	if(FindEmpty()) // Find empty sections
+	if(FindEmpty())				  // Find empty sections
 		error = true;
 
 	if(!error)
@@ -208,7 +208,7 @@ ConfigSection* MyConfig::GetSection(std::string label)
 {
 	FORmm(SectionMap, sections, label, it)
 		if(it->second->IsCopy() == false)
-			return it->second;
+		return it->second;
 	return 0;
 }
 
@@ -216,7 +216,7 @@ ConfigSection* MyConfig::GetSection(std::string label, std::string name)
 {
 	FORmm(SectionMap, sections, label, it)
 		if(it->second->Label() == label && it->second->IsMultiple() && it->second->Name() == name)
-			return it->second;
+		return it->second;
 
 	return 0;
 }
@@ -225,8 +225,8 @@ std::vector<ConfigSection*> MyConfig::GetSectionClones(std::string label)
 {
 	std::vector<ConfigSection*> s;
 	FORmm(SectionMap, sections, label, it)
- 		if(it->second->Label() == label && it->second->IsMultiple() && it->second->IsCopy())
-			s.push_back(it->second);
+		if(it->second->Label() == label && it->second->IsMultiple() && it->second->IsCopy())
+		s.push_back(it->second);
 
 	return s;
 }
@@ -243,7 +243,7 @@ ConfigSection* MyConfig::AddSection(std::string label, std::string description, 
 
 	FORit(SectionMap, sections, it)
 		if(it->second->Label() == label)
-			throw error("Section " + label + " has a name already used");
+		throw error("Section " + label + " has a name already used");
 
 	return AddSection(new ConfigSection(label, description, multiple, this, 0));
 }
@@ -251,15 +251,15 @@ ConfigSection* MyConfig::AddSection(std::string label, std::string description, 
 bool MyConfig::FindEmpty()
 {
 	std::string begin = "in global porty: ";
-	bool error = false; // Error() macro change this value
+	bool error = false;			  // Error() macro change this value
 
 	FORit(SectionMap, sections, it)
 		if(!it->second->Found())
-		{
-			ConfigSection* s = it->second;
-			if(s->IsMultiple() == false)
-				Error(begin << "missing section '" << s->Label() << "' (" << s->Description() << ")");
-		}
+	{
+		ConfigSection* s = it->second;
+		if(s->IsMultiple() == false)
+			Error(begin << "missing section '" << s->Label() << "' (" << s->Description() << ")");
+	}
 
 	return error;
 }
@@ -269,16 +269,16 @@ bool MyConfig::FindEmpty()
  ********************************************************************************************/
 
 ConfigSection::ConfigSection(std::string _label, std::string _description, bool _multiple,
-                             MyConfig* _config, ConfigSection* _parent)
-	: label(_label), description(_description), multiple(_multiple), config(_config), parent(_parent), copy(false),
-	  name_item(0), found(false), end_func(0)
+			MyConfig* _config, ConfigSection* _parent)
+			: label(_label), description(_description), multiple(_multiple), config(_config), parent(_parent), copy(false),
+			name_item(0), found(false), end_func(0)
 {
 	items.clear();
 }
 
 ConfigSection::ConfigSection(ConfigSection& cs)
-	: label(cs.label), description(cs.description), multiple(cs.multiple), config(cs.config), parent(cs.parent),
-	  copy(cs.copy), name_item(0), found(cs.found), end_func(cs.end_func)
+			: label(cs.label), description(cs.description), multiple(cs.multiple), config(cs.config), parent(cs.parent),
+			copy(cs.copy), name_item(0), found(cs.found), end_func(cs.end_func)
 {
 	FORit(SectionMap, cs.sections, it)
 		sections.insert(std::make_pair(it->second->label, new ConfigSection(*it->second)));
@@ -305,15 +305,15 @@ ConfigSection* ConfigSection::GetSection(std::string label)
 {
 	FORmm(SectionMap, sections, label, it)
 		if(it->second->IsCopy() == false)
-			return it->second;
+		return it->second;
 	return 0;
 }
 
 ConfigSection* ConfigSection::GetSection(std::string label, std::string name)
 {
 	FORmm(SectionMap, sections, label, it)
- 		if(it->second->Label() == label && it->second->IsMultiple() && it->second->Name() == name)
-			return it->second;
+		if(it->second->Label() == label && it->second->IsMultiple() && it->second->Name() == name)
+		return it->second;
 
 	return 0;
 }
@@ -322,8 +322,8 @@ std::vector<ConfigSection*> ConfigSection::GetSectionClones(std::string label)
 {
 	std::vector<ConfigSection*> s;
 	FORmm(SectionMap, sections, label, it)
- 		if(it->second->Label() == label && it->second->IsMultiple() && it->second->IsCopy())
-			s.push_back(it->second);
+		if(it->second->Label() == label && it->second->IsMultiple() && it->second->IsCopy())
+		s.push_back(it->second);
 
 	return s;
 }
@@ -331,24 +331,24 @@ std::vector<ConfigSection*> ConfigSection::GetSectionClones(std::string label)
 bool ConfigSection::FindEmpty()
 {
 	std::string begin = "in «" + Label() + (Name().empty() ? "" : ("(" + Name() + ")")) + "»: ";
-	bool error = false; // Error() macro change this value
-	int line = config->NbLines();      /* Récuperation des informations de MyConfig */
-	std::string path = config->Path(); /* pour pouvoir utiliser la macro Error()    */
+	bool error = false;			  // Error() macro change this value
+	int line = config->NbLines();		  /* Récuperation des informations de MyConfig */
+	std::string path = config->Path();	  /* pour pouvoir utiliser la macro Error()    */
 
 	FORit(ItemMap, items, it)
 		if(!it->second->Found())
-		{
-			ConfigItem* item = it->second;
-			if(item->DefValue().empty() || item->SetValue(item->DefValue()) == false)
-				Error(begin << "missing item '" << item->Label() << "' (" << item->Description() << ")");
-		}
+	{
+		ConfigItem* item = it->second;
+		if(item->DefValue().empty() || item->SetValue(item->DefValue()) == false)
+			Error(begin << "missing item '" << item->Label() << "' (" << item->Description() << ")");
+	}
 
 	FORit(SectionMap, sections, it)
 		if(!it->second->Found() && it->second->IsMultiple() == false)
-		{
-			ConfigSection* s = it->second;
-			Error(begin << "missing section '" << s->Label() << "' (" << s->Description() << ")");
-		}
+	{
+		ConfigSection* s = it->second;
+		Error(begin << "missing section '" << s->Label() << "' (" << s->Description() << ")");
+	}
 
 	return error;
 }
@@ -363,7 +363,7 @@ ConfigSection* ConfigSection::AddSection(std::string label, std::string descript
 {
 	FORit(SectionMap, sections, it)
 		if(it->second->Label() == label)
-			throw MyConfig::error("Section " + label + " has a name already used in section \"" + Label() + "\"");
+		throw MyConfig::error("Section " + label + " has a name already used in section \"" + Label() + "\"");
 
 	return AddSection(new ConfigSection(label, description, multiple, config, this));
 }

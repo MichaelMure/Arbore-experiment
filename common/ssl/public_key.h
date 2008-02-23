@@ -36,5 +36,4 @@ public:
 	void Crypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 	bool CheckSignature(const char* buf, size_t but_size, const char* signature, size_t crypt_size);
 };
-
-#endif // PF_PUBLIC_KEY_H
+#endif						  // PF_PUBLIC_KEY_H

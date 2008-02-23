@@ -24,17 +24,18 @@
 
 bool is_ip(const char *ip)
 {
-        char *ptr = NULL;
-        int i = 0, d = 0;
+	char *ptr = NULL;
+	int i = 0, d = 0;
 
-        for(; i < 4; ++i) /* 4 dots expected (IPv4) */
-        {       /* Note about strtol: stores in endptr either NULL or '\0' if conversion is complete */
-                if(!isdigit((unsigned char) *ip) /* most current case (not ip, letter host) */
-                        || (d = strtol(ip, &ptr, 10)) < 0 || d > 255 /* ok, valid number? */
-                        || (ptr && *ptr != 0 && (*ptr != '.' || 3 == i) && ptr != ip)) return false;
-                if(ptr) ip = ptr + 1, ptr = NULL; /* jump the dot */
-        }
-        return true;
+	for(; i < 4; ++i)			  /* 4 dots expected (IPv4) */
+	{					  /* Note about strtol: stores in endptr either NULL or '\0' if conversion is complete */
+		if(!isdigit((unsigned char) *ip)  /* most current case (not ip, letter host) */
+						  /* ok, valid number? */
+			|| (d = strtol(ip, &ptr, 10)) < 0 || d > 255
+			|| (ptr && *ptr != 0 && (*ptr != '.' || 3 == i) && ptr != ip)) return false;
+		if(ptr) ip = ptr + 1, ptr = NULL;  /* jump the dot */
+	}
+	return true;
 }
 
 std::string stringtok(std::string &in, const char * const delimiters)
@@ -55,7 +56,7 @@ std::string stringtok(std::string &in, const char * const delimiters)
 		else
 			s = in.substr(i);
 		in = "";
-		return s;   // nothing left but white space
+		return s;			  // nothing left but white space
 	}
 
 	// push token
@@ -69,33 +70,33 @@ std::string pf_addr2string(const pf_addr addr)
 {
 	std::string ret;
 	if(addr.ip[0] == 0 &&
-	   addr.ip[1] == 0 &&
-	   addr.ip[2] == 0)
+		addr.ip[1] == 0 &&
+		addr.ip[2] == 0)
 	{
 		char str[16];
 		unsigned char* nbr = (unsigned char*) &(addr.ip[3]);
 		snprintf(str, 16, "%i.%i.%i.%i", nbr[0],
-						nbr[1],
-						nbr[2],
-						nbr[3]);
+			nbr[1],
+			nbr[2],
+			nbr[3]);
 		ret = std::string(str);
 	}
 	else
 	{
 		/* TODO: ipv6 */
 	}
-        return ret;
+	return ret;
 }
 
 #ifdef WORDS_BIGENDIAN
 uint64_t htonll(uint64_t number)
 {
-  return number;
+	return number;
 }
 
 uint64_t ntohll(uint64_t number)
 {
-  return number;
+	return number;
 }
 
 pf_addr nto_pf_addr(pf_addr addr)
@@ -108,18 +109,18 @@ pf_addr pf_addr_ton(pf_addr addr)
 	return addr;
 }
 
-#else /* WORDS_BIGENDIAN */
+#else						  /* WORDS_BIGENDIAN */
 
 uint64_t htonll(uint64_t number)
 {
-  return ( htonl( (number >> 32) & 0xFFFFFFFF) |
-          ((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
+	return ( htonl( (number >> 32) & 0xFFFFFFFF) |
+		((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
 }
 
 uint64_t ntohll(uint64_t number)
 {
-    return ( htonl( (number >> 32) & 0xFFFFFFFF) |
-             ((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
+	return ( htonl( (number >> 32) & 0xFFFFFFFF) |
+		((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
 }
 
 pf_addr nto_pf_addr(pf_addr addr)
@@ -145,6 +146,4 @@ pf_addr pf_addr_ton(pf_addr addr)
 
 	return addr;
 }
-
-#endif /* WORDS_BIGENDIAN */
-
+#endif						  /* WORDS_BIGENDIAN */

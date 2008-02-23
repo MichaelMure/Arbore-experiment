@@ -32,7 +32,7 @@ enum PacketArgType
 	T_NONE
 };
 
-#define MAX_PACKET_ARGS	16
+#define MAX_PACKET_ARGS 16
 extern const PacketArgType packet_args[][MAX_PACKET_ARGS];
 
 /* This is base class used to stock pointers */
@@ -56,5 +56,4 @@ public:
 	PacketArg(A _val) { val = _val; }
 	PacketArgBase* clone() const { return new PacketArg<A>(*this); }
 };
-
-#endif /* PACKET_ARG_H */
+#endif						  /* PACKET_ARG_H */

@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -46,4 +45,3 @@ int pf_utimens(const char *path, const struct timespec ts[2])
 {
 	return 0;
 }
-

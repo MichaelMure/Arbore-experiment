@@ -52,10 +52,8 @@ class PacketBase
 
 protected:
 	msg_type type;
-	uint32_t size; // size of the msg (excluding header)
+	uint32_t size;			  // size of the msg (excluding header)
 	char* datas;
-
-
 
 public:
 
@@ -87,7 +85,7 @@ public:
 	void ReceiveContent(int fd) throw(RecvError, Malformated);
 
 	template<typename T>
-	PacketBase& SetArg(size_t arg, T val)
+		PacketBase& SetArg(size_t arg, T val)
 	{
 		if(arg_lst.size() <= arg)
 			arg_lst.resize(arg + 1, NULL);
@@ -99,9 +97,8 @@ public:
 		return *this;
 	}
 
-
 	template<typename T>
-	T GetArg(size_t arg)
+		T GetArg(size_t arg)
 	{
 		assert(arg_lst.size() > arg);
 		assert(arg_lst[arg] != NULL);
@@ -110,5 +107,4 @@ public:
 		return (dynamic_cast< PacketArg<T>* >(arg_lst[arg]))->val;
 	}
 };
-
-#endif /* PACKET_BASE_H */
+#endif						  /* PACKET_BASE_H */

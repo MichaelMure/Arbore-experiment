@@ -28,8 +28,8 @@
 
 class Packet : public PacketBase
 {
-	id_t id_src; // 0 means want an id
-	id_t id_dst; // 0 means "to everybody"
+	id_t id_src;				  // 0 means want an id
+	id_t id_dst;				  // 0 means "to everybody"
 
 	char* DumpBuffer() const;
 public:
@@ -50,5 +50,4 @@ public:
 
 	virtual void Send(int fd);
 };
-
-#endif /* PACKET_H */
+#endif						  /* PACKET_H */

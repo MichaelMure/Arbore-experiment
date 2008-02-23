@@ -15,7 +15,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
-*/
+ */
 
 #include <list>
 #include <time.h>
@@ -53,8 +53,8 @@ void Scheduler::Queue(Job* job)
 {
 	log[W_INFO] << "New job queued";
 	for(std::list<Job*>::iterator it = job_queue.begin();
-			it != job_queue.end();
-			++it)
+		it != job_queue.end();
+		++it)
 	{
 		if(job->GetStartTime() < (*it)->GetStartTime())
 		{

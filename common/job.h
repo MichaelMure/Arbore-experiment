@@ -15,7 +15,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
-*/
+ */
 
 #ifndef JOB_H
 #define JOB_H
@@ -44,12 +44,11 @@ class JobNewConnection : public Job, private pf_addr
 	time_t dt;
 public:
 	JobNewConnection(pf_addr addr) :
-		Job(time(NULL)), pf_addr(addr) { dt = 1; }
+	Job(time(NULL)), pf_addr(addr) { dt = 1; }
 	JobNewConnection(const JobNewConnection* j) :
-		Job(time(NULL) + j->dt),  pf_addr(pf_addr(*j)), dt(j->dt) {}
+	Job(time(NULL) + j->dt),  pf_addr(pf_addr(*j)), dt(j->dt) {}
 
 	void Start();
 	const job_type GetType() const {return JOB_NEW_CONNECT; }
 };
-
 #endif

@@ -93,13 +93,13 @@ FileList FileDistribution::GetFiles(id_t id) const
 	id_number = it - begin;
 
 	for(FileList::iterator it = files.begin();
-	    it != files.end();
-	    ++it)
+		it != files.end();
+		++it)
 	{
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-		      ((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
-		    ++i);
+			((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
+			++i);
 
 		if(i < NB_PEERS_PER_FILE)
 			result.insert(*it);
@@ -110,8 +110,8 @@ FileList FileDistribution::GetFiles(id_t id) const
 
 void FileDistribution::AddFile(FileEntry* f, unsigned int flags)
 {
-	assert(f != NULL);               /* exists */
-	assert(f->GetParent() != NULL);  /* isn't the root dir */
+	assert(f != NULL);			  /* exists */
+	assert(f->GetParent() != NULL);		  /* isn't the root dir */
 
 	if(IsResponsible(net.GetMyID(), f))
 	{
@@ -133,8 +133,8 @@ void FileDistribution::AddFile(FileEntry* f, unsigned int flags)
 
 void FileDistribution::RemoveFile(FileEntry* f, unsigned int flags)
 {
-	assert(f != NULL);               /* exists */
-	assert(f->GetParent() != NULL);  /* isn't the root dir */
+	assert(f != NULL);			  /* exists */
+	assert(f->GetParent() != NULL);		  /* isn't the root dir */
 
 	std::set<Peer*> peers = GetPeers(f);
 	Packet pckt = cache.CreateRmFilePacket(f);
@@ -173,7 +173,8 @@ void FileDistribution::UpdateRespFiles()
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
 		Packet pckt = cache.CreateMkFilePacket(*it);
-		std::set<Peer*> peers = GetPeers(*it); // get actual peer list
+						  // get actual peer list
+		std::set<Peer*> peers = GetPeers(*it);
 
 		log[W_DEBUG] << "- file " << (*it)->GetFullName();
 

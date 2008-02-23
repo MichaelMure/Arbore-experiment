@@ -35,9 +35,9 @@ class Peer
 {
 	int fd;
 	pf_addr addr;
-	int ts_diff; // diff between our timestamp and its timestamp */
-	Packet* incoming; // packet we are receiving
-	std::queue<PacketBase> send_queue; // packets we are sending (with flush)
+	int ts_diff;				  // diff between our timestamp and its timestamp */
+	Packet* incoming;			  // packet we are receiving
+	std::queue<PacketBase> send_queue;	  // packets we are sending (with flush)
 
 	unsigned int flags;
 
@@ -62,9 +62,9 @@ public:
 	class MustDisconnect : public std::exception {};
 	class PeerCantConnect: public std::exception
 	{
-	public:
-		pf_addr addr;
-		PeerCantConnect(const pf_addr _addr) : addr(_addr) {}
+		public:
+			pf_addr addr;
+			PeerCantConnect(const pf_addr _addr) : addr(_addr) {}
 	};
 
 	enum
@@ -98,5 +98,4 @@ public:
 	void SendHello();
 	void Receive();
 };
-
 #endif

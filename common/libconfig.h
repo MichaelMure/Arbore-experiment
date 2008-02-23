@@ -125,7 +125,7 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  */
 class MyConfig
 {
-/* Constructeur */
+	/* Constructeur */
 public:
 	MyConfig(std::string path);
 
@@ -133,7 +133,7 @@ public:
 
 	~MyConfig();
 
-/* Exceptions */
+	/* Exceptions */
 public:
 
 	/** This class is an exception class throwed when there is a problem in building of sections/items */
@@ -148,14 +148,14 @@ public:
 			std::string reason;
 	};
 
-/* Methodes */
+	/* Methodes */
 public:
 
 	bool Load(std::string _path = "");
 
 	bool FindEmpty();
 
-/* Attributs */
+	/* Attributs */
 public:
 
 	/** Get a section from his label */
@@ -183,7 +183,7 @@ public:
 	unsigned NbLines() const { return line; }
 	std::string Path() const { return path; }
 
-/* Variables privées */
+	/* Variables privées */
 private:
 	ConfigSection* AddSection(ConfigSection*);
 	std::string path;
@@ -198,7 +198,7 @@ private:
 
 class ConfigSection
 {
-/* Constructeur */
+	/* Constructeur */
 public:
 	ConfigSection(ConfigSection&);
 
@@ -207,10 +207,10 @@ public:
 	typedef void (*TEndOfTab) (ConfigSection*);
 
 	friend class MyConfig;
-/* Methodes */
+	/* Methodes */
 public:
 
-/* Attributs */
+	/* Attributs */
 public:
 
 	/** Get a subsection from his label */
@@ -277,7 +277,7 @@ public:
 	void SetEndOfTab(TEndOfTab eot_f) { end_func = eot_f; }
 	TEndOfTab EndOfTab() const { return end_func; }
 
-/* Variables privées */
+	/* Variables privées */
 private:
 	/** This constructor is privated because only AddSection must call him. */
 	ConfigSection(std::string name, std::string description, bool multiple, MyConfig* config, ConfigSection* parent);
@@ -308,7 +308,7 @@ private:
  */
 class ConfigItem
 {
-/* Constructeur */
+	/* Constructeur */
 public:
 
 	typedef void (*TCallBack) (ConfigItem*);
@@ -322,23 +322,22 @@ public:
 	 * @param _parent parent of this item (a ConfigSection)
 	 */
 	ConfigItem(std::string _label, std::string _description, std::string _def_value, TCallBack _call_back,
-	           MyConfig* _config, ConfigSection* _parent)
+		MyConfig* _config, ConfigSection* _parent)
 		: label(_label), description(_description), config(_config), parent(_parent), found(false),
-		  call_back(_call_back), def_value(_def_value)
-	{}
+		call_back(_call_back), def_value(_def_value)
+		{}
 
 	virtual ~ConfigItem() {}
 
 	friend class ConfigSection;
 
-/* Methodes */
+	/* Methodes */
 public:
 
 	/** Give a clone of this Item (you couldn't be allowed to call this) */
 	virtual ConfigItem* Clone() const = 0;
 
-
-/* Attributs */
+	/* Attributs */
 public:
 
 	std::string Label() const { return label; }
@@ -351,9 +350,18 @@ public:
 	bool Found() const { return found; }
 	void SetFound() { found = true; }
 
-	virtual int Integer() const { return 0; }                        /**< Get value as an integer */
-	virtual std::string String() const { return ""; }                /**< Get value as a string */
-	virtual bool Boolean() const { return false; }                   /**< Get a boolean value */
+	virtual int Integer() const	  /**< Get value as an integer */
+	{
+		return 0;
+	}
+	virtual std::string String() const/**< Get value as a string */
+	{
+		return "";
+	}
+	virtual bool Boolean() const	  /**< Get a boolean value */
+	{
+		return false;
+	}
 	/**< This function might return false if value isn't good */
 	virtual bool SetValue(std::string) = 0;
 
@@ -363,7 +371,7 @@ public:
 
 	std::string DefValue() const { return def_value; }
 
-/* Variables privées */
+	/* Variables privées */
 private:
 	std::string label;
 	std::string description;
@@ -379,9 +387,9 @@ class ConfigItem_string : public ConfigItem
 {
 public:
 	ConfigItem_string(std::string _label, std::string _description, std::string def_value = "", TCallBack cb = 0,
-	                  MyConfig* _config = 0, ConfigSection* _parent = 0)
+		MyConfig* _config = 0, ConfigSection* _parent = 0)
 		: ConfigItem(_label, _description, def_value, cb, _config, _parent)
-	{}
+		{}
 
 	virtual ConfigItem* Clone() const
 	{
@@ -402,9 +410,9 @@ class ConfigItem_int : public ConfigItem
 {
 public:
 	ConfigItem_int(std::string _label, std::string _description, int _min = INT_MIN, int _max = INT_MAX, std::string def_value = "",
-	               TCallBack cb = 0, MyConfig* _config = 0, ConfigSection* _parent = 0)
+		TCallBack cb = 0, MyConfig* _config = 0, ConfigSection* _parent = 0)
 		: ConfigItem(_label, _description, def_value, cb, _config, _parent), min(_min), max(_max)
-	{}
+		{}
 
 	virtual ConfigItem* Clone() const
 	{
@@ -448,9 +456,9 @@ class ConfigItem_bool : public ConfigItem
 {
 public:
 	ConfigItem_bool(std::string _label, std::string _description, std::string def_value = "", TCallBack cb = 0,
-	               MyConfig* _config = 0, ConfigSection* _parent = 0)
+		MyConfig* _config = 0, ConfigSection* _parent = 0)
 		: ConfigItem(_label, _description, def_value, cb, _config, _parent)
-	{}
+		{}
 
 	virtual ConfigItem* Clone() const
 	{
@@ -478,6 +486,4 @@ public:
 private:
 	bool value;
 };
-
-
-#endif /* LIB_CONFIG_H */
+#endif						  /* LIB_CONFIG_H */

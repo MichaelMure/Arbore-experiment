@@ -15,7 +15,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
-*/
+ */
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
@@ -46,5 +46,4 @@ public:
 	size_t GetQueueSize() const { return job_queue.size(); }
 	std::list<Job*>& GetQueue() { return job_queue; }
 };
-
 #endif

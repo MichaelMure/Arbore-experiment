@@ -34,5 +34,4 @@ public:
 	virtual void Write(const char* buf, size_t size) = 0;
 	virtual int Read(char* buf, size_t size) = 0;
 };
-
-#endif // CONNECTION_H
+#endif						  // CONNECTION_H

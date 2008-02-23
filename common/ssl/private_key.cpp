@@ -22,4 +22,3 @@
 PrivateKey::PrivateKey()
 {
 }
-

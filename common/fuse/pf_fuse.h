@@ -34,6 +34,4 @@ int pf_unlink(const char *path);
 int pf_utimens(const char *path, const struct timespec ts[2]);
 
 extern struct fuse_operations pf_oper;
-
-
-#endif // P2PFS_FUSE
+#endif						  // P2PFS_FUSE

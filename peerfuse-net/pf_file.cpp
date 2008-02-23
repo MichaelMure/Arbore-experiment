@@ -28,4 +28,3 @@ bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 	else
 		return f1 < f2;
 }
-

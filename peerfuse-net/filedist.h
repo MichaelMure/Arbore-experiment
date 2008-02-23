@@ -29,7 +29,6 @@ class Peer;
 
 const size_t NB_PEERS_PER_FILE = 5;
 
-
 class FileDistribution
 {
 	std::vector<id_t> id_list;
@@ -55,5 +54,4 @@ public:
 	void AddFile(FileEntry* f, unsigned int flags = 0);
 	void RemoveFile(FileEntry* f, unsigned int flags = 0);
 };
-
-#endif /* FILEDIST_H */
+#endif						  /* FILEDIST_H */

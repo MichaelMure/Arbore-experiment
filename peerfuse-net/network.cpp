@@ -62,8 +62,8 @@ void Network::Broadcast(Packet pckt, const Peer* but_one)
 	pckt.SetDstID(0);
 	for(PeerMap::iterator it = fd2peer.begin(); it != fd2peer.end(); ++it)
 		if(!it->second->IsAnonymous() &&
-		   it->second->IsHighLink() &&
-		   it->second != but_one)
+		it->second->IsHighLink() &&
+		it->second != but_one)
 			it->second->SendMsg(pckt);
 }
 

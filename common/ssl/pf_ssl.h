@@ -32,7 +32,9 @@ public:
 	class ConnectionError : public std::exception {};
 
 	Ssl() {}
-	virtual ~Ssl() {} /* Needed for abstract classes */
+	virtual ~Ssl()			  /* Needed for abstract classes */
+	{
+	}
 
 	Connection* GetConnection(int fd);
 
@@ -40,5 +42,4 @@ public:
 	virtual void Close(Connection* conn) = 0;
 	virtual void CloseAll() = 0;
 };
-
-#endif // PF_SSL_H
+#endif						  // PF_SSL_H

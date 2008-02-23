@@ -28,16 +28,16 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	/* NET_HELLO */
 	{
-		/* NET_HELLO_NOW */	T_UINT32,
-		/* NET_HELLO_PORT */	T_UINT32,
-		/* NET_HELLO_VERSION */	T_STR,
-		/* NET_HELLO_MY_ID */	T_UINT32,
+		/* NET_HELLO_NOW */     T_UINT32,
+		/* NET_HELLO_PORT */    T_UINT32,
+		/* NET_HELLO_VERSION */ T_STR,
+		/* NET_HELLO_MY_ID */   T_UINT32,
 		T_NONE
 	},
 
 	/* NET_YOUR_ID */
 	{
-		/* NET_YOUR_ID_ID */	T_UINT32,
+		/* NET_YOUR_ID_ID */    T_UINT32,
 		T_NONE
 	},
 
@@ -108,5 +108,3 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 	{ T_NONE },
 
 };
-
-

@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
 	SslSsl ssl;
 
 	int sd = socket (AF_INET, SOCK_STREAM, 0);
-	
+
 	struct sockaddr_in sa;
 	memset (&sa, '\0', sizeof(sa));
 	sa.sin_family      = AF_INET;
 	sa.sin_addr.s_addr = inet_addr ("127.0.0.1");
 	sa.sin_port        = htons     (8000);
-	
+
 	connect(sd, (struct sockaddr*) &sa, sizeof(sa));
 	ssl.Connect(sd);
 	ConnectionSsl* conn = ssl.GetConnection(sd);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 		printf("Unable to receive\n");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	socklen_t client_len = sizeof(sa_cli);
 	int cli_fd;
 	if((cli_fd = accept (listen_fd, (struct sockaddr*) &sa_cli, &client_len)) == -1)
@@ -103,4 +103,3 @@ int main(int argc, char* argv[])
 	printf("%s\n", buf);
 }
 #endif
-

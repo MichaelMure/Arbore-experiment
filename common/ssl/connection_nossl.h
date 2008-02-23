@@ -33,5 +33,4 @@ public:
 	void Write(const char* buf, size_t size);
 	int Read(char* buf, size_t size);
 };
-
-#endif // CONNECTION_NOSSL_H
+#endif						  // CONNECTION_NOSSL_H

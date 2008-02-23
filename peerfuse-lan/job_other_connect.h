@@ -39,5 +39,4 @@ public:
 	void Start();
 	const job_type GetType() const {return JOB_OTHER_CONNECT; }
 };
-
 #endif

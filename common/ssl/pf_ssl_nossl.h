@@ -40,5 +40,4 @@ public:
 	void Close(SslConnection* conn);
 	void CloseAll();
 };
-
-#endif // PF_SSL_NOSSL_H
+#endif						  // PF_SSL_NOSSL_H

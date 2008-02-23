@@ -27,8 +27,8 @@
 Cache cache;
 
 Cache::Cache()
-	: Mutex(RECURSIVE_MUTEX),
-	tree("", NULL)
+			: Mutex(RECURSIVE_MUTEX),
+			tree("", NULL)
 {
 }
 
@@ -44,7 +44,7 @@ void Cache::Load(std::string hd_path)
 		hdd.BuildTree(GetTree(), hd_path);
 	}
 	catch(...)
-	{ /* U G L Y, I think we MUST find a solution. */
+	{					  /* U G L Y, I think we MUST find a solution. */
 		Unlock();
 		throw;
 	}
@@ -64,7 +64,7 @@ FileEntry* Cache::Path2File(std::string path, std::string* filename)
 		if(!tmp)
 		{
 			if(path.find('/') == std::string::npos && filename)
-			{ /* we are in last dir, but this file doesn't exist */
+			{			  /* we are in last dir, but this file doesn't exist */
 				*filename = name;
 				Unlock();
 				return current_dir;

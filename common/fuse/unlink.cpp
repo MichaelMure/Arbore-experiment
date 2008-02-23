@@ -23,7 +23,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-
 #include <fuse.h>
 #include <errno.h>
 /* At time, this headers are useless
@@ -50,7 +49,7 @@ int pf_unlink(const char *path)
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
-		return -ENOENT; /* No such file or directory */
+		return -ENOENT;			  /* No such file or directory */
 	}
 	catch(Cache::DirNotEmpty &e)
 	{

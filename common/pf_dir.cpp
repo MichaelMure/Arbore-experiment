@@ -20,9 +20,10 @@
 #include "pf_dir.h"
 
 DirEntry::DirEntry(std::string name, DirEntry* _parent)
-	: FileEntry(name, _parent)
+			: FileEntry(name, _parent)
 {
-	stat.mode = S_IFDIR | S_IRWXU | S_IRWXG | S_IRWXO;     /* Protection */
+						  /* Protection */
+	stat.mode = S_IFDIR | S_IRWXU | S_IRWXG | S_IRWXO;
 }
 
 DirEntry::~DirEntry()
@@ -35,7 +36,7 @@ DirEntry::~DirEntry()
 void DirEntry::AddFile(FileEntry* file)
 {
 	if(files.find(file->GetName()) != files.end())
-		return; // TODO: no happy, raise an exception?
+		return;				  // TODO: no happy, raise an exception?
 	files[file->GetName()] = file;
 }
 
@@ -53,4 +54,3 @@ FileEntry* DirEntry::GetFile(std::string name) const
 
 	return ret->second;
 }
-
