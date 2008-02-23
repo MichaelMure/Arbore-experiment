@@ -27,27 +27,29 @@ FileDistribution::FileDistribution()
 
 }
 
-bool FileDistribution::_is_responsible(const Peer* peer, const FileEntry* file, const std::vector<id_t>& id_list) const
+bool FileDistribution::_is_responsible(const id_t peer_id, const FileEntry* file, const std::vector<id_t>& id_list) const
 {
-	size_t i = 0;
-	size_t id_n;
+	assert(peer_id > 0);
+	assert(file != NULL);
+
 	std::vector<id_t>::const_iterator it;
 	std::vector<id_t>::const_iterator begin = id_list.begin();
-	for(it = begin; it != id_list.end() && *it != peer->GetID(); ++it);
+	for(it = begin; it != id_list.end() && *it != peer_id; ++it);
 
 	if(it == id_list.end())
 		return false;
 
-	id_n = it - begin;
+	size_t id_n = it - begin;
+	size_t i = 0;
 
 	for(; i < NB_PEERS_PER_FILE && file->GetPathSerial() % id_list.size() != id_n % id_list.size(); ++i);
 
 	return (i < NB_PEERS_PER_FILE);
 }
 
-bool FileDistribution::IsResponsible(const Peer* peer, const FileEntry* file) const
+bool FileDistribution::IsResponsible(const id_t peer_id, const FileEntry* file) const
 {
-	return _is_responsible(peer, file, id_list);
+	return _is_responsible(peer_id, file, id_list);
 }
 
 std::set<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
@@ -57,6 +59,8 @@ std::set<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
 
 std::set<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
 {
+	assert(f != NULL);
+
 	std::set<Peer*> list;
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
@@ -106,19 +110,32 @@ FileList FileDistribution::GetFiles(id_t id) const
 
 void FileDistribution::AddFile(FileEntry* f, unsigned int flags)
 {
-	resp_files.insert(f);
-	std::set<Peer*> peers = GetPeers(f);
-	Packet pckt = cache.CreateMkFilePacket(f);
+	assert(f != NULL);               /* exists */
+	assert(f->GetParent() != NULL);  /* isn't the root dir */
 
-	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
+	if(IsResponsible(net.GetMyID(), f))
 	{
-		pckt.SetDstID((*p)->GetID());
-		(*p)->SendMsg(pckt);
+		resp_files.insert(f);
+
+		if(flags & M_PROPAGATE)
+		{
+			std::set<Peer*> peers = GetPeers(f);
+			Packet pckt = cache.CreateMkFilePacket(f);
+
+			for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
+			{
+				pckt.SetDstID((*p)->GetID());
+				(*p)->SendMsg(pckt);
+			}
+		}
 	}
 }
 
 void FileDistribution::RemoveFile(FileEntry* f, unsigned int flags)
 {
+	assert(f != NULL);               /* exists */
+	assert(f->GetParent() != NULL);  /* isn't the root dir */
+
 	std::set<Peer*> peers = GetPeers(f);
 	Packet pckt = cache.CreateRmFilePacket(f);
 
@@ -164,7 +181,7 @@ void FileDistribution::UpdateRespFiles()
 		for(std::set<Peer*>::iterator peer = peers.begin(); peer != peers.end(); ++peer)
 		{
 			log[W_DEBUG] << "  -> " << *peer;
-			if(!_is_responsible(*peer, *it, last_id_list))
+			if(!_is_responsible((*peer)->GetID(), *it, last_id_list))
 			{
 				pckt.SetDstID((*peer)->GetID());
 				(*peer)->SendMsg(pckt);
