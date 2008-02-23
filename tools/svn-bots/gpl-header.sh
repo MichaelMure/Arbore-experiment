@@ -20,6 +20,7 @@
 set -e
 
 cd /home/p2pfs-buildbot/peerfuse/gpl_header
+svn up >/dev/null
 headers_count=0
 
 # Check cpp / h files
@@ -42,7 +43,6 @@ do
 	then
 		# remove the #!/bin/bash
 		LINES=$(cat "$file"|wc -l)
-		echo $LINES
 		tail -n $(( $LINES - 1 )) "$file" >> tmp
 	else
 		cat "$file" >> tmp
@@ -52,8 +52,8 @@ do
 	headers_count=$(($headers_count+1))
 done
 
-if [ "$header_count" != "0" ]
+if [ "$headers_count" != "0" ]
 then
-	svn ci -m "$headers_count GPL headers added"
+	svn ci -m "$headers_count GPL headers added" > /dev/null
 fi
 
