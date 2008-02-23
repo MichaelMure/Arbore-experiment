@@ -17,22 +17,20 @@
  * $Id$
  */
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#include <openssl/ssl.h>
+#include "connection_ssl.h"
 
-#include <exception>
-
-class Connection
+ConnectionSsl::~ConnectionSsl()
 {
-	int fd;
-public:
-	class ConnectionError : public std::exception {};
+	SSL_free(ssl);
+}
 
-	Connection(int _fd) : fd(_fd) {}
-	virtual ~Connection() {}
+void ConnectionSsl::Write(const char *buf, size_t size)
+{
+	SSL_write(ssl, buf, size);
+}
 
-	virtual void Write(const char* buf, size_t size) = 0;
-	virtual int Read(char* buf, size_t size) = 0;
-};
-
-#endif // CONNECTION_H
+int ConnectionSsl::Read(char *buf, size_t size)
+{
+	return SSL_read(ssl, buf, size);
+}
