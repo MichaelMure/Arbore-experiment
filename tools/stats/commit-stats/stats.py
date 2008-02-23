@@ -274,7 +274,7 @@ def main():
     child = os.popen("svn log %s" % sys.argv[1])
 
     if len(sys.argv) > 2:
-        output = sys.argv[2]
+        output = sys.argv[2] + '/'
     else:
         output = ''
 
