@@ -42,6 +42,7 @@ IF(PF_NET)
 	SET(BIN_NAME peerfuse-net)
 ELSE(PF_NET)
 	SET(SRC ${SRC}
+		peerfuse-lan/application.cpp
 		peerfuse-lan/network.cpp
 		peerfuse-lan/pflan.cpp
 		peerfuse-lan/pflan_fuse.cpp
