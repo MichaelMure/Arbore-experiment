@@ -36,13 +36,13 @@ class FileDistribution
 	FileList resp_files;
 
 	bool _is_responsible(const Peer* peer, const FileEntry* file, const std::vector<id_t>& id_list) const;
-	std::vector<Peer*> _get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
+	std::set<Peer*> _get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
 
 public:
 
 	FileDistribution();
 
-	std::vector<Peer*> GetPeers(const FileEntry* f) const;
+	std::set<Peer*> GetPeers(const FileEntry* f) const;
 	bool IsResponsible(const Peer* peer, const FileEntry* file) const;
 
 	FileList GetFiles(id_t id) const;
@@ -50,6 +50,10 @@ public:
 	FileList GetMyRespFiles() const { return resp_files; }
 
 	void UpdateRespFiles();
+
+	/* Flags are defined in cache.h */
+	void AddFile(FileEntry* f, unsigned int flags = 0);
+	void RemoveFile(FileEntry* f, unsigned int flags = 0);
 };
 
 #endif /* FILEDIST_H */

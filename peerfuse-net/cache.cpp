@@ -216,8 +216,7 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
 		throw;
 	}
 
-	if(flags & M_PROPAGATE)
-		net.Broadcast(CreateMkFilePacket(file));
+	filedist.AddFile(file, flags);
 
 	Unlock();
 	return file;
@@ -264,8 +263,7 @@ void Cache::RmFile(std::string path, unsigned int flags)
 	}
 
 	/* Send before removing file */
-	if(flags & M_PROPAGATE)
-		net.Broadcast(CreateRmFilePacket(f));
+	filedist.RemoveFile(f, flags);
 
 	f->GetParent()->RemFile(f);
 	Unlock();

@@ -50,14 +50,14 @@ bool FileDistribution::IsResponsible(const Peer* peer, const FileEntry* file) co
 	return _is_responsible(peer, file, id_list);
 }
 
-std::vector<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
+std::set<Peer*> FileDistribution::GetPeers(const FileEntry* f) const
 {
 	return _get_peers_from_idlist(f, id_list);
 }
 
-std::vector<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
+std::set<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
 {
-	std::vector<Peer*> list;
+	std::set<Peer*> list;
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
@@ -67,7 +67,7 @@ std::vector<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, 
 		 * ID. For example, for me.
 		 */
 		if(peer)
-			list.push_back(peer);
+			list.insert(peer);
 	}
 
 	return list;
@@ -104,6 +104,33 @@ FileList FileDistribution::GetFiles(id_t id) const
 	return result;
 }
 
+void FileDistribution::AddFile(FileEntry* f, unsigned int flags)
+{
+	resp_files.insert(f);
+	std::set<Peer*> peers = GetPeers(f);
+	Packet pckt = cache.CreateMkFilePacket(f);
+
+	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
+	{
+		pckt.SetDstID((*p)->GetID());
+		(*p)->SendMsg(pckt);
+	}
+}
+
+void FileDistribution::RemoveFile(FileEntry* f, unsigned int flags)
+{
+	std::set<Peer*> peers = GetPeers(f);
+	Packet pckt = cache.CreateRmFilePacket(f);
+
+	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
+	{
+		pckt.SetDstID((*p)->GetID());
+		(*p)->SendMsg(pckt);
+	}
+
+	resp_files.erase(f);
+}
+
 void FileDistribution::UpdateRespFiles()
 {
 	/* Store last id list */
@@ -129,12 +156,12 @@ void FileDistribution::UpdateRespFiles()
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
 		Packet pckt = cache.CreateMkFilePacket(*it);
-		PeerList peers = GetPeers(*it); // get actual peer list
+		std::set<Peer*> peers = GetPeers(*it); // get actual peer list
 
 		log[W_DEBUG] << "- file " << (*it)->GetFullName();
 
 		/* TODO do not send message to peers we know they have already this file version */
-		for(PeerList::iterator peer = peers.begin(); peer != peers.end(); ++peer)
+		for(std::set<Peer*>::iterator peer = peers.begin(); peer != peers.end(); ++peer)
 		{
 			log[W_DEBUG] << "  -> " << *peer;
 			if(!_is_responsible(*peer, *it, last_id_list))
