@@ -16,9 +16,11 @@
 
 == Peerfuse NET ==
 
-	* Fix the mutex problem
+	* When we create/remove/update a file or a dir, send to parent directory responsible
+	  if I am not, or send to all other responsibles if I am.
 
-	* Send only once the MKFILE for a specific file and peer, at net.merge
+	* When receive a create/remove/update for a file or a dir, send to other responsibles
+	  if I am AND sender isn't responsible
 
 == Peerfuse LAN ==
 
