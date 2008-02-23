@@ -17,7 +17,20 @@
 # $Id$
 #
 
-find . -type f -a '(' -path '*/branches/*' -path '*/branches*' -prune -o -path '*/.*' -prune -o -print ')' | while read file; do
-    if grep -q '\$Id:' "$file" && ! svn propget svn:keywords "$file" | grep -q '^Id$'; then svn propset svn:keywords Id "$file"; fi
-  done
+cd /home/p2pfs-buidlbot/peerfuse/propset/trunk
+prop_count=0
+
+(find . -name \*.cpp; find -name \*.h; find -name \*.sh |grep -v 'tools/svn-bots/svn-Id\.sh') | while read file
+do
+	if grep -q '\$Id.*\$' "$file" && ! (svn propget svn:keywords "$file" | grep -q '^Id$')
+	then
+		svn propset svn:keywords Id "$file" > /dev/null
+		prop_count=$(($prop_count+1))
+	fi
+done
+
+if [ "$prop_count" != "0" ]
+then
+	svn ci --username=bot-propset -m "$prop_count properties set."
+fi
 
