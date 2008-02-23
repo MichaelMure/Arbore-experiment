@@ -57,7 +57,7 @@ class Graph:
 
     dpi = 70
 
-    colours = ['#21FF85', '#B2B6E0', '#5289FF', '#A9482E', '#C3F4F8', '#E5D587',
+    colours = ['#B2B6E0', '#C3F4F8', '#5289FF', '#A9482E', '#21FF85', '#E5D587',
                '#E07191', '#74D2F1', '#5BC466', '#92E0DF', '#FFFFFF', '#AFFF54',
                '#C09858', '#FFCB75', '#33ADFF', '#9E4570', '#9AE0A1', '#47BE4F',
                '#CC0099', '#E0DD8D', '#FF8A2B', '#4B5DFF', '#6DF8BE', '#9C56FF',
@@ -238,6 +238,7 @@ class Commit:
         self.user = user
         self.date = date
         self.time = time
+        self.message = []
 
 class User:
 
@@ -279,31 +280,43 @@ def main():
         output = ''
 
     data = child.read().split('\n')
-    data.reverse()
 
     users = {}
     dates = {}
     hours = [CommitList(i) for i in xrange(24)]
     months = {}
+    all_commits = []
 
     REGEXP = re.compile("^r([0-9]{1,4}) \| (.*) \| ([0-9 -]+) ([0-9 :]+) \+([0-9]+) \((.*)\) \| ([0-9]+) (line|lines)$")
+
+    nb_line = 0
     for line in data:
         regs = REGEXP.match(line)
         if regs:
-            revision = regs.group(1)
+            revision = int(regs.group(1))
             username = regs.group(2)
             date = regs.group(3)
             time = regs.group(4)
+            nb_lines = int(regs.group(7)) + 1
 
             if not users.has_key(username):
                 users[username] = User(username)
             user = users[username]
 
             commit = Commit(revision, user, date, time)
+            all_commits += [commit]
 
             user.add_commit(commit)
+        elif len(all_commits) > 0 and nb_lines > 0:
+            if len(line) > 0:
+                all_commits[-1].message += [line]
+            nb_lines -= 1
 
-            dt = parseDatetime('%s %s' % (date, time))
+    all_commits.reverse() # first to last
+
+    for commit in all_commits:
+
+            dt = parseDatetime('%s %s' % (commit.date, commit.time))
 
             hours[dt.hour].add_commit(commit)
 
@@ -330,6 +343,8 @@ def main():
                     d = datetime(y, m, 1).date()
 
             months[(dt.year, dt.month)].add_commit(commit)
+
+    all_commits.reverse() # last to first
 
     html = file(output + 'stats.html', 'w')
     html.write("""
@@ -408,6 +423,17 @@ def main():
     users_pie.create_img(output + 'users.png')
     html.write('<img src="users.png" />')
     html.write('</p>')
+
+    html.write('<h2>ChangeLog</h2>')
+
+    for i in all_commits:
+        html.write('<p><b>r%d</b> by <i>%s</i> at %s %s: ' % (i.revision, i.user.name, i.date, i.time))
+        for line in i.message:
+            html.write('<br />%s' % line)
+        html.write('<br />------------------------------------------------------------------------')
+
+        html.write('</p>')
+
 
     html.write("""
 </div>
