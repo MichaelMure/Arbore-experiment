@@ -17,7 +17,7 @@
 # $Id$
 #
 
-cd /home/p2pfs-buidlbot/peerfuse/propset/trunk
+cd /home/p2pfs-buildbot/peerfuse/propset
 prop_count=0
 
 (find . -name \*.cpp; find -name \*.h; find -name \*.sh |grep -v 'tools/svn-bots/svn-Id\.sh') | while read file
