@@ -268,10 +268,15 @@ class CommitList:
 def main():
 
     if len(sys.argv) < 2:
-        print 'Syntax: %s <path of log>' % sys.argv[0]
+        print 'Syntax: %s <path of log> [output dir]' % sys.argv[0]
         return
 
     child = os.popen("svn log %s" % sys.argv[1])
+
+    if len(sys.argv) > 2:
+        output = sys.argv[2]
+    else:
+        output = ''
 
     data = child.read().split('\n')
     data.reverse()
@@ -326,7 +331,7 @@ def main():
 
             months[(dt.year, dt.month)].add_commit(commit)
 
-    html = file('stats.html', 'w')
+    html = file(output + 'stats.html', 'w')
     html.write("""
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html
@@ -358,7 +363,7 @@ def main():
                 lst += [0]
         hours_histo.add_entry(commits.name, lst)
 
-    hours_histo.create_img('hours.png')
+    hours_histo.create_img(output + 'hours.png')
 
     html.write('<img src="hours.png" />')
 
@@ -373,7 +378,7 @@ def main():
                 lst += [0]
         months_histo.add_entry(commits.name, lst)
 
-    months_histo.create_img('months.png')
+    months_histo.create_img(output + 'months.png')
     html.write('<img src="months.png" />')
 
     html.write('</p>')
@@ -390,7 +395,7 @@ def main():
                 lst += [0]
         dates_histo.add_entry(commits.name, lst)
 
-    dates_histo.create_img('dates.png')
+    dates_histo.create_img(output + 'dates.png')
     html.write('<img src="dates.png" />')
 
     html.write('</p>')
@@ -400,7 +405,7 @@ def main():
     for u in users.values():
         users_pie.add_entry(u.name, len(u.commits))
 
-    users_pie.create_img('users.png')
+    users_pie.create_img(output + 'users.png')
     html.write('<img src="users.png" />')
     html.write('</p>')
 
