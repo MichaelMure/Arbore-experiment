@@ -272,6 +272,7 @@ def main():
         print 'Syntax: %s <path of log> [output dir]' % sys.argv[0]
         return
 
+    os.system('svn up %s >>/dev/null' % sys.argv[1])
     child = os.popen("svn log %s" % sys.argv[1])
 
     if len(sys.argv) > 2:
