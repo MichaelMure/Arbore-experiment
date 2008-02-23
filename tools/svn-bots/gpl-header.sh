@@ -54,6 +54,6 @@ done
 
 if [ "$headers_count" != "0" ]
 then
-	svn ci -m "$headers_count GPL headers added" > /dev/null
+	svn ci --username=bot-gpl -m "$headers_count GPL headers added" > /dev/null
 fi
 

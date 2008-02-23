@@ -17,20 +17,20 @@
 # $Id$
 #
 
+set -e
 cd /home/p2pfs-buildbot/peerfuse/propset
-prop_count=0
 
 (find . -name \*.cpp; find -name \*.h; find -name \*.sh |grep -v 'tools/svn-bots/svn-Id\.sh') | while read file
 do
 	if grep -q '\$Id.*\$' "$file" && ! (svn propget svn:keywords "$file" | grep -q '^Id$')
 	then
 		svn propset svn:keywords Id "$file" > /dev/null
-		prop_count=$(($prop_count+1))
 	fi
 done
 
+prop_count="$(svn status|grep ^\ M|wc -l)"
 if [ "$prop_count" != "0" ]
 then
-	svn ci --username=bot-propset -m "$prop_count properties set."
+	svn ci --username=bot-propset -m "$prop_count properties set." > /dev/null
 fi
 

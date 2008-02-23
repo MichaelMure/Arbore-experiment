@@ -45,7 +45,7 @@ done
 PLUS_LINE=$(svn diff|grep ^+|wc -l)
 LESS_LINE=$(svn diff|grep ^-|wc -l)
 
-svn ci -m "+$PLUS_LINE lines  -$LESS_LINE lines"
+svn ci --username=bot-indent -m "+$PLUS_LINE lines  -$LESS_LINE lines"
 #echo "+$PLUS_LINE lines  -$LESS_LINE lines"
 
 
