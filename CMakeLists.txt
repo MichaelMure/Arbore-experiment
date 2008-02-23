@@ -24,6 +24,11 @@ SET(SRC
 	common/fuse/rmdir.cpp
 	common/fuse/unlink.cpp
 	common/fuse/utimens.cpp
+
+	common/ssl/certificate.cpp
+	common/ssl/connection_ssl.cpp
+	common/ssl/pf_ssl_ssl.cpp
+	common/ssl/private_key.cpp
 	)
 
 
@@ -38,8 +43,7 @@ IF(PF_NET)
 		peerfuse-net/filedist.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/net_proto.cpp
-		peerfuse-net/peer.cpp
-		common/ssl/certificate.cpp)
+		peerfuse-net/peer.cpp)
 	SET(BIN_NAME peerfuse-net)
 ELSE(PF_NET)
 	SET(SRC ${SRC}
@@ -58,6 +62,8 @@ ENDIF(PF_NET)
 
 ADD_EXECUTABLE(${BIN_NAME} ${SRC})
 
+FIND_PACKAGE(OpenSSL)
+
 INCLUDE(FindFuse.cmake)
 IF(NOT FUSE_FOUND)
 	MESSAGE(FATAL_ERROR "Unable to find Fuse library")
@@ -65,9 +71,9 @@ ELSE(NOT FUSE_FOUND)
 	MESSAGE(STATUS "Found Fuse library")
 ENDIF(NOT FUSE_FOUND)
 
-INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_PATH} "${BIN_NAME}/" "src/" "common/" "common/fuse")
+INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_PATH} ${OPENSSL_INCLUDE_DIR} "${BIN_NAME}/" "src/" "common/" "common/fuse")
 LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LIBRARY_PATH})
-TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY})
+TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY} ${OPENSSL_LIBRARIES})
 
 
 SET(CMAKE_BUILD_TYPE ${BUILD})
