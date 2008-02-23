@@ -29,6 +29,7 @@ SET(SRC
 
 IF(PF_NET)
 	SET(SRC ${SRC}
+		peerfuse-net/application.cpp
 		peerfuse-net/network.cpp
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp
