@@ -35,7 +35,7 @@ void ConnectionSsl::ReadToBuf()
 	const int buf_size = 128;
 	int received = 0;
 	char* buf = (char*)malloc(buf_size);
-	
+
 	do
 	{
 		received = SSL_read(ssl, (void*)buf, buf_size);
@@ -50,4 +50,3 @@ void ConnectionSsl::ReadToBuf()
 
 	free(buf);
 }
-

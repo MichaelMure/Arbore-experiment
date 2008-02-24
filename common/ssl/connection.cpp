@@ -40,4 +40,3 @@ bool Connection::Read(char **buf, size_t size)
 	read_buf = new_buf;
 	return true;
 }
-
