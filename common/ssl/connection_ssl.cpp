@@ -30,7 +30,24 @@ void ConnectionSsl::Write(const char *buf, size_t size)
 	SSL_write(ssl, buf, size);
 }
 
-int ConnectionSsl::Read(char *buf, size_t size)
+void ConnectionSsl::ReadToBuf()
 {
-	return SSL_read(ssl, buf, size);
+	const int buf_size = 128;
+	int received = 0;
+	char* buf = (char*)malloc(buf_size);
+	
+	do
+	{
+		received = SSL_read(ssl, (void*)buf, buf_size);
+		if(received > 0)
+		{
+			read_buf = (char*)realloc(read_buf, buf_size + received);
+			memcpy(read_buf + buf_size, buf, received);
+			read_buf_size += received;
+		}
+	}
+	while(received == buf_size);
+
+	free(buf);
 }
+

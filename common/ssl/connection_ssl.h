@@ -33,7 +33,7 @@ public:
 	~ConnectionSsl();
 
 	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
+	void ReadToBuf();
 
 	//Certificate GetCertificate();
 };

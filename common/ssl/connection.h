@@ -25,13 +25,18 @@
 class Connection
 {
 	int fd;
+protected:
+	char* read_buf;
+	size_t read_buf_size;
 public:
 	class ConnectionError : public std::exception {};
 
-	Connection(int _fd) : fd(_fd) {}
+	Connection(int _fd);
 	virtual ~Connection() {}
 
+	// Fill the buffer with incoming datas
+	virtual void ReadToBuf() = 0;
 	virtual void Write(const char* buf, size_t size) = 0;
-	virtual int Read(char* buf, size_t size) = 0;
+	bool Read(char **buf, size_t size);
 };
 #endif						  // CONNECTION_H

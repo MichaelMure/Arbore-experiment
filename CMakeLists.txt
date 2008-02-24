@@ -26,6 +26,7 @@ SET(SRC
 	common/fuse/utimens.cpp
 
 	common/ssl/certificate.cpp
+	common/ssl/connection.cpp
 	common/ssl/connection_ssl.cpp
 	common/ssl/pf_ssl_ssl.cpp
 	common/ssl/private_key.cpp
