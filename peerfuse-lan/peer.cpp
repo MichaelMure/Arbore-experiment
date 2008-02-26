@@ -34,9 +34,10 @@
 #include "session_config.h"
 #include "tools.h"
 
-Peer::Peer(int _fd, pf_addr _addr)
+Peer::Peer(int _fd, pf_addr _addr, Connection* _conn)
 			: fd(_fd),
 			addr(_addr),
+			conn(_conn),
 			ts_diff(0),
 			incoming(NULL),
 			flags(0)
@@ -48,6 +49,7 @@ Peer::~Peer()
 	if(fd)
 		close(fd);
 	delete incoming;
+	delete conn;
 }
 
 void Peer::Flush()

@@ -46,10 +46,10 @@ public:
 	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
 	void SetPrivateKey(PrivateKey _key) { key = _key; }
 
-	void HandShake(int fd);
 	ConnectionSsl* GetConnection(int fd);
 
-	void Connect(int fd);
+	Connection* Accept(int fd);
+	Connection* Connect(int fd);
 	void Close(Connection* conn);
 	void CloseAll();
 };

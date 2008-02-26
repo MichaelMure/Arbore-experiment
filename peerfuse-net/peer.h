@@ -20,6 +20,7 @@
 #ifndef PEER_H
 #define PEER_H
 
+#include "connection.h"
 #include "pf_types.h"
 #include "packet.h"
 #include "ssl/certificate.h"
@@ -34,6 +35,8 @@ class Peer
 {
 	int fd;
 	pf_addr addr;
+	Connection* conn;
+
 	int ts_diff;				  // diff between our timestamp and its timestamp */
 	Packet* incoming;			  // packet we are receiving
 	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
@@ -81,7 +84,7 @@ public:
 	};
 
 	/* Constructors */
-	Peer(int _fd, pf_addr addr, Peer* = 0);
+	Peer(int _fd, pf_addr addr, Connection* _conn, Peer* parent = 0);
 	~Peer();
 
 	id_t GetID() const { return addr.id; }

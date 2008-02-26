@@ -38,7 +38,8 @@ public:
 
 	Connection* GetConnection(int fd);
 
-	virtual void Connect(int fd) = 0;
+	virtual Connection* Accept(int fd) = 0;
+	virtual Connection* Connect(int fd) = 0;
 	virtual void Close(Connection* conn) = 0;
 	virtual void CloseAll() = 0;
 };

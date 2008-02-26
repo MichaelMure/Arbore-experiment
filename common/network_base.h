@@ -28,6 +28,7 @@
 #include <map>
 #include <time.h>
 
+#include "pf_ssl.h"
 #include "scheduler.h"
 #include "peer.h"
 #include "pf_types.h"
@@ -71,6 +72,7 @@ private:
 
 protected:
 	id_t my_id;
+	Ssl *ssl;
 
 	PeerList peer_list;
 	PeerMap fd2peer;

@@ -20,6 +20,7 @@
 #ifndef PEER_H
 #define PEER_H
 
+#include "connection.h"
 #include "pf_types.h"
 #include "packet.h"
 #include <queue>
@@ -35,6 +36,8 @@ class Peer
 {
 	int fd;
 	pf_addr addr;
+	Connection* conn;
+
 	int ts_diff;				  // diff between our timestamp and its timestamp */
 	Packet* incoming;			  // packet we are receiving
 	std::queue<PacketBase> send_queue;	  // packets we are sending (with flush)
@@ -74,7 +77,7 @@ public:
 	};
 
 	/* Constructors */
-	Peer(int _fd, pf_addr addr);
+	Peer(int _fd, pf_addr addr, Connection* _conn);
 	~Peer();
 
 	int GetFd() const { return fd; }

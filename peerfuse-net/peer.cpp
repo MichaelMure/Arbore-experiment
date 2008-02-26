@@ -32,9 +32,10 @@
 #include "log.h"
 #include "session_config.h"
 
-Peer::Peer(int _fd, pf_addr _addr, Peer* parent)
+Peer::Peer(int _fd, pf_addr _addr, Connection* _conn, Peer* parent)
 			: fd(_fd),
 			addr(_addr),
+			conn(_conn),
 			ts_diff(0),
 			incoming(NULL),
 			uplink(parent),
@@ -47,6 +48,7 @@ Peer::~Peer()
 	if(fd)
 		close(fd);
 	delete incoming;
+	delete conn;
 
 	if(uplink)
 	{
@@ -248,7 +250,8 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	}
 	catch(Network::CantConnectTo &e)
 	{
-		net.AddPeer(new Peer(-1, addr));
+		// BUG: ???
+		net.AddPeer(new Peer(-1, addr, NULL));
 	}
 }
 

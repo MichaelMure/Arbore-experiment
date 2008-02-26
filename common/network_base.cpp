@@ -28,6 +28,7 @@
 #include <netdb.h>
 #include <time.h>
 
+#include "pf_ssl_ssl.h"
 #include "log.h"
 #include "libconfig.h"
 #include "network_base.h"
@@ -44,6 +45,7 @@ NetworkBase::NetworkBase() throw(CantRunThread)
 {
 	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
+	ssl = new SslSsl();
 
 	int r = pthread_create(&thread_id, NULL, StartThread, (void*)this);
 	if (r != 0)
@@ -54,7 +56,7 @@ NetworkBase::~NetworkBase()
 {
 	running = false;
 	pthread_join(thread_id, NULL);
-
+	delete ssl;
 }
 
 void *NetworkBase::StartThread(void* arg)
@@ -164,7 +166,8 @@ void NetworkBase::Main()
 						pf_addr addr = none_addr;
 						addr.ip[3] = newcon.sin_addr.s_addr;
 
-						AddPeer(new Peer(newfd, addr));
+						Connection *peer_conn = ssl->Accept(newfd);
+						AddPeer(new Peer(newfd, addr, peer_conn));
 					}
 				}
 				else
@@ -280,7 +283,8 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	Peer* p = AddPeer(new Peer(sock, addr));
+	Connection* conn = ssl->Connect(sock);
+	Peer* p = AddPeer(new Peer(sock, addr, conn));
 	p->SetFlag(Peer::SERVER);
 	DelDisconnected(addr);
 	return p;
@@ -311,6 +315,10 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 	fcntl(serv_sock, F_SETFL, O_NONBLOCK);
 
 	setsockopt(serv_sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof reuse_addr);
+
+	int flags = fcntl(serv_sock, F_GETFL);
+	int res = fcntl(serv_sock, F_SETFL, flags | O_NONBLOCK);
+	assert(res != -1);
 
 	localhost.sin_family = AF_INET;
 	localhost.sin_addr.s_addr = inet_addr(bindaddr);
