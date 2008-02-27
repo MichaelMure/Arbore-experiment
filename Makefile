@@ -5,10 +5,10 @@ PF_LAN_OPT = $(CMAKE_OPTIONS) -DPF_NET:BOOL=OFF
 all: pfnet pflan
 
 pfnet: build.peerfuse-net/Makefile
-	make -C build.peerfuse-net all -j4
+	make -C build.peerfuse-net all
 
 pflan: build.peerfuse-lan/Makefile
-	make -C build.peerfuse-lan all -j4
+	make -C build.peerfuse-lan all
 
 build.peerfuse-net/Makefile:
 	[ -d build.peerfuse-net ] || mkdir build.peerfuse-net; \
