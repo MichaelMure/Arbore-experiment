@@ -14,17 +14,6 @@ SET(SRC
 	common/scheduler.cpp
 	common/tools.cpp
 
-	common/fuse/chmod.cpp
-	common/fuse/chown.cpp
-	common/fuse/create.cpp
-	common/fuse/flush.cpp
-	common/fuse/getattr.cpp
-	common/fuse/mkdir.cpp
-	common/fuse/readdir.cpp
-	common/fuse/rmdir.cpp
-	common/fuse/unlink.cpp
-	common/fuse/utimens.cpp
-
 	common/ssl/certificate.cpp
 	common/ssl/connection.cpp
 	common/ssl/connection_ssl.cpp
@@ -32,6 +21,21 @@ SET(SRC
 	common/ssl/private_key.cpp
 	)
 
+IF(NOT PF_SERVER_MODE)
+	SET(SRC ${SRC}
+		common/fuse/chmod.cpp
+		common/fuse/chown.cpp
+		common/fuse/create.cpp
+		common/fuse/flush.cpp
+		common/fuse/getattr.cpp
+		common/fuse/mkdir.cpp
+		common/fuse/readdir.cpp
+		common/fuse/rmdir.cpp
+		common/fuse/unlink.cpp
+		common/fuse/utimens.cpp)
+ELSE(NOT PF_SERVER_MODE)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")
+ENDIF(NOT PF_SERVER_MODE)
 
 IF(PF_NET)
 	SET(SRC ${SRC}
@@ -65,12 +69,16 @@ ADD_EXECUTABLE(${BIN_NAME} ${SRC})
 
 FIND_PACKAGE(OpenSSL)
 
-INCLUDE(FindFuse.cmake)
-IF(NOT FUSE_FOUND)
-	MESSAGE(FATAL_ERROR "Unable to find Fuse library")
-ELSE(NOT FUSE_FOUND)
-	MESSAGE(STATUS "Found Fuse library")
-ENDIF(NOT FUSE_FOUND)
+## Server mode disables fuse export
+IF(NOT PF_SERVER_MODE)
+	INCLUDE(FindFuse.cmake)
+	IF(NOT FUSE_FOUND)
+		MESSAGE(FATAL_ERROR "Unable to find Fuse library")
+		MESSAGE(FATAL_ERROR "")
+	ELSE(NOT FUSE_FOUND)
+		MESSAGE(STATUS "Found Fuse library")
+	ENDIF(NOT FUSE_FOUND)
+ENDIF(NOT PF_SERVER_MODE)
 
 INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_PATH} ${OPENSSL_INCLUDE_DIR}
 	"${BIN_NAME}/" "src/" "common/" "common/fuse" "common/ssl")
@@ -79,5 +87,5 @@ TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY} ${OPENSSL
 
 
 SET(CMAKE_BUILD_TYPE ${BUILD})
-SET(CMAKE_C_FLAGS "-DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})

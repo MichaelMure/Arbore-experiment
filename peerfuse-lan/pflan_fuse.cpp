@@ -17,6 +17,7 @@
  * $Id$
  */
 
+#ifndef PF_SERVER_MODE
 #define FUSE_USE_VERSION 26
 #ifdef linux
 /* For pread()/pwrite() */
@@ -351,4 +352,5 @@ static int xmp_removexattr(const char *path, const char *name)
 	return 0;
 }
 #endif						  /* HAVE_SETXATTR */
-#endif
+#endif // 0
+#endif // PF_SERVER_MODE

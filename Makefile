@@ -2,6 +2,10 @@ CMAKE_OPTIONS = -DCMAKE_BUILD_TYPE=Debug -DCMAKE_VERBOSE_MAKEFILE=0
 PF_NET_OPT = $(CMAKE_OPTIONS) -DPF_NET:BOOL=ON
 PF_LAN_OPT = $(CMAKE_OPTIONS) -DPF_NET:BOOL=OFF
 
+## If PF_SERV_MODE environnement variable is not set, then disable server mode
+PF_SERVER_MODE ?= OFF
+CMAKE_OPTIONS := $(CMAKE_OPTIONS) -DPF_SERVER_MODE=$(PF_SERVER_MODE)
+
 all: pfnet pflan
 
 pfnet: build.peerfuse-net/Makefile
