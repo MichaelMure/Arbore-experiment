@@ -335,7 +335,7 @@ bool Peer::Receive()
 		char* header;
 
 		if(!conn->Read(&header, Packet::GetHeaderSize()))
-			return false; // All the content couldn't be retrieved yet -> exit
+			return false;		  // All the content couldn't be retrieved yet -> exit
 
 		incoming = new Packet(header);
 		free(header);
@@ -347,7 +347,7 @@ bool Peer::Receive()
 
 	// Continue receiving the packet
 	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
-		return false; // All the content couldn't be retrieved yet -> exit
+		return false;			  // All the content couldn't be retrieved yet -> exit
 
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance

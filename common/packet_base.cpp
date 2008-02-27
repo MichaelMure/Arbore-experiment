@@ -92,7 +92,7 @@ bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 
 	memcpy(datas, buf, GetDataSize());
 	free(buf);
-	
+
 	BuildArgsFromData();
 	return true;
 }

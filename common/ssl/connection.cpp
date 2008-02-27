@@ -20,11 +20,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>	// fcntl
-#include <fcntl.h>	// fcntl
+#include <unistd.h>				  // fcntl
+#include <fcntl.h>				  // fcntl
 #include "connection.h"
 #include "log.h"
-
 
 Connection::Connection(int _fd) : fd(_fd),
 			read_buf(NULL),
@@ -81,4 +80,3 @@ void Connection::Write(const char* buf, size_t size)
 	// Try to flush to the socket
 	SocketWrite();
 }
-

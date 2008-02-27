@@ -394,7 +394,7 @@ bool Peer::Receive()
 
 	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
 		return false;
-		
+
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance
 	 * will be free'd.

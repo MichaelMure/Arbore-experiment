@@ -62,12 +62,14 @@ void ConnectionSsl::SocketRead()
 			// TODO: handle disconnections
 			log[W_DEBUG] << "ssl_read TODO:handle this disconnection";
 		}
-		else // received < 0
+		else				  // received < 0
 		{
-			if(SSL_get_error(ssl, received) == SSL_ERROR_WANT_READ // No error, we are just waiting for datas
-			|| SSL_get_error(ssl, received) == SSL_ERROR_WANT_WRITE) // A WANT_WRITE can be returnd see man SSL_read()
+						  // No error, we are just waiting for datas
+			if(SSL_get_error(ssl, received) == SSL_ERROR_WANT_READ
+						  // A WANT_WRITE can be returnd see man SSL_read()
+				|| SSL_get_error(ssl, received) == SSL_ERROR_WANT_WRITE)
 				return;
-			throw RecvError(); // TODO : return the SSL error string...
+			throw RecvError();	  // TODO : return the SSL error string...
 		}
 	}
 	while(received == buf_size);
