@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include "pf_ssl_ssl.h"
+#include "connection.h"
 #include "log.h"
 #include "libconfig.h"
 #include "network_base.h"
@@ -167,18 +168,18 @@ void NetworkBase::Main()
 						addr.ip[3] = newcon.sin_addr.s_addr;
 
 						Connection *peer_conn = ssl->Accept(newfd);
-						AddPeer(new Peer(newfd, addr, peer_conn));
+						AddPeer(new Peer(addr, peer_conn));
 					}
 				}
 				else
 				{
 					try
 					{
-						fd2peer[i]->Receive();
+						while(fd2peer[i]->Receive()) ;
 					}
-					catch(Packet::RecvError &e)
+					catch(Connection::RecvError &e)
 					{
-						log[W_WARNING] << "recv() error: " << strerror(errno);
+						log[W_WARNING] << "recv() error: " /*<< strerror(errno)*/;
 						if(errno != EINTR)
 						{
 							Peer* p = fd2peer[i];
@@ -284,7 +285,7 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 	}
 
 	Connection* conn = ssl->Connect(sock);
-	Peer* p = AddPeer(new Peer(sock, addr, conn));
+	Peer* p = AddPeer(new Peer(addr, conn));
 	p->SetFlag(Peer::SERVER);
 	DelDisconnected(addr);
 	return p;
@@ -311,8 +312,6 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 	serv_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(serv_sock < 0)
 		throw CantOpenSock();
-
-	fcntl(serv_sock, F_SETFL, O_NONBLOCK);
 
 	setsockopt(serv_sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof reuse_addr);
 

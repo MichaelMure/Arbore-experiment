@@ -17,8 +17,9 @@
  * $Id$
  */
 
-#include "packet.h"
 #include <netinet/in.h>				  // htonl, ntohl
+#include "packet.h"
+#include "connection.h"
 
 Packet::Packet(msg_type _type, id_t src, id_t dst)
 			: PacketBase(_type),
@@ -88,9 +89,9 @@ uint32_t Packet::GetSize() const
 	return PacketBase::GetSize() - PacketBase::GetHeaderSize() + GetHeaderSize();
 }
 
-void Packet::Send(int fd)
+void Packet::Send(Connection* conn)
 {
-	PacketBase::Send(fd);
+	PacketBase::Send(conn);
 	log[W_PARSE] << "                       srcid=" << id_src << ", " <<
 		"dstid=" << id_dst << ", ";
 

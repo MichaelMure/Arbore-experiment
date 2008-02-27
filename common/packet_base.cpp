@@ -84,12 +84,17 @@ PacketBase::~PacketBase()
 		delete *it;
 }
 
-void PacketBase::ReceiveContent(int fd) throw(RecvError, Malformated)
+bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 {
-	if(recv(fd, datas, GetDataSize(), 0) <= 0)
-		throw RecvError();
+	char* buf;
+	if(!conn->Read(&buf, GetDataSize()))
+		return false;
 
+	memcpy(datas, buf, GetDataSize());
+	free(buf);
+	
 	BuildArgsFromData();
+	return true;
 }
 
 char* PacketBase::DumpBuffer() const
@@ -214,11 +219,11 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	return *this;
 }
 
-void PacketBase::Send(int fd)
+void PacketBase::Send(Connection* conn)
 {
 	BuildDataFromArgs();
 	char* buf = DumpBuffer();
-	write(fd, buf, GetSize());
+	conn->Write(buf, GetSize());
 	free(buf);
 
 	log[W_PARSE] << "Send a message header: type=" << GetType() << ", " <<

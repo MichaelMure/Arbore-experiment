@@ -19,34 +19,56 @@
 
 #include <openssl/ssl.h>
 #include "connection_ssl.h"
+#include "log.h"
 
 ConnectionSsl::~ConnectionSsl()
 {
 	SSL_free(ssl);
 }
 
-void ConnectionSsl::Write(const char *buf, size_t size)
+void ConnectionSsl::SocketWrite()
 {
-	SSL_write(ssl, buf, size);
+	// TODO: implement SSL_MODE_ENABLE_PARTIAL_WRITE
+	if(SSL_write(ssl, write_buf, write_buf_size) <= 0)
+	{
+		log[W_DEBUG] << "Write failed";
+		throw WriteError();
+	}
+
+	write_buf_size = 0;
+	free(write_buf);
+	write_buf = NULL;
 }
 
-void ConnectionSsl::ReadToBuf()
+void ConnectionSsl::SocketRead()
 {
 	const int buf_size = 128;
+	char buf[buf_size];
+
 	int received = 0;
-	char* buf = (char*)malloc(buf_size);
 
 	do
 	{
 		received = SSL_read(ssl, (void*)buf, buf_size);
 		if(received > 0)
 		{
-			read_buf = (char*)realloc(read_buf, buf_size + received);
-			memcpy(read_buf + buf_size, buf, received);
+			read_buf = (char*)realloc(read_buf, read_buf_size + received);
+			memcpy(read_buf + read_buf_size, buf, received);
 			read_buf_size += received;
+		}
+		else
+		if(received == 0)
+		{
+			// TODO: handle disconnections
+			log[W_DEBUG] << "ssl_read TODO:handle this disconnection";
+		}
+		else // received < 0
+		{
+			if(SSL_get_error(ssl, received) == SSL_ERROR_WANT_READ // No error, we are just waiting for datas
+			|| SSL_get_error(ssl, received) == SSL_ERROR_WANT_WRITE) // A WANT_WRITE can be returnd see man SSL_read()
+				return;
+			throw RecvError(); // TODO : return the SSL error string...
 		}
 	}
 	while(received == buf_size);
-
-	free(buf);
 }

@@ -34,7 +34,6 @@ typedef std::vector<Peer*> PeerList;
 
 class Peer
 {
-	int fd;
 	pf_addr addr;
 	Connection* conn;
 
@@ -44,7 +43,7 @@ class Peer
 
 	unsigned int flags;
 
-	// Receiving functions
+	// Message handling functions
 	void Handle_net_hello(struct Packet* pckt);
 	void Handle_net_your_id(struct Packet* pckt);
 	void Handle_net_get_struct_diff(struct Packet* pckt);
@@ -77,10 +76,10 @@ public:
 	};
 
 	/* Constructors */
-	Peer(int _fd, pf_addr addr, Connection* _conn);
+	Peer(pf_addr addr, Connection* _conn);
 	~Peer();
 
-	int GetFd() const { return fd; }
+	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 
 	time_t Timestamp(time_t ts) { return ts_diff + ts; }
@@ -99,6 +98,6 @@ public:
 	void Flush();
 	void SendMsg(const PacketBase& pckt);
 	void SendHello();
-	void Receive();
+	bool Receive();
 };
 #endif

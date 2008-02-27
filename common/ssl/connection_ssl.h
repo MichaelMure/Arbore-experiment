@@ -27,13 +27,11 @@ class ConnectionSsl : public Connection
 {
 	SSL* ssl;
 public:
-	class ConnectionError : public std::exception {};
-
 	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
 	~ConnectionSsl();
 
-	void Write(const char* buf, size_t size);
-	void ReadToBuf();
+	void SocketWrite();
+	void SocketRead();
 
 	//Certificate GetCertificate();
 };

@@ -23,6 +23,7 @@
 #include <vector>
 #include <cassert>
 #include <string>
+#include "connection.h"
 #include "pf_types.h"
 #include "net_proto.h"
 #include "packet_arg.h"
@@ -58,7 +59,6 @@ protected:
 public:
 
 	/* Exceptions */
-	class RecvError : public std::exception {};
 	class Malformated : public std::exception {};
 
 	/* Constructors */
@@ -76,13 +76,13 @@ public:
 	 *
 	 * @param fd file descriptor of socket
 	 */
-	virtual void Send(int fd);
+	virtual void Send(Connection* conn);
 
 	/** Receive content of packet from a peer.
 	 *
 	 * @param fd file descriptor of socket
 	 */
-	void ReceiveContent(int fd) throw(RecvError, Malformated);
+	bool ReceiveContent(Connection* conn) throw(Malformated);
 
 	template<typename T>
 		PacketBase& SetArg(size_t arg, T val)

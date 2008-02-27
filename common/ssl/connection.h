@@ -28,15 +28,23 @@ class Connection
 protected:
 	char* read_buf;
 	size_t read_buf_size;
+
+	char* write_buf;
+	size_t write_buf_size;
 public:
 	class ConnectionError : public std::exception {};
+	class RecvError : public std::exception {};
+	class WriteError : public std::exception {};
 
 	Connection(int _fd);
 	virtual ~Connection() {}
 
 	// Fill the buffer with incoming datas
-	virtual void ReadToBuf() = 0;
-	virtual void Write(const char* buf, size_t size) = 0;
+	virtual void SocketRead() = 0;
+	virtual void SocketWrite() = 0;
+	void Write(const char* buf, size_t size);
 	bool Read(char **buf, size_t size);
+
+	int GetFd() const { return fd; }
 };
 #endif						  // CONNECTION_H

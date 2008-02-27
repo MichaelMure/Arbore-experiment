@@ -48,6 +48,6 @@ public:
 	Packet& SetSrcID(id_t id) { id_src = id; return *this; }
 	Packet& SetDstID(id_t id) { id_dst = id; return *this; }
 
-	virtual void Send(int fd);
+	virtual void Send(Connection* conn);
 };
 #endif						  /* PACKET_H */

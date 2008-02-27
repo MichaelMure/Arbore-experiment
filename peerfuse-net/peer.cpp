@@ -32,21 +32,18 @@
 #include "log.h"
 #include "session_config.h"
 
-Peer::Peer(int _fd, pf_addr _addr, Connection* _conn, Peer* parent)
-			: fd(_fd),
-			addr(_addr),
+Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
+			: addr(_addr),
 			conn(_conn),
 			ts_diff(0),
 			incoming(NULL),
 			uplink(parent),
-			flags(_fd >= 0 ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
+			flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
 {
 }
 
 Peer::~Peer()
 {
-	if(fd)
-		close(fd);
 	delete incoming;
 	delete conn;
 
@@ -63,7 +60,7 @@ void Peer::Flush()
 {
 	while(!send_queue.empty())
 	{
-		send_queue.front().Send(fd);
+		send_queue.front().Send(conn);
 		send_queue.pop();
 	}
 }
@@ -251,7 +248,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	catch(Network::CantConnectTo &e)
 	{
 		// BUG: ???
-		net.AddPeer(new Peer(-1, addr, NULL));
+		net.AddPeer(new Peer(addr, NULL));
 	}
 }
 
@@ -371,20 +368,19 @@ void Peer::HandleMsg(Packet* pckt)
 	(this->*handler[pckt->GetType()].func)(pckt);
 }
 
-void Peer::Receive()
+bool Peer::Receive()
 {
-	/* If there was already an incoming packet, we can receive its content */
-	if(incoming)
-		incoming->ReceiveContent(fd);
-	else
+	// Receive the header
+	if(!incoming)
 	{
 		/* This is a new packet, we only receive the header */
-		char header[ Packet::GetHeaderSize() ];
+		char* header;
 
-		if(recv(fd, &header, Packet::GetHeaderSize(), 0) <= 0)
-			throw Packet::RecvError();
+		if(!conn->Read(&header, Packet::GetHeaderSize()))
+			return false;
 
 		incoming = new Packet(header);
+		free(header);
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" srcid=" << incoming->GetSrcID() << ", " <<
@@ -394,10 +390,11 @@ void Peer::Receive()
 		/* If there some data in packet, we wait for the rest on the next Receive() call.
 		 * In other case, it is because packet only contains headers and we can parse it.
 		 */
-		if(incoming->GetDataSize() > 0)
-			return;
 	}
 
+	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
+		return false;
+		
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance
 	 * will be free'd.
@@ -425,4 +422,6 @@ void Peer::Receive()
 	/* Route broadcast packets */
 	if((*packet)->GetDstID() == 0)
 		net.Broadcast(**packet, this);
+
+	return true;
 }

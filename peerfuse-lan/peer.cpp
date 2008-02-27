@@ -34,9 +34,8 @@
 #include "session_config.h"
 #include "tools.h"
 
-Peer::Peer(int _fd, pf_addr _addr, Connection* _conn)
-			: fd(_fd),
-			addr(_addr),
+Peer::Peer(pf_addr _addr, Connection* _conn)
+			: addr(_addr),
 			conn(_conn),
 			ts_diff(0),
 			incoming(NULL),
@@ -46,8 +45,6 @@ Peer::Peer(int _fd, pf_addr _addr, Connection* _conn)
 
 Peer::~Peer()
 {
-	if(fd)
-		close(fd);
 	delete incoming;
 	delete conn;
 }
@@ -56,7 +53,7 @@ void Peer::Flush()
 {
 	while(!send_queue.empty())
 	{
-		send_queue.front().Send(fd);
+		send_queue.front().Send(conn);
 		send_queue.pop();
 	}
 }
@@ -328,30 +325,29 @@ void Peer::HandleMsg(Packet* pckt)
 	(this->*handler[pckt->GetType()])(pckt);
 }
 
-void Peer::Receive()
+// true when there is still data available, false elsewise
+bool Peer::Receive()
 {
-	/* If there was already an incoming packet, we can receive its content */
-	if(incoming)
-		incoming->ReceiveContent(fd);
-	else
+	// Receive the header
+	if(!incoming)
 	{
 		/* This is a new packet, we only receive the header */
-		char header[ Packet::GetHeaderSize() ];
+		char* header;
 
-		if(recv(fd, &header, Packet::GetHeaderSize(), 0) <= 0)
-			throw Packet::RecvError();
+		if(!conn->Read(&header, Packet::GetHeaderSize()))
+			return false; // All the content couldn't be retrieved yet -> exit
 
 		incoming = new Packet(header);
+		free(header);
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" size=" << incoming->GetDataSize();
 
-		/* If there some data in packet, we wait for the rest on the next Receive() call.
-		 * In other case, it is because packet only contains headers and we can parse it.
-		 */
-		if(incoming->GetDataSize() > 0)
-			return;
 	}
+
+	// Continue receiving the packet
+	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
+		return false; // All the content couldn't be retrieved yet -> exit
 
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance
@@ -361,4 +357,5 @@ void Peer::Receive()
 	incoming = NULL;
 
 	HandleMsg(*packet);
+	return true;
 }
