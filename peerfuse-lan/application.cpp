@@ -34,7 +34,7 @@
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
 #include "pf_fuse.h"
-#endif // PF_SERVER_MODE
+#endif						  // PF_SERVER_MODE
 
 MyConfig conf;
 
@@ -91,11 +91,11 @@ int Application::main(int argc, char *argv[])
 		net.Start(&conf);
 
 		umask(0);
-#ifndef PF_SERVER_MODE
+		#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);
-#else
+		#else
 		while(1) sleep(1);
-#endif
+		#endif
 	}
 	catch(MyConfig::error &e)
 	{

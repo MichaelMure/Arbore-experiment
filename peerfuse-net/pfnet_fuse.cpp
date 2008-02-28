@@ -353,5 +353,5 @@ static int xmp_removexattr(const char *path, const char *name)
 	return 0;
 }
 #endif						  /* HAVE_SETXATTR */
-#endif // 0
-#endif // PF_SERVER_MODE
+#endif						  // 0
+#endif						  // PF_SERVER_MODE
