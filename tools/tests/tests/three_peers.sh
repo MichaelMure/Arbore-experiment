@@ -36,12 +36,12 @@ export LISTEN_PORT=1414
 export CONNECT_PORT=9876
 start_p2pfs
 
-sleep 3
+sleep 5
 
 rmdir "$MNT3/blh/ca"
 touch "$MNT1/yop"
 
-sleep 2
+sleep 5
 
 find "$MNT1" | colrm 1 ${#MNT1} > /tmp/p2pfs_tests_find1
 find "$MNT3" | colrm 1 ${#MNT3} > /tmp/p2pfs_tests_find2
