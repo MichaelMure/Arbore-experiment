@@ -173,7 +173,7 @@ void FileDistribution::UpdateRespFiles()
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
 		Packet pckt = cache.CreateMkFilePacket(*it);
-						  // get actual peer list
+		/* get actual peer list */
 		std::set<Peer*> peers = GetPeers(*it);
 
 		log[W_DEBUG] << "- file " << (*it)->GetFullName();
