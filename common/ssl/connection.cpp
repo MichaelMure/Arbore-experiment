@@ -36,6 +36,11 @@ Connection::Connection(int _fd) : fd(_fd),
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
+Connection::~Connection()
+{
+	close(fd);
+}
+
 // Read "size" octets from the read buffer
 // returns true and buf if enough datas can be read
 // returns false when not enough data is available

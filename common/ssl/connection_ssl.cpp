@@ -23,6 +23,7 @@
 
 ConnectionSsl::~ConnectionSsl()
 {
+	SSL_shutdown(ssl);
 	SSL_free(ssl);
 }
 
@@ -59,8 +60,7 @@ void ConnectionSsl::SocketRead()
 		else
 		if(received == 0)
 		{
-			// TODO: handle disconnections
-			log[W_DEBUG] << "ssl_read TODO:handle this disconnection";
+			throw RecvError();	  // TODO : return the SSL error string...
 		}
 		else				  // received < 0
 		{

@@ -37,7 +37,7 @@ public:
 	class WriteError : public std::exception {};
 
 	Connection(int _fd);
-	virtual ~Connection() {}
+	virtual ~Connection();
 
 	// Fill the buffer with incoming datas
 	virtual void SocketRead() = 0;
