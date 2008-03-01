@@ -48,8 +48,8 @@ public:
 
 	void Use()			  // Tell wether we have performed the operation
 	{
-		last_time = time(NULL)
-			used = true;
+		last_time = time(NULL);
+		used = true;
 	}
 
 	// Methods called
