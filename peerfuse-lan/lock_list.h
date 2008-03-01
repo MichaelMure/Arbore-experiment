@@ -25,7 +25,7 @@
 
 class LockList
 {
-	std::map<std::string, Lock> my_locks_list; // Maps the filename to its lock
+	std::map<std::string, Lock> my_locks_list;// Maps the filename to its lock
 	std::map<std::string, Peer*> peers_locks;
 
 public:
@@ -44,6 +44,4 @@ public:
 	// the lock expired delete it, if it still exists
 	void TryDelete(std::string file);
 };
-
-#endif //LOCK_LIST_H
-
+#endif						  //LOCK_LIST_H

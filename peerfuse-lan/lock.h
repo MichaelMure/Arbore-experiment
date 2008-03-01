@@ -49,13 +49,13 @@ public:
 	void Use()			  // Tell wether we have performed the operation
 	{
 		last_time = time(NULL)
-		used = true;
+			used = true;
 	}
 
 	// Methods called
 	void Request();			  // When a lock has been refused this is called to reask for the lock
 	bool WantDelete();		  // Called to delete the lock when it has reached a timeout
-					  // Or when someone asked for the lock
+	// Or when someone asked for the lock
 
 	bool IsLocked();
 	void AcceptedBy(Peer* p);
