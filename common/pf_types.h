@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef P2PFS_TYPE_H
-#define P2PFS_TYPE_H
+#ifndef PF_TYPES_H
+#define PF_TYPES_H
 
 #include <vector>
 
@@ -63,4 +63,4 @@ public:
 		delete p;
 	}
 };
-#endif						  /* P2PFS_TYPE_H */
+#endif						  /* PF_TYPES_H */

@@ -17,12 +17,12 @@
  * $Id$
  */
 
-#ifndef P2PFS_H
-#define P2PFS_H
+#ifndef PFNET_H
+#define PFNET_H
 
 #include "libconfig.h"
 
 #define PEERFUSE_VERSION        "peerfuse-net 0.1"
 
 extern MyConfig conf;
-#endif						  /* P2PFS_H */
+#endif						  /* PFNET_H */

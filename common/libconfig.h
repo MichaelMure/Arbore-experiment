@@ -23,8 +23,8 @@
  *           * std::string stringtok(std::string &in, const char * const delimiters);
  */
 
-#ifndef LIB_CONFIG_H
-#define LIB_CONFIG_H
+#ifndef LIBCONFIG_H
+#define LIBCONFIG_H
 
 #include <string>
 #include <vector>
@@ -486,4 +486,4 @@ public:
 private:
 	bool value;
 };
-#endif						  /* LIB_CONFIG_H */
+#endif						  /* LIBCONFIG_H */

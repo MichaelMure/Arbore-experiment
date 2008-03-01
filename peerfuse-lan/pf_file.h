@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef PFLAN_FILE_H
-#define PFLAN_FILE_H
+#ifndef PF_FILE_H
+#define PF_FILE_H
 
 #include "pf_filebase.h"
 

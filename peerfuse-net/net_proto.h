@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef NETPROTO_H
-#define NETPROTO_H
+#ifndef NET_PROTO_H
+#define NET_PROTO_H
 
 /* Please see the PROTOCOL file */
 
@@ -72,4 +72,4 @@ enum net_rmfile
 	NET_RMFILE_PATH
 	// ...
 };
-#endif						  /* NETPROTO_H */
+#endif						  /* NET_PROTO_H */

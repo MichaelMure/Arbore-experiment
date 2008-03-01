@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef PFNET_FILE_H
-#define PFNET_FILE_H
+#ifndef PF_FILE_H
+#define PF_FILE_H
 
 #include <set>
 

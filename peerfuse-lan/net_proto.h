@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef NETPROTO_H
-#define NETPROTO_H
+#ifndef NET_PROTO_H
+#define NET_PROTO_H
 
 /* Please see the PROTOCOL file */
 
@@ -108,4 +108,4 @@ enum net_peer_connection_rejected
 enum net_peer_all_connected
 {
 };
-#endif						  /* NETPROTO_H */
+#endif						  /* NET_PROTO_H */

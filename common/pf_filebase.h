@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef P2PFS_FILE_H
-#define P2PFS_FILE_H
+#ifndef PF_FILEBASE_H
+#define PF_FILEBASE_H
 
 #include <string>
 #include <sys/types.h>
@@ -55,4 +55,4 @@ public:
 
 	bool IsChildOf(const FileEntryBase* f) const;
 };
-#endif						  /* P2PFS_FILE_H */
+#endif						  /* PF_FILEBASE_H */

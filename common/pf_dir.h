@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef DIR_H
-#define DIR_H
+#ifndef PF_DIR_H
+#define PF_DIR_H
 
 #include <map>
 #include "pf_file.h"
@@ -42,4 +42,4 @@ public:
 
 	FileEntry* GetFile(std::string name) const;
 };
-#endif						  /* DIR_H */
+#endif						  /* PF_DIR_H */
