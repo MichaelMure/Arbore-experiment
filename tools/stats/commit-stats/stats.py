@@ -297,14 +297,14 @@ def main():
             revision = int(regs.group(1))
             username = regs.group(2)
             date = regs.group(3)
-            time = regs.group(4)
+            commit_time = regs.group(4)
             nb_lines = int(regs.group(7)) + 1
 
             if not users.has_key(username):
                 users[username] = User(username)
             user = users[username]
 
-            commit = Commit(revision, user, date, time)
+            commit = Commit(revision, user, date, commit_time)
             all_commits += [commit]
 
             user.add_commit(commit)
@@ -435,12 +435,16 @@ def main():
 
         html.write('</p>')
 
+    t = time.localtime()
 
     html.write("""
 </div>
+<div class="foot">
+Generated on %02d/%02d/%02d at %02d:%02d
+</div>
 </div>
 </body>
-</html>""")
+</html>""" % (t[2], t[1], t[0], t[3], t[4]))
 
 
 if __name__ == '__main__':
