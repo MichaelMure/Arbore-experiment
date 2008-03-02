@@ -11,6 +11,7 @@ import sys
 from datetime import datetime, timedelta
 import time
 import re
+from xml.dom import minidom
 
 # Date regex: YYYY-MM-DD
 DATE_REGEX_LONG = re.compile("^([0-9]{1,4})-([01]?[0-9])-([0-3]?[0-9])$")
@@ -99,10 +100,12 @@ class Graph:
 
 class Pie(Graph):
 
-    def __init__(self, size):
+    def __init__(self, size, title=None, legend=True):
 
         self.entries = []
         self.labels = []
+        self.title = title
+        self.legend = legend
         Graph.__init__(self, size)
 
     def add_entry(self, label, value):
@@ -117,19 +120,29 @@ class Pie(Graph):
     def build(self, fig):
         # Set of beautiful colors.
 
-        ax = fig.add_subplot(121)
+        if self.legend:
+            ax = fig.add_subplot(121)
+        else:
+            ax = fig.add_subplot(111)
 
         self.__pie = ax.pie(self.entries, labels=None, colors=self.colours, autopct=None, shadow=True)
+        if self.title:
+            ax.set_title(self.title)
 
-        ax = fig.add_subplot(122)
-        self.__legend = ax.legend(self.__pie, ['%s (%d)' % (self.labels[i], self.entries[i]) for i in xrange(len(self.labels))], shadow=True)
-        ax.grid(False)
-        ax.set_axis_off()
+        if self.legend:
+            ax = fig.add_subplot(122)
+            self.__legend = ax.legend(self.__pie, ['%s (%d)' % (self.labels[i], self.entries[i]) for i in xrange(len(self.labels))], shadow=True)
+            ax.grid(False)
+            ax.set_axis_off()
 
     def get_coords(self):
         # We calculate coords to know where are all labels.
         #return []
         coords = []
+
+        if not self.legend:
+            return coords
+
         for i in self.__legend.get_texts():
 
             left, bottom, width, height = i.get_window_extent().get_bounds()
@@ -255,6 +268,7 @@ class User:
 
         self.name = name
         self.commits = []
+        self.nb_lines = 0
 
     def add_commit(self, commit):
 
@@ -274,30 +288,40 @@ class CommitList:
             self.users_commits[commit.user] = []
         self.users_commits[commit.user] += [commit]
 
+def blame(path, users):
 
-def main():
+    child = os.popen("svn list -R %s" % path)
+    files = child.read().split('\n')
 
-    if len(sys.argv) < 2:
-        print 'Syntax: %s <path of log> [output dir]' % sys.argv[0]
-        return
+    child.close()
 
-    os.system('svn up %s >>/dev/null' % sys.argv[1])
-    child = os.popen("svn log -v %s" % sys.argv[1])
+    for f in files:
+        file = os.path.join(path, f)
 
-    if len(sys.argv) > 2:
-        output = sys.argv[2] + '/'
-    else:
-        output = ''
+        # This is a directory, don't blame it.
+        if file[-1] == '/': continue
 
-    data = child.read().split('\n')
+        child = os.popen("svn blame --xml %s" % file)
+        data = child.read()
+        try:
+            dom = minidom.parseString(data)
+            commits = dom.getElementsByTagName('commit')
+            for commit in commits:
+                author = commit.getElementsByTagName('author')[0]
+                username = author.firstChild.data
+                users[username].nb_lines += 1
+        except:
+            pass
 
-    users = {}
-    dates = {}
-    hours = [CommitList(i) for i in xrange(24)]
-    months = {}
-    all_commits = []
+        child.close()
+
+def get_commits(path, users, all_commits):
 
     REGEXP = re.compile("^r([0-9]{1,4}) \| (.*) \| ([0-9 -]+) ([0-9 :]+) \+([0-9]+) \((.*)\) \| ([0-9]+) (line|lines)$")
+
+    child = os.popen("svn log -v %s" % path)
+
+    data = child.read().split('\n')
 
     nb_line = 0
     commit_declaration = False
@@ -333,7 +357,7 @@ def main():
         else:
             commit_declaration = False
 
-    all_commits.reverse() # first to last
+def stat_commits(all_commits, hours, months, dates):
 
     for commit in all_commits:
 
@@ -365,6 +389,34 @@ def main():
 
             months[(dt.year, dt.month)].add_commit(commit)
 
+
+def main():
+
+    if len(sys.argv) < 2:
+        print 'Syntax: %s <path of log> [output dir]' % sys.argv[0]
+        return
+
+    os.system('svn up %s >>/dev/null' % sys.argv[1])
+
+    if len(sys.argv) > 2:
+        output = sys.argv[2] + '/'
+    else:
+        output = ''
+
+    users = {}
+    dates = {}
+    hours = [CommitList(i) for i in xrange(24)]
+    months = {}
+    all_commits = []
+
+    get_commits(sys.argv[1], users, all_commits)
+
+    all_commits.reverse() # first to last
+
+    blame(sys.argv[1], users)
+
+    stat_commits(all_commits, hours, months, dates)
+
     all_commits.reverse() # last to first
 
     html = file(output + 'stats.html', 'w')
@@ -380,6 +432,24 @@ def main():
     <link rel="shortcut icon" type="image/png" href="http://vaginus.org/favicon.png" />
     <script type="text/javascript">
 
+    function getElementsByClass(searchClass,node,tag) {
+        var classElements = new Array();
+        if ( node == null )
+                node = document;
+        if ( tag == null )
+                tag = '*';
+        var els = node.getElementsByTagName(tag);
+        var elsLen = els.length;
+        var pattern = new RegExp("(^|\\\\s)"+searchClass+"(\\\\s|$)");
+        for (i = 0, j = 0; i < elsLen; i++) {
+                if ( pattern.test(els[i].className) ) {
+                        classElements[j] = els[i];
+                        j++;
+                }
+        }
+        return classElements;
+    }
+
     function showhide(name)
     {
         var elem = document.getElementById(name);
@@ -394,24 +464,18 @@ def main():
 
     function showall(name)
     {
-        var revnum = 1;
+        var elems = getElementsByClass(name);
         var elem;
-        while( (elem = document.getElementById(name + revnum)))
-        {
+        for(var i = 0; elem = elems[i]; ++i)
             elem.style.display = '';
-            revnum++;
-        }
     }
 
     function hideall(name)
     {
-        var revnum = 1;
+        var elems = getElementsByClass(name);
         var elem;
-        while( (elem = document.getElementById(name + revnum)))
-        {
+        for(var i = 0; elem = elems[i]; ++i)
             elem.style.display = 'none';
-            revnum++;
-        }
     }
 
     </script>
@@ -474,21 +538,29 @@ def main():
     html.write('<h2>User commits</h2>')
     html.write('<p>')
 
-    users_pie = Pie((7,3))
+    users_pie = Pie((6,2.5), title='Commits', legend=True)
     for u in users.values():
         users_pie.add_entry(u.name, len(u.commits))
 
     users_pie.create_img(output + 'users.png')
     html.write('<img alt="users" src="users.png" />')
+
+    ulines_pie = Pie((6,2.5), title='Lines', legend=True)
+    for u in users.values():
+        ulines_pie.add_entry(u.name, u.nb_lines)
+
+    ulines_pie.create_img(output + 'ulines.png')
+    html.write('<img alt="ulines" src="ulines.png" />')
+
     html.write('</p>')
 
     html.write('<h2>ChangeLog</h2>')
 
-    html.write('<p><a href="javascript:showall(\'r\')">Show all</a>/<a href="javascript:hideall(\'r\')">Hide all</a></p>')
+    html.write('<p><a href="javascript:showall(\'revision\')">Show all</a>/<a href="javascript:hideall(\'revision\')">Hide all</a></p>')
 
     for i in all_commits:
         html.write('<p><b>r%d</b> by <i>%s</i> at %s %s:  (<a href="javascript:showhide(\'r%d\')">Show/hide</a>)</p>' % (i.revision, i.user.name, i.date, i.time, i.revision))
-        html.write('<pre id="r%d">' % i.revision)
+        html.write('<pre id="r%d" class="revision">' % i.revision)
         for line in i.changed_files:
             html.write('%s\n' % text2html(line))
         html.write('</pre>')
