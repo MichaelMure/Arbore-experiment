@@ -18,6 +18,14 @@ DATE_REGEX_LONG = re.compile("^([0-9]{1,4})-([01]?[0-9])-([0-3]?[0-9])$")
 # Datetime regex: "HH:MM:SS" (FR format)
 DATETIME_REGEX = re.compile("([0-9]{1,2}):([0-9]{2}):([0-9]{2})$")
 
+def text2html(value):
+
+    value = value.replace('&', '&amp;')
+    value = value.replace('<', '&lt;')
+    value = value.replace('>', '&gt;')
+
+    return value
+
 def parseDatetime(value):
 
     now = datetime.today()
@@ -238,6 +246,7 @@ class Commit:
         self.user = user
         self.date = date
         self.time = time
+        self.changed_files = []
         self.message = []
 
 class User:
@@ -273,7 +282,7 @@ def main():
         return
 
     os.system('svn up %s >>/dev/null' % sys.argv[1])
-    child = os.popen("svn log %s" % sys.argv[1])
+    child = os.popen("svn log -v %s" % sys.argv[1])
 
     if len(sys.argv) > 2:
         output = sys.argv[2] + '/'
@@ -291,6 +300,7 @@ def main():
     REGEXP = re.compile("^r([0-9]{1,4}) \| (.*) \| ([0-9 -]+) ([0-9 :]+) \+([0-9]+) \((.*)\) \| ([0-9]+) (line|lines)$")
 
     nb_line = 0
+    commit_declaration = False
     for line in data:
         regs = REGEXP.match(line)
         if regs:
@@ -308,10 +318,20 @@ def main():
             all_commits += [commit]
 
             user.add_commit(commit)
+
+            commit_declaration = True
+
+        elif commit_declaration and len(line) > 0:
+            all_commits[-1].changed_files += [line]
         elif len(all_commits) > 0 and nb_lines > 0:
             if len(line) > 0:
                 all_commits[-1].message += [line]
+
+            commit_declaration = False
             nb_lines -= 1
+
+        else:
+            commit_declaration = False
 
     all_commits.reverse() # first to last
 
@@ -348,8 +368,7 @@ def main():
     all_commits.reverse() # last to first
 
     html = file(output + 'stats.html', 'w')
-    html.write("""
-<?xml version="1.0" encoding="UTF-8"?>
+    html.write("""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -359,6 +378,43 @@ def main():
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel='stylesheet' href='http://vaginus.org/vaginus.css' type='text/css' />
     <link rel="shortcut icon" type="image/png" href="http://vaginus.org/favicon.png" />
+    <script type="text/javascript">
+
+    function showhide(name)
+    {
+        var elem = document.getElementById(name);
+
+        if (!elem) return;
+
+        if(elem.style.display == '')
+            elem.style.display = 'none';
+        else
+            elem.style.display = '';
+    }
+
+    function showall(name)
+    {
+        var revnum = 1;
+        var elem;
+        while( (elem = document.getElementById(name + revnum)))
+        {
+            elem.style.display = '';
+            revnum++;
+        }
+    }
+
+    function hideall(name)
+    {
+        var revnum = 1;
+        var elem;
+        while( (elem = document.getElementById(name + revnum)))
+        {
+            elem.style.display = 'none';
+            revnum++;
+        }
+    }
+
+    </script>
 </head>
 
 <body>
@@ -381,7 +437,7 @@ def main():
 
     hours_histo.create_img(output + 'hours.png')
 
-    html.write('<img src="hours.png" />')
+    html.write('<img src="hours.png" alt="hours" />')
 
     months_s = sorted(months.items())
     months_histo = Histogram((9,3), 'Commits by months', [i.name for i in users.values()], legend=True)
@@ -395,7 +451,7 @@ def main():
         months_histo.add_entry(commits.name, lst)
 
     months_histo.create_img(output + 'months.png')
-    html.write('<img src="months.png" />')
+    html.write('<img alt="months" src="months.png" />')
 
     html.write('</p>')
     html.write('<p>')
@@ -412,26 +468,34 @@ def main():
         dates_histo.add_entry(commits.name, lst)
 
     dates_histo.create_img(output + 'dates.png')
-    html.write('<img src="dates.png" />')
+    html.write('<img alt="dates" src="dates.png" />')
 
     html.write('</p>')
     html.write('<h2>User commits</h2>')
+    html.write('<p>')
 
     users_pie = Pie((7,3))
     for u in users.values():
         users_pie.add_entry(u.name, len(u.commits))
 
     users_pie.create_img(output + 'users.png')
-    html.write('<img src="users.png" />')
+    html.write('<img alt="users" src="users.png" />')
     html.write('</p>')
 
     html.write('<h2>ChangeLog</h2>')
 
+    html.write('<p><a href="javascript:showall(\'r\')">Show all</a>/<a href="javascript:hideall(\'r\')">Hide all</a></p>')
+
     for i in all_commits:
-        html.write('<p><b>r%d</b> by <i>%s</i> at %s %s: ' % (i.revision, i.user.name, i.date, i.time))
+        html.write('<p><b>r%d</b> by <i>%s</i> at %s %s:  (<a href="javascript:showhide(\'r%d\')">Show/hide</a>)</p>' % (i.revision, i.user.name, i.date, i.time, i.revision))
+        html.write('<pre id="r%d">' % i.revision)
+        for line in i.changed_files:
+            html.write('%s\n' % text2html(line))
+        html.write('</pre>')
+        html.write('<p>')
         for line in i.message:
-            html.write('<br />%s' % line)
-        html.write('<br />------------------------------------------------------------------------')
+            html.write('%s<br />' % text2html(line))
+        html.write('------------------------------------------------------------------------')
 
         html.write('</p>')
 
