@@ -460,6 +460,8 @@ def main():
             elem.style.display = 'none';
         else
             elem.style.display = '';
+
+        return false;
     }
 
     function showall(name)
@@ -468,6 +470,8 @@ def main():
         var elem;
         for(var i = 0; elem = elems[i]; ++i)
             elem.style.display = '';
+
+        return false;
     }
 
     function hideall(name)
@@ -476,6 +480,8 @@ def main():
         var elem;
         for(var i = 0; elem = elems[i]; ++i)
             elem.style.display = 'none';
+
+        return false;
     }
 
     </script>
@@ -556,10 +562,10 @@ def main():
 
     html.write('<h2>ChangeLog</h2>')
 
-    html.write('<p><a href="javascript:showall(\'revision\')">Show all</a>/<a href="javascript:hideall(\'revision\')">Hide all</a></p>')
+    html.write('<p><a href="#" onClick="return showall(\'revision\')">Show all</a>/<a href="#" onClick="return hideall(\'revision\')">Hide all</a></p>')
 
     for i in all_commits:
-        html.write('<p><b>r%d</b> by <i>%s</i> at %s %s:  (<a href="javascript:showhide(\'r%d\')">Show/hide</a>)</p>' % (i.revision, i.user.name, i.date, i.time, i.revision))
+        html.write('<p><b>r%d</b> by <i>%s</i> at %s %s:  (<a href="#" onClick="return showhide(\'r%d\')">Show/hide</a>)</p>' % (i.revision, i.user.name, i.date, i.time, i.revision))
         html.write('<pre id="r%d" class="revision">' % i.revision)
         for line in i.changed_files:
             html.write('%s\n' % text2html(line))
