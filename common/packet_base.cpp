@@ -99,8 +99,17 @@ bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 
 uint32_t PacketBase::GetHeaderSize()
 {
+#if defined(PF_NET)
+	return sizeof(id_t)			  // id_src
+		+ sizeof(id_t)			  // id_dst
+		+ sizeof(uint32_t)		  // size of the packet
+		+ sizeof(uint32_t);		  // size of the type
+#elif defined(PF_LAN)
 	return sizeof(uint32_t)			  // size of the packet
 		+ sizeof(uint32_t);		  // size of the type
+#else
+#error "Hu ?"
+#endif
 }
 
 uint32_t PacketBase::GetSize() const
