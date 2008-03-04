@@ -67,7 +67,6 @@ public:
 	PacketBase& operator=(const PacketBase& packet);
 	virtual ~PacketBase();
 
-
 	static uint32_t GetHeaderSize();
 	uint32_t GetSize() const;
 	uint32_t GetDataSize() const { return size; }

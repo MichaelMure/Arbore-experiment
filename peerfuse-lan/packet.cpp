@@ -43,5 +43,3 @@ char* Packet::DumpBuffer() const
 	memcpy(ptr, datas, GetDataSize());
 	return dump;
 }
-
-
