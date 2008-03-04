@@ -40,9 +40,6 @@ public:
 	Packet& operator=(const Packet& packet);
 	Packet(char* header);
 
-	static uint32_t GetHeaderSize();
-	virtual uint32_t GetSize() const;
-
 	id_t GetSrcID() const { return id_src; }
 	id_t GetDstID() const { return id_dst; }
 	Packet& SetSrcID(id_t id) { id_src = id; return *this; }

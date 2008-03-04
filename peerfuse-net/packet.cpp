@@ -76,19 +76,6 @@ char* Packet::DumpBuffer() const
 	return dump;
 }
 
-uint32_t Packet::GetHeaderSize()
-{
-	return sizeof(id_t)			  // id_src
-		+ sizeof(id_t)			  // id_dst
-		+ sizeof(uint32_t)		  // size of the packet
-		+ sizeof(uint32_t);		  // size of the type
-}
-
-uint32_t Packet::GetSize() const
-{
-	return PacketBase::GetSize() - PacketBase::GetHeaderSize() + GetHeaderSize();
-}
-
 void Packet::Send(Connection* conn)
 {
 	PacketBase::Send(conn);

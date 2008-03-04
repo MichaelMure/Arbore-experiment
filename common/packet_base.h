@@ -69,7 +69,7 @@ public:
 
 
 	static uint32_t GetHeaderSize();
-	virtual uint32_t GetSize() const;
+	uint32_t GetSize() const;
 	uint32_t GetDataSize() const { return size; }
 	msg_type GetType() const { return type; }
 

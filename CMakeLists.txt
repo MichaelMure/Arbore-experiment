@@ -50,6 +50,7 @@ IF(PF_NET)
 		peerfuse-net/net_proto.cpp
 		peerfuse-net/peer.cpp)
 	SET(BIN_NAME peerfuse-net)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_NET")
 ELSE(PF_NET)
 	SET(SRC ${SRC}
 		peerfuse-lan/application.cpp
@@ -62,6 +63,7 @@ ELSE(PF_NET)
 		peerfuse-lan/peer.cpp
 		peerfuse-lan/job_other_connect.cpp)
 	SET(BIN_NAME peerfuse-lan)
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_LAN")
 ENDIF(PF_NET)
 
 
