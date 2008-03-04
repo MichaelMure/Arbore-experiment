@@ -28,5 +28,7 @@ public:
 	Packet(msg_type type) : PacketBase(type) {}
 	Packet(const Packet& packet) : PacketBase(packet) {}
 	Packet(char* header);
+
+	virtual char* DumpBuffer() const;
 };
 #endif						  /* PACKET_H */

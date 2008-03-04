@@ -32,7 +32,7 @@ class PacketBase
 {
 	std::vector<PacketArgBase*> arg_lst;
 
-	virtual char* DumpBuffer() const;
+	virtual char* DumpBuffer() const = 0;
 
 	void BuildArgsFromData();
 	void BuildDataFromArgs();
@@ -67,6 +67,7 @@ public:
 	PacketBase& operator=(const PacketBase& packet);
 	virtual ~PacketBase();
 
+
 	static uint32_t GetHeaderSize();
 	virtual uint32_t GetSize() const;
 	uint32_t GetDataSize() const { return size; }
@@ -85,7 +86,7 @@ public:
 	bool ReceiveContent(Connection* conn) throw(Malformated);
 
 	template<typename T>
-		PacketBase& SetArg(size_t arg, T val)
+		void SetArg(size_t arg, T val)
 	{
 		if(arg_lst.size() <= arg)
 			arg_lst.resize(arg + 1, NULL);
@@ -93,8 +94,6 @@ public:
 			delete arg_lst[arg];
 
 		arg_lst[arg] = new PacketArg<T>(val);
-
-		return *this;
 	}
 
 	template<typename T>

@@ -62,7 +62,7 @@ void Peer::Flush()
  *  Send
  */
 
-void Peer::SendMsg(const PacketBase& pckt)
+void Peer::SendMsg(const Packet& pckt)
 {
 	send_queue.push(pckt);
 	net.HavePacketToSend(this);
@@ -112,7 +112,9 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	{
 		// The peer don't have an ID, give him one
 		// TODO: check it's not already used
-		SendMsg(Packet(NET_YOUR_ID).SetArg(NET_YOUR_ID_ID, net.CreateID()));
+		Packet p(NET_YOUR_ID);
+		p.SetArg(NET_YOUR_ID_ID, net.CreateID());
+		SendMsg(p);
 	}
 	else
 		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
@@ -142,12 +144,16 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	catch(Network::CantConnectTo &e)
 	{
 		// acknowledge the peer this peer can't be contacted
-		SendMsg(Packet(NET_PEER_CONNECTION_RST).SetArg(NET_PEER_CONNECTION_RST_ADDRESS, new_peer));
+		Packet p(NET_PEER_CONNECTION_RST);
+		p.SetArg(NET_PEER_CONNECTION_RST_ADDRESS, new_peer);
+		SendMsg(p);
 		return;
 	}
 
 	// acknowledge the peer the connection is established
-	SendMsg(Packet(NET_PEER_CONNECTION_ACK).SetArg(NET_PEER_CONNECTION_ACK_ADDRESS, new_peer));
+	Packet p(NET_PEER_CONNECTION_ACK);
+	p.SetArg(NET_PEER_CONNECTION_ACK_ADDRESS, new_peer);
+	SendMsg(p);
 }
 
 void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
@@ -191,7 +197,9 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
 		if((*it)->GetAddr() == new_peer)
 	{
-		(*it)->SendMsg(Packet(NET_PEER_CONNECTION_REJECTED).SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr()));
+		Packet p(NET_PEER_CONNECTION_REJECTED);
+		p.SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr());
+		(*it)->SendMsg(p);
 		break;
 	}
 }

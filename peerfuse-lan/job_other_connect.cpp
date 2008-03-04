@@ -59,7 +59,9 @@ void JobOtherConnect::Start()
 		// Check if we already asked this peer to connect to the "connect_to" peer
 		if(find(is_connecting.begin(), is_connecting.end(), *it) == is_connecting.end())
 		{
-			(*it)->SendMsg(Packet(NET_PEER_CONNECTION).SetArg(NET_PEER_CONNECTION_ADDRESS, connect_to->GetAddr()));
+			Packet p(NET_PEER_CONNECTION);
+			p.SetArg(NET_PEER_CONNECTION_ADDRESS, connect_to->GetAddr());
+			(*it)->SendMsg(p);
 			is_connecting.push_back(*it);
 			everybody_connected = false;
 		}

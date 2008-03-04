@@ -39,7 +39,7 @@ class Peer
 
 	int ts_diff;				  // diff between our timestamp and its timestamp */
 	Packet* incoming;			  // packet we are receiving
-	std::queue<PacketBase> send_queue;	  // packets we are sending (with flush)
+	std::queue<Packet> send_queue;	  // packets we are sending (with flush)
 
 	unsigned int flags;
 
@@ -96,7 +96,7 @@ public:
 	void HandleMsg(struct Packet* pckt);
 
 	void Flush();
-	void SendMsg(const PacketBase& pckt);
+	void SendMsg(const Packet& pckt);
 	void SendHello();
 	bool Receive();
 };

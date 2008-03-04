@@ -97,20 +97,6 @@ bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 	return true;
 }
 
-char* PacketBase::DumpBuffer() const
-{
-	char* dump = (char*)malloc(GetSize());
-	uint32_t _type = htonl(type);
-	uint32_t _size = htonl(size);
-	char* ptr = dump;
-	memcpy(ptr, &_type, sizeof(_type));
-	ptr += sizeof _type;
-	memcpy(ptr, &_size, sizeof(_size));
-	ptr += sizeof _size;
-	memcpy(ptr, datas, GetDataSize());
-	return dump;
-}
-
 uint32_t PacketBase::GetHeaderSize()
 {
 	return sizeof(uint32_t)			  // size of the packet
