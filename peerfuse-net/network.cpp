@@ -49,7 +49,8 @@ Network::~Network()
 void Network::GivePacketTo(id_t id, Packet* packet) const
 {
 	PeerList::const_iterator it;
-	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it);
+	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
+		;
 
 	if(it != peer_list.end())
 		(*it)->HandleMsg(packet);
@@ -70,7 +71,8 @@ void Network::Broadcast(Packet pckt, const Peer* but_one)
 Peer* Network::ID2Peer(id_t id) const
 {
 	PeerList::const_iterator it;
-	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it);
+	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
+		;
 
 	return (it != peer_list.end() ? *it : NULL);
 }

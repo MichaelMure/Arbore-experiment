@@ -21,6 +21,7 @@
 #define PF_TYPES_H
 
 #include <vector>
+#include <stdint.h>
 
 typedef unsigned int id_t;
 

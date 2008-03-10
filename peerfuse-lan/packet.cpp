@@ -18,6 +18,7 @@
  */
 
 #include "packet.h"
+#include <string.h>
 #include <netinet/in.h>				  // htonl, ntohl
 
 Packet::Packet(char* header) :
@@ -27,12 +28,12 @@ Packet::Packet(char* header) :
 	type = (msg_type)ntohl(h[0]);
 	size = ntohl(h[1]);
 
-	datas = (char*)malloc(size);
+	datas = new char [size];
 }
 
 char* Packet::DumpBuffer() const
 {
-	char* dump = (char*)malloc(GetSize());
+	char* dump = new char [GetSize()];
 	uint32_t _type = htonl(type);
 	uint32_t _size = htonl(size);
 	char* ptr = dump;

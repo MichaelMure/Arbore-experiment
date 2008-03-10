@@ -37,6 +37,6 @@ public:
 	bool IsConnectingTo(pf_addr addr);
 	void PeerConnected(Peer* peer);
 	void Start();
-	const job_type GetType() const {return JOB_OTHER_CONNECT; }
+	job_type GetType() const {return JOB_OTHER_CONNECT; }
 };
 #endif

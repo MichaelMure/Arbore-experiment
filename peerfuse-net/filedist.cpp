@@ -17,6 +17,7 @@
  * $Id$
  */
 
+#include <algorithm>
 #include "filedist.h"
 #include "network.h"
 #include "cache.h"
@@ -34,7 +35,8 @@ bool FileDistribution::_is_responsible(const id_t peer_id, const FileEntry* file
 
 	std::vector<id_t>::const_iterator it;
 	std::vector<id_t>::const_iterator begin = id_list.begin();
-	for(it = begin; it != id_list.end() && *it != peer_id; ++it);
+	for(it = begin; it != id_list.end() && *it != peer_id; ++it)
+		;
 
 	if(it == id_list.end())
 		return false;
@@ -42,7 +44,8 @@ bool FileDistribution::_is_responsible(const id_t peer_id, const FileEntry* file
 	size_t id_n = it - begin;
 	size_t i = 0;
 
-	for(; i < NB_PEERS_PER_FILE && file->GetPathSerial() % id_list.size() != id_n % id_list.size(); ++i);
+	for(; i < NB_PEERS_PER_FILE && file->GetPathSerial() % id_list.size() != id_n % id_list.size(); ++i)
+		;
 
 	return (i < NB_PEERS_PER_FILE);
 }
@@ -85,7 +88,9 @@ FileList FileDistribution::GetFiles(id_t id) const
 	size_t id_number;
 	std::vector<id_t>::const_iterator it;
 	std::vector<id_t>::const_iterator begin = id_list.begin();
-	for(it = begin; it != id_list.end() && *it != id;  ++it);
+
+	for(it = begin; it != id_list.end() && *it != id;  ++it)
+		;
 
 	if(it == id_list.end())
 		return files;
@@ -98,8 +103,9 @@ FileList FileDistribution::GetFiles(id_t id) const
 	{
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-			((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
-			++i);
+		    ((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
+		    ++i)
+			;
 
 		if(i < NB_PEERS_PER_FILE)
 			result.insert(*it);

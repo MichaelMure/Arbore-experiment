@@ -346,8 +346,8 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	/* Listen a TCP port */
 	ConfigSection* section = conf->GetSection("listen");
 
-	Listen(section->GetItem("port")->Integer(),
-		section->GetItem("bind")->String().c_str());
+	Listen(static_cast<uint16_t>(section->GetItem("port")->Integer()),
+	       section->GetItem("bind")->String().c_str());
 
 	/* Connect to other servers */
 	Peer* peer = 0;
@@ -356,7 +356,8 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	{
 		try
 		{
-			peer = Connect((*it)->GetItem("host")->String(), (*it)->GetItem("port")->Integer());
+			peer = Connect((*it)->GetItem("host")->String(),
+			               static_cast<uint16_t>((*it)->GetItem("port")->Integer()));
 
 			/* If Connect() doesn't raise any exception, we are connected and we leave loop */
 			break;

@@ -32,7 +32,7 @@ public:
 
 	time_t GetStartTime() const { return start_time; }
 	virtual void Start() = 0;
-	virtual const job_type GetType() const = 0;
+	virtual job_type GetType() const = 0;
 };
 
 // TODO: split me
@@ -49,6 +49,6 @@ public:
 	Job(time(NULL) + j->dt),  pf_addr(pf_addr(*j)), dt(j->dt) {}
 
 	void Start();
-	const job_type GetType() const {return JOB_NEW_CONNECT; }
+	job_type GetType() const {return JOB_NEW_CONNECT; }
 };
 #endif

@@ -48,7 +48,8 @@ Log::flux::~flux()
 	if(!(flag & log.LoggedFlags()))
 		return;
 
-	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(flag & all_flags[i].flag); --i);
+	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(flag & all_flags[i].flag); --i)
+		;
 
 	if(i < 0)
 		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", flag, str.c_str());
@@ -86,7 +87,8 @@ void Log::SetLoggedFlags(std::string s)
 			break;
 		}
 
-		for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && (token != all_flags[i].s); --i);
+		for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && (token != all_flags[i].s); --i)
+			;
 
 		if(i >= 0)
 			logged_flags |= all_flags[i].flag;

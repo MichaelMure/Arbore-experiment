@@ -31,6 +31,7 @@
 #include <map>
 #include <sstream>
 #include <ctype.h>
+#include <limits.h>
 
 class ConfigSection;
 class ConfigItem;

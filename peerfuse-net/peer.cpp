@@ -50,7 +50,8 @@ Peer::~Peer()
 	if(uplink)
 	{
 		std::vector<Peer*>::iterator it = uplink->downlinks.begin();
-		while(it != uplink->downlinks.end() && *it != this);
+		while(it != uplink->downlinks.end() && *it != this)
+			;
 		if(it != uplink->downlinks.end())
 			uplink->downlinks.erase(it);
 	}
@@ -137,8 +138,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
 	addr.id = pckt->GetSrcID();		  /* TODO: we'll know ID with certificate, when connection is SSL. */
-	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
-	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
+	ts_diff = static_cast<uint32_t>(time(NULL)) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
+	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
 	DelFlag(ANONYMOUS);
 
@@ -380,7 +381,7 @@ bool Peer::Receive()
 			return false;
 
 		incoming = new Packet(header);
-		free(header);
+		delete header;
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" srcid=" << incoming->GetSrcID() << ", " <<

@@ -19,6 +19,7 @@
 
 #include <arpa/inet.h>
 #include <string>
+#include <stdlib.h>
 #include "tools.h"
 #include "pf_types.h"
 
@@ -113,14 +114,14 @@ pf_addr pf_addr_ton(pf_addr addr)
 
 uint64_t htonll(uint64_t number)
 {
-	return ( htonl( (number >> 32) & 0xFFFFFFFF) |
-		((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
+	return ( htonl((uint32_t) (number >> 32) & 0xFFFFFFFF) |
+		((uint64_t) (htonl((uint32_t)number & 0xFFFFFFFF))  << 32));
 }
 
 uint64_t ntohll(uint64_t number)
 {
-	return ( htonl( (number >> 32) & 0xFFFFFFFF) |
-		((uint64_t) (htonl(number & 0xFFFFFFFF))  << 32));
+	return ( htonl((uint32_t) (number >> 32) & 0xFFFFFFFF) |
+		((uint64_t) (htonl((uint32_t)number & 0xFFFFFFFF))  << 32));
 }
 
 pf_addr nto_pf_addr(pf_addr addr)

@@ -19,6 +19,7 @@
 
 #include <list>
 #include <time.h>
+#include <algorithm>
 #include "job.h"
 #include "scheduler.h"
 #include "log.h"
@@ -68,7 +69,7 @@ void Scheduler::Queue(Job* job)
 
 void Scheduler::Cancel(Job* job)
 {
-	std::list<Job*>::iterator it = find(job_queue.begin(), job_queue.end(), job);
+	std::list<Job*>::iterator it = std::find(job_queue.begin(), job_queue.end(), job);
 
 	if(it == job_queue.end())
 		return;

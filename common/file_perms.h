@@ -19,6 +19,7 @@
 
 #ifndef FILE_PERMS_H
 #define FILE_PERMS_H
+
 #include <unistd.h>
 
 class FilePermissions

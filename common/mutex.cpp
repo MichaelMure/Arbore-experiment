@@ -25,7 +25,7 @@
 
 void Mutex::Init(MutexType _type)
 {
-	mutex = (pthread_mutex_t*) calloc(sizeof(pthread_mutex_t), 1);
+	mutex = (pthread_mutex_t*) new pthread_mutex_t;
 	type = _type;
 
 	pthread_mutexattr_t attr;
@@ -67,7 +67,7 @@ Mutex::~Mutex()
 {
 	int r = pthread_mutex_destroy(mutex);
 	assert(r == 0);
-	free(mutex);
+	delete mutex;
 }
 
 void Mutex::Lock()

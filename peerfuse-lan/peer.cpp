@@ -93,7 +93,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	}
 
 	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
-	addr.port = pckt->GetArg<uint32_t>(NET_HELLO_PORT);
+	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
 	if(IsServer())
 	{
@@ -346,7 +346,7 @@ bool Peer::Receive()
 			return false;		  // All the content couldn't be retrieved yet -> exit
 
 		incoming = new Packet(header);
-		free(header);
+		delete header;
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" size=" << incoming->GetDataSize();

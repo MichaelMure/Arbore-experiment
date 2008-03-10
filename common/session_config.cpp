@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <stdlib.h>
 #include "session_config.h"
 #include "log.h"
 

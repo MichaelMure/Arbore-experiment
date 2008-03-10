@@ -22,6 +22,7 @@
 #include <netinet/in.h>				  // htonl, ntohl
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <string.h>
 #include "packet_base.h"
 #include "packet_arg.h"
 #include "pf_types.h"
@@ -49,7 +50,7 @@ PacketBase::PacketBase(const PacketBase& p)
 {
 	if(size)
 	{
-		datas = (char*) malloc(size);
+		datas = new char [size];
 		memcpy(datas, p.datas, size);
 	}
 	for(std::vector<PacketArgBase*>::const_iterator it = p.arg_lst.begin(); it != p.arg_lst.end(); ++it)
@@ -63,7 +64,7 @@ PacketBase& PacketBase::operator=(const PacketBase& p)
 
 	if(size)
 	{
-		datas = (char*) malloc(size);
+		datas = new char [size];
 		memcpy(datas, p.datas, size);
 	}
 	else
@@ -78,7 +79,7 @@ PacketBase& PacketBase::operator=(const PacketBase& p)
 PacketBase::~PacketBase()
 {
 	if(datas)
-		free(datas);
+		delete datas;
 
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
@@ -91,7 +92,7 @@ bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 		return false;
 
 	memcpy(datas, buf, GetDataSize());
-	free(buf);
+	delete buf;
 
 	BuildArgsFromData();
 	return true;
@@ -119,7 +120,7 @@ uint32_t PacketBase::GetSize() const
 
 PacketBase& PacketBase::Write(uint32_t nbr)
 {
-	char* new_datas = (char*)malloc(size + sizeof(nbr));
+	char* new_datas = new char [size + sizeof nbr];
 
 	log[W_PARSE] << "Sending uint32: " << nbr;
 
@@ -127,7 +128,7 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		free(datas);
+		delete datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
 	size += sizeof(nbr);
 	datas = new_datas;
@@ -137,7 +138,7 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 
 PacketBase& PacketBase::Write(uint64_t nbr)
 {
-	char* new_datas = (char*)malloc(size + sizeof(nbr));
+	char* new_datas = new char [size + sizeof nbr];
 
 	log[W_PARSE] << "Sending uint64: " << nbr;
 
@@ -145,7 +146,7 @@ PacketBase& PacketBase::Write(uint64_t nbr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		free(datas);
+		delete datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
 	size += sizeof(nbr);
 	datas = new_datas;
@@ -155,7 +156,7 @@ PacketBase& PacketBase::Write(uint64_t nbr)
 
 PacketBase& PacketBase::Write(pf_addr addr)
 {
-	char* new_datas = (char*)malloc(size + sizeof(addr));
+	char* new_datas = new char [size + sizeof addr];
 
 	log[W_PARSE] << "Sending addr";
 
@@ -163,7 +164,7 @@ PacketBase& PacketBase::Write(pf_addr addr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		free(datas);
+		delete datas;
 	memcpy(new_datas + size, &addr, sizeof(addr));
 	size += sizeof(addr);
 	datas = new_datas;
@@ -176,11 +177,11 @@ PacketBase& PacketBase::Write(std::string str)
 	uint32_t str_len = str.size();
 	Write(str_len);
 	log[W_PARSE] << "Sending str: " << str;
-	char* new_datas = (char*)malloc(size + str_len);
+	char* new_datas = new char [size + str_len];
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		free(datas);
+		delete datas;
 
 	memcpy(new_datas + size, str.c_str(), str_len);
 	size += str_len;
@@ -194,12 +195,12 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	Write((uint32_t)addr_list.size());
 
 	log[W_PARSE] << "Sending addr";
-	char* new_datas = (char*)malloc(size + (addr_list.size() * sizeof(pf_addr)));
+	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
 
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		free(datas);
+		delete datas;
 
 	char* ptr = new_datas + size;
 
@@ -219,7 +220,7 @@ void PacketBase::Send(Connection* conn)
 	BuildDataFromArgs();
 	char* buf = DumpBuffer();
 	conn->Write(buf, GetSize());
-	free(buf);
+	delete buf;
 
 	log[W_PARSE] << "Send a message header: type=" << GetType() << ", " <<
 	//"srcid=" << id_src << ", " <<
@@ -238,11 +239,11 @@ uint32_t PacketBase::ReadInt32()
 	size -= sizeof(uint32_t);
 	if(size > 0)
 	{
-		new_datas = (char*)malloc(size);
+		new_datas = new char [size];
 		memcpy(new_datas, datas + sizeof(uint32_t), size);
 	}
 
-	free(datas);
+	delete datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -263,11 +264,11 @@ uint64_t PacketBase::ReadInt64()
 	size -= sizeof(uint64_t);
 	if(size > 0)
 	{
-		new_datas = (char*)malloc(size);
+		new_datas = new char [size];
 		memcpy(new_datas, datas + sizeof(uint64_t), size);
 	}
 
-	free(datas);
+	delete datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -288,11 +289,11 @@ pf_addr PacketBase::ReadAddr()
 	size -= sizeof(pf_addr);
 	if(size > 0)
 	{
-		new_datas = (char*)malloc(size);
+		new_datas = new char [size];
 		memcpy(new_datas, datas + sizeof(pf_addr), size);
 	}
 
-	free(datas);
+	delete datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -306,7 +307,7 @@ std::string PacketBase::ReadStr()
 {
 	uint32_t str_size = ReadInt32();
 	ASSERT(size >= str_size);
-	char* str = (char*)malloc(str_size+1);
+	char* str = new char [str_size+1];
 
 	memcpy(str, datas, str_size);
 	str[str_size] = '\0';
@@ -317,12 +318,12 @@ std::string PacketBase::ReadStr()
 	size -= str_size;
 	if(size > 0)
 	{
-		new_datas = (char*)malloc(size);
+		new_datas = new char [size];
 		memcpy(new_datas, datas + str_size, size);
 	}
 
-	free(datas);
-	free(str);
+	delete datas;
+	delete str;
 
 	if(size > 0)
 		datas = new_datas;
@@ -351,11 +352,11 @@ AddrList PacketBase::ReadAddrList()
 	size -= list_size * sizeof(pf_addr);
 	if(size > 0)
 	{
-		new_datas = (char*)malloc(size);
+		new_datas = new char [size];
 		memcpy(new_datas, datas + (list_size * sizeof(pf_addr)), size);
 	}
 
-	free(datas);
+	delete datas;
 
 	if(size > 0)
 		datas = new_datas;

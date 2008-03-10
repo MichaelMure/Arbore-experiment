@@ -32,7 +32,7 @@ public:
 	/* Overrided to send NET_HELLO message when connected. */
 	virtual Peer* Connect(const pf_addr addr);
 
-	const bool GetMerging() const { return merging; }
+	bool GetMerging() const { return merging; }
 	void SetMerging(bool m) { merging = m; }
 };
 

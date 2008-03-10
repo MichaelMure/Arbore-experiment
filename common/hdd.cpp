@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <stack>
+#include <string.h>
 #include "hdd.h"
 #include "log.h"
 
@@ -38,7 +39,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-			
+
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	root = _root;
