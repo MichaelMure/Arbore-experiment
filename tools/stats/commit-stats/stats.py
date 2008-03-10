@@ -66,12 +66,12 @@ class Graph:
 
     dpi = 70
 
-    colours = ['#B2B6E0', '#C3F4F8', '#5289FF', '#A9482E', '#21FF85', '#E5D587',
+    colours = ['#B2B6E0', '#C3F4F8', '#5289FF', '#A9482E', '#E6CBB7', '#E5D587',
                '#E07191', '#74D2F1', '#5BC466', '#92E0DF', '#FFFFFF', '#AFFF54',
                '#C09858', '#FFCB75', '#33ADFF', '#9E4570', '#9AE0A1', '#47BE4F',
                '#CC0099', '#E0DD8D', '#FF8A2B', '#4B5DFF', '#6DF8BE', '#9C56FF',
                '#BE7344', '#CCBE78', '#E0ACD0', '#FF37E1', '#45709E', '#676FFF',
-               '#4CAC84', '#35FF1A', '#806170', '#C3BF46', '#E0829A', '#E6CBB7']
+               '#4CAC84', '#35FF1A', '#806170', '#C3BF46', '#E0829A', '#21FF85']
 
 
     def __init__(self, size):
