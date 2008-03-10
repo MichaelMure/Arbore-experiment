@@ -79,7 +79,7 @@ PacketBase& PacketBase::operator=(const PacketBase& p)
 PacketBase::~PacketBase()
 {
 	if(datas)
-		delete datas;
+		delete []datas;
 
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
@@ -92,7 +92,7 @@ bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
 		return false;
 
 	memcpy(datas, buf, GetDataSize());
-	delete buf;
+	delete []buf;
 
 	BuildArgsFromData();
 	return true;
@@ -128,7 +128,7 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		delete datas;
+		delete []datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
 	size += sizeof(nbr);
 	datas = new_datas;
@@ -146,7 +146,7 @@ PacketBase& PacketBase::Write(uint64_t nbr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		delete datas;
+		delete []datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
 	size += sizeof(nbr);
 	datas = new_datas;
@@ -164,7 +164,7 @@ PacketBase& PacketBase::Write(pf_addr addr)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		delete datas;
+		delete []datas;
 	memcpy(new_datas + size, &addr, sizeof(addr));
 	size += sizeof(addr);
 	datas = new_datas;
@@ -181,7 +181,7 @@ PacketBase& PacketBase::Write(std::string str)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		delete datas;
+		delete []datas;
 
 	memcpy(new_datas + size, str.c_str(), str_len);
 	size += str_len;
@@ -200,7 +200,7 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
-		delete datas;
+		delete []datas;
 
 	char* ptr = new_datas + size;
 
@@ -220,7 +220,7 @@ void PacketBase::Send(Connection* conn)
 	BuildDataFromArgs();
 	char* buf = DumpBuffer();
 	conn->Write(buf, GetSize());
-	delete buf;
+	delete []buf;
 
 	log[W_PARSE] << "Send a message header: type=" << GetType() << ", " <<
 	//"srcid=" << id_src << ", " <<
@@ -243,7 +243,7 @@ uint32_t PacketBase::ReadInt32()
 		memcpy(new_datas, datas + sizeof(uint32_t), size);
 	}
 
-	delete datas;
+	delete []datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -268,7 +268,7 @@ uint64_t PacketBase::ReadInt64()
 		memcpy(new_datas, datas + sizeof(uint64_t), size);
 	}
 
-	delete datas;
+	delete []datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -293,7 +293,7 @@ pf_addr PacketBase::ReadAddr()
 		memcpy(new_datas, datas + sizeof(pf_addr), size);
 	}
 
-	delete datas;
+	delete []datas;
 
 	if(size > 0)
 		datas = new_datas;
@@ -322,8 +322,8 @@ std::string PacketBase::ReadStr()
 		memcpy(new_datas, datas + str_size, size);
 	}
 
-	delete datas;
-	delete str;
+	delete []datas;
+	delete []str;
 
 	if(size > 0)
 		datas = new_datas;
@@ -356,7 +356,7 @@ AddrList PacketBase::ReadAddrList()
 		memcpy(new_datas, datas + (list_size * sizeof(pf_addr)), size);
 	}
 
-	delete datas;
+	delete []datas;
 
 	if(size > 0)
 		datas = new_datas;

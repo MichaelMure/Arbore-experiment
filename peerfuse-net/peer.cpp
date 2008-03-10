@@ -381,7 +381,7 @@ bool Peer::Receive()
 			return false;
 
 		incoming = new Packet(header);
-		delete header;
+		delete []header;
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" srcid=" << incoming->GetSrcID() << ", " <<

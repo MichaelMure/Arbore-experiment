@@ -346,7 +346,7 @@ bool Peer::Receive()
 			return false;		  // All the content couldn't be retrieved yet -> exit
 
 		incoming = new Packet(header);
-		delete [] header;
+		delete []header;
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" size=" << incoming->GetDataSize();
