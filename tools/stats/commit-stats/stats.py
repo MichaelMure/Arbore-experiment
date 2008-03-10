@@ -261,6 +261,7 @@ class Commit:
         self.time = time
         self.changed_files = []
         self.message = []
+        self.files = []
 
 class User:
 
@@ -269,10 +270,18 @@ class User:
         self.name = name
         self.commits = []
         self.nb_lines = 0
+        self.files = {}
 
     def add_commit(self, commit):
 
         self.commits += [commit]
+
+class File:
+
+    def __init__(self, name):
+
+        self.name = name
+        self.commits = CommitList(name)
 
 class CommitList:
 
@@ -315,7 +324,7 @@ def blame(path, users):
 
         child.close()
 
-def get_commits(path, users, all_commits):
+def get_commits(path, users, all_commits, files):
 
     REGEXP = re.compile("^r([0-9]{1,4}) \| (.*) \| ([0-9 -]+) ([0-9 :]+) \+([0-9]+) \((.*)\) \| ([0-9]+) (line|lines)$")
 
@@ -347,6 +356,20 @@ def get_commits(path, users, all_commits):
 
         elif commit_declaration and len(line) > 0:
             all_commits[-1].changed_files += [line]
+            freg = re.match('^[ ]+([MA]) ([a-zA-Z0-9_./-]+)', line)
+            if freg:
+                try:
+                    file = files[freg.group(2)]
+                except KeyError:
+                    file = File(freg.group(2))
+                    files[freg.group(2)] = file
+
+                file.commits.add_commit(commit)
+                all_commits[-1].files += [file]
+                try:
+                    user.files[freg.group(2)] += [commit]
+                except KeyError:
+                    user.files[freg.group(2)] = [commit]
         elif len(all_commits) > 0 and nb_lines > 0:
             if len(line) > 0:
                 all_commits[-1].message += [line]
@@ -408,8 +431,9 @@ def main():
     hours = [CommitList(i) for i in xrange(24)]
     months = {}
     all_commits = []
+    files = {}
 
-    get_commits(sys.argv[1], users, all_commits)
+    get_commits(sys.argv[1], users, all_commits, files)
 
     all_commits.reverse() # first to last
 
@@ -559,6 +583,34 @@ def main():
     html.write('<img alt="ulines" src="ulines.png" />')
 
     html.write('</p>')
+
+    html.write('<h2>Most actives files</h2>')
+    html.write('<p>')
+
+    files_s = sorted(files.values(), key=lambda (u): (len(u.commits.commits)), reverse=True)
+    try:
+        files_s = files_s[:15]
+    except:
+        pass
+    files_histo = Histogram((7,4), 'Files commits', [i.name for i in users.values()])
+    html.write('<img alt="files" src="files.png" align="right" border="0" hspace="5" vspace="5" />')
+    html.write('<ul>')
+    cnt = 0
+    for f in files_s:
+        cnt += 1
+        lst = []
+        for i in users.values():
+            if f.commits.users_commits.has_key(i):
+                lst += [len(f.commits.users_commits[i])]
+            else:
+                lst += [0]
+        html.write('<li>%d. %s (%d)</li>' % (cnt, f.commits.name, len(f.commits.commits)))
+        files_histo.add_entry(cnt, lst)
+
+    files_histo.create_img(output + 'files.png')
+    html.write('</ul>')
+    html.write('</p>')
+
 
     html.write('<h2>ChangeLog</h2>')
 
