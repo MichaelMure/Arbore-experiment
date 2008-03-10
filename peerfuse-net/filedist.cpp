@@ -103,9 +103,9 @@ FileList FileDistribution::GetFiles(id_t id) const
 	{
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-		    ((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
-		    ++i)
-			;
+			((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
+			++i)
+		;
 
 		if(i < NB_PEERS_PER_FILE)
 			result.insert(*it);
