@@ -452,7 +452,7 @@ def main():
 <head>
     <title>Stats of commits</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel='stylesheet' href='http://vaginus.org/vaginus.css' type='text/css' />
+    <link rel='stylesheet' href='http://peerfuse.org/style.css' type='text/css' />
     <link rel="shortcut icon" type="image/png" href="http://vaginus.org/favicon.png" />
     <script type="text/javascript">
 
