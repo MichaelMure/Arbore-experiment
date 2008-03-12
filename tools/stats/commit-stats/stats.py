@@ -517,7 +517,7 @@ def main():
 
 <div id="content">""")
 
-    html.write('<p>')
+    html.write('<p class="graphlist">')
 
     hours_histo = Histogram((4,3), 'Commits by hour', [i.name for i in users.values()])
     for commits in hours:
@@ -548,7 +548,7 @@ def main():
     html.write('<img alt="months" src="months.png" />')
 
     html.write('</p>')
-    html.write('<p>')
+    html.write('<p class="graphlist">')
 
     dates_histo = Histogram((12,4), 'Commits by day', [i.name for i in users.values()])
     dates_s = sorted(dates.items())
@@ -566,7 +566,7 @@ def main():
 
     html.write('</p>')
     html.write('<h2>User commits</h2>')
-    html.write('<p>')
+    html.write('<p class="graphlist">')
 
     users_pie = Pie((6,2.5), title='Commits', legend=True)
     for u in users.values():
