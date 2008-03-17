@@ -33,12 +33,12 @@
 #include "session_config.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
-	: addr(_addr),
-	conn(_conn),
-	ts_diff(0),
-	incoming(NULL),
-	uplink(parent),
-	flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
+			: addr(_addr),
+			conn(_conn),
+			ts_diff(0),
+			incoming(NULL),
+			uplink(parent),
+			flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
 {
 }
 
