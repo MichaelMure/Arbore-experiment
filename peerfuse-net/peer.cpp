@@ -33,12 +33,12 @@
 #include "session_config.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
-			: addr(_addr),
-			conn(_conn),
-			ts_diff(0),
-			incoming(NULL),
-			uplink(parent),
-			flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
+	: addr(_addr),
+	conn(_conn),
+	ts_diff(0),
+	incoming(NULL),
+	uplink(parent),
+	flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
 {
 }
 
@@ -80,7 +80,8 @@ void Peer::SendHello()
 {
 	// Make the message
 	Packet pckt(NET_HELLO, net.GetMyID(), addr.id);
-						  // Time / now
+
+	// Time / now
 	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
 	uint32_t flags = 0;
 	if(IsHighLink())
