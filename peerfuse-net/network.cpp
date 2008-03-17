@@ -100,10 +100,24 @@ void Network::AddDisconnected(const pf_addr& addr)
 
 void Network::DelDisconnected(const pf_addr& addr)
 {
-	std::list<pf_addr>::iterator it = find(disconnected_list.begin(), disconnected_list.end(), addr);
+	disconnected_list.remove(addr);
 
-	if( it != disconnected_list.end())
-		disconnected_list.erase(it);
+	/* Remove connection from queue. */
+	std::list<Job*> job_list = scheduler.GetQueue();
+	for(std::list<Job*>::iterator it = job_list.begin();
+	    it != job_list.end();
+	    ++it)
+	{
+		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
+		if(job)
+		{
+			PeerMap::iterator it = fd2peer.begin();
+			for(; it != fd2peer.end() && !job->IsMe(it->second->GetAddr()); ++it)
+				;
+			if(it != fd2peer.end())
+				scheduler.Cancel(job);
+		}
+	}
 }
 
 Peer* Network::Start(MyConfig* config)

@@ -177,6 +177,9 @@ void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
 void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 {
 	pf_addr new_peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_RST_ADDRESS);
+
+	/* we will erase some data from scheduler's queue, so
+	 * do a copy of it here. */
 	std::list<Job*> jobs = net.scheduler.GetQueue();
 
 	for(std::list<Job*>::iterator it = jobs.begin();

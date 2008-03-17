@@ -93,6 +93,7 @@ public:
 	void Main();
 
 	const PeerList& GetPeerList() { return peer_list; }
+	const PeerMap& GetPeerMap() { return fd2peer; }
 	Peer* AddPeer(Peer* peer);
 
 	bool IsRunning() const { return running; }

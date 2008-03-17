@@ -50,5 +50,7 @@ public:
 
 	void Start();
 	job_type GetType() const {return JOB_NEW_CONNECT; }
+	bool IsMe(const pf_addr&);
+
 };
 #endif

@@ -286,6 +286,7 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 
 	Connection* conn = ssl->Connect(sock);
 	Peer* p = AddPeer(new Peer(addr, conn));
+
 	p->SetFlag(Peer::SERVER);
 	DelDisconnected(addr);
 	return p;
