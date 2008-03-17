@@ -105,6 +105,7 @@ void Peer::Send_net_peer_list(PeerList peers)
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
+		/* TODO: put certificate here! */
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
 
 		SendMsg(pckt);
@@ -222,8 +223,11 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 
 /** NET_PEER_CONNECTION
  *
+ * Args:
  * NET_PEER_CONNECTION_ADDRESS
  * NET_PEER_CONNECTION_CERTIFICATE
+ *
+ * IMPORTANT: Sender of this packet is the uplink of this peer.
  */
 void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
@@ -240,18 +244,28 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 			return;			  /* TODO: this is an other peer with same ID !? DO SOMETHING! */
 	}
 
+	Peer* p;
+
 	try
 	{
-		Peer* p = net.Connect(addr);
+		p = net.Connect(addr);
 
 		p->SendHello();
 
 	}
 	catch(Network::CantConnectTo &e)
 	{
-		// BUG: ???
-		net.AddPeer(new Peer(addr, NULL));
+		// BUG: ??? -lds
+		/* No, we can't connect to this peer, so we create
+		 * a Peer object with no connection. -romain
+		 */
+		p = net.AddPeer(new Peer(addr, NULL));
 	}
+
+	/* This is my child */
+	p->uplink = this;
+	downlinks.push_back(p);
+
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
