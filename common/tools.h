@@ -21,6 +21,7 @@
 #define TOOLS_H
 
 #include <string>
+#include <sstream>
 #include "pf_types.h"
 
 bool is_ip(const char* ip);
@@ -33,4 +34,23 @@ pf_addr pf_addr_ton(pf_addr addr);
 
 extern uint64_t htonll(uint64_t number);
 extern uint64_t ntohll(uint64_t number);
+
+template<typename T>
+T StrToTyp(const std::string & Str)
+{
+    T Dest;
+    std::istringstream iss( Str );
+    iss >> Dest;
+    return Dest;
+}
+
+template<typename T>
+std::string TypToStr( const T & Value )
+{
+    std::ostringstream oss;
+    oss << Value;
+    return oss.str();
+}
+
+
 #endif						  /* TOOLS_H */

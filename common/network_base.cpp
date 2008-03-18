@@ -171,6 +171,8 @@ void NetworkBase::Main()
 
 						addr.id = peer_conn->GetCertificateID();
 						AddPeer(new Peer(addr, peer_conn));
+
+						DelDisconnected(addr);
 					}
 				}
 				else
@@ -278,7 +280,7 @@ Peer* NetworkBase::Connect(pf_addr addr)
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_port = htons(addr.port);
 
-	log[W_INFO] << "Connecting to " << addr << ":" << addr.port;
+	log[W_INFO] << "Connecting to " << addr;
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{

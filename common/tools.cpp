@@ -86,6 +86,9 @@ std::string pf_addr2string(const pf_addr addr)
 	{
 		/* TODO: ipv6 */
 	}
+	ret += ":" + TypToStr(addr.port);
+	if(addr.id)
+		ret += "/" + TypToStr(addr.id);
 	return ret;
 }
 
