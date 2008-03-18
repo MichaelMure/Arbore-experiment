@@ -21,6 +21,7 @@
 #define CONNECTION_H
 
 #include <exception>
+#include "pf_types.h"
 
 class Connection
 {
@@ -46,5 +47,6 @@ public:
 	bool Read(char **buf, size_t size);
 
 	int GetFd() const { return fd; }
+	virtual id_t GetCertificateID() const { return 0; }
 };
 #endif						  // CONNECTION_H

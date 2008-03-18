@@ -168,6 +168,8 @@ void NetworkBase::Main()
 						addr.ip[3] = newcon.sin_addr.s_addr;
 
 						Connection *peer_conn = ssl->Accept(newfd);
+
+						addr.id = peer_conn->GetCertificateID();
 						AddPeer(new Peer(addr, peer_conn));
 					}
 				}
@@ -252,7 +254,7 @@ Peer* NetworkBase::Connect(const std::string& hostname, uint16_t port)
 	return Connect(addr);
 }
 
-Peer* NetworkBase::Connect(const pf_addr addr)
+Peer* NetworkBase::Connect(pf_addr addr)
 {
 	/* Socket creation
 	 * Note: during initialisation, as = {0} isn't compatible everywhere, we set it to
@@ -285,7 +287,8 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 	}
 
 	Connection* conn = ssl->Connect(sock);
-	//addr.id = conn->GetCertificateID();
+
+	addr.id = conn->GetCertificateID();
 	Peer* p = AddPeer(new Peer(addr, conn));
 
 	p->SetFlag(Peer::SERVER);
