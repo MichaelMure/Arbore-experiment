@@ -37,7 +37,7 @@
 #include "job.h"
 #include "scheduler.h"
 
-NetworkBase::NetworkBase() throw(CantRunThread)
+NetworkBase::NetworkBase() throw(CantRunThread, Ssl::CantReadCertificate)
 			: running(true),
 			serv_sock(-1),
 			highsock(-1),
@@ -285,6 +285,7 @@ Peer* NetworkBase::Connect(const pf_addr addr)
 	}
 
 	Connection* conn = ssl->Connect(sock);
+	//addr.id = conn->GetCertificateID();
 	Peer* p = AddPeer(new Peer(addr, conn));
 
 	p->SetFlag(Peer::SERVER);

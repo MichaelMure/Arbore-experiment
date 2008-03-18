@@ -86,7 +86,7 @@ public:
 	Scheduler scheduler;
 
 	/* Constructors */
-	NetworkBase() throw (CantRunThread);
+	NetworkBase() throw (CantRunThread, Ssl::CantReadCertificate);
 	virtual ~NetworkBase();
 
 	/** Main loop (select()) */

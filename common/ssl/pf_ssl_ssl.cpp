@@ -26,7 +26,7 @@
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl()
+SslSsl::SslSsl() throw (CantReadCertificate)
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -36,13 +36,11 @@ SslSsl::SslSsl()
 	SSL_METHOD* meth = SSLv23_server_method();
 	server_ctx = SSL_CTX_new(meth);
 
+	/* TODO: get path from configuration! */
 	if(SSL_CTX_use_certificate_file(server_ctx, "common/ssl/server-cert.pem", SSL_FILETYPE_PEM)        <= 0
 		|| SSL_CTX_use_PrivateKey_file(server_ctx, "common/ssl/server-key.pem", SSL_FILETYPE_PEM)  <= 0
 		|| SSL_CTX_check_private_key(server_ctx)        <= 0)
-	{
-		printf("Failed to initialize something\n");
-		exit(EXIT_FAILURE);
-	}
+		throw CantReadCertificate();
 
 	// Client part initialization
 	meth = SSLv23_client_method();
@@ -51,10 +49,7 @@ SslSsl::SslSsl()
 	if(SSL_CTX_use_certificate_file(client_ctx, "common/ssl/server-cert.pem", SSL_FILETYPE_PEM)        <= 0
 		|| SSL_CTX_use_PrivateKey_file(client_ctx, "common/ssl/server-key.pem", SSL_FILETYPE_PEM)  <= 0
 		|| SSL_CTX_check_private_key(client_ctx)        <= 0)
-	{
-		printf("Failed to initialize something\n");
-		exit(EXIT_FAILURE);
-	}
+		throw CantReadCertificate();
 }
 
 SslSsl::~SslSsl()

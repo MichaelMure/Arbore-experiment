@@ -104,6 +104,10 @@ int Application::main(int argc, char *argv[])
 	{
 		log[W_ERR] << "Unable to create network thread, exiting..";
 	}
+	catch(Ssl::CantReadCertificate &e)
+	{
+		log[W_ERR] << "Unable to read certificate. Please check path and integrity.";
+	}
 	catch(Network::CantOpenSock &e)
 	{
 		log[W_ERR] << "Unable to open socket, exiting..";

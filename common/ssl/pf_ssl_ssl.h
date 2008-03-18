@@ -39,7 +39,7 @@ class SslSsl : public Ssl
 public:
 	class ConnectionError : public std::exception {};
 
-	SslSsl();
+	SslSsl() throw (CantReadCertificate);
 	~SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }

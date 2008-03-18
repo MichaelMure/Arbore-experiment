@@ -30,6 +30,7 @@ protected:
 	std::map<int, Connection*> fd_map;
 public:
 	class ConnectionError : public std::exception {};
+	class CantReadCertificate : public std::exception {};
 
 	Ssl() {}
 	virtual ~Ssl()			  /* Needed for abstract classes */
