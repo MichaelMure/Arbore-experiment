@@ -38,10 +38,10 @@ bool JobNewConnection::IsMe(const pf_addr& addr)
 {
 	/* If this peer is the same host/port than me. */
 	if(addr.ip[0] == this->ip[0] &&
-	   addr.ip[1] == this->ip[1] &&
-	   addr.ip[2] == this->ip[2] &&
-	   addr.ip[3] == this->ip[3] &&
-	   addr.port == this->port)
+		addr.ip[1] == this->ip[1] &&
+		addr.ip[2] == this->ip[2] &&
+		addr.ip[3] == this->ip[3] &&
+		addr.port == this->port)
 		return true;
 
 	/* If this peer is the same ID than me.

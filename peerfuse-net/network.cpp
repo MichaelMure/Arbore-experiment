@@ -105,8 +105,8 @@ void Network::DelDisconnected(const pf_addr& addr)
 	/* Remove connection from queue. */
 	std::list<Job*> job_list = scheduler.GetQueue();
 	for(std::list<Job*>::iterator it = job_list.begin();
-	    it != job_list.end();
-	    ++it)
+		it != job_list.end();
+		++it)
 	{
 		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
 		if(job)
