@@ -24,17 +24,17 @@ function build_conf
 	then
 		LISTEN_PORT=9876
 	fi
-	
+
 	if [ "$CONNECT_PORT" == "" ]
 	then
 		CONNECT_PORT=6789
 	fi
-	
+
 	if [ "$CACHE_ROOT" == "" ]
 	then
 		exit 1
 	fi
-	
+
 	echo "
 ###########################
 #   ___ ___ ___  __       #
@@ -62,6 +62,15 @@ connection {
 	host = localhost
 
 	port = $CONNECT_PORT
+}
+
+ssl {
+
+	ca = .cacert.pem
+
+	key = server-key.pem
+
+	cert = server-cert.pem
 }
 
 # Harddisk configuration

@@ -361,17 +361,19 @@ Peer* NetworkBase::Start(MyConfig* conf)
 {
 	assert(ssl == NULL);
 
-	std::vector<ConfigSection*> sections = conf->GetSectionClones("ssl");
-	ConfigSection* section;
-	if(!sections.empty())
+	ConfigSection* section = conf->GetSection("ssl");
+	if(section && (!section->GetItem("enabled") || section->GetItem("enabled")->Boolean() == true))
 	{
-		section = sections.front();
+		log[W_INFO] << "Using a SSL wrapper";
 		ssl = new SslSsl(section->GetItem("cert")->String(),
 			section->GetItem("key")->String(),
 			section->GetItem("ca")->String());
 	}
 	else
+	{
+		log[W_INFO] << "Not using a SSL wrapper";
 		ssl = new SslNoSsl();
+	}
 
 	/* Listen a TCP port */
 	section = conf->GetSection("listen");
@@ -381,7 +383,7 @@ Peer* NetworkBase::Start(MyConfig* conf)
 
 	/* Connect to other servers */
 	Peer* peer = 0;
-	sections = conf->GetSectionClones("connection");
+	std::vector<ConfigSection*> sections = conf->GetSectionClones("connection");
 	for(std::vector<ConfigSection*>::iterator it = sections.begin(); it != sections.end(); ++it)
 	{
 		try

@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cstring>
 #include <sys/resource.h>
 
 #include "libconfig.h"
@@ -51,6 +52,7 @@ Application::Application()
 	section = conf.AddSection("ssl", "SSL parameters", false);
 	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
+	section->AddItem(new ConfigItem_string("ca", "CA certificate"));
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
@@ -62,7 +64,7 @@ Application::Application()
 
 int Application::main(int argc, char *argv[])
 {
-	if(argc < 2)
+	if(argc < 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
 	{
 		std::cerr << "Syntax: " << argv[0] << " <configpath> <mount point> [fuse options]" << std::endl;
 		exit(EXIT_FAILURE);
