@@ -100,6 +100,7 @@ void Network::AddDisconnected(const pf_addr& addr)
 
 void Network::DelDisconnected(const pf_addr& addr)
 {
+	log[W_INFO] << "Removed disconnected: " << addr;
 	disconnected_list.remove(addr);
 
 	/* Remove connection from queue. */
@@ -109,13 +110,10 @@ void Network::DelDisconnected(const pf_addr& addr)
 		++it)
 	{
 		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
-		if(job)
+		if(job && job->IsMe(addr))
 		{
-			PeerMap::iterator it = fd2peer.begin();
-			for(; it != fd2peer.end() && !job->IsMe(it->second->GetAddr()); ++it)
-				;
-			if(it != fd2peer.end())
-				scheduler.Cancel(job);
+			log[W_DEBUG] << "-> removed a job";
+			scheduler.Cancel(job);
 		}
 	}
 }
