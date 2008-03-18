@@ -42,10 +42,16 @@ void Scheduler::HandleJobs()
 
 	while(job_queue.size() != 0 && job_queue.front()->GetStartTime() < now)
 	{
-		log[W_INFO] << "Begining handling job." << job_queue.size();
-		job_queue.front()->Start();
-		delete job_queue.front();
+		log[W_DEBUG] << "Begining handling job." << job_queue.size();
+
+		/* We remove job from queue before calling it, to prevent
+		 * crash if it tries to change queue list.
+		 */
+		Job* job = job_queue.front();
 		job_queue.erase(job_queue.begin());
+
+		job->Start();
+		delete job;
 	}
 }
 
