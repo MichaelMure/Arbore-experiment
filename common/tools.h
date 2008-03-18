@@ -38,19 +38,17 @@ extern uint64_t ntohll(uint64_t number);
 template<typename T>
 T StrToTyp(const std::string & Str)
 {
-    T Dest;
-    std::istringstream iss( Str );
-    iss >> Dest;
-    return Dest;
+	T Dest;
+	std::istringstream iss( Str );
+	iss >> Dest;
+	return Dest;
 }
 
 template<typename T>
 std::string TypToStr( const T & Value )
 {
-    std::ostringstream oss;
-    oss << Value;
-    return oss.str();
+	std::ostringstream oss;
+	oss << Value;
+	return oss.str();
 }
-
-
 #endif						  /* TOOLS_H */
