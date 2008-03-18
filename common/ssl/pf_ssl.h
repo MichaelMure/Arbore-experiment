@@ -48,7 +48,6 @@ public:
 		return c->second;
 	}
 
-
 	virtual Connection* Accept(int fd) = 0;
 	virtual Connection* Connect(int fd) = 0;
 	virtual void Close(Connection* conn) = 0;

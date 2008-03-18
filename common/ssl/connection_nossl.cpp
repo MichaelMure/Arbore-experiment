@@ -24,7 +24,7 @@
 #include "log.h"
 
 ConnectionNoSsl::ConnectionNoSsl(int _fd)
-	: Connection(_fd)
+			: Connection(_fd)
 {}
 
 ConnectionNoSsl::~ConnectionNoSsl()

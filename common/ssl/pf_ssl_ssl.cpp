@@ -84,7 +84,6 @@ Connection* SslSsl::Connect(int fd)
 	return new_conn;
 }
 
-
 void SslSsl::Close(Connection* conn)
 {
 }

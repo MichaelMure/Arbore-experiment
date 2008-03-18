@@ -33,11 +33,11 @@ SslNoSsl::~SslNoSsl()
 Connection* SslNoSsl::Accept(int fd)
 {
 	// TODO: check errors
-#if 0
+	#if 0
 	SSL* ssl = SSL_new(server_ctx);
 	SSL_set_fd(ssl, fd);
 	SSL_accept(ssl);
-#endif
+	#endif
 
 	Connection* new_conn = new ConnectionNoSsl(fd);
 	fd_map[fd] = new_conn;
@@ -47,11 +47,11 @@ Connection* SslNoSsl::Accept(int fd)
 
 Connection* SslNoSsl::Connect(int fd)
 {
-#if 0
+	#if 0
 	SSL* ssl = SSL_new(client_ctx);
 	SSL_set_fd(ssl, fd);
 	SSL_connect(ssl);
-#endif
+	#endif
 
 	Connection* new_conn = new ConnectionNoSsl(fd);
 	fd_map[fd] = new_conn;

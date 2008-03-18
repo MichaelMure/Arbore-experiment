@@ -367,8 +367,8 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	{
 		section = sections.front();
 		ssl = new SslSsl(section->GetItem("cert")->String(),
-		                 section->GetItem("key")->String(),
-				 section->GetItem("ca")->String());
+			section->GetItem("key")->String(),
+			section->GetItem("ca")->String());
 	}
 	else
 		ssl = new SslNoSsl();
