@@ -48,6 +48,10 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("host", "Hostname"), true);
 	section->AddItem(new ConfigItem_int("port", "Port", 1, 65535));
 
+	section = conf.AddSection("ssl", "SSL parameters", false);
+	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
+	section->AddItem(new ConfigItem_string("key", "Private key path"));
+
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
 

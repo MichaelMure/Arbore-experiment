@@ -17,7 +17,6 @@
  * $Id$
  */
 
-#include <stdio.h>
 #include <list>
 #include <exception>
 #include <openssl/ssl.h>
@@ -26,7 +25,7 @@
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl() throw (CantReadCertificate)
+SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate)
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -36,9 +35,8 @@ SslSsl::SslSsl() throw (CantReadCertificate)
 	SSL_METHOD* meth = SSLv23_server_method();
 	server_ctx = SSL_CTX_new(meth);
 
-	/* TODO: get path from configuration! */
-	if(SSL_CTX_use_certificate_file(server_ctx, "common/ssl/server-cert.pem", SSL_FILETYPE_PEM)        <= 0
-		|| SSL_CTX_use_PrivateKey_file(server_ctx, "common/ssl/server-key.pem", SSL_FILETYPE_PEM)  <= 0
+	if(SSL_CTX_use_certificate_file(server_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
+		|| SSL_CTX_use_PrivateKey_file(server_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
 		|| SSL_CTX_check_private_key(server_ctx)        <= 0)
 		throw CantReadCertificate();
 
@@ -46,10 +44,12 @@ SslSsl::SslSsl() throw (CantReadCertificate)
 	meth = SSLv23_client_method();
 	client_ctx = SSL_CTX_new(meth);
 
-	if(SSL_CTX_use_certificate_file(client_ctx, "common/ssl/server-cert.pem", SSL_FILETYPE_PEM)        <= 0
-		|| SSL_CTX_use_PrivateKey_file(client_ctx, "common/ssl/server-key.pem", SSL_FILETYPE_PEM)  <= 0
+	if(SSL_CTX_use_certificate_file(client_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
+		|| SSL_CTX_use_PrivateKey_file(client_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
 		|| SSL_CTX_check_private_key(client_ctx)        <= 0)
 		throw CantReadCertificate();
+
+	/* TODO save ca path */
 }
 
 SslSsl::~SslSsl()
@@ -84,16 +84,6 @@ Connection* SslSsl::Connect(int fd)
 	return new_conn;
 }
 
-ConnectionSsl* SslSsl::GetConnection(int fd)
-{
-	std::map<int, Connection*>::iterator c;
-	c = fd_map.find(fd);
-
-	if(c == fd_map.end())
-		return NULL;
-
-	return static_cast<ConnectionSsl*>(c->second);
-}
 
 void SslSsl::Close(Connection* conn)
 {

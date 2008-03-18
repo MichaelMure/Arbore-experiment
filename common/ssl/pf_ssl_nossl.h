@@ -20,8 +20,7 @@
 #ifndef PF_SSL_NOSSL_H
 #define PF_SSL_NOSSL_H
 
-#include <list>
-#include <exception>
+#include <string>
 #include "pf_ssl.h"
 
 class SslNoSsl : public Ssl
@@ -29,15 +28,16 @@ class SslNoSsl : public Ssl
 	int fd;
 
 public:
-	class ConnectionError : public std::exception {};
-
 	SslNoSsl();
+	~SslNoSsl();
 
 	void Bind(std::string interface, uint16_t port);
-	std::list<SslConnection*> Select();
+	std::list<Connection*> Select();
 
+	Connection* Accept(int fd);
+	Connection* Connect(int fd);
 	void Connect(std::string host, uint16_t port);
-	void Close(SslConnection* conn);
+	void Close(Connection* conn);
 	void CloseAll();
 };
 #endif						  // PF_SSL_NOSSL_H

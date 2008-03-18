@@ -20,12 +20,9 @@
 #ifndef PF_SSL_SSL_H
 #define PF_SSL_SSL_H
 
-#include <list>
-#include <exception>
 #include <openssl/ssl.h>
 #include "pf_ssl.h"
 #include "certificate.h"
-#include "connection_ssl.h"
 
 class SslSsl : public Ssl
 {
@@ -37,16 +34,13 @@ class SslSsl : public Ssl
 	Certificate cacert;
 	PrivateKey key;
 public:
-	class ConnectionError : public std::exception {};
 
-	SslSsl() throw (CantReadCertificate);
+	SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate);
 	~SslSsl();
 
 	void SetCertificate(Certificate _cert) { cert = _cert; }
 	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
 	void SetPrivateKey(PrivateKey _key) { key = _key; }
-
-	ConnectionSsl* GetConnection(int fd);
 
 	Connection* Accept(int fd);
 	Connection* Connect(int fd);

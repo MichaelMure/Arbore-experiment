@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include "pf_ssl_ssl.h"
+#include "pf_ssl_nossl.h"
 #include "connection.h"
 #include "log.h"
 #include "libconfig.h"
@@ -42,11 +43,11 @@ NetworkBase::NetworkBase() throw(CantRunThread, Ssl::CantReadCertificate)
 			serv_sock(-1),
 			highsock(-1),
 			listening_port(0),
-			my_id(0)
+			my_id(0),
+			ssl(NULL)
 {
 	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
-	ssl = new SslSsl();
 
 	int r = pthread_create(&thread_id, NULL, StartThread, (void*)this);
 	if (r != 0)
@@ -75,7 +76,6 @@ void NetworkBase::HavePacketToSend(const Peer* peer)
 
 Peer* NetworkBase::AddPeer(Peer* p)
 {
-
 	log[W_CONNEC] << "-> Added a new peer: " << p->GetFd();
 
 	if(p->GetFd() >= 0)
@@ -229,10 +229,15 @@ void NetworkBase::CloseAll()
 	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
 	highsock = -1;
+
+	delete ssl;
+	ssl = 0;
 }
 
 Peer* NetworkBase::Connect(const std::string& hostname, uint16_t port)
 {
+	assert(ssl);
+
 	const char* ip = hostname.c_str();
 	static pf_addr none_addr;
 	pf_addr addr = none_addr;
@@ -258,6 +263,8 @@ Peer* NetworkBase::Connect(const std::string& hostname, uint16_t port)
 
 Peer* NetworkBase::Connect(pf_addr addr)
 {
+	assert(ssl);
+
 	/* Socket creation
 	 * Note: during initialisation, as = {0} isn't compatible everywhere, we set it to
 	 * a static variable which initialises by itself
@@ -300,6 +307,8 @@ Peer* NetworkBase::Connect(pf_addr addr)
 
 void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock, CantListen)
 {
+	assert(ssl);
+
 	unsigned int reuse_addr = 1;
 	struct sockaddr_in localhost;		  /* bind info structure */
 
@@ -350,15 +359,29 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 
 Peer* NetworkBase::Start(MyConfig* conf)
 {
+	assert(ssl == NULL);
+
+	std::vector<ConfigSection*> sections = conf->GetSectionClones("ssl");
+	ConfigSection* section;
+	if(!sections.empty())
+	{
+		section = sections.front();
+		ssl = new SslSsl(section->GetItem("cert")->String(),
+		                 section->GetItem("key")->String(),
+				 section->GetItem("ca")->String());
+	}
+	else
+		ssl = new SslNoSsl();
+
 	/* Listen a TCP port */
-	ConfigSection* section = conf->GetSection("listen");
+	section = conf->GetSection("listen");
 
 	Listen(static_cast<uint16_t>(section->GetItem("port")->Integer()),
 		section->GetItem("bind")->String().c_str());
 
 	/* Connect to other servers */
 	Peer* peer = 0;
-	std::vector<ConfigSection*> sections = conf->GetSectionClones("connection");
+	sections = conf->GetSectionClones("connection");
 	for(std::vector<ConfigSection*>::iterator it = sections.begin(); it != sections.end(); ++it)
 	{
 		try

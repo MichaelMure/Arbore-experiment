@@ -29,8 +29,9 @@ public:
 	class ConnectionError : public std::exception {};
 
 	ConnectionNoSsl(int _fd);
+	~ConnectionNoSsl();
 
-	void Write(const char* buf, size_t size);
-	int Read(char* buf, size_t size);
+	void SocketWrite();
+	void SocketRead();
 };
 #endif						  // CONNECTION_NOSSL_H

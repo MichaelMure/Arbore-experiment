@@ -17,41 +17,51 @@
  * $Id$
  */
 
-#ifndef PF_SSL_H
-#define PF_SSL_H
-
-#include <map>
+#include <list>
 #include <exception>
-#include "connection.h"
+#include "pf_ssl_nossl.h"
+#include "connection_nossl.h"
 
-class Ssl
+SslNoSsl::SslNoSsl()
 {
-protected:
-	std::map<int, Connection*> fd_map;
-public:
-	class ConnectionError : public std::exception {};
-	class CantReadCertificate : public std::exception {};
+}
 
-	Ssl() {}
-	virtual ~Ssl()			  /* Needed for abstract classes */
-	{
-	}
+SslNoSsl::~SslNoSsl()
+{
+}
 
-	Connection* GetConnection(int fd)
-	{
-		std::map<int, Connection*>::iterator c;
-		c = fd_map.find(fd);
+Connection* SslNoSsl::Accept(int fd)
+{
+	// TODO: check errors
+#if 0
+	SSL* ssl = SSL_new(server_ctx);
+	SSL_set_fd(ssl, fd);
+	SSL_accept(ssl);
+#endif
 
-		if(c == fd_map.end())
-			return NULL;
+	Connection* new_conn = new ConnectionNoSsl(fd);
+	fd_map[fd] = new_conn;
 
-		return c->second;
-	}
+	return new_conn;
+}
 
+Connection* SslNoSsl::Connect(int fd)
+{
+#if 0
+	SSL* ssl = SSL_new(client_ctx);
+	SSL_set_fd(ssl, fd);
+	SSL_connect(ssl);
+#endif
 
-	virtual Connection* Accept(int fd) = 0;
-	virtual Connection* Connect(int fd) = 0;
-	virtual void Close(Connection* conn) = 0;
-	virtual void CloseAll() = 0;
-};
-#endif						  // PF_SSL_H
+	Connection* new_conn = new ConnectionNoSsl(fd);
+	fd_map[fd] = new_conn;
+	return new_conn;
+}
+
+void SslNoSsl::Close(Connection* conn)
+{
+}
+
+void SslNoSsl::CloseAll()
+{
+}
