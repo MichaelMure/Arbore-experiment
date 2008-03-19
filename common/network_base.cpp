@@ -396,7 +396,7 @@ Peer* NetworkBase::Start(MyConfig* conf)
 		}
 		catch(...)
 		{
-			/* We doesn't care about error and what it is, we'll so try to connect
+			/* We don't care about error and what it is, we'll so try to connect
 			 * to next server.
 			 * If there isn't any server, we wait alone.
 			 */
