@@ -49,7 +49,7 @@ int pf_mkdir(const char *path, mode_t mode)
 		 * but we know that this is a dir, and MkFile
 		 * will create a DirEntry only if this flag is set.
 		 */
-		cache.MkFile(path, mode|S_IFDIR, M_PROPAGATE);
+		cache.MkFile(path, mode|S_IFDIR);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

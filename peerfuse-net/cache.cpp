@@ -27,8 +27,7 @@
 Cache cache;
 
 Cache::Cache()
-			: Mutex(RECURSIVE_MUTEX),
-			tree("", NULL)
+	: tree("", NULL)
 {
 }
 
@@ -177,7 +176,7 @@ FileList Cache::GetAllFiles()
 	return list;
 }
 
-FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
+FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
 {
 	Lock();
 	std::string filename;
@@ -193,7 +192,7 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
 	if(filename.empty() || !dir)
 	{
 		Unlock();
-		throw FileAlreadyExists(file);
+		throw FileAlreadyExists();
 	}
 
 	if(mode & S_IFDIR)
@@ -216,13 +215,13 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
 		throw;
 	}
 
-	filedist.AddFile(file, flags);
+	filedist.AddFile(file, sender);
 
 	Unlock();
 	return file;
 }
 
-void Cache::RmFile(std::string path, unsigned int flags)
+void Cache::RmFile(std::string path, Peer* sender)
 {
 	Lock();
 	FileEntry* f = Path2File(path);
@@ -263,21 +262,17 @@ void Cache::RmFile(std::string path, unsigned int flags)
 	}
 
 	/* Send before removing file */
-	filedist.RemoveFile(f, flags);
+	filedist.RemoveFile(f, sender);
 
 	f->GetParent()->RemFile(f);
 	Unlock();
 
 }
 
-void Cache::ModFile(std::string path, unsigned int flags)
+void Cache::ModFile(std::string path, Peer* sender)
 {
 	Lock();
 
-	if(flags & M_PROPAGATE)
-	{
-
-	}
 	Unlock();
 }
 

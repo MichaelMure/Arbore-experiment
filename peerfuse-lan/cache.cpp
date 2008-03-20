@@ -27,8 +27,7 @@
 Cache cache;
 
 Cache::Cache()
-			: Mutex(RECURSIVE_MUTEX),
-			tree("", NULL)
+	: tree("", NULL)
 {
 }
 
@@ -174,7 +173,7 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 	p->SendMsg(Packet(NET_END_OF_DIFF));
 }
 
-FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
+FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
 {
 	Lock();
 	std::string filename;
@@ -214,14 +213,14 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, unsigned int flags)
 		throw;
 	}
 
-	if(flags & M_PROPAGATE)
+	if(sender == NULL)
 		net.Broadcast(CreateMkFilePacket(file));
 
 	Unlock();
 	return file;
 }
 
-void Cache::RmFile(std::string path, unsigned int flags)
+void Cache::RmFile(std::string path, Peer* sender)
 {
 	Lock();
 	FileEntry* f = Path2File(path);
@@ -262,7 +261,7 @@ void Cache::RmFile(std::string path, unsigned int flags)
 	}
 
 	/* Send before removing file */
-	if(flags & M_PROPAGATE)
+	if(sender == NULL)
 		net.Broadcast(CreateRmFilePacket(f));
 
 	f->GetParent()->RemFile(f);
@@ -270,13 +269,11 @@ void Cache::RmFile(std::string path, unsigned int flags)
 
 }
 
-void Cache::ModFile(std::string path, unsigned int flags)
+void Cache::ModFile(std::string path, Peer* sender)
 {
 	Lock();
 
-	if(flags & M_PROPAGATE)
-	{
+	/* TODO: implement it. */
 
-	}
 	Unlock();
 }

@@ -51,6 +51,6 @@ int pf_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 
 		fi->fh = fd;*/
 
-	cache.MkFile(path, mode, M_PROPAGATE);
+	cache.MkFile(path, mode);
 	return 0;
 }

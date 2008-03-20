@@ -60,7 +60,7 @@ public:
 	 * @param f file
 	 * @return set of Peer*
 	 */
-	std::set<Peer*> GetPeers(const FileEntry* f) const;
+	std::set<Peer*> GetRespPeers(const FileEntry* f) const;
 
 	/** Is this peer responsible of that file?
 	 * It calls the internal _is_responsible() method with this->id_list
@@ -81,7 +81,7 @@ public:
 	void UpdateRespFiles();
 
 	/* Flags are defined in cache.h */
-	void AddFile(FileEntry* f, unsigned int flags = 0);
-	void RemoveFile(FileEntry* f, unsigned int flags = 0);
+	void AddFile(FileEntry* f, Peer* sender);
+	void RemoveFile(FileEntry* f, Peer* sender);
 };
 #endif						  /* FILEDIST_H */

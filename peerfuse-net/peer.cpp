@@ -287,7 +287,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		leaf = e.file;
+		// TODO: fuck that leaf = e.file;
 
 		time_t dist_ts = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
 

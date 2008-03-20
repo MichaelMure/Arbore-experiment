@@ -45,7 +45,7 @@ int pf_rmdir(const char *path)
 {
 	try
 	{
-		cache.RmFile(path, M_PROPAGATE);
+		cache.RmFile(path);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

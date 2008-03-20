@@ -246,7 +246,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
 		mode_t mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 
-		FileEntry* leaf = cache.MkFile(filename, mode);
+		FileEntry* leaf = cache.MkFile(filename, mode, this);
 
 		leaf->stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
 		leaf->stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
@@ -273,7 +273,7 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 	cache.Lock();
 	try
 	{
-		cache.RmFile(msg->GetArg<std::string>(NET_RMFILE_PATH));
+		cache.RmFile(msg->GetArg<std::string>(NET_RMFILE_PATH), this);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

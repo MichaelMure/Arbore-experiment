@@ -17,55 +17,49 @@
  * $Id$
  */
 
-#ifndef CACHE_H
-#define CACHE_H
+#ifndef CACHE_BASE_H
+#define CACHE_BASE_H
 
 #include <vector>
-#include "cache_base.h"
-#include "pf_dir.h"
+#include "mutex.h"
 #include "pf_file.h"
 #include "packet.h"
-#include "hdd.h"
-#include "filedist.h"
 
-class Cache : public CacheInterface
+class Peer;
+class FileEntry;
+class DirEntry;
+
+class CacheInterface : public Mutex
 {
-	DirEntry tree;
-	Hdd hdd;
-	FileDistribution filedist;
-	std::vector<FileEntry*> files;
 
 public:
 
-	Cache();
-	~Cache();
+	/* Exceptions */
+	class DirNotEmpty : public std::exception {};
+	class FileAlreadyExists : public std::exception {};
+	class NoSuchFileOrDir : public std::exception {};
+	class NoPermission : public std::exception {};
+
+	CacheInterface() : Mutex(RECURSIVE_MUTEX) {}
+	virtual ~CacheInterface() {}
 
 	/** Load all tree from an hard drive path.
 	 * It will call the Hdd object to load it.
 	 *
 	 * @param hd_param path on hard drive
 	 */
-	virtual void Load(std::string hd_path);
+	virtual void Load(std::string hd_path) = 0;
 
-	virtual DirEntry* GetTree() { return &tree; }
+	virtual DirEntry* GetTree() = 0;
 
-	/* This method will explore all arborescence. It can be
-	 * slow, so do NOT call this function too frequently.
-	 */
-	virtual FileList GetAllFiles();
+	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL) = 0;
 
-	FileEntry* Path2File(std::string path, std::string *filename = NULL);
+	virtual FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = NULL) = 0;
+	virtual void RmFile(std::string path, Peer* sender = NULL) = 0;
+	virtual void ModFile(std::string path, Peer* sender = NULL) = 0;
 
-	FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = NULL);
-	void RmFile(std::string path, Peer* sender = NULL);
-	void ModFile(std::string path, Peer* sender = NULL);
-
-	Packet CreateMkFilePacket(FileEntry* file);
-	Packet CreateRmFilePacket(FileEntry* file);
-
-	/* FileDistributino functions... */
-	void UpdateRespFiles();
+	virtual Packet CreateMkFilePacket(FileEntry* file) = 0;
+	virtual Packet CreateRmFilePacket(FileEntry* file) = 0;
 };
 
-extern Cache cache;
-#endif
+#endif /* CACHE_BASE_H */

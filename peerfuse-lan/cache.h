@@ -21,26 +21,18 @@
 #define CACHE_H
 
 #include <vector>
-#include "mutex.h"
+#include "cache_base.h"
 #include "pf_dir.h"
 #include "pf_file.h"
 #include "packet.h"
 #include "hdd.h"
 
-class Peer;
-
-class Cache : public Mutex
+class Cache : public CacheInterface
 {
 	DirEntry tree;
 	Hdd hdd;
 
 public:
-
-	/* Exceptions */
-	class DirNotEmpty : public std::exception {};
-	class FileAlreadyExists : public std::exception {};
-	class NoSuchFileOrDir : public std::exception {};
-	class NoPermission : public std::exception {};
 
 	Cache();
 	~Cache();
@@ -50,21 +42,20 @@ public:
 	 *
 	 * @param hd_param path on hard drive
 	 */
-	void Load(std::string hd_path);
+	virtual void Load(std::string hd_path);
 
-	DirEntry* GetTree() { return &tree; }
+	virtual DirEntry* GetTree() { return &tree; }
 
-	FileEntry* Path2File(std::string path, std::string *filename = NULL);
+	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL);
 
-#define M_PROPAGATE   0x01
-	FileEntry* MkFile(std::string path, mode_t mode, unsigned int flags = 0);
-	void RmFile(std::string path, unsigned int flags = 0);
-	void ModFile(std::string path, unsigned int flags = 0);
+	virtual FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = 0);
+	virtual void RmFile(std::string path, Peer* sender = 0);
+	virtual void ModFile(std::string path, Peer* sender = 0);
 
-	void SendChanges(Peer* p, time_t last_view);
+	virtual void SendChanges(Peer* p, time_t last_view);
 
-	Packet CreateMkFilePacket(FileEntry* file);
-	Packet CreateRmFilePacket(FileEntry* file);
+	virtual Packet CreateMkFilePacket(FileEntry* file);
+	virtual Packet CreateRmFilePacket(FileEntry* file);
 
 	std::vector<FileEntry*> GetModifiedEntries(time_t last_conn);
 };
