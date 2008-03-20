@@ -296,9 +296,13 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		 */
 		if(leaf->stat.mtime > dist_ts)
 		{
+			/* My file is more recent than peer's, so I send it a mkfile
+			 * to correct this.
+			 */
 			Packet pckt = cache.CreateMkFilePacket(leaf);
 			pckt.SetDstID(GetID());
 			SendMsg(pckt);
+			return;
 		}
 		else if(leaf->stat.mtime == dist_ts)
 		{

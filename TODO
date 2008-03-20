@@ -10,9 +10,9 @@
 
 	* Implement all FUSE functions
 
-	* Forbid every commands when status is CONNECTING (before first HELLO message)
-
 	* Handle symbolic links
+
+	* Implement SslNoSsl class (if necessary) and test it.
 
 == Peerfuse NET ==
 
@@ -24,4 +24,3 @@
 
 == Peerfuse LAN ==
 
-	* [DONE] Remove IDs usage in cache.cpp and peer.cpp
