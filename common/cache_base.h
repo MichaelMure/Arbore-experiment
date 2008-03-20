@@ -61,5 +61,4 @@ public:
 	virtual Packet CreateMkFilePacket(FileEntry* file) = 0;
 	virtual Packet CreateRmFilePacket(FileEntry* file) = 0;
 };
-
-#endif /* CACHE_BASE_H */
+#endif						  /* CACHE_BASE_H */

@@ -27,7 +27,7 @@
 Cache cache;
 
 Cache::Cache()
-	: tree("", NULL)
+			: tree("", NULL)
 {
 }
 
