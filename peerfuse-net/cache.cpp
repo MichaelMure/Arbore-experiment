@@ -212,8 +212,6 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 		filedist.AddFile(file, sender);
 
-		Unlock();
-
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
