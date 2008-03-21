@@ -22,13 +22,13 @@
 
 #ifndef FUSE_USE_VERSION
 #define FUSE_USE_VERSION 26
-#endif /* FUSE_USE_VERSION */
+#endif						  /* FUSE_USE_VERSION */
 #ifndef _XOPEN_SOURCE
 #ifdef linux
 /* For pread()/pwrite() */
 #define _XOPEN_SOURCE 500
-#endif  /* linux */
-#endif  /* _XOPEN_SOURCE */
+#endif						  /* linux */
+#endif						  /* _XOPEN_SOURCE */
 
 #include <fuse.h>
 

@@ -325,8 +325,6 @@ void Cache::ModFile(std::string path, Peer* sender)
 	Unlock();
 }
 
-
-
 void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 {
 	Lock();
@@ -380,7 +378,7 @@ pf_stat Cache::GetAttr(std::string path)
 }
 
 void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
-	off_t offset, struct fuse_file_info *fi)
+			off_t offset, struct fuse_file_info *fi)
 {
 	Lock();
 	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));

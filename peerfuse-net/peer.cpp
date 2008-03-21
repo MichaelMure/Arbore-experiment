@@ -284,7 +284,6 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
 		stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 
-
 		cache.MkFile(filename, stat, this);
 	}
 	catch(Cache::NoSuchFileOrDir &e)

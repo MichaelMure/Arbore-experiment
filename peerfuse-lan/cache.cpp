@@ -28,7 +28,7 @@
 Cache cache;
 
 Cache::Cache()
-	: tree("", NULL)
+			: tree("", NULL)
 {
 }
 
@@ -283,67 +283,67 @@ void Cache::ModFile(std::string path, Peer* sender)
 
 void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 {
-        Lock();
+	Lock();
 
-        FileEntry* file = Path2File(path);
-        if(!file)
-                throw NoSuchFileOrDir();
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
 
-        file->stat.uid = uid;
-        file->stat.gid = gid;
+	file->stat.uid = uid;
+	file->stat.gid = gid;
 
-        Unlock();
+	Unlock();
 }
 
 void Cache::ChMod(std::string path, mode_t mode)
 {
-        Lock();
+	Lock();
 
-        FileEntry* file = Path2File(path);
-        if(!file)
-                throw NoSuchFileOrDir();
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
 
-        file->stat.mode = mode;
+	file->stat.mode = mode;
 
-        Unlock();
+	Unlock();
 }
 
 pf_stat Cache::GetAttr(std::string path)
 {
-        pf_stat stat;
+	pf_stat stat;
 
-        Lock();
+	Lock();
 
-        FileEntry* file = Path2File(path);
-        if(!file)
-                throw NoSuchFileOrDir();
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
 
-        stat = file->stat;
-        Unlock();
+	stat = file->stat;
+	Unlock();
 
-        return stat;
+	return stat;
 }
 
 void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
-        off_t offset, struct fuse_file_info *fi)
+			off_t offset, struct fuse_file_info *fi)
 {
-        Lock();
-        DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
+	Lock();
+	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
 
-        if(!dir)
-                throw NoSuchFileOrDir();
+	if(!dir)
+		throw NoSuchFileOrDir();
 
-        FileMap files = dir->GetFiles();
-        for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
-        {
-                struct stat st;
-                memset(&st, 0, sizeof st);
-                /*st.st_ino = de->d_ino;
-                st.st_mode = de->d_type << 12;*/
+	FileMap files = dir->GetFiles();
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		struct stat st;
+		memset(&st, 0, sizeof st);
+		/*st.st_ino = de->d_ino;
+		st.st_mode = de->d_type << 12;*/
 
-                if(filler(buf, it->second->GetName().c_str(), &st, 0))
-                        break;
-        }
+		if(filler(buf, it->second->GetName().c_str(), &st, 0))
+			break;
+	}
 
 	Unlock();
 }
