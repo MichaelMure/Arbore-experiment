@@ -131,7 +131,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 
 			/* if file has just been created, send it to parent
 			 * directory's responsibles */
-			if(f->GetParent() && !IsResponsible(sender->GetID(), f))
+			if(sender != NULL && f->GetParent() && !IsResponsible(sender->GetID(), f))
 			{
 				std::set<Peer*> peers = GetRespPeers(f->GetParent());
 
