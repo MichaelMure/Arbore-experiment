@@ -179,13 +179,15 @@ FileList Cache::GetAllFiles()
 
 void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 {
-	Lock();
 	std::string filename;
-	FileEntry* file = Path2File(path, &filename);
-	DirEntry* dir = dynamic_cast<DirEntry*>(file);
+	FileEntry* file = 0;
 
 	try
 	{
+		Lock();
+
+		file = Path2File(path, &filename);
+		DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 		if(!file)
 		{
@@ -224,6 +226,8 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 		filedist.AddFile(file, sender);
 
+		Unlock();
+
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
@@ -238,6 +242,8 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		 */
 		// TODO: fuck that leaf = e.file;
 
+		Lock();
+
 		time_t dist_ts = stat.mtime;
 
 		if(file->stat.mtime > dist_ts)
@@ -248,19 +254,20 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 			Packet pckt = cache.CreateMkFilePacket(file);
 			pckt.SetDstID(sender->GetID());
 			sender->SendMsg(pckt);
+			Unlock();
 			return;
 		}
 		else if(file->stat.mtime == dist_ts)
 		{
 			/* TODO Same timestamp, what can we do?... */
-			cache.Unlock();
+			Unlock();
 			return;			  /* same version, go out */
 		}
 
 		file->stat = stat;
-	}
 
-	Unlock();
+		Unlock();
+	}
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
@@ -326,7 +333,10 @@ void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	file->stat.uid = uid;
 	file->stat.gid = gid;
@@ -340,7 +350,10 @@ void Cache::ChMod(std::string path, mode_t mode)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	file->stat.mode = mode;
 
@@ -355,7 +368,10 @@ pf_stat Cache::GetAttr(std::string path)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	stat = file->stat;
 	Unlock();
@@ -370,7 +386,10 @@ void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
 
 	if(!dir)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	FileMap files = dir->GetFiles();
 	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
