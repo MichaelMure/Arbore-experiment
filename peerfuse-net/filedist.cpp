@@ -172,8 +172,8 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	}
 
 	if(f->GetParent() && sender != NULL &&
-	   IsResponsible(net.GetMyID(), f->GetParent()) &&
-	   !IsResponsible(sender->GetID(), f->GetParent()))
+		IsResponsible(net.GetMyID(), f->GetParent()) &&
+		!IsResponsible(sender->GetID(), f->GetParent()))
 	{
 		/* Someone sent this file to me, an I'm responsible of its parent directory,
 		 * but him isn't responsible of it.
