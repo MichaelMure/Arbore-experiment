@@ -18,6 +18,7 @@
  */
 
 #include <stack>
+#include <cstring>
 
 #include "cache.h"
 #include "log.h"
@@ -176,49 +177,90 @@ FileList Cache::GetAllFiles()
 	return list;
 }
 
-FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
+void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 {
 	Lock();
 	std::string filename;
 	FileEntry* file = Path2File(path, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
-	if(!file)
-	{
-		Unlock();
-		throw NoSuchFileOrDir();
-	}
-
-	if(filename.empty() || !dir)
-	{
-		Unlock();
-		throw FileAlreadyExists();
-	}
-
-	if(mode & S_IFDIR)
-		file = new DirEntry(filename, dir);
-	else
-		file = new FileEntry(filename, dir);
-
-	file->stat.mode = mode;
-	dir->AddFile(file);
-
-	log[W_DEBUG] << "Created " << (mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
-
 	try
 	{
-		hdd.MkFile(file);
-	}
-	catch(...)
-	{
-		Unlock();
-		throw;
-	}
 
-	filedist.AddFile(file, sender);
+		if(!file)
+		{
+			Unlock();
+			throw NoSuchFileOrDir();
+		}
+
+		if(filename.empty() || !dir)
+		{
+			Unlock();
+			throw FileAlreadyExists();
+		}
+
+		if(stat.mode & S_IFDIR)
+			file = new DirEntry(filename, dir);
+		else
+			file = new FileEntry(filename, dir);
+
+		/* Copy stat only if this isn't my who created this file! */
+		if(sender)
+			file->stat = stat;
+
+		dir->AddFile(file);
+
+		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
+
+		try
+		{
+			hdd.MkFile(file);
+		}
+		catch(...)
+		{
+			Unlock();
+			throw;
+		}
+
+		filedist.AddFile(file, sender);
+
+	}
+	catch(Cache::FileAlreadyExists &e)
+	{
+		/* If it me who wants to create this file, we go out
+		 * to let fuse returns an error.
+		 */
+		if(sender == NULL)
+			throw;
+
+		/* This file already exists, but do not panic! We take modifications only if
+		 * this file is more recent than mine.
+		 */
+		// TODO: fuck that leaf = e.file;
+
+		time_t dist_ts = stat.mtime;
+
+		if(file->stat.mtime > dist_ts)
+		{
+			/* My file is more recent than peer's, so I send it a mkfile
+			 * to correct this.
+			 */
+			Packet pckt = cache.CreateMkFilePacket(file);
+			pckt.SetDstID(sender->GetID());
+			sender->SendMsg(pckt);
+			return;
+		}
+		else if(file->stat.mtime == dist_ts)
+		{
+			/* TODO Same timestamp, what can we do?... */
+			cache.Unlock();
+			return;			  /* same version, go out */
+		}
+
+		file->stat = stat;
+	}
 
 	Unlock();
-	return file;
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
@@ -274,6 +316,76 @@ void Cache::ModFile(std::string path, Peer* sender)
 	Lock();
 
 	Unlock();
+}
+
+
+
+void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
+{
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
+
+	file->stat.uid = uid;
+	file->stat.gid = gid;
+
+	Unlock();
+}
+
+void Cache::ChMod(std::string path, mode_t mode)
+{
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
+
+	file->stat.mode = mode;
+
+	Unlock();
+}
+
+pf_stat Cache::GetAttr(std::string path)
+{
+	pf_stat stat;
+
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+		throw NoSuchFileOrDir();
+
+	stat = file->stat;
+	Unlock();
+
+	return stat;
+}
+
+void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
+	off_t offset, struct fuse_file_info *fi)
+{
+	Lock();
+	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
+
+	if(!dir)
+		throw NoSuchFileOrDir();
+
+	FileMap files = dir->GetFiles();
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		struct stat st;
+		memset(&st, 0, sizeof st);
+		/*st.st_ino = de->d_ino;
+		st.st_mode = de->d_type << 12;*/
+
+		if(filler(buf, it->second->GetName().c_str(), &st, 0))
+			break;
+	}
+
+	Unlock();
+
 }
 
 void Cache::UpdateRespFiles()

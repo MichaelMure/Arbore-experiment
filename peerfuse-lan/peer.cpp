@@ -239,21 +239,21 @@ void Peer::Handle_net_end_of_diff(struct Packet* pckt)
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
 {
-	cache.Lock();
 	std::string filename;
 	try
 	{
 		filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
-		mode_t mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+		pf_stat stat;
 
-		FileEntry* leaf = cache.MkFile(filename, mode, this);
+		stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+		stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
+		stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
+		stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
+		stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
+		stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+		stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 
-		leaf->stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
-		leaf->stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
-		leaf->stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
-		leaf->stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
-		leaf->stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
-		leaf->stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
+		cache.MkFile(filename, stat, this);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
@@ -265,12 +265,10 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		log[W_DESYNCH] << "Unable to create " << filename << ": File already exists";
 		/* XXX: DO SOMETHING */
 	}
-	cache.Unlock();
 }
 
 void Peer::Handle_net_rmfile(struct Packet* msg)
 {
-	cache.Lock();
 	try
 	{
 		cache.RmFile(msg->GetArg<std::string>(NET_RMFILE_PATH), this);
@@ -285,7 +283,6 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 		log[W_DESYNCH] << "Unable to remove " << msg->GetArg<std::string>(NET_RMFILE_PATH) << ": Dir not empty";
 		/* TODO: Desynch, DO SOMETHING */
 	}
-	cache.Unlock();
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)

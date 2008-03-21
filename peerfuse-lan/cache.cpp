@@ -17,6 +17,7 @@
  * $Id$
  */
 
+#include <cstring>
 #include <stack>
 
 #include "cache.h"
@@ -27,7 +28,7 @@
 Cache cache;
 
 Cache::Cache()
-			: tree("", NULL)
+	: tree("", NULL)
 {
 }
 
@@ -173,7 +174,7 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 	p->SendMsg(Packet(NET_END_OF_DIFF));
 }
 
-FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
+void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 {
 	Lock();
 	std::string filename;
@@ -193,15 +194,18 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
 
 	FileEntry* file;
 
-	if(mode & S_IFDIR)
+	if(stat.mode & S_IFDIR)
 		file = new DirEntry(filename, dir);
 	else
 		file = new FileEntry(filename, dir);
 
-	file->stat.mode = mode;
+	/* Copy stat only if it's me who created this file! */
+	if(sender != NULL)
+		file->stat = stat;
+
 	dir->AddFile(file);
 
-	log[W_DEBUG] << "Created " << (mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
+	log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 
 	try
 	{
@@ -217,7 +221,6 @@ FileEntry* Cache::MkFile(std::string path, mode_t mode, Peer* sender)
 		net.Broadcast(CreateMkFilePacket(file));
 
 	Unlock();
-	return file;
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
@@ -274,6 +277,73 @@ void Cache::ModFile(std::string path, Peer* sender)
 	Lock();
 
 	/* TODO: implement it. */
+
+	Unlock();
+}
+
+void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
+{
+        Lock();
+
+        FileEntry* file = Path2File(path);
+        if(!file)
+                throw NoSuchFileOrDir();
+
+        file->stat.uid = uid;
+        file->stat.gid = gid;
+
+        Unlock();
+}
+
+void Cache::ChMod(std::string path, mode_t mode)
+{
+        Lock();
+
+        FileEntry* file = Path2File(path);
+        if(!file)
+                throw NoSuchFileOrDir();
+
+        file->stat.mode = mode;
+
+        Unlock();
+}
+
+pf_stat Cache::GetAttr(std::string path)
+{
+        pf_stat stat;
+
+        Lock();
+
+        FileEntry* file = Path2File(path);
+        if(!file)
+                throw NoSuchFileOrDir();
+
+        stat = file->stat;
+        Unlock();
+
+        return stat;
+}
+
+void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
+        off_t offset, struct fuse_file_info *fi)
+{
+        Lock();
+        DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
+
+        if(!dir)
+                throw NoSuchFileOrDir();
+
+        FileMap files = dir->GetFiles();
+        for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+        {
+                struct stat st;
+                memset(&st, 0, sizeof st);
+                /*st.st_ino = de->d_ino;
+                st.st_mode = de->d_type << 12;*/
+
+                if(filler(buf, it->second->GetName().c_str(), &st, 0))
+                        break;
+        }
 
 	Unlock();
 }

@@ -45,24 +45,25 @@ int pf_getattr(const char *path, struct stat *stbuf)
 {
 	memset(stbuf, 0, sizeof *stbuf);
 
-	cache.Lock();
-	FileEntry* f = cache.Path2File(std::string(path));
-
-	if(!f)
+	try
 	{
-		cache.Unlock();
+		pf_stat stat = cache.GetAttr(path);
+
+		stbuf->st_mode  = stat.mode;
+		stbuf->st_uid   = stat.uid;
+		stbuf->st_gid   = stat.gid;
+		stbuf->st_size  = stat.size;
+		// stbuf->st_blksize	= stat.blksize;
+		// stbuf->st_blocks	= stat.blocks;
+		stbuf->st_atime = stat.atime;
+		stbuf->st_mtime = stat.mtime;
+		stbuf->st_ctime = stat.ctime;
+
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
 		return -ENOENT;
 	}
 
-	stbuf->st_mode  = f->stat.mode;
-	stbuf->st_uid   = f->stat.uid;
-	stbuf->st_gid   = f->stat.gid;
-	stbuf->st_size  = f->stat.size;
-	//	stbuf->st_blksize	= f->stat.blksize;
-	//	stbuf->st_blocks	= f->stat.blocks;
-	stbuf->st_atime = f->stat.atime;
-	stbuf->st_mtime = f->stat.mtime;
-	stbuf->st_ctime = f->stat.ctime;
-	cache.Unlock();
 	return 0;
 }

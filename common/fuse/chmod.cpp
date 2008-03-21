@@ -43,17 +43,14 @@
 
 int pf_chmod(const char* path, mode_t mode)
 {
-	cache.Lock();
-	FileEntry* f = cache.Path2File(path);
-
-	if(!f)
+	try
 	{
-		cache.Unlock();
+		cache.ChMod(path, mode);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
 		return -ENOENT;
 	}
 
-	f->stat.mode = mode;
-
-	cache.Unlock();
 	return 0;
 }

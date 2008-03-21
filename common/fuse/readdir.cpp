@@ -25,7 +25,6 @@
 
 #include <fuse.h>
 #include <errno.h>
-#include <string.h>
 /* At time, this headers are useless
 #include <stdio.h>
 #include <unistd.h>
@@ -42,29 +41,16 @@
 #include "cache.h"
 
 int pf_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-off_t offset, struct fuse_file_info *fi)
+	off_t offset, struct fuse_file_info *fi)
 {
-	cache.Lock();
-	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
-
-	if(!dir)
+	try
 	{
-		cache.Unlock();
-		return 1;
+		cache.FillReadDir(path, buf, filler, offset, fi);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
+		return -ENOENT;
 	}
 
-	FileMap files = dir->GetFiles();
-	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
-	{
-		struct stat st;
-		memset(&st, 0, sizeof st);
-		/*st.st_ino = de->d_ino;
-		st.st_mode = de->d_type << 12;*/
-
-		if(filler(buf, it->second->GetName().c_str(), &st, 0))
-			break;
-	}
-
-	cache.Unlock();
 	return 0;
 }

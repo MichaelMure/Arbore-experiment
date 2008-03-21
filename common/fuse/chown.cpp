@@ -43,18 +43,14 @@
 
 int pf_chown(const char *path, uid_t uid, gid_t gid)
 {
-	cache.Lock();
-	FileEntry* f = cache.Path2File(path);
-
-	if(!f)
+	try
 	{
-		cache.Unlock();
+		cache.ChOwn(path, uid, gid);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
 		return -ENOENT;
 	}
 
-	f->stat.uid = uid;
-	f->stat.gid = gid;
-
-	cache.Unlock();
 	return 0;
 }

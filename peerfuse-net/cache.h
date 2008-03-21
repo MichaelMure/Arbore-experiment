@@ -35,6 +35,24 @@ class Cache : public CacheInterface
 	FileDistribution filedist;
 	std::vector<FileEntry*> files;
 
+protected:
+
+	/* Because there are functions which return protected data,
+	 * but that FileDistribution object is an own attribute, these
+	 * functions are private but filedist *can* call them.
+	 * It's so my friend.
+	 */
+	friend class FileDistribution;
+
+	virtual DirEntry* GetTree() { return &tree; }
+
+	/* This method will explore all arborescence. It can be
+	 * slow, so do NOT call this function too frequently.
+	 */
+	virtual FileList GetAllFiles();
+
+	FileEntry* Path2File(std::string path, std::string *filename = NULL);
+
 public:
 
 	Cache();
@@ -47,16 +65,12 @@ public:
 	 */
 	virtual void Load(std::string hd_path);
 
-	virtual DirEntry* GetTree() { return &tree; }
+	virtual void ChOwn(std::string path, uid_t uid, gid_t gid);
+	virtual void ChMod(std::string path, mode_t mode);
+	virtual pf_stat GetAttr(std::string path);
+	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 
-	/* This method will explore all arborescence. It can be
-	 * slow, so do NOT call this function too frequently.
-	 */
-	virtual FileList GetAllFiles();
-
-	FileEntry* Path2File(std::string path, std::string *filename = NULL);
-
-	FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = NULL);
+	void MkFile(std::string path, pf_stat stat, Peer* sender = NULL);
 	void RmFile(std::string path, Peer* sender = NULL);
 	void ModFile(std::string path, Peer* sender = NULL);
 

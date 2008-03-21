@@ -20,6 +20,18 @@
 #ifndef CACHE_BASE_H
 #define CACHE_BASE_H
 
+#ifndef FUSE_USE_VERSION
+#define FUSE_USE_VERSION 26
+#endif /* FUSE_USE_VERSION */
+#ifndef _XOPEN_SOURCE
+#ifdef linux
+/* For pread()/pwrite() */
+#define _XOPEN_SOURCE 500
+#endif  /* linux */
+#endif  /* _XOPEN_SOURCE */
+
+#include <fuse.h>
+
 #include <vector>
 #include "mutex.h"
 #include "pf_file.h"
@@ -29,6 +41,11 @@ class Peer;
 class FileEntry;
 class DirEntry;
 
+/** This class is interface for the Cache classes.
+ *
+ * \warning It is really important to NOT return ANY part
+ * of this class from functions (FileEntry*, etc)
+ */
 class CacheInterface : public Mutex
 {
 
@@ -50,11 +67,12 @@ public:
 	 */
 	virtual void Load(std::string hd_path) = 0;
 
-	virtual DirEntry* GetTree() = 0;
+	virtual void ChOwn(std::string path, uid_t uid, gid_t gid) = 0;
+	virtual void ChMod(std::string path, mode_t mode) = 0;
+	virtual pf_stat GetAttr(std::string path) = 0;
+	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) = 0;
 
-	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL) = 0;
-
-	virtual FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = NULL) = 0;
+	virtual void MkFile(std::string path, pf_stat stat, Peer* sender = NULL) = 0;
 	virtual void RmFile(std::string path, Peer* sender = NULL) = 0;
 	virtual void ModFile(std::string path, Peer* sender = NULL) = 0;
 

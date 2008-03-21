@@ -270,47 +270,22 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
 {
-	cache.Lock();
 	std::string filename;
-
-	FileEntry* leaf;
 
 	try
 	{
 		filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
-		mode_t mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+		pf_stat stat;
+		stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+		stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
+		stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
+		stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
+		stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
+		stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+		stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 
-		leaf = cache.MkFile(filename, mode);
-	}
-	catch(Cache::FileAlreadyExists &e)
-	{
-		/* This file already exists, but do not panic! We take modifications only if
-		 * this file is more recent than mine.
-		 */
-		// TODO: fuck that leaf = e.file;
 
-		time_t dist_ts = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
-
-		/* TODO SEE WHAT THE FUCK TO DO WHEN TIMESTAMP ARE EQUAL
-		 * Note that we can consider this is the same version, so we do nothing.
-		 */
-		if(leaf->stat.mtime > dist_ts)
-		{
-			/* My file is more recent than peer's, so I send it a mkfile
-			 * to correct this.
-			 */
-			Packet pckt = cache.CreateMkFilePacket(leaf);
-			pckt.SetDstID(GetID());
-			SendMsg(pckt);
-			return;
-		}
-		else if(leaf->stat.mtime == dist_ts)
-		{
-			cache.Unlock();
-			return;			  /* same version, go out */
-		}
-
-		leaf->stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+		cache.MkFile(filename, stat, this);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
@@ -320,20 +295,10 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		cache.Unlock();
 		return;
 	}
-
-	leaf->stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
-	leaf->stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
-	leaf->stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
-	leaf->stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
-	leaf->stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
-	leaf->stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
-
-	cache.Unlock();
 }
 
 void Peer::Handle_net_rmfile(struct Packet* msg)
 {
-	cache.Lock();
 	try
 	{
 		cache.RmFile(msg->GetArg<std::string>(NET_RMFILE_PATH));
@@ -348,7 +313,6 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 		log[W_DESYNCH] << "Unable to remove " << msg->GetArg<std::string>(NET_RMFILE_PATH) << ": Dir not empty";
 		/* TODO: Desynch, DO SOMETHING */
 	}
-	cache.Unlock();
 }
 
 void Peer::HandleMsg(Packet* pckt)

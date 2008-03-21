@@ -32,6 +32,12 @@ class Cache : public CacheInterface
 	DirEntry tree;
 	Hdd hdd;
 
+	virtual DirEntry* GetTree() { return &tree; }
+	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL);
+
+	/* XXX It appears that this function is NOT used anymore! */
+	std::vector<FileEntry*> GetModifiedEntries(time_t last_conn);
+
 public:
 
 	Cache();
@@ -44,11 +50,12 @@ public:
 	 */
 	virtual void Load(std::string hd_path);
 
-	virtual DirEntry* GetTree() { return &tree; }
+	virtual void ChOwn(std::string path, uid_t uid, gid_t gid);
+	virtual void ChMod(std::string path, mode_t mode);
+	virtual pf_stat GetAttr(std::string path);
+	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 
-	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL);
-
-	virtual FileEntry* MkFile(std::string path, mode_t mode, Peer* sender = 0);
+	virtual void MkFile(std::string path, pf_stat stat, Peer* sender = 0);
 	virtual void RmFile(std::string path, Peer* sender = 0);
 	virtual void ModFile(std::string path, Peer* sender = 0);
 
@@ -57,7 +64,6 @@ public:
 	virtual Packet CreateMkFilePacket(FileEntry* file);
 	virtual Packet CreateRmFilePacket(FileEntry* file);
 
-	std::vector<FileEntry*> GetModifiedEntries(time_t last_conn);
 };
 
 extern Cache cache;
