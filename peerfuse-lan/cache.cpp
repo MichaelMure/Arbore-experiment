@@ -287,7 +287,10 @@ void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	file->stat.uid = uid;
 	file->stat.gid = gid;
@@ -301,7 +304,10 @@ void Cache::ChMod(std::string path, mode_t mode)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	file->stat.mode = mode;
 
@@ -316,7 +322,10 @@ pf_stat Cache::GetAttr(std::string path)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	stat = file->stat;
 	Unlock();
@@ -331,7 +340,10 @@ void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
 
 	if(!dir)
+	{
+		Unlock();
 		throw NoSuchFileOrDir();
+	}
 
 	FileMap files = dir->GetFiles();
 	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
