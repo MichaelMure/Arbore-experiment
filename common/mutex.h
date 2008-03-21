@@ -69,5 +69,4 @@ public:
 		p->Unlock();
 	}
 };
-
 #endif
