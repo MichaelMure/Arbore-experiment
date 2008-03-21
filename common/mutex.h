@@ -42,4 +42,32 @@ public:
 	void Lock();
 	void Unlock();
 };
+
+/** Lock a Mutex locally.
+ *
+ * On a block, juste create an auto instance of this class.
+ * When it will be removed (while exiting this block), mutex will be unlocked.
+ *
+ * Juste use:
+ * BlockLockMutex lock(mutex);
+ *
+ */
+class BlockLockMutex
+{
+	Mutex* p;
+	BlockLockMutex(const BlockLockMutex&);
+	BlockLockMutex& operator=(const BlockLockMutex&);
+
+public:
+	explicit BlockLockMutex(Mutex* _p)
+		: p(_p)
+	{
+		p->Lock();
+	}
+	~BlockLockMutex()
+	{
+		p->Unlock();
+	}
+};
+
 #endif
