@@ -38,7 +38,7 @@ public:
 	size_t GetSize() const { return files.size(); }
 
 	void AddFile(FileEntry* file);
-	void RemFile(FileEntry* file); /**< will *not* destroy object */
+	void RemFile(FileEntry* file);	  /**< will *not* destroy object */
 
 	FileEntry* GetFile(std::string name) const;
 };
