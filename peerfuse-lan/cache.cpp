@@ -176,21 +176,15 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 
 void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 {
-	Lock();
+	BlockLockMutex lock(this);
 	std::string filename;
 	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path, &filename));
 
 	if(!dir)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
 	if(filename.empty())
-	{
-		Unlock();
 		throw FileAlreadyExists();
-	}
 
 	FileEntry* file;
 
@@ -207,25 +201,16 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 	log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 
-	try
-	{
-		hdd.MkFile(file);
-	}
-	catch(...)
-	{
-		Unlock();
-		throw;
-	}
+	hdd.MkFile(file);
 
+	/* if it's me who created file */
 	if(sender == NULL)
 		net.Broadcast(CreateMkFilePacket(file));
-
-	Unlock();
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
 {
-	Lock();
+	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
 
 	// If it's a dir that isn't empty -> return error
@@ -233,43 +218,26 @@ void Cache::RmFile(std::string path, Peer* sender)
 	{
 		DirEntry* d = static_cast<DirEntry*>(f);
 		if(d->GetSize() != 0)
-		{
-			Unlock();
 			throw DirNotEmpty();
-		}
 	}
 
 	if(!f)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
 	if(!f->GetParent())
-	{
-		Unlock();
 		throw NoPermission();
-	}
 
 	log[W_DEBUG] << "Removed " << path;
 
-	try
-	{
-		hdd.RmFile(f);
-	}
-	catch(...)
-	{
-		Unlock();
-		throw;
-	}
+	hdd.RmFile(f);
 
 	/* Send before removing file */
 	if(sender == NULL)
 		net.Broadcast(CreateRmFilePacket(f));
 
 	f->GetParent()->RemFile(f);
-	Unlock();
 
+	delete f;
 }
 
 void Cache::ModFile(std::string path, Peer* sender)
