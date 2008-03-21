@@ -43,7 +43,6 @@ void DirEntry::AddFile(FileEntry* file)
 void DirEntry::RemFile(FileEntry* file)
 {
 	files.erase(file->GetName());
-	delete file;
 }
 
 FileEntry* DirEntry::GetFile(std::string name) const
