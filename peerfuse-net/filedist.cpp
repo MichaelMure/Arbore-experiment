@@ -57,10 +57,10 @@ bool FileDistribution::IsResponsible(const id_t peer_id, const FileEntry* file) 
 
 std::set<Peer*> FileDistribution::GetRespPeers(const FileEntry* f) const
 {
-	return _get_peers_from_idlist(f, id_list);
+	return _get_resp_peers_from_idlist(f, id_list);
 }
 
-std::set<Peer*> FileDistribution::_get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
+std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
 {
 	assert(f != NULL);
 
@@ -117,24 +117,81 @@ FileList FileDistribution::GetFiles(id_t id) const
 void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 {
 	assert(f != NULL);			  /* exists */
-	assert(f->GetParent() != NULL);		  /* isn't the root dir */
 
+	std::set<Peer*> relayed_peers;
+
+	/* I'm responsible of this file. */
 	if(IsResponsible(net.GetMyID(), f))
 	{
-		resp_files.insert(f);
-
-		if(sender != 0)
+		/* this function can be called when this file is updated, so add
+		 * it in list only if it isn't already in. */
+		if(resp_files.find(f) == resp_files.end())
 		{
-			std::set<Peer*> peers = GetRespPeers(f);
-			Packet pckt = cache.CreateMkFilePacket(f);
+			resp_files.insert(f);
 
-			for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
+			/* if file has just been created, send it to parent
+			 * directory's responsibles */
+			if(f->GetParent() && !IsResponsible(sender->GetID(), f))
 			{
-				pckt.SetDstID((*p)->GetID());
-				(*p)->SendMsg(pckt);
+				std::set<Peer*> peers = GetRespPeers(f->GetParent());
+
+				/* If I'm also responsible of this file's parent, I send message
+				 * to all other responsibles. In other case, I only send it
+				 * to the a responsible who will relay message to other responsibles.
+				 */
+				if(IsResponsible(net.GetMyID(), f->GetParent()))
+					relayed_peers.insert(peers.begin(), peers.end());
+				else if(peers.empty() == false)
+					relayed_peers.insert(*peers.begin());
+				else
+					log[W_WARNING] << "There isn't any responsible for this file !?" << f->GetParent();
 			}
 		}
+
+		/* Send packet to other responsibles peers if it's me that
+		 * created file, or if sender isn't responsible of this
+		 * packet. */
+		if(!sender || !IsResponsible(sender->GetID(), f))
+		{
+			std::set<Peer*> lp = GetRespPeers(f);
+			relayed_peers.insert(lp.begin(), lp.end());
+		}
 	}
+	else if(sender == NULL)
+	{
+		/* I created this file and I'm not the responsible,
+		 * so I send it to a responsible.
+		 */
+
+		std::set<Peer*> resps = GetRespPeers(f);
+
+		if(resps.empty())
+			log[W_WARNING] << "There isn't any responsible of this file !?!?!? " << f;
+		else
+			relayed_peers.insert(*resps.begin());
+	}
+
+	if(f->GetParent() && sender != NULL &&
+	   IsResponsible(net.GetMyID(), f->GetParent()) &&
+	   !IsResponsible(sender->GetID(), f->GetParent()))
+	{
+		/* Someone sent this file to me, an I'm responsible of its parent directory,
+		 * but him isn't responsible of it.
+		 * So I relay message to others file's parent responsibles.
+		 */
+		std::set<Peer*> peers = GetRespPeers(f->GetParent());
+		relayed_peers.insert(peers.begin(), peers.end());
+	}
+
+	/* Create and send message to relayed peers. */
+	Packet pckt = cache.CreateMkFilePacket(f);
+
+	for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+	{
+		pckt.SetDstID((*p)->GetID());
+		(*p)->SendMsg(pckt);
+	}
+
 }
 
 void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)

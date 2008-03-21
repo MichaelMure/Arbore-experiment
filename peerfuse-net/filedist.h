@@ -47,7 +47,7 @@ class FileDistribution
 	 * @param id_list list of ids on network.
 	 * @return set of Peer*
 	 */
-	std::set<Peer*> _get_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
+	std::set<Peer*> _get_resp_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
 
 public:
 

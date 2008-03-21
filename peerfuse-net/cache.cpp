@@ -182,7 +182,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 	std::string filename;
 	FileEntry* file = 0;
 
-	BlockLockMutex p(this);
+	BlockLockMutex lock(this);
 
 	try
 	{
@@ -208,10 +208,8 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 
+		/* Write file on cache */
 		hdd.MkFile(file);
-
-		filedist.AddFile(file, sender);
-
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
@@ -224,8 +222,6 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		// TODO: fuck that leaf = e.file;
-
 		time_t dist_ts = stat.mtime;
 
 		if(file->stat.mtime > dist_ts)
@@ -245,12 +241,17 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		}
 
 		file->stat = stat;
+
+		/* TODO: update local cached file. */
 	}
+
+	/* Add file on FileDistribution */
+	filedist.AddFile(file, sender);
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
 {
-	Lock();
+	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
 
 	// If it's a dir that isn't empty -> return error
@@ -258,42 +259,22 @@ void Cache::RmFile(std::string path, Peer* sender)
 	{
 		DirEntry* d = static_cast<DirEntry*>(f);
 		if(d->GetSize() != 0)
-		{
-			Unlock();
 			throw DirNotEmpty();
-		}
 	}
 
 	if(!f)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
 	if(!f->GetParent())
-	{
-		Unlock();
 		throw NoPermission();
-	}
 
 	log[W_DEBUG] << "Removed " << path;
 
-	try
-	{
-		hdd.RmFile(f);
-	}
-	catch(...)
-	{
-		Unlock();
-		throw;
-	}
-
-	/* Send before removing file */
+	hdd.RmFile(f);
 	filedist.RemoveFile(f, sender);
 
 	f->GetParent()->RemFile(f);
-	Unlock();
-
+	delete f;
 }
 
 void Cache::ModFile(std::string path, Peer* sender)
