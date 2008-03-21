@@ -30,7 +30,7 @@ public:
 	virtual void Broadcast(Packet pckt, const Peer* but_one = 0);
 
 	/* Overrided to send NET_HELLO message when connected. */
-	virtual Peer* Connect(const pf_addr addr);
+	virtual Peer* Connect(pf_addr addr);
 
 	bool GetMerging() const { return merging; }
 	void SetMerging(bool m) { merging = m; }

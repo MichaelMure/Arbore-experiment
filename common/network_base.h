@@ -119,7 +119,7 @@ public:
 
 	/* Connect to a pf_addr.
 	 */
-	Peer* Connect(pf_addr addr);
+	virtual Peer* Connect(pf_addr addr);
 
 	id_t GetMyID() const { return my_id; }
 	void SetMyID(const id_t id) { my_id = id; }

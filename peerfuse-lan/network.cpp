@@ -21,7 +21,7 @@
 
 Network net;
 
-Peer* Network::Connect(const pf_addr addr)
+Peer* Network::Connect(pf_addr addr)
 {
 	/* The NetworkBase::_connect() method doesn't send
 	 * the Hello message, becaue pfnet must say if this is

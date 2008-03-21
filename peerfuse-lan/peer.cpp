@@ -140,6 +140,8 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	try
 	{
 		net.Connect(new_peer);
+
+		/* It is not necessary to send hello here, Network::Connect() do this. */
 	}
 	catch(Network::CantConnectTo &e)
 	{
