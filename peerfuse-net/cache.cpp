@@ -182,24 +182,18 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 	std::string filename;
 	FileEntry* file = 0;
 
+	BlockLockMutex p(this);
+
 	try
 	{
-		Lock();
-
 		file = Path2File(path, &filename);
 		DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 		if(!file)
-		{
-			Unlock();
 			throw NoSuchFileOrDir();
-		}
 
 		if(filename.empty() || !dir)
-		{
-			Unlock();
 			throw FileAlreadyExists();
-		}
 
 		if(stat.mode & S_IFDIR)
 			file = new DirEntry(filename, dir);
@@ -214,15 +208,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 
-		try
-		{
-			hdd.MkFile(file);
-		}
-		catch(...)
-		{
-			Unlock();
-			throw;
-		}
+		hdd.MkFile(file);
 
 		filedist.AddFile(file, sender);
 
@@ -242,8 +228,6 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		 */
 		// TODO: fuck that leaf = e.file;
 
-		Lock();
-
 		time_t dist_ts = stat.mtime;
 
 		if(file->stat.mtime > dist_ts)
@@ -254,19 +238,15 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 			Packet pckt = cache.CreateMkFilePacket(file);
 			pckt.SetDstID(sender->GetID());
 			sender->SendMsg(pckt);
-			Unlock();
 			return;
 		}
 		else if(file->stat.mtime == dist_ts)
 		{
 			/* TODO Same timestamp, what can we do?... */
-			Unlock();
 			return;			  /* same version, go out */
 		}
 
 		file->stat = stat;
-
-		Unlock();
 	}
 }
 
