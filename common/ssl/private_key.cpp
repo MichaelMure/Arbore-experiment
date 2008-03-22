@@ -82,4 +82,3 @@ void PrivateKey::LoadPem(std::string filename, std::string password)
 
 	LoadBuf(buf, file_size);
 }
-
