@@ -42,7 +42,10 @@ public:
 	FileEntry(std::string _name, DirEntry* parent)
 		: FileEntryBase(_name, parent),
 		path_serial(0u)
-		{}
+	{
+		for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
+			path_serial += (path_serial << 3) + (unsigned char)*c;
+	}
 
 	/* TODO: calculate this */
 	unsigned int GetPathSerial() const { return path_serial; }
