@@ -34,6 +34,7 @@ SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantRea
 	// Server part initialization
 	SSL_METHOD* meth = SSLv23_server_method();
 	server_ctx = SSL_CTX_new(meth);
+	SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
 	if(SSL_CTX_use_certificate_file(server_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
 		|| SSL_CTX_use_PrivateKey_file(server_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
@@ -43,6 +44,7 @@ SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantRea
 	// Client part initialization
 	meth = SSLv23_client_method();
 	client_ctx = SSL_CTX_new(meth);
+	SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
 	if(SSL_CTX_use_certificate_file(client_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
 		|| SSL_CTX_use_PrivateKey_file(client_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
