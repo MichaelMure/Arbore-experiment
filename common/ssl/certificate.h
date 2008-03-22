@@ -26,13 +26,20 @@
 
 class Certificate
 {
-	int fd;
+private:
+	X509* ssl_cert;
+	char* raw_cert;
+	size_t raw_cert_size;
 
+	void LoadX509Buf(const char* buf, size_t size);
 public:
 	class BadCertificate : public std::exception {};
 	class BadPassword : public std::exception {};
+	class BadFile : public std::exception {};
 
 	Certificate();
+	Certificate(const Certificate& cert);
+	~Certificate();
 
 	void LoadX509(std::string filename, std::string password);
 	PrivateKey LoadPKCS12(std::string filename, std::string password);
@@ -42,7 +49,7 @@ public:
 	const std::string GetCertificateInfos();
 	const std::string GetIDFromCertificate();
 
-	bool operator==(const Certificate&) { return true; }
-
+	X509* GetSSL() { return ssl_cert; }
+	//bool operator==(const Certificate&) { return true; }
 };
 #endif						  // PF_CERTIFICATE_H
