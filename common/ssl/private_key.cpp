@@ -19,6 +19,7 @@
 
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+#include <cstring>
 #include "private_key.h"
 
 PrivateKey::PrivateKey() : ssl_key(NULL), raw_key(NULL), raw_key_size(0)

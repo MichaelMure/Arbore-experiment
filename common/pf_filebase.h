@@ -35,6 +35,7 @@ public:
 	time_t atime;
 	time_t mtime;
 	time_t ctime;
+	time_t meta_mtime;
 };
 
 class FileEntryBase

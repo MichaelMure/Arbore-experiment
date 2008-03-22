@@ -19,6 +19,7 @@
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <cstring>
 #include "certificate.h"
 
 Certificate::Certificate() : ssl_cert(NULL), raw_cert(NULL), raw_cert_size(0)
