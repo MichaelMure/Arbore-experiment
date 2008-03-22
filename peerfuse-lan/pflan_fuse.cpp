@@ -50,7 +50,7 @@ struct fuse_operations pf_oper =
 	pf_unlink,
 	pf_rmdir,
 	NULL,					  /* pf_symlink */
-	NULL,					  /* pf_rename */
+	pf_rename,
 	NULL,					  /* pf_link */
 	pf_chmod,
 	pf_chown,

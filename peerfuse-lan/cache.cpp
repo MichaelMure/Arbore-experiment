@@ -240,7 +240,7 @@ void Cache::RmFile(std::string path, Peer* sender)
 	delete f;
 }
 
-void Cache::ModFile(std::string path, Peer* sender)
+void Cache::RenameFile(std::string path, std::string new_path, Peer* sender)
 {
 	Lock();
 
@@ -263,6 +263,8 @@ void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 	file->stat.uid = uid;
 	file->stat.gid = gid;
 
+	/* TODO propagate it */
+
 	Unlock();
 }
 
@@ -278,6 +280,8 @@ void Cache::ChMod(std::string path, mode_t mode)
 	}
 
 	file->stat.mode = mode;
+
+	/* TODO propagate it */
 
 	Unlock();
 }

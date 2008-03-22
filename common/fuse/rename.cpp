@@ -17,23 +17,44 @@
  * $Id$
  */
 
-#include "pf_file.h"
+#define FUSE_USE_VERSION 26
+#ifdef linux
+/* For pread()/pwrite() */
+#define _XOPEN_SOURCE 500
+#endif
 
-bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
+#include <fuse.h>
+#include <errno.h>
+/* At time, this headers are useless
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <errno.h>
+#include <sys/time.h>
+#ifdef HAVE_SETXATTR
+#include <sys/xattr.h>
+#endif
+*/
+
+#include "pf_fuse.h"
+#include "cache.h"
+
+int pf_rename(const char *path, const char* new_path)
 {
-	if(f1->IsChildOf(f2))
-		return false;
-	else if(f2->IsChildOf(f1))
-		return true;
-	else
-		return f1 < f2;
-}
+	try
+	{
+		cache.RenameFile(path, new_path);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
+		return -ENOENT;			  /* No such file or directory */
+	}
+	catch(Cache::FileAlreadyExists &e)
+	{
+		return -EEXIST;
+	}
 
-FileEntry::FileEntry(std::string _name, DirEntry* parent)
-	: FileEntryBase(_name, parent),
-	path_serial(0u)
-{
-	for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
-		path_serial += (path_serial << 3) + (unsigned char)*c;
+	return 0;
 }
-

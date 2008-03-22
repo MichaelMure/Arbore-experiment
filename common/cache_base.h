@@ -74,7 +74,7 @@ public:
 
 	virtual void MkFile(std::string path, pf_stat stat, Peer* sender = NULL) = 0;
 	virtual void RmFile(std::string path, Peer* sender = NULL) = 0;
-	virtual void ModFile(std::string path, Peer* sender = NULL) = 0;
+	virtual void RenameFile(std::string path, std::string new_path, Peer* sender = NULL) = 0;
 
 	virtual Packet CreateMkFilePacket(FileEntry* file) = 0;
 	virtual Packet CreateRmFilePacket(FileEntry* file) = 0;

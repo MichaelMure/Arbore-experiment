@@ -29,6 +29,7 @@ int pf_getattr(const char *path, struct stat *stbuf);
 int pf_mkdir(const char *path, mode_t mode);
 int pf_chmod(const char*, mode_t);
 int pf_readdir(const char*, void*, int (*)(void*, const char*, const struct stat*, off_t), off_t, fuse_file_info*);
+int pf_rename(const char* path, const char* new_path);
 int pf_rmdir(const char *path);
 int pf_unlink(const char *path);
 int pf_utimens(const char *path, const struct timespec ts[2]);

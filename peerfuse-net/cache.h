@@ -72,7 +72,7 @@ public:
 
 	void MkFile(std::string path, pf_stat stat, Peer* sender = NULL);
 	void RmFile(std::string path, Peer* sender = NULL);
-	void ModFile(std::string path, Peer* sender = NULL);
+	void RenameFile(std::string path, std::string new_path, Peer* sender = NULL);
 
 	Packet CreateMkFilePacket(FileEntry* file);
 	Packet CreateRmFilePacket(FileEntry* file);

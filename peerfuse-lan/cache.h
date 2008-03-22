@@ -57,7 +57,7 @@ public:
 
 	virtual void MkFile(std::string path, pf_stat stat, Peer* sender = 0);
 	virtual void RmFile(std::string path, Peer* sender = 0);
-	virtual void ModFile(std::string path, Peer* sender = 0);
+	virtual void RenameFile(std::string path, std::string new_path, Peer* sender = 0);
 
 	virtual void SendChanges(Peer* p, time_t last_view);
 
