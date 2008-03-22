@@ -82,4 +82,3 @@ void Certificate::LoadX509(std::string filename, std::string password)
 
 	LoadX509Buf(buf, file_size);
 }
-
