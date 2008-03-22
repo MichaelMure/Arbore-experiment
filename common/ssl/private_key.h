@@ -19,22 +19,33 @@
 
 #ifndef PF_PRIVATE_KEY_H
 #define PF_PRIVATE_KEY_H
+
+#include <openssl/evp.h>
 #include <exception>
 #include <string>
 
 class PrivateKey
 {
+private:
+	EVP_PKEY* ssl_key;
+	char* raw_key;
+	size_t raw_key_size;
 
 public:
 	class BadPrivateKey : public std::exception {};
 	class BadPassword : public std::exception {};
+	class BadFile : public std::exception {};
 
 	PrivateKey();
+	PrivateKey(const PrivateKey& pkey);
+	~PrivateKey();
 
 	void LoadPem(std::string filename, std::string password);
 	void LoadBuf(const char* buf, size_t size);
 
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 	void Sign(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
+
+	EVP_PKEY* GetSSL() { return ssl_key; }
 };
 #endif						  // PF_PRIVATE_KEY_H

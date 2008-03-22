@@ -25,7 +25,7 @@
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate)
+SslSsl::SslSsl(std::string cert, std::string key_file, std::string ca) throw (CantReadCertificate)
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -36,8 +36,9 @@ SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantRea
 	server_ctx = SSL_CTX_new(meth);
 	SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
+	key.LoadPem(key_file, "");
 	if(SSL_CTX_use_certificate_file(server_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
-		|| SSL_CTX_use_PrivateKey_file(server_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
+		|| SSL_CTX_use_PrivateKey(server_ctx, key.GetSSL())  <= 0
 		|| SSL_CTX_check_private_key(server_ctx)        <= 0)
 		throw CantReadCertificate();
 
@@ -47,7 +48,7 @@ SslSsl::SslSsl(std::string cert, std::string key, std::string ca) throw (CantRea
 	SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
 	if(SSL_CTX_use_certificate_file(client_ctx, cert.c_str(), SSL_FILETYPE_PEM)        <= 0
-		|| SSL_CTX_use_PrivateKey_file(client_ctx, key.c_str(), SSL_FILETYPE_PEM)  <= 0
+		|| SSL_CTX_use_PrivateKey(client_ctx, key.GetSSL())  <= 0
 		|| SSL_CTX_check_private_key(client_ctx)        <= 0)
 		throw CantReadCertificate();
 
