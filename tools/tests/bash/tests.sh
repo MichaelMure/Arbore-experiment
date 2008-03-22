@@ -84,6 +84,8 @@ function start_p2pfs
 		COUNT=$(($COUNT + 1))
 		if [ $COUNT == 20 ]
 		then
+			echo "Could not start:"
+			cat "${!LOG}" 
 			exit 1
 		fi
 	done
