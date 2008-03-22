@@ -237,12 +237,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	Peer* already_connected = net.ID2Peer(addr.id);
 
 	if(already_connected)
-	{
-		if(cert == already_connected->GetCertificate())
-			return;			  /* I'm already connected to him. */
-		else
-			return;			  /* TODO: this is an other peer with same ID !? DO SOMETHING! */
-	}
+		return;			  /* I'm already connected to him. */
 
 	Peer* p;
 
