@@ -90,6 +90,7 @@ int Application::main(int argc, char *argv[])
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
+		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
 
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))

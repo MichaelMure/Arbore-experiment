@@ -77,4 +77,5 @@ public:
 };
 
 extern SessionConfig session_cfg;
+extern SessionConfig tree_cfg;
 #endif

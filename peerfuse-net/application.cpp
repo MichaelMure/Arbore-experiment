@@ -88,6 +88,7 @@ int Application::main(int argc, char *argv[])
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
+		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
 
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 		cache.UpdateRespFiles();

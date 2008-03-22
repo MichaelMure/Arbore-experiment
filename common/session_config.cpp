@@ -47,6 +47,7 @@ std::string SessionConfigOptList<uint32_t>::GetAsString(const std::string& opt)
 };
 
 SessionConfig session_cfg;
+SessionConfig tree_cfg;
 
 SessionConfig::SessionConfig() : filename("")
 {
