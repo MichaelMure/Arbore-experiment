@@ -242,7 +242,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 		file->stat = stat;
 
-		/* TODO: update local cached file. */
+		hdd.UpdateFile(file);
 	}
 
 	/* Add file on FileDistribution */

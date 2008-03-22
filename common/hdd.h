@@ -55,6 +55,7 @@ public:
 	void BuildTree(DirEntry* d, std::string path);
 
 	void MkFile(FileEntry* f);
+	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
 	void RmFile(FileEntry* f);
 };
 #endif
