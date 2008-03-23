@@ -129,8 +129,6 @@ Peer* Network::Start(MyConfig* config)
 	Certificate cert = sslssl->GetCertificate();
 	my_id = cert.GetIDFromCertificate();
 
-	log[W_DEBUG] << "bite";
-
 	if(peer)
 	{
 		peer->SetHighLink();
