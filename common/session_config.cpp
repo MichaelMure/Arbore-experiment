@@ -44,7 +44,9 @@ SessionConfig::~SessionConfig()
 	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
 		it != list.end();
 		++it)
-	delete it->second;
+	{
+		delete it->second;
+	}
 }
 
 static ssize_t getline(std::string& line, std::fstream& file)
