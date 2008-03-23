@@ -28,8 +28,8 @@ class Certificate
 {
 private:
 	X509* ssl_cert;
-	char* raw_cert;
-	size_t raw_cert_size;
+	//char* raw_cert;
+	//size_t raw_cert_size;
 
 	void LoadX509Buf(const char* buf, size_t size);
 public:
@@ -41,15 +41,17 @@ public:
 	Certificate(const Certificate& cert);
 	~Certificate();
 
-	void LoadX509(std::string filename, std::string password);
-	PrivateKey LoadPKCS12(std::string filename, std::string password);
+	void LoadPem(std::string filename, std::string password);
+	void LoadSSL(X509* _ssl_cert);
+	void LoadRaw(const unsigned char* buf, size_t len);
 
 	PublicKey GetPublicKey();
 
 	const std::string GetCertificateInfos();
-	const std::string GetIDFromCertificate();
+	long GetIDFromCertificate();
 
 	X509* GetSSL() { return ssl_cert; }
+	void GetRaw(unsigned char** buf, size_t* len);
 	//bool operator==(const Certificate&) { return true; }
 };
 #endif						  // PF_CERTIFICATE_H

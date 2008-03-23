@@ -26,6 +26,7 @@
 
 class SslSsl : public Ssl
 {
+private:
 	// Context: holds default SSL values to use
 	SSL_CTX* server_ctx;
 	SSL_CTX* client_ctx;
@@ -33,6 +34,8 @@ class SslSsl : public Ssl
 	Certificate cert;
 	Certificate cacert;
 	PrivateKey key;
+
+	void SetCertificates(SSL_CTX* ctx);
 public:
 
 	SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate);

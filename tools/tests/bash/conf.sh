@@ -66,7 +66,7 @@ connection {
 
 ssl {
 
-	ca = .cacert.pem
+	ca = cacert.pem
 
 	key = server-key.pem
 

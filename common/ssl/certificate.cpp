@@ -22,48 +22,31 @@
 #include <cstring>
 #include "certificate.h"
 
-Certificate::Certificate() : ssl_cert(NULL), raw_cert(NULL), raw_cert_size(0)
+Certificate::Certificate() : ssl_cert(NULL)
 {
 }
 
-Certificate::Certificate(const Certificate& cert) : ssl_cert(NULL), raw_cert(NULL), raw_cert_size(0)
+Certificate::Certificate(const Certificate& cert) : ssl_cert(NULL)
 {
-	if(cert.raw_cert)
-		LoadX509Buf(cert.raw_cert, cert.raw_cert_size);
+	if(cert.ssl_cert != NULL)
+		ssl_cert = X509_dup(cert.ssl_cert);
+	else
+		ssl_cert = NULL;
 }
 
 Certificate::~Certificate()
 {
-	if(raw_cert) delete []raw_cert;
 	if(ssl_cert) X509_free(ssl_cert);
 }
 
-void Certificate::LoadX509Buf(const char* buf, size_t size)
+void Certificate::LoadPem(std::string filename, std::string password)
 {
-	if(raw_cert)
-		delete []raw_cert;
-
-	raw_cert = new char[size];
-	raw_cert_size = size;
-
-	memcpy(raw_cert, buf, size);
-
 	if(ssl_cert)
-		X509_free(ssl_cert);
-
-	BIO* raw_cert_bio = BIO_new_mem_buf(raw_cert, size);
-	ssl_cert = PEM_read_bio_X509(raw_cert_bio, NULL, NULL, NULL);
-	BIO_free(raw_cert_bio);
-
-	if(!ssl_cert)
 	{
-		delete []raw_cert;
-		throw BadCertificate();
+		X509_free(ssl_cert);
+		ssl_cert = NULL;
 	}
-}
 
-void Certificate::LoadX509(std::string filename, std::string password)
-{
 	FILE* f = fopen(filename.c_str(), "r");
 	if(!f)
 		throw BadFile();
@@ -80,5 +63,53 @@ void Certificate::LoadX509(std::string filename, std::string password)
 		throw BadFile();
 	fclose(f);
 
-	LoadX509Buf(buf, file_size);
+	BIO* raw_cert_bio = BIO_new_mem_buf(buf, file_size);
+	ssl_cert = PEM_read_bio_X509(raw_cert_bio, NULL, NULL, NULL);
+	BIO_free(raw_cert_bio);
+
+	if(!ssl_cert)
+		throw BadCertificate();
+}
+
+void Certificate::LoadSSL(X509* _ssl_cert)
+{
+	ssl_cert = _ssl_cert;
+}
+
+void Certificate::LoadRaw(const unsigned char* buf, size_t len)
+{
+	if(ssl_cert)
+		X509_free(ssl_cert);
+
+	ssl_cert = d2i_X509(NULL, &buf, len);
+	
+	if (ssl_cert == NULL)
+		throw BadCertificate();
+	   /* Some error */
+}
+
+void Certificate::GetRaw(unsigned char** buf, size_t* len)
+{
+	// Returns a certificate in binary format
+	// Non-tested
+	unsigned char *p;
+
+	*len = (size_t)i2d_X509(ssl_cert, NULL);
+	
+	*buf = (unsigned char*)malloc(*len);
+	p = *buf;
+	
+	i2d_X509(ssl_cert, &p);
+}
+
+long Certificate::GetIDFromCertificate()
+{
+	if(!ssl_cert)
+		return 0;
+
+	ASN1_INTEGER* no = X509_get_serialNumber(ssl_cert);
+	long id = ASN1_INTEGER_get(no);
+	M_ASN1_INTEGER_free(no);
+
+	return id;
 }

@@ -21,6 +21,7 @@
 #include <exception>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
+#include "log.h"
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
@@ -36,26 +37,39 @@ SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_f
 	server_ctx = SSL_CTX_new(meth);
 	SSL_CTX_set_mode(server_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
-	key.LoadPem(key_file, "");
-	cert.LoadX509(cert_file, "");
-	//cacert.LoadX509(cacert_file, "");
-
-	if(SSL_CTX_use_certificate(server_ctx, cert.GetSSL())        <= 0
-		|| SSL_CTX_use_PrivateKey(server_ctx, key.GetSSL())  <= 0
-		|| SSL_CTX_check_private_key(server_ctx)        <= 0)
-		throw CantReadCertificate();
-
 	// Client part initialization
 	meth = SSLv23_client_method();
 	client_ctx = SSL_CTX_new(meth);
 	SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
+	SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER, NULL);
 
-	if(SSL_CTX_use_certificate(client_ctx, cert.GetSSL())        <= 0
-		|| SSL_CTX_use_PrivateKey(client_ctx, key.GetSSL())  <= 0
-		|| SSL_CTX_check_private_key(client_ctx)        <= 0)
+	log[W_INFO] << "Loading private key: " << key_file;
+	key.LoadPem(key_file, "");
+	log[W_INFO] << "Loading certificate: " << cert_file;
+	cert.LoadPem(cert_file, "");
+	log[W_INFO] << "Loading CA certificate: " << cacert_file;
+	cacert.LoadPem(cacert_file, "");
+
+	SetCertificates(server_ctx);
+	SetCertificates(client_ctx);
+}
+
+void SslSsl::SetCertificates(SSL_CTX* ctx)
+{
+	// TODO: specify a callback that checks the peers cert without checking
+	// the certificates purpose
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER /*| SSL_VERIFY_FAIL_IF_NO_PEER_CERT*/, NULL);
+
+	// Load certificates in the session
+	if(SSL_CTX_use_certificate(ctx, cert.GetSSL())        <= 0
+		|| SSL_CTX_use_PrivateKey(ctx, key.GetSSL())  <= 0
+		|| SSL_CTX_check_private_key(ctx)        <= 0)
 		throw CantReadCertificate();
 
-	/* TODO save ca path */
+	// Set trust certificates
+	X509_STORE* st = SSL_CTX_get_cert_store(ctx);
+	X509_STORE_add_cert(st, cacert.GetSSL());
+	// TODO: set the crl
 }
 
 SslSsl::~SslSsl()
