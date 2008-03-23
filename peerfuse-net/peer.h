@@ -86,7 +86,7 @@ public:
 	Peer(pf_addr addr, Connection* _conn, Peer* parent = 0);
 	~Peer();
 
-	id_t GetID() const { return addr.id; }
+	pf_id GetID() const { return addr.id; }
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 

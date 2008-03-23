@@ -47,6 +47,6 @@ public:
 	bool Read(char **buf, size_t size);
 
 	int GetFd() const { return fd; }
-	virtual id_t GetCertificateID() const { return 0; }
+	virtual pf_id GetCertificateID() const { return 0; }
 };
 #endif						  // CONNECTION_H

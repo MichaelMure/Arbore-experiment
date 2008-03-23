@@ -28,22 +28,22 @@
 
 class Packet : public PacketBase
 {
-	id_t id_src;				  // 0 means want an id
-	id_t id_dst;				  // 0 means "to everybody"
+	pf_id id_src;				  // 0 means want an id
+	pf_id id_dst;				  // 0 means "to everybody"
 
 	char* DumpBuffer() const;
 public:
 
 	/* Constructors */
-	Packet(msg_type _type, id_t src = 0, id_t dst = 0);
+	Packet(msg_type _type, pf_id src = 0, pf_id dst = 0);
 	Packet(const Packet& packet);
 	Packet& operator=(const Packet& packet);
 	Packet(char* header);
 
-	id_t GetSrcID() const { return id_src; }
-	id_t GetDstID() const { return id_dst; }
-	Packet& SetSrcID(id_t id) { id_src = id; return *this; }
-	Packet& SetDstID(id_t id) { id_dst = id; return *this; }
+	pf_id GetSrcID() const { return id_src; }
+	pf_id GetDstID() const { return id_dst; }
+	Packet& SetSrcID(pf_id id) { id_src = id; return *this; }
+	Packet& SetDstID(pf_id id) { id_dst = id; return *this; }
 
 	virtual void Send(Connection* conn);
 };

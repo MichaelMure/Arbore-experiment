@@ -41,7 +41,7 @@ public:
 	Network();
 	virtual ~Network();
 
-	Peer* ID2Peer(id_t id) const;
+	Peer* ID2Peer(pf_id id) const;
 
 	/** Return a list of connected high linkes */
 	PeerList GetDirectHighLinks() const;
@@ -53,7 +53,7 @@ public:
 
 	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL);
 
-	void GivePacketTo(id_t id, Packet* packet) const;
+	void GivePacketTo(pf_id id, Packet* packet) const;
 };
 
 extern Network net;

@@ -28,13 +28,13 @@ FileDistribution::FileDistribution()
 
 }
 
-bool FileDistribution::_is_responsible(const id_t peer_id, const FileEntry* file, const std::vector<id_t>& id_list) const
+bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* file, const std::vector<pf_id>& id_list) const
 {
 	assert(peer_id > 0);
 	assert(file != NULL);
 
-	std::vector<id_t>::const_iterator it;
-	std::vector<id_t>::const_iterator begin = id_list.begin();
+	std::vector<pf_id>::const_iterator it;
+	std::vector<pf_id>::const_iterator begin = id_list.begin();
 	for(it = begin; it != id_list.end() && *it != peer_id; ++it)
 		;
 
@@ -50,7 +50,7 @@ bool FileDistribution::_is_responsible(const id_t peer_id, const FileEntry* file
 	return (i < NB_PEERS_PER_FILE);
 }
 
-bool FileDistribution::IsResponsible(const id_t peer_id, const FileEntry* file) const
+bool FileDistribution::IsResponsible(const pf_id peer_id, const FileEntry* file) const
 {
 	return _is_responsible(peer_id, file, id_list);
 }
@@ -60,7 +60,7 @@ std::set<Peer*> FileDistribution::GetRespPeers(const FileEntry* f) const
 	return _get_resp_peers_from_idlist(f, id_list);
 }
 
-std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& idl) const
+std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& idl) const
 {
 	assert(f != NULL);
 
@@ -80,14 +80,14 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 	return list;
 }
 
-FileList FileDistribution::GetFiles(id_t id) const
+FileList FileDistribution::GetFiles(pf_id id) const
 {
 	FileList files = cache.GetAllFiles();
 	FileList result;
 
 	size_t id_number;
-	std::vector<id_t>::const_iterator it;
-	std::vector<id_t>::const_iterator begin = id_list.begin();
+	std::vector<pf_id>::const_iterator it;
+	std::vector<pf_id>::const_iterator begin = id_list.begin();
 
 	for(it = begin; it != id_list.end() && *it != id;  ++it)
 		;
@@ -214,7 +214,7 @@ void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)
 void FileDistribution::UpdateRespFiles()
 {
 	/* Store last id list */
-	std::vector<id_t> last_id_list = id_list;
+	std::vector<pf_id> last_id_list = id_list;
 
 	/* First set new list of id */
 	id_list.clear();

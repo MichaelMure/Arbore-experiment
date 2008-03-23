@@ -26,17 +26,27 @@ Certificate::Certificate() : ssl_cert(NULL)
 {
 }
 
-Certificate::Certificate(const Certificate& cert) : ssl_cert(NULL)
+Certificate::Certificate(const Certificate& cert)
+	: ssl_cert(NULL)
+{
+	if(cert.ssl_cert != NULL)
+		ssl_cert = X509_dup(cert.ssl_cert);
+}
+
+Certificate& Certificate::operator=(const Certificate& cert)
 {
 	if(cert.ssl_cert != NULL)
 		ssl_cert = X509_dup(cert.ssl_cert);
 	else
 		ssl_cert = NULL;
+
+	return *this;
 }
 
 Certificate::~Certificate()
 {
-	if(ssl_cert) X509_free(ssl_cert);
+	if(ssl_cert)
+		X509_free(ssl_cert);
 }
 
 void Certificate::LoadPem(std::string filename, std::string password)
@@ -73,6 +83,12 @@ void Certificate::LoadPem(std::string filename, std::string password)
 
 void Certificate::LoadSSL(X509* _ssl_cert)
 {
+	if(ssl_cert)
+		X509_free(ssl_cert);
+
+	/* XXX do we use the same object (like here), or we can copy
+	 * certificate with X509_dup()?
+	 */
 	ssl_cert = _ssl_cert;
 }
 
@@ -102,14 +118,21 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len)
 	i2d_X509(ssl_cert, &p);
 }
 
-long Certificate::GetIDFromCertificate()
+pf_id Certificate::GetIDFromCertificate()
 {
 	if(!ssl_cert)
 		return 0;
 
 	ASN1_INTEGER* no = X509_get_serialNumber(ssl_cert);
 	long id = ASN1_INTEGER_get(no);
-	M_ASN1_INTEGER_free(no);
+
+	/* Note: it appears to free part of memory of ssl_cert,
+	 * so a call to X509_cert() will crash. -romain
+	 */
+	//M_ASN1_INTEGER_free(no);
+
+	if(id <= 0 || (unsigned long)id > ID_MAX)
+		throw BadCertificate();
 
 	return id;
 }

@@ -71,7 +71,7 @@ private:
 	uint16_t listening_port;
 
 protected:
-	id_t my_id;
+	pf_id my_id;
 	Ssl *ssl;
 
 	PeerList peer_list;
@@ -121,11 +121,11 @@ public:
 	 */
 	virtual Peer* Connect(pf_addr addr);
 
-	id_t GetMyID() const { return my_id; }
-	void SetMyID(const id_t id) { my_id = id; }
+	pf_id GetMyID() const { return my_id; }
+	void SetMyID(const pf_id id) { my_id = id; }
 
 	/* Create an ID not used by any other peer in network */
-	id_t CreateID();
+	pf_id CreateID();
 
 	virtual void AddDisconnected(const pf_addr& addr) {}
 	virtual void DelDisconnected(const pf_addr& addr) {}

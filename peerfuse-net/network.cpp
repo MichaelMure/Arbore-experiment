@@ -35,6 +35,7 @@
 #include "tools.h"
 #include "job.h"
 #include "scheduler.h"
+#include "ssl/pf_ssl_ssl.h"
 
 Network net;
 
@@ -46,7 +47,7 @@ Network::~Network()
 {
 }
 
-void Network::GivePacketTo(id_t id, Packet* packet) const
+void Network::GivePacketTo(pf_id id, Packet* packet) const
 {
 	PeerList::const_iterator it;
 	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
@@ -68,7 +69,7 @@ void Network::Broadcast(Packet pckt, const Peer* but_one)
 			it->second->SendMsg(pckt);
 }
 
-Peer* Network::ID2Peer(id_t id) const
+Peer* Network::ID2Peer(pf_id id) const
 {
 	PeerList::const_iterator it;
 	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
@@ -120,19 +121,15 @@ void Network::DelDisconnected(const pf_addr& addr)
 
 Peer* Network::Start(MyConfig* config)
 {
-	/*
-	 * TODO TODO TODO        TODO        TODO TODO              TODO
-	 *      TODO         TODO    TODO    TODO    TODO       TODO    TODO
-	 *      TODO       TODO        TODO  TODO       TODO  TODO        TODO
-	 *      TODO       TODO        TODO  TODO       TODO  TODO        TODO
-	 *      TODO         TODO    TODO    TODO    TODO       TODO    TODO
-	 *      TODO             TODO        TODO TODO              TODO
-	 *
-	 * Do NOT create ID, but get it from certificate!
-	 */
-	my_id = CreateID();
-
 	Peer* peer = NetworkBase::Start(config);
+
+	SslSsl* sslssl = dynamic_cast<SslSsl*>(ssl);
+
+	assert(sslssl != NULL); /* we MUST use a SSL connection on pfnet. */
+	Certificate cert = sslssl->GetCertificate();
+	my_id = cert.GetIDFromCertificate();
+
+	log[W_DEBUG] << "bite";
 
 	if(peer)
 	{

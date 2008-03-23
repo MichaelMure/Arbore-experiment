@@ -31,7 +31,7 @@ const size_t NB_PEERS_PER_FILE = 5;
 
 class FileDistribution
 {
-	std::vector<id_t> id_list;
+	std::vector<pf_id> id_list;
 	FileList resp_files;
 
 	/** This is an internal function to know if an ID is responsible of a file.
@@ -40,14 +40,14 @@ class FileDistribution
 	 * @param id_list list of ids on network.
 	 * @return true if peer_id is responsible of file.
 	 */
-	bool _is_responsible(const id_t peer_id, const FileEntry* file, const std::vector<id_t>& id_list) const;
+	bool _is_responsible(const pf_id peer_id, const FileEntry* file, const std::vector<pf_id>& id_list) const;
 
 	/** This is an internal function to get responsible peers of a file.
 	 * @param f file
 	 * @param id_list list of ids on network.
 	 * @return set of Peer*
 	 */
-	std::set<Peer*> _get_resp_peers_from_idlist(const FileEntry* f, const std::vector<id_t>& id_list) const;
+	std::set<Peer*> _get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& id_list) const;
 
 public:
 
@@ -70,10 +70,10 @@ public:
 	 * @param file FileEntry*
 	 * @return true if peer_id is responsible of file.
 	 */
-	bool IsResponsible(const id_t peer_id, const FileEntry* file) const;
+	bool IsResponsible(const pf_id peer_id, const FileEntry* file) const;
 
 	/** Get files whose peer is responsible. */
-	FileList GetFiles(id_t id) const;
+	FileList GetFiles(pf_id id) const;
 
 	FileList GetMyRespFiles() const { return resp_files; }
 

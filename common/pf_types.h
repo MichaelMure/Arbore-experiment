@@ -23,16 +23,18 @@
 #include <vector>
 #include <stdint.h>
 
-typedef unsigned int id_t;
-
 typedef unsigned int uint32_t;
+typedef uint32_t pf_id;
+
+/* Result of 2^32 */
+#define ID_MAX 4294967295U
 
 class pf_addr
 {
 public:
 	uint32_t ip[4];
 	uint16_t port;
-	id_t id;
+	pf_id id;
 
 	bool operator ==(const pf_addr &other)
 	{

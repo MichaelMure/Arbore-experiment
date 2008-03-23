@@ -22,7 +22,7 @@
 #include "packet.h"
 #include "connection.h"
 
-Packet::Packet(msg_type _type, id_t src, id_t dst)
+Packet::Packet(msg_type _type, pf_id src, pf_id dst)
 			: PacketBase(_type),
 			id_src(src),
 			id_dst(dst)
@@ -60,8 +60,8 @@ Packet& Packet::operator=(const Packet& p)
 char* Packet::DumpBuffer() const
 {
 	char* dump = new char [GetSize()];
-	id_t _src = htonl(id_src);
-	id_t _dst = htonl(id_dst);
+	pf_id _src = htonl(id_src);
+	pf_id _dst = htonl(id_dst);
 	uint32_t _type = htonl(type);
 	uint32_t _size = htonl(size);
 	char* ptr = dump;

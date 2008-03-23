@@ -100,7 +100,7 @@ void Peer::Send_net_peer_list(PeerList peers)
 		if(*it == this)
 			continue;
 
-		id_t id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
+		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
 
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
@@ -237,7 +237,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	Peer* already_connected = net.ID2Peer(addr.id);
 
 	if(already_connected)
-		return;				  /* I'm already connected to him. */
+		return;			  /* I'm already connected to him. */
 
 	Peer* p;
 

@@ -84,7 +84,7 @@ public:
 
 	time_t Timestamp(time_t ts) { return ts_diff + ts; }
 
-	id_t GetID() const { return addr.id; }
+	pf_id GetID() const { return addr.id; }
 
 	bool IsServer() const { return (flags & SERVER); }
 	bool IsClient() const { return !(flags & SERVER); }

@@ -23,6 +23,7 @@
 
 #include "public_key.h"
 #include "private_key.h"
+#include "pf_types.h"
 
 class Certificate
 {
@@ -39,6 +40,7 @@ public:
 
 	Certificate();
 	Certificate(const Certificate& cert);
+	Certificate& operator=(const Certificate& cert);
 	~Certificate();
 
 	void LoadPem(std::string filename, std::string password);
@@ -48,7 +50,7 @@ public:
 	PublicKey GetPublicKey();
 
 	const std::string GetCertificateInfos();
-	long GetIDFromCertificate();
+	pf_id GetIDFromCertificate();
 
 	X509* GetSSL() { return ssl_cert; }
 	void GetRaw(unsigned char** buf, size_t* len);

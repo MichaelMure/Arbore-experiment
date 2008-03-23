@@ -406,10 +406,10 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	return peer;
 }
 
-id_t NetworkBase::CreateID()
+pf_id NetworkBase::CreateID()
 {
 	// TODO: optimize me
-	id_t new_id = 0;
+	pf_id new_id = 0;
 	while(!new_id)
 	{
 		new_id = rand();

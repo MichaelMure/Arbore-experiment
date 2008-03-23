@@ -94,7 +94,7 @@ int Application::main(int argc, char *argv[])
 
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))
-			net.SetMyID((id_t)my_id);
+			net.SetMyID((pf_id)my_id);
 
 		net.Start(&conf);
 

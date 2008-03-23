@@ -41,9 +41,8 @@ public:
 	SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate);
 	~SslSsl();
 
-	void SetCertificate(Certificate _cert) { cert = _cert; }
-	void SetCACertificate(Certificate _cacert) { cacert = _cacert; }
-	void SetPrivateKey(PrivateKey _key) { key = _key; }
+	Certificate GetCertificate() const { return cert; }
+	Certificate GetCACertificate() const { return cacert; }
 
 	Connection* Accept(int fd);
 	Connection* Connect(int fd);
