@@ -125,7 +125,7 @@ Peer* Network::Start(MyConfig* config)
 
 	SslSsl* sslssl = dynamic_cast<SslSsl*>(ssl);
 
-	assert(sslssl != NULL); /* we MUST use a SSL connection on pfnet. */
+	assert(sslssl != NULL);			  /* we MUST use a SSL connection on pfnet. */
 	Certificate cert = sslssl->GetCertificate();
 	my_id = cert.GetIDFromCertificate();
 

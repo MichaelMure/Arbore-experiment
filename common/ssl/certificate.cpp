@@ -27,7 +27,7 @@ Certificate::Certificate() : ssl_cert(NULL)
 }
 
 Certificate::Certificate(const Certificate& cert)
-	: ssl_cert(NULL)
+			: ssl_cert(NULL)
 {
 	if(cert.ssl_cert != NULL)
 		ssl_cert = X509_dup(cert.ssl_cert);

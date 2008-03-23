@@ -237,7 +237,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	Peer* already_connected = net.ID2Peer(addr.id);
 
 	if(already_connected)
-		return;			  /* I'm already connected to him. */
+		return;				  /* I'm already connected to him. */
 
 	Peer* p;
 
