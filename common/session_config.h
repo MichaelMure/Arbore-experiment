@@ -33,9 +33,9 @@ public:
 	SessionConfigValueBase(std::string _type)
 		: type(_type)
 	{}
+	virtual ~SessionConfigValueBase() {}
 
 	virtual std::string GetAsString() const = 0;
-
 	std::string GetType() const { return type; }
 };
 
