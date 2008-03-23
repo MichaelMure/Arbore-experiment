@@ -25,25 +25,9 @@
 #include "log.h"
 
 template<>
-std::string SessionConfigOptList<std::string>::GetAsString(const std::string& opt)
+std::string SessionConfigValue<std::string>::GetAsString() const
 {
-	std::string val;
-	if(Get(opt, val))
-		return opt + "=" + val;
-	return opt + "=";
-};
-
-template<>
-std::string SessionConfigOptList<uint32_t>::GetAsString(const std::string& opt)
-{
-	uint32_t nbr;
-	if(Get(opt, nbr))
-	{
-		std::stringstream out;
-		out << nbr;
-		return opt + "=" + out.str();
-	}
-	return opt + "=";
+	return value;
 };
 
 SessionConfig session_cfg;
@@ -56,6 +40,11 @@ SessionConfig::SessionConfig() : filename("")
 SessionConfig::~SessionConfig()
 {
 	Save();
+
+	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
+		it != list.end();
+		++it)
+		delete it->second;
 }
 
 static ssize_t getline(std::string& line, std::fstream& file)
@@ -110,14 +99,12 @@ void SessionConfig::Save()
 		return;
 	}
 
-	for(std::map<std::string, std::string>::const_iterator it_str = opt_str.GetMap().begin();
-		it_str != opt_str.GetMap().end();
-		++it_str)
-	fout << opt_str.GetAsString(it_str->first) << std::endl;
-	for(std::map<std::string, uint32_t>::const_iterator it_uint = opt_uint.GetMap().begin();
-		it_uint != opt_uint.GetMap().end();
-		++it_uint)
-	fout << opt_uint.GetAsString(it_uint->first) << std::endl;
+	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
+		it != list.end();
+		++it)
+	{
+		fout << it->first << "=" << it->second->GetAsString() << std::endl;
+	}
 	fout.close();
 	log[W_INFO] << "SessionConfig: Config saved.";
 }
@@ -137,8 +124,9 @@ void SessionConfig::Parse(const std::string& line)
 		&& ((val.at(0) >= '0' && val.at(0) <= '9')))
 	{
 		int nbr = atoi(val.c_str());
-		opt_uint.Set(opt, nbr);
+		Set(opt, nbr);
 	}
 	else
-		opt_str.Set(opt, val);
+		Set(opt, val);
 }
+

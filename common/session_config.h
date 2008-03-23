@@ -22,36 +22,50 @@
 #include <sstream>
 #include <map>
 #include <string>
+#include <typeinfo>
 #include "log.h"
 
-template <class A>
-class SessionConfigOptList
+class SessionConfigValueBase
 {
-	std::map<std::string, A> lst;
+	std::string type;
 public:
-	bool Get(const std::string& opt, A& val)
-	{
-		typename std::map<std::string, A>::iterator it;
-		log[W_INFO] << "Reading option " << opt;
-		it = lst.find(opt);
-		if(it == lst.end())
-			return false;
-		val = it->second;
-		return true;
-	}
 
-	void Set(const std::string& opt, const A& val)
-	{
-		log[W_INFO] << "Setting option " << opt;
-		lst[opt] = val;
-	}
+	SessionConfigValueBase(std::string _type)
+		: type(_type)
+	{}
 
-	const std::map<std::string, A>& GetMap()
-	{
-		return lst;
-	}
+	virtual std::string GetAsString() const = 0;
 
-	std::string GetAsString(const std::string& opt);
+	std::string GetType() const { return type; }
+};
+
+template<class A>
+class SessionConfigValue : public SessionConfigValueBase
+{
+	std::string opt;
+	A value;
+	SessionConfigValue();
+public:
+
+	SessionConfigValue(std::string _opt, A _value)
+		: SessionConfigValueBase(typeid(_value).name()),
+		opt(_opt),
+		value(_value)
+	{}
+
+	void Set(const A& val)
+	{
+		log[W_INFO] << "Setting option " << opt << "=" << value;
+		value = val;
+	}
+	A Get() const { return value; }
+
+	std::string GetAsString() const
+	{
+		std::stringstream out;
+		out << value;
+		return out.str();
+	};
 
 };
 
@@ -59,8 +73,7 @@ class SessionConfig
 {
 	std::string filename;
 
-	SessionConfigOptList<std::string> opt_str;
-	SessionConfigOptList<uint32_t> opt_uint;
+	std::map<std::string, SessionConfigValueBase*> list;
 
 	void Save();
 	void Parse(const std::string& line);
@@ -70,10 +83,35 @@ public:
 
 	void Load(const std::string& file);
 
-	bool Get(const std::string& opt, std::string& val) { return opt_str.Get(opt, val); }
-	void Set(const std::string& opt, const std::string& val) { return opt_str.Set(opt, val); }
-	bool Get(const std::string& opt, uint32_t val) { return opt_uint.Get(opt, val); }
-	void Set(const std::string& opt, const uint32_t val) { return opt_uint.Set(opt, val); }
+	template<class T>
+	bool Get(const std::string& opt, T& val) const
+	{
+		std::map<std::string, SessionConfigValueBase*>::const_iterator it;
+		it = list.find(opt);
+		if(it == list.end())
+			return false;
+
+		if(it->second->GetType() != typeid(val).name())
+			return false;
+
+		val = dynamic_cast<SessionConfigValue<T>*>(it->second)->Get();
+		return true;
+	}
+
+	template<class T>
+	void Set(const std::string& opt, const T& val)
+	{
+		std::map<std::string, SessionConfigValueBase*>::iterator it;
+		it = list.find(opt);
+		if(it == list.end())
+			list[opt] = new SessionConfigValue<T>(opt, val);
+		else if(it->second->GetType() != typeid(val).name())
+			return;
+		else
+			dynamic_cast<SessionConfigValue<T> *>(it->second)->Set(val);
+	}
+
+
 };
 
 extern SessionConfig session_cfg;

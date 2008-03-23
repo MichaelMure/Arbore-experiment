@@ -26,6 +26,7 @@
 #include <string.h>
 #include "hdd.h"
 #include "log.h"
+#include "session_config.h"
 
 Hdd::Hdd()
 {
@@ -39,7 +40,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-			
+
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	root = _root;
@@ -87,6 +88,11 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			f->stat.atime = stats.st_atime;
 			f->stat.mtime = stats.st_mtime;
 			f->stat.ctime = stats.st_ctime;
+			if(!tree_cfg.Get(f_path, f->stat.meta_mtime))
+			{
+				f->stat.meta_mtime = f->stat.mtime;
+				tree_cfg.Set(f_path, f->stat.meta_mtime);
+			}
 
 			cache_dir->AddFile(f);
 			if(dir->d_type & DT_DIR)
@@ -153,6 +159,8 @@ void Hdd::MkFile(FileEntry* f)
 
 	if(lchown(path.c_str(), f->stat.uid, f->stat.gid) != 0)
 		throw HddWriteFailure(path);
+
+	tree_cfg.Set(f->GetFullName(), f->stat.meta_mtime);
 }
 
 void Hdd::RmFile(FileEntry* f)

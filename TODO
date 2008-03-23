@@ -2,25 +2,19 @@
 * TODO *
 ********
 
+== Roadmap ==
+
+	* TODO fill this
+
 == Global ==
 
 == Common ==
-
-	* Save config when exiting
-
-	* Implement all FUSE functions
 
 	* Handle symbolic links
 
 	* Implement SslNoSsl class (if necessary) and test it.
 
 == Peerfuse NET ==
-
-	* When we create/remove/update a file or a dir, send to parent directory responsible
-	  if I am not, or send to all other responsibles if I am.
-
-	* When receive a create/remove/update for a file or a dir, send to other responsibles
-	  if I am AND sender isn't responsible
 
 == Peerfuse LAN ==
 
