@@ -40,7 +40,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-
+			
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	root = _root;

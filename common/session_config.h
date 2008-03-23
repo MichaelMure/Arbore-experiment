@@ -32,7 +32,7 @@ public:
 
 	SessionConfigValueBase(std::string _type)
 		: type(_type)
-	{}
+		{}
 	virtual ~SessionConfigValueBase() {}
 
 	virtual std::string GetAsString() const = 0;
@@ -51,7 +51,7 @@ public:
 		: SessionConfigValueBase(typeid(_value).name()),
 		opt(_opt),
 		value(_value)
-	{}
+		{}
 
 	void Set(const A& val)
 	{
@@ -84,7 +84,7 @@ public:
 	void Load(const std::string& file);
 
 	template<class T>
-	bool Get(const std::string& opt, T& val) const
+		bool Get(const std::string& opt, T& val) const
 	{
 		std::map<std::string, SessionConfigValueBase*>::const_iterator it;
 		it = list.find(opt);
@@ -99,7 +99,7 @@ public:
 	}
 
 	template<class T>
-	void Set(const std::string& opt, const T& val)
+		void Set(const std::string& opt, const T& val)
 	{
 		std::map<std::string, SessionConfigValueBase*>::iterator it;
 		it = list.find(opt);
@@ -110,7 +110,6 @@ public:
 		else
 			dynamic_cast<SessionConfigValue<T> *>(it->second)->Set(val);
 	}
-
 
 };
 
