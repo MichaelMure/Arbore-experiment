@@ -39,6 +39,12 @@ PrivateKey::~PrivateKey()
 	if(ssl_key) EVP_PKEY_free(ssl_key);
 }
 
+int PrivateKey::PasswordCallback(char* buf, int size, int rwflag, void* datas)
+{
+	buf[0] = '\0';
+	return 0;
+}
+
 void PrivateKey::LoadBuf(const char* buf, size_t size)
 {
 	if(raw_key)
@@ -50,14 +56,19 @@ void PrivateKey::LoadBuf(const char* buf, size_t size)
 	memcpy(raw_key, buf, size);
 
 	if(ssl_key)
+	{
 		EVP_PKEY_free(ssl_key);
+		ssl_key = NULL;
+	}
 
 	BIO* raw_key_bio = BIO_new_mem_buf(raw_key, size);
-	ssl_key = PEM_read_bio_PrivateKey(raw_key_bio, NULL, NULL, NULL);
+	ssl_key = PEM_read_bio_PrivateKey(raw_key_bio, NULL, &PasswordCallback, NULL);
 	BIO_free(raw_key_bio);
 
 	if(!ssl_key)
 	{
+		raw_key = NULL;
+		raw_key_size = 0;
 		delete []raw_key;
 		throw BadPrivateKey();
 	}
