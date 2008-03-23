@@ -82,10 +82,10 @@ void Certificate::LoadRaw(const unsigned char* buf, size_t len)
 		X509_free(ssl_cert);
 
 	ssl_cert = d2i_X509(NULL, &buf, len);
-	
+
 	if (ssl_cert == NULL)
 		throw BadCertificate();
-	   /* Some error */
+	/* Some error */
 }
 
 void Certificate::GetRaw(unsigned char** buf, size_t* len)
@@ -95,10 +95,10 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len)
 	unsigned char *p;
 
 	*len = (size_t)i2d_X509(ssl_cert, NULL);
-	
+
 	*buf = (unsigned char*)malloc(*len);
 	p = *buf;
-	
+
 	i2d_X509(ssl_cert, &p);
 }
 
