@@ -20,27 +20,24 @@
 #ifndef PEER_H
 #define PEER_H
 
-#include "connection.h"
+#include "connection_ssl.h"
 #include "pf_types.h"
 #include "packet.h"
-#include "ssl/certificate.h"
+#include "peer_interface.h"
 #include <queue>
 
-class FileEntry;
 class Peer;
 
 typedef std::vector<Peer*> PeerList;
 
-class Peer
+class Peer : public PeerInterface
 {
 	pf_addr addr;
-	Connection* conn;
+	ConnectionSsl* conn;
 
 	int ts_diff;				  // diff between our timestamp and its timestamp */
 	Packet* incoming;			  // packet we are receiving
 	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
-
-	Certificate cert;
 
 	/* Network is representer for me like this:
 	 *  me
@@ -90,8 +87,6 @@ public:
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 
-	Certificate GetCertificate() const { return cert; }
-
 	time_t Timestamp(time_t ts) { return ts_diff + ts; }
 
 	bool IsHighLink() const { return flags & HIGHLINK; }
@@ -111,7 +106,7 @@ public:
 	void HandleMsg(struct Packet* pckt);
 
 	void Flush();
-	void SendMsg(const PacketBase& pckt);
+	void SendMsg(const Packet& pckt);
 	void SendHello();
 	bool Receive();
 };

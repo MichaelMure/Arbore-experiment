@@ -23,16 +23,14 @@
 #include "connection.h"
 #include "pf_types.h"
 #include "packet.h"
+#include "peer_interface.h"
 #include <queue>
-#include <list>
-
-class FileEntry;
 
 class Peer;
 
 typedef std::vector<Peer*> PeerList;
 
-class Peer
+class Peer : public PeerInterface
 {
 	pf_addr addr;
 	Connection* conn;

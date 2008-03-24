@@ -156,7 +156,7 @@ void NetworkBase::Main()
 						}
 						catch(Connection::WriteError &e)
 						{
-							log[W_WARNING] << "recv() error: " << e.GetString();
+							log[W_WARNING] << "send() error: " << e.GetString();
 							Peer* p = fd2peer[i];
 							if(p->GetAddr().port > 0)
 								AddDisconnected(p->GetAddr());

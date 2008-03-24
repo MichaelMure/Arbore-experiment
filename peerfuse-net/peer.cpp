@@ -34,12 +34,15 @@
 
 Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
 			: addr(_addr),
-			conn(_conn),
+			conn(dynamic_cast<ConnectionSsl*>(_conn)),
 			ts_diff(0),
 			incoming(NULL),
 			uplink(parent),
 			flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
 {
+	assert(conn);
+	addr.id = conn->GetCertificateID();
+	log[W_DEBUG] << "Dist id : " << addr.id;
 }
 
 Peer::~Peer()
@@ -70,9 +73,9 @@ void Peer::Flush()
  *  Send
  */
 
-void Peer::SendMsg(const PacketBase& pckt)
+void Peer::SendMsg(const Packet& pckt)
 {
-	send_queue.push(dynamic_cast<const Packet&>(pckt));
+	send_queue.push(pckt);
 	net.HavePacketToSend(this);
 }
 
@@ -386,7 +389,7 @@ bool Peer::Receive()
 		throw Packet::Malformated();
 
 	/* Only handle this packet if it is a broadcast or if it is sent to me */
-	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == net.GetMyID() || !net.GetMyID())
+	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == net.GetMyID())
 	{
 		/* If source is not me, I translate packet to real source. */
 		if((*packet)->GetSrcID() && (*packet)->GetSrcID() != GetID() && GetID())
@@ -396,6 +399,15 @@ bool Peer::Receive()
 		}
 		else
 			HandleMsg(*packet);
+	}
+	else if((*packet)->GetDstID())
+	{
+		Peer* relay_to = net.ID2Peer((*packet)->GetDstID());
+		if(relay_to)
+			relay_to->SendMsg(**packet);
+		else
+			log[W_WARNING] << "Received a message to an unknown ID !?"
+				<< "from=" << (*packet)->GetSrcID() << " to=" << (*packet)->GetDstID();
 	}
 
 	/* Route broadcast packets */
