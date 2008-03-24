@@ -107,5 +107,3 @@ pf_id ConnectionSsl::GetCertificateID()
 {
 	return GetCertificate().GetIDFromCertificate();
 }
-
-
