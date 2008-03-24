@@ -104,6 +104,7 @@ Packet Cache::CreateMkFilePacket(FileEntry* f)
 	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->stat.size);
 	pckt.SetArg(NET_MKFILE_ACCESS_TIME, (uint32_t)f->stat.atime);
 	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->stat.mtime);
+	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
 	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->stat.ctime);
 
 	return pckt;
@@ -299,6 +300,7 @@ void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
 
 	file->stat.uid = uid;
 	file->stat.gid = gid;
+	file->stat.meta_mtime = time(NULL);
 
 	/* TODO propagate it */
 
@@ -317,6 +319,7 @@ void Cache::ChMod(std::string path, mode_t mode)
 	}
 
 	file->stat.mode = mode;
+	file->stat.meta_mtime = time(NULL);
 
 	/* TODO propagate it */
 

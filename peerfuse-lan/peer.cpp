@@ -253,6 +253,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 		stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
 		stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
 		stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+		stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_META_MODIF_TIME));
 		stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 
 		cache.MkFile(filename, stat, this);
