@@ -95,7 +95,7 @@ void ConnectionSsl::SocketRead() throw(RecvError)
 Certificate ConnectionSsl::GetCertificate()
 {
 	assert(ssl);
-	X509* ssl_cert = SSL_get_certificate(ssl);
+	X509* ssl_cert = SSL_get_peer_certificate(ssl);
 	assert(ssl_cert);
 
 	Certificate cert;
