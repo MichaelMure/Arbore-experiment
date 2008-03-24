@@ -380,13 +380,14 @@ def get_commits(path, users, all_commits, files):
         else:
             commit_declaration = False
 
-def stat_commits(all_commits, hours, months, dates):
+def stat_commits(all_commits, hours, months, dates, week):
 
     for commit in all_commits:
 
             dt = parseDatetime('%s %s' % (commit.date, commit.time))
 
             hours[dt.hour].add_commit(commit)
+            week[dt.weekday()].add_commit(commit)
 
             if not dates:
                 now = datetime.today().date()
@@ -426,10 +427,13 @@ def main():
     else:
         output = ''
 
+    weekday2name = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
     users = {}
     dates = {}
     hours = [CommitList(i) for i in xrange(24)]
     months = {}
+    weekdays = [CommitList(weekday2name[i]) for i in xrange(7)]
     all_commits = []
     files = {}
 
@@ -439,7 +443,7 @@ def main():
 
     blame(sys.argv[1], users)
 
-    stat_commits(all_commits, hours, months, dates)
+    stat_commits(all_commits, hours, months, dates, weekdays)
 
     all_commits.reverse() # last to first
 
@@ -533,8 +537,23 @@ def main():
 
     html.write('<img src="hours.png" alt="hours" />')
 
+    weekdays_histo = Histogram((4,3), 'Commits by weekday', [i.name for i in users.values()])
+    for commits in weekdays:
+        lst = []
+        for i in users.values():
+            if commits.users_commits.has_key(i):
+                lst += [len(commits.users_commits[i])]
+            else:
+                lst += [0]
+        weekdays_histo.add_entry(commits.name, lst)
+
+    weekdays_histo.create_img(output + 'weekdays.png')
+
+    html.write('<img src="weekdays.png" alt="weekdays" />')
+
+
     months_s = sorted(months.items())
-    months_histo = Histogram((9,3), 'Commits by months', [i.name for i in users.values()], legend=True)
+    months_histo = Histogram((4,3), 'Commits by months', [i.name for i in users.values()], legend=False)
     for key, commits in months_s:
         lst = []
         for i in users.values():

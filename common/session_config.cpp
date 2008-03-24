@@ -88,7 +88,7 @@ void SessionConfig::Load(const std::string& _filename)
 	}
 
 	fin.close();
-	log[W_INFO] << "SessionConfig: Loaded.";
+	log[W_INFO] << "SessionConfig: Loaded " << filename;
 }
 
 void SessionConfig::Save()
@@ -108,7 +108,7 @@ void SessionConfig::Save()
 		fout << it->first << "=" << it->second->GetAsString() << std::endl;
 	}
 	fout.close();
-	log[W_INFO] << "SessionConfig: Config saved.";
+	log[W_INFO] << "SessionConfig: Config saved in " << filename;
 }
 
 void SessionConfig::Parse(const std::string& line)
