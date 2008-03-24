@@ -20,8 +20,9 @@
 #ifndef PF_SSL_H
 #define PF_SSL_H
 
+#include <string>
 #include <map>
-#include <exception>
+#include "pf_exception.h"
 #include "connection.h"
 
 class Ssl
@@ -29,8 +30,11 @@ class Ssl
 protected:
 	std::map<int, Connection*> fd_map;
 public:
-	class ConnectionError : public std::exception {};
-	class CantReadCertificate : public std::exception {};
+	class ConnectionError : public StrException
+	{
+	public:
+		ConnectionError(std::string _error="Connection failed") : StrException(_error) {}
+	};
 
 	Ssl() {}
 	virtual ~Ssl()			  /* Needed for abstract classes */

@@ -18,6 +18,7 @@
  */
 
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 #include "connection_ssl.h"
 #include "log.h"
 
@@ -27,7 +28,7 @@ ConnectionSsl::~ConnectionSsl()
 	SSL_free(ssl);
 }
 
-void ConnectionSsl::SocketWrite()
+void ConnectionSsl::SocketWrite() throw(WriteError)
 {
 	size_t written = SSL_write(ssl, write_buf, write_buf_size);
 	if(written <= 0)
@@ -38,7 +39,8 @@ void ConnectionSsl::SocketWrite()
 			|| SSL_get_error(ssl, written) == SSL_ERROR_WANT_WRITE)
 			return;
 		log[W_DEBUG] << "Write failed";
-		throw WriteError();
+		std::string err = ERR_error_string(SSL_get_error(ssl, written), NULL);
+		throw WriteError(err);
 	}
 	else
 	if(written == write_buf_size)
@@ -59,7 +61,7 @@ void ConnectionSsl::SocketWrite()
 	}
 }
 
-void ConnectionSsl::SocketRead()
+void ConnectionSsl::SocketRead() throw(RecvError)
 {
 	const int buf_size = 128;
 	char buf[buf_size];
@@ -76,18 +78,14 @@ void ConnectionSsl::SocketRead()
 			read_buf_size += received;
 		}
 		else
-		if(received == 0)
-		{
-			throw RecvError();	  // TODO : return the SSL error string...
-		}
-		else				  // received < 0
 		{
 			// No error, we are just waiting for datas
 			// A WANT_WRITE can be returnd see man SSL_read()
 			if(SSL_get_error(ssl, received) == SSL_ERROR_WANT_READ
 				|| SSL_get_error(ssl, received) == SSL_ERROR_WANT_WRITE)
 				return;
-			throw RecvError();	  // TODO : return the SSL error string...
+			std::string err = ERR_error_string( SSL_get_error(ssl, received), NULL);
+			throw RecvError(err);
 		}
 	}
 	while(received == buf_size);

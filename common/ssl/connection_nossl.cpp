@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <errno.h>
 #include "connection_nossl.h"
 #include "log.h"
 
@@ -31,18 +32,17 @@ ConnectionNoSsl::~ConnectionNoSsl()
 {
 }
 
-void ConnectionNoSsl::SocketWrite()
+void ConnectionNoSsl::SocketWrite() throw(WriteError)
 {
-	// TODO: implement SSL_MODE_ENABLE_PARTIAL_WRITE
 	if(send(fd, write_buf, write_buf_size, 0) <= 0)
-		throw WriteError();
+		throw WriteError(std::string(strerror(errno)));
 
 	write_buf_size = 0;
 	free(write_buf);
 	write_buf = NULL;
 }
 
-void ConnectionNoSsl::SocketRead()
+void ConnectionNoSsl::SocketRead() throw(RecvError)
 {
 	const int buf_size = 128;
 	char buf[buf_size];
@@ -51,7 +51,7 @@ void ConnectionNoSsl::SocketRead()
 
 	do
 	{
-		received = read(fd, (void*)buf, buf_size);
+		received = recv(fd, (void*)buf, buf_size, 0);
 		if(received > 0)
 		{
 			read_buf = (char*)realloc(read_buf, read_buf_size + received);
@@ -60,11 +60,11 @@ void ConnectionNoSsl::SocketRead()
 		}
 		else if(received == 0)
 		{
-			throw RecvError();	  // TODO : return the SSL error string...
+			throw RecvError("Peer disconnected");
 		}
 		else				  // received < 0
 		{
-			throw RecvError();	  // TODO : return the SSL error string...
+			throw RecvError(strerror(errno));
 		}
 	}
 	while(received == buf_size);

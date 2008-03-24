@@ -21,13 +21,13 @@
 #define PF_SSL_SSL_H
 
 #include <openssl/ssl.h>
+#include "pf_exception.h"
 #include "pf_ssl.h"
 #include "certificate.h"
 
 class SslSsl : public Ssl
 {
 private:
-	// Context: holds default SSL values to use
 	SSL_CTX* server_ctx;
 	SSL_CTX* client_ctx;
 
@@ -37,15 +37,20 @@ private:
 
 	void SetCertificates(SSL_CTX* ctx);
 public:
+	class SslHandshakeFailed : public StrException
+	{
+	public:
+		SslHandshakeFailed(std::string err) : StrException(err) {}
+	};
 
-	SslSsl(std::string cert, std::string key, std::string ca) throw (CantReadCertificate);
+	SslSsl(std::string cert, std::string key, std::string ca) throw (Certificate::BadCertificate);
 	~SslSsl();
 
 	Certificate GetCertificate() const { return cert; }
 	Certificate GetCACertificate() const { return cacert; }
 
-	Connection* Accept(int fd);
-	Connection* Connect(int fd);
+	Connection* Accept(int fd) throw(SslHandshakeFailed);
+	Connection* Connect(int fd) throw(SslHandshakeFailed);
 	void Close(Connection* conn);
 	void CloseAll();
 };

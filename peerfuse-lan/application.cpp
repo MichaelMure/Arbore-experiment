@@ -27,6 +27,8 @@
 #include "libconfig.h"
 #include "application.h"
 #include "network.h"
+#include "pf_ssl_ssl.h"
+#include "certificate.h"
 #include "cache.h"
 #include "log.h"
 #include "pf_file.h"
@@ -114,10 +116,6 @@ int Application::main(int argc, char *argv[])
 	{
 		log[W_ERR] << "Unable to create network thread, exiting..";
 	}
-	catch(Ssl::CantReadCertificate &e)
-	{
-		log[W_ERR] << "Unable to read certificate. Please check path and integrity.";
-	}
 	catch(Network::CantOpenSock &e)
 	{
 		log[W_ERR] << "Unable to open socket, exiting..";
@@ -136,6 +134,22 @@ int Application::main(int argc, char *argv[])
 	catch(Peer::PeerCantConnect &e)
 	{
 		log[W_ERR]  << "Host " << e.addr << " can't connect.";
+	}
+	catch(Certificate::BadCertificate &e)
+	{
+		log[W_ERR] << "Unable to read certificate: " << e.GetString();
+	}
+	catch(Certificate::BadFile &e)
+	{
+		log[W_ERR] << "Unable to read certificate file";
+	}
+	catch(PrivateKey::BadPrivateKey &e)
+	{
+		log[W_ERR] << "Unable to read priveate key: " << e.GetString();
+	}
+	catch(PrivateKey::BadFile &e)
+	{
+		log[W_ERR] << "Unable to read private key file";
 	}
 	catch(Hdd::HddAccessFailure &e)
 	{

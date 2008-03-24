@@ -31,7 +31,7 @@ public:
 	ConnectionNoSsl(int _fd);
 	~ConnectionNoSsl();
 
-	void SocketWrite();
-	void SocketRead();
+	void SocketWrite() throw(WriteError);
+	void SocketRead() throw(RecvError);
 };
 #endif						  // CONNECTION_NOSSL_H

@@ -21,12 +21,13 @@
 #include <exception>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
+#include <openssl/err.h>
 #include "log.h"
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
 
-SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_file) throw (CantReadCertificate)
+SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_file) throw (Certificate::BadCertificate)
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -41,7 +42,6 @@ SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_f
 	meth = SSLv23_client_method();
 	client_ctx = SSL_CTX_new(meth);
 	SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
-	SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER, NULL);
 
 	log[W_INFO] << "Loading private key: " << key_file;
 	key.LoadPem(key_file, "");
@@ -56,15 +56,19 @@ SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_f
 
 void SslSsl::SetCertificates(SSL_CTX* ctx)
 {
+	int ret;
 	// TODO: specify a callback that checks the peers cert without checking
 	// the certificates purpose
-	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER /*| SSL_VERIFY_FAIL_IF_NO_PEER_CERT*/, NULL);
+	//SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
 	// Load certificates in the session
-	if(SSL_CTX_use_certificate(ctx, cert.GetSSL())        <= 0
-		|| SSL_CTX_use_PrivateKey(ctx, key.GetSSL())  <= 0
-		|| SSL_CTX_check_private_key(ctx)        <= 0)
-		throw CantReadCertificate();
+	if((ret = SSL_CTX_use_certificate(ctx, cert.GetSSL()))	<= 0
+		|| (ret = SSL_CTX_use_PrivateKey(ctx, key.GetSSL()))	<= 0
+		|| (ret = SSL_CTX_check_private_key(ctx))		<= 0)
+	{
+		std::string str = std::string(ERR_error_string( ERR_get_error(), NULL));
+		throw Certificate::BadCertificate(str);
+	}
 
 	// Set trust certificates
 	X509_STORE* st = SSL_CTX_get_cert_store(ctx);
@@ -76,12 +80,16 @@ SslSsl::~SslSsl()
 {
 }
 
-Connection* SslSsl::Accept(int fd)
+Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
 {
-	// TODO: check errors
+	int ret;
 	SSL* ssl = SSL_new(server_ctx);
 	SSL_set_fd(ssl, fd);
-	SSL_accept(ssl);
+	if((ret = SSL_accept(ssl)) <= 0)
+	{
+		std::string err = ERR_error_string(SSL_get_error(ssl, ret), NULL);
+		throw SslHandshakeFailed(err);
+	}
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;
@@ -93,11 +101,16 @@ Connection* SslSsl::Accept(int fd)
 	return new_conn;
 }
 
-Connection* SslSsl::Connect(int fd)
+Connection* SslSsl::Connect(int fd) throw(SslSsl::SslHandshakeFailed)
 {
+	int ret;
 	SSL* ssl = SSL_new(client_ctx);
 	SSL_set_fd(ssl, fd);
-	SSL_connect(ssl);
+	if((ret = SSL_connect(ssl)) <= 0)
+	{
+		std::string err = ERR_error_string(SSL_get_error(ssl, ret), NULL);
+		throw SslHandshakeFailed(err);
+	}
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;

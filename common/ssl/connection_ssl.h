@@ -30,8 +30,8 @@ public:
 	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
 	~ConnectionSsl();
 
-	void SocketWrite();
-	void SocketRead();
+	void SocketWrite() throw(WriteError);
+	void SocketRead() throw(RecvError);
 
 	//Certificate GetCertificate();
 };

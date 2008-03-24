@@ -17,6 +17,7 @@
  * $Id$
  */
 
+#include <openssl/err.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 #include <cstring>
@@ -49,7 +50,7 @@ Certificate::~Certificate()
 		X509_free(ssl_cert);
 }
 
-void Certificate::LoadPem(std::string filename, std::string password)
+void Certificate::LoadPem(std::string filename, std::string password) throw(BadFile, BadCertificate)
 {
 	if(ssl_cert)
 	{
@@ -78,7 +79,10 @@ void Certificate::LoadPem(std::string filename, std::string password)
 	BIO_free(raw_cert_bio);
 
 	if(!ssl_cert)
-		throw BadCertificate();
+	{
+		std::string str = std::string(ERR_error_string( ERR_get_error(), NULL));
+		throw BadCertificate(str);
+	}
 }
 
 void Certificate::LoadSSL(X509* _ssl_cert)
@@ -92,16 +96,18 @@ void Certificate::LoadSSL(X509* _ssl_cert)
 	ssl_cert = _ssl_cert;
 }
 
-void Certificate::LoadRaw(const unsigned char* buf, size_t len)
+void Certificate::LoadRaw(const unsigned char* buf, size_t len) throw(BadCertificate)
 {
 	if(ssl_cert)
 		X509_free(ssl_cert);
 
 	ssl_cert = d2i_X509(NULL, &buf, len);
 
-	if (ssl_cert == NULL)
-		throw BadCertificate();
-	/* Some error */
+	if(!ssl_cert)
+	{
+		std::string str = std::string(ERR_error_string( ERR_get_error(), NULL));
+		throw BadCertificate(str);
+	}
 }
 
 void Certificate::GetRaw(unsigned char** buf, size_t* len)
@@ -118,7 +124,7 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len)
 	i2d_X509(ssl_cert, &p);
 }
 
-pf_id Certificate::GetIDFromCertificate()
+pf_id Certificate::GetIDFromCertificate() throw(BadCertificate)
 {
 	if(!ssl_cert)
 		return 0;
@@ -132,7 +138,7 @@ pf_id Certificate::GetIDFromCertificate()
 	//M_ASN1_INTEGER_free(no);
 
 	if(id <= 0 || (unsigned long)id > ID_MAX)
-		throw BadCertificate();
+		throw BadCertificate("Can't read certificate's serial number");
 
 	return id;
 }

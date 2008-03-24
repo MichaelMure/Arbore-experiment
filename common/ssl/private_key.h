@@ -21,8 +21,8 @@
 #define PF_PRIVATE_KEY_H
 
 #include <openssl/evp.h>
-#include <exception>
 #include <string>
+#include "pf_exception.h"
 
 class PrivateKey
 {
@@ -32,7 +32,11 @@ private:
 	size_t raw_key_size;
 
 public:
-	class BadPrivateKey : public std::exception {};
+	class BadPrivateKey : public StrException
+	{
+	public:
+		BadPrivateKey(std::string err) : StrException(err) {}
+	};
 	class BadPassword : public std::exception {};
 	class BadFile : public std::exception {};
 
@@ -41,8 +45,8 @@ public:
 	~PrivateKey();
 
 	static int PasswordCallback(char* buf, int size, int rwflag, void* datas);
-	void LoadPem(std::string filename, std::string password);
-	void LoadBuf(const char* buf, size_t size);
+	void LoadPem(std::string filename, std::string password) throw(BadPrivateKey, BadFile);
+	void LoadBuf(const char* buf, size_t size) throw(BadPrivateKey);
 
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 	void Sign(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);

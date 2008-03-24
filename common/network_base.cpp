@@ -38,7 +38,7 @@
 #include "job.h"
 #include "scheduler.h"
 
-NetworkBase::NetworkBase() throw(CantRunThread, Ssl::CantReadCertificate)
+NetworkBase::NetworkBase() throw(CantRunThread)
 			: running(true),
 			serv_sock(-1),
 			highsock(-1),
@@ -148,7 +148,20 @@ void NetworkBase::Main()
 					FD_CLR(i, &global_write_set);
 
 					if(cl != fd2peer.end())
-						cl->second->Flush();
+					{
+						try
+						{
+							cl->second->Flush();
+						}
+						catch(Connection::WriteError &e)
+						{
+							log[W_WARNING] << "recv() error: " << e.GetString();
+							Peer* p = fd2peer[i];
+							if(p->GetAddr().port > 0)
+								AddDisconnected(p->GetAddr());
+							RemovePeer(p);
+						}
+					}
 					else
 						log[W_WARNING] << "tmp_write_set(" << i << ") and " << i << " doesn't exist!";
 				}
@@ -167,7 +180,16 @@ void NetworkBase::Main()
 						pf_addr addr = none_addr;
 						addr.ip[3] = newcon.sin_addr.s_addr;
 
-						Connection *peer_conn = ssl->Accept(newfd);
+						Connection *peer_conn;
+						try
+						{
+							peer_conn = ssl->Accept(newfd);
+						}
+						catch(SslSsl::SslHandshakeFailed &e)
+						{
+							log [W_WARNING] << "SSL handshake failure: " << e.GetString();
+							continue;
+						}
 
 						addr.id = peer_conn->GetCertificateID();
 						AddPeer(new Peer(addr, peer_conn));
@@ -183,14 +205,11 @@ void NetworkBase::Main()
 					}
 					catch(Connection::RecvError &e)
 					{
-						log[W_WARNING] << "recv() error: " /*<< strerror(errno)*/;
-						if(errno != EINTR)
-						{
-							Peer* p = fd2peer[i];
-							if(p->GetAddr().port > 0)
-								AddDisconnected(p->GetAddr());
-							RemovePeer(p);
-						}
+						log[W_WARNING] << "recv() error: " << e.GetString();
+						Peer* p = fd2peer[i];
+						if(p->GetAddr().port > 0) // TODO: explain this hack
+							AddDisconnected(p->GetAddr());
+						RemovePeer(p);
 					}
 					catch(Packet::Malformated &e)
 					{
@@ -200,6 +219,7 @@ void NetworkBase::Main()
 					catch(Peer::MustDisconnect &e)
 					{
 						log[W_WARNING] << "Must disconnected";
+						// TODO: Why don't we AddDisconnected() it ?
 						RemovePeer(fd2peer[i]);
 					}
 				}
@@ -295,7 +315,16 @@ Peer* NetworkBase::Connect(pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	Connection* conn = ssl->Connect(sock);
+	Connection* conn;
+	try
+	{
+		conn = ssl->Connect(sock);
+	}
+	catch(SslSsl::SslHandshakeFailed &e)
+	{
+		log [W_WARNING] << "SSL handshake failure: " << e.GetString();
+		throw CantConnectTo(errno, addr);
+	}
 
 	addr.id = conn->GetCertificateID();
 	Peer* p = AddPeer(new Peer(addr, conn));

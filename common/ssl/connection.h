@@ -20,7 +20,7 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <exception>
+#include "pf_exception.h"
 #include "pf_types.h"
 
 class Connection
@@ -33,9 +33,16 @@ protected:
 	char* write_buf;
 	size_t write_buf_size;
 public:
-	class ConnectionError : public std::exception {};
-	class RecvError : public std::exception {};
-	class WriteError : public std::exception {};
+	class RecvError : public StrException
+	{
+	public:
+		RecvError(std::string err) : StrException(err) {}
+	};
+	class WriteError : public StrException
+	{
+	public:
+		WriteError(std::string err) : StrException(err) {}
+	};
 
 	Connection(int _fd);
 	virtual ~Connection();

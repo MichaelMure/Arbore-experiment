@@ -20,6 +20,7 @@
 #ifndef PF_CERTIFICATE_H
 #define PF_CERTIFICATE_H
 #include <exception>
+#include "pf_exception.h"
 
 #include "public_key.h"
 #include "private_key.h"
@@ -29,13 +30,15 @@ class Certificate
 {
 private:
 	X509* ssl_cert;
-	//char* raw_cert;
-	//size_t raw_cert_size;
 
 	void LoadX509Buf(const char* buf, size_t size);
 public:
-	class BadCertificate : public std::exception {};
-	class BadPassword : public std::exception {};
+	class BadCertificate : public StrException
+	{
+	public:
+		BadCertificate(std::string _error) : StrException(_error) {}
+	};
+
 	class BadFile : public std::exception {};
 
 	Certificate();
@@ -43,17 +46,16 @@ public:
 	Certificate& operator=(const Certificate& cert);
 	~Certificate();
 
-	void LoadPem(std::string filename, std::string password);
+	void LoadPem(std::string filename, std::string password) throw(BadFile, BadCertificate);
 	void LoadSSL(X509* _ssl_cert);
-	void LoadRaw(const unsigned char* buf, size_t len);
+	void LoadRaw(const unsigned char* buf, size_t len) throw(BadCertificate);
 
 	PublicKey GetPublicKey();
 
 	const std::string GetCertificateInfos();
-	pf_id GetIDFromCertificate();
+	pf_id GetIDFromCertificate() throw(BadCertificate);
 
 	X509* GetSSL() { return ssl_cert; }
 	void GetRaw(unsigned char** buf, size_t* len);
-	//bool operator==(const Certificate&) { return true; }
 };
 #endif						  // PF_CERTIFICATE_H
