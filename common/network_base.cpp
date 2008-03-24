@@ -207,7 +207,8 @@ void NetworkBase::Main()
 					{
 						log[W_WARNING] << "recv() error: " << e.GetString();
 						Peer* p = fd2peer[i];
-						if(p->GetAddr().port > 0) // TODO: explain this hack
+						  // TODO: explain this hack
+						if(p->GetAddr().port > 0)
 							AddDisconnected(p->GetAddr());
 						RemovePeer(p);
 					}

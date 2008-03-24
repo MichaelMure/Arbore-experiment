@@ -35,8 +35,8 @@ private:
 public:
 	class BadCertificate : public StrException
 	{
-	public:
-		BadCertificate(std::string _error) : StrException(_error) {}
+		public:
+			BadCertificate(std::string _error) : StrException(_error) {}
 	};
 
 	class BadFile : public std::exception {};

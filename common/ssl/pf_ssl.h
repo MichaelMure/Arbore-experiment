@@ -32,8 +32,8 @@ protected:
 public:
 	class ConnectionError : public StrException
 	{
-	public:
-		ConnectionError(std::string _error="Connection failed") : StrException(_error) {}
+		public:
+			ConnectionError(std::string _error="Connection failed") : StrException(_error) {}
 	};
 
 	Ssl() {}

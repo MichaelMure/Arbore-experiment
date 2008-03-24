@@ -35,13 +35,13 @@ protected:
 public:
 	class RecvError : public StrException
 	{
-	public:
-		RecvError(std::string err) : StrException(err) {}
+		public:
+			RecvError(std::string err) : StrException(err) {}
 	};
 	class WriteError : public StrException
 	{
-	public:
-		WriteError(std::string err) : StrException(err) {}
+		public:
+			WriteError(std::string err) : StrException(err) {}
 	};
 
 	Connection(int _fd);

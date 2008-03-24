@@ -39,8 +39,8 @@ private:
 public:
 	class SslHandshakeFailed : public StrException
 	{
-	public:
-		SslHandshakeFailed(std::string err) : StrException(err) {}
+		public:
+			SslHandshakeFailed(std::string err) : StrException(err) {}
 	};
 
 	SslSsl(std::string cert, std::string key, std::string ca) throw (Certificate::BadCertificate);

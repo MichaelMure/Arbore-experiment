@@ -62,9 +62,9 @@ void SslSsl::SetCertificates(SSL_CTX* ctx)
 	//SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
 	// Load certificates in the session
-	if((ret = SSL_CTX_use_certificate(ctx, cert.GetSSL()))	<= 0
-		|| (ret = SSL_CTX_use_PrivateKey(ctx, key.GetSSL()))	<= 0
-		|| (ret = SSL_CTX_check_private_key(ctx))		<= 0)
+	if((ret = SSL_CTX_use_certificate(ctx, cert.GetSSL()))  <= 0
+		|| (ret = SSL_CTX_use_PrivateKey(ctx, key.GetSSL()))    <= 0
+		|| (ret = SSL_CTX_check_private_key(ctx))               <= 0)
 	{
 		std::string str = std::string(ERR_error_string( ERR_get_error(), NULL));
 		throw Certificate::BadCertificate(str);

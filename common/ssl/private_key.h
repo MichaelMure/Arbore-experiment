@@ -34,8 +34,8 @@ private:
 public:
 	class BadPrivateKey : public StrException
 	{
-	public:
-		BadPrivateKey(std::string err) : StrException(err) {}
+		public:
+			BadPrivateKey(std::string err) : StrException(err) {}
 	};
 	class BadPassword : public std::exception {};
 	class BadFile : public std::exception {};

@@ -33,5 +33,4 @@ public:
 	void SetString(const std::string& _err) { err = _err; }
 	const std::string GetString() const { return err; }
 };
-
-#endif // PF_EXCEPTION_H
+#endif						  // PF_EXCEPTION_H
