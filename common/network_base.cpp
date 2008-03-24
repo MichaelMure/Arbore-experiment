@@ -31,6 +31,7 @@
 #include "pf_ssl_ssl.h"
 #include "pf_ssl_nossl.h"
 #include "connection.h"
+#include "connection_ssl.h"
 #include "log.h"
 #include "libconfig.h"
 #include "network_base.h"
@@ -191,7 +192,7 @@ void NetworkBase::Main()
 							continue;
 						}
 
-						addr.id = peer_conn->GetCertificateID();
+						//addr.id = peer_conn->GetCertificateID();
 						AddPeer(new Peer(addr, peer_conn));
 
 						DelDisconnected(addr);
@@ -327,7 +328,7 @@ Peer* NetworkBase::Connect(pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	addr.id = conn->GetCertificateID();
+	//addr.id = conn->GetCertificateID();
 	Peer* p = AddPeer(new Peer(addr, conn));
 
 	p->SetFlag(Peer::SERVER);

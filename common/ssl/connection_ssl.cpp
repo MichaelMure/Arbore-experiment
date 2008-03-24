@@ -17,6 +17,7 @@
  * $Id$
  */
 
+#include <assert.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include "connection_ssl.h"
@@ -90,3 +91,21 @@ void ConnectionSsl::SocketRead() throw(RecvError)
 	}
 	while(received == buf_size);
 }
+
+Certificate ConnectionSsl::GetCertificate()
+{
+	assert(ssl);
+	X509* ssl_cert = SSL_get_certificate(ssl);
+	assert(ssl_cert);
+
+	Certificate cert;
+	cert.SetSSL(X509_dup(ssl_cert));
+	return cert;
+}
+
+pf_id ConnectionSsl::GetCertificateID()
+{
+	return GetCertificate().GetIDFromCertificate();
+}
+
+

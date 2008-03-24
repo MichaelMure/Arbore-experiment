@@ -22,6 +22,7 @@
 
 #include <exception>
 #include "connection.h"
+#include "certificate.h"
 
 class ConnectionSsl : public Connection
 {
@@ -33,6 +34,7 @@ public:
 	void SocketWrite() throw(WriteError);
 	void SocketRead() throw(RecvError);
 
-	//Certificate GetCertificate();
+	Certificate GetCertificate();
+	pf_id GetCertificateID();
 };
 #endif						  // PF_CONNECTION_SSL_H

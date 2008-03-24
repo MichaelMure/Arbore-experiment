@@ -85,7 +85,7 @@ void Certificate::LoadPem(std::string filename, std::string password) throw(BadF
 	}
 }
 
-void Certificate::LoadSSL(X509* _ssl_cert)
+void Certificate::SetSSL(X509* _ssl_cert)
 {
 	if(ssl_cert)
 		X509_free(ssl_cert);

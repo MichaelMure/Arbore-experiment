@@ -47,7 +47,6 @@ public:
 	~Certificate();
 
 	void LoadPem(std::string filename, std::string password) throw(BadFile, BadCertificate);
-	void LoadSSL(X509* _ssl_cert);
 	void LoadRaw(const unsigned char* buf, size_t len) throw(BadCertificate);
 
 	PublicKey GetPublicKey();
@@ -55,7 +54,8 @@ public:
 	const std::string GetCertificateInfos();
 	pf_id GetIDFromCertificate() throw(BadCertificate);
 
-	X509* GetSSL() { return ssl_cert; }
+	X509* GetSSL() const { return ssl_cert; }
+	void SetSSL(X509* _ssl_cert);
 	void GetRaw(unsigned char** buf, size_t* len);
 };
 #endif						  // PF_CERTIFICATE_H
