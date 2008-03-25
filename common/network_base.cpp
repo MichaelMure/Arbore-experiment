@@ -50,6 +50,7 @@ NetworkBase::NetworkBase() throw(CantRunThread)
 	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
 
+	srand(time(NULL));
 	int r = pthread_create(&thread_id, NULL, StartThread, (void*)this);
 	if (r != 0)
 		throw CantRunThread();
@@ -444,6 +445,11 @@ pf_id NetworkBase::CreateID()
 	while(!new_id)
 	{
 		new_id = rand();
+		if(new_id == GetMyID())
+		{
+			new_id = 0;
+			continue;
+		}
 		for(PeerMap::iterator peer = fd2peer.begin();
 			peer != fd2peer.end();
 			++peer)

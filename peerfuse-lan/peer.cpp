@@ -122,6 +122,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
 {
+	if(net.GetMyID() != 0)
+		throw MustDisconnect();
 	net.SetMyID(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
 	session_cfg.Set("my_id", net.GetMyID());
 	log[W_INFO] << "My ID now is " << net.GetMyID();
