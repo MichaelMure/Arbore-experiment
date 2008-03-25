@@ -135,7 +135,7 @@ void SessionConfig::Parse(const std::string& line)
 void SessionConfig::Display()
 {
 	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
-			it != list.end();
-			++it)
-		log[W_INFO] << it->first << ":" << it->second->GetAsString();
+		it != list.end();
+		++it)
+	log[W_INFO] << it->first << ":" << it->second->GetAsString();
 }

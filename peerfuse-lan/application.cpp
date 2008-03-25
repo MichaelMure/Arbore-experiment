@@ -105,7 +105,6 @@ int Application::main(int argc, char *argv[])
 		else
 			log[W_INFO] << "I have no ID yet.";
 
-
 		net.Start(&conf);
 
 		umask(0);
