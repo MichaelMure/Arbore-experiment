@@ -92,11 +92,19 @@ int Application::main(int argc, char *argv[])
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
+		session_cfg.Display();
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
+		tree_cfg.Display();
 
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))
+		{
 			net.SetMyID((pf_id)my_id);
+			log[W_INFO] << "I have ID " << my_id;
+		}
+		else
+			log[W_INFO] << "I have no ID yet.";
+
 
 		net.Start(&conf);
 

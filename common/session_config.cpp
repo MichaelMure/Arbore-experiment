@@ -125,9 +125,17 @@ void SessionConfig::Parse(const std::string& line)
 	if(val.find('.',0) == std::string::npos
 		&& ((val.at(0) >= '0' && val.at(0) <= '9')))
 	{
-		int nbr = atoi(val.c_str());
+		uint32_t nbr = atoi(val.c_str());
 		Set(opt, nbr);
 	}
 	else
 		Set(opt, val);
+}
+
+void SessionConfig::Display()
+{
+	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
+			it != list.end();
+			++it)
+		log[W_INFO] << it->first << ":" << it->second->GetAsString();
 }

@@ -82,6 +82,7 @@ public:
 	~SessionConfig();
 
 	void Load(const std::string& file);
+	void Display();
 
 	template<class T>
 		bool Get(const std::string& opt, T& val) const
