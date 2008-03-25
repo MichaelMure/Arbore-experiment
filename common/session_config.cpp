@@ -125,7 +125,7 @@ void SessionConfig::Parse(const std::string& line)
 	if(val.find('.',0) == std::string::npos
 		&& ((val.at(0) >= '0' && val.at(0) <= '9')))
 	{
-		uint32_t nbr = atoi(val.c_str());
+		uint32_t nbr = strtoul(val.c_str(), NULL, 10);
 		Set(opt, nbr);
 	}
 	else
