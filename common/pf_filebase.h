@@ -64,5 +64,4 @@ inline Log::flux& Log::flux::operator<< <FileEntryBase*> (FileEntryBase* file)
 	str += file->GetFullName();
 	return *this;
 }
-
 #endif						  /* PF_FILEBASE_H */

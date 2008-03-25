@@ -49,4 +49,4 @@ public:
 	virtual void SendHello() = 0;
 	virtual bool Receive() = 0;
 };
-#endif /* PEER_INTERFACE_H */
+#endif						  /* PEER_INTERFACE_H */
