@@ -31,8 +31,8 @@ ConnectionSsl::~ConnectionSsl()
 
 void ConnectionSsl::SocketWrite() throw(WriteError)
 {
-	size_t written = SSL_write(ssl, write_buf, write_buf_size);
-	if(written <= 0)
+	int written = SSL_write(ssl, write_buf, write_buf_size);
+	if(written < 0)
 	{
 		// No error, we are just waiting for datas
 		// A WANT_READ can be returnd see man SSL_read()
@@ -40,11 +40,15 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 			|| SSL_get_error(ssl, written) == SSL_ERROR_WANT_WRITE)
 			return;
 		log[W_DEBUG] << "Write failed";
-		std::string err = ERR_error_string(SSL_get_error(ssl, written), NULL);
+		std::string err = ERR_error_string(ERR_get_error(), NULL);
 		throw WriteError(err);
 	}
 	else
-	if(written == write_buf_size)
+	if(written == 0)
+	{
+		throw WriteError("Peer disconnected");
+	}
+	if(written == (int)write_buf_size)
 	{
 		// All the buffer has been sent
 		write_buf_size = 0;
@@ -79,13 +83,18 @@ void ConnectionSsl::SocketRead() throw(RecvError)
 			read_buf_size += received;
 		}
 		else
+		if(received == 0)
+		{
+			throw RecvError("Peer disconnected");
+		}
+		else
 		{
 			// No error, we are just waiting for datas
 			// A WANT_WRITE can be returnd see man SSL_read()
 			if(SSL_get_error(ssl, received) == SSL_ERROR_WANT_READ
 				|| SSL_get_error(ssl, received) == SSL_ERROR_WANT_WRITE)
 				return;
-			std::string err = ERR_error_string( SSL_get_error(ssl, received), NULL);
+			std::string err = ERR_error_string( ERR_get_error(), NULL);
 			throw RecvError(err);
 		}
 	}

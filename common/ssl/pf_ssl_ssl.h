@@ -36,6 +36,7 @@ private:
 	PrivateKey key;
 
 	void SetCertificates(SSL_CTX* ctx);
+	void CheckPeerCertificate(SSL* ssl);
 public:
 	class SslHandshakeFailed : public StrException
 	{

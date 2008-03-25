@@ -59,7 +59,7 @@ void SslSsl::SetCertificates(SSL_CTX* ctx)
 	int ret;
 	// TODO: specify a callback that checks the peers cert without checking
 	// the certificates purpose
-	//SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
 	// Load certificates in the session
 	if((ret = SSL_CTX_use_certificate(ctx, cert.GetSSL()))  <= 0
@@ -80,6 +80,23 @@ SslSsl::~SslSsl()
 {
 }
 
+void SslSsl::CheckPeerCertificate(SSL* ssl)
+{
+	int ret;
+	if(SSL_get_peer_certificate(ssl) == NULL)
+		throw SslHandshakeFailed("The peer didn't cert any certificate");
+
+	if((ret = SSL_get_verify_result(ssl)) != X509_V_OK)
+	{
+		std::string err = std::string(X509_verify_cert_error_string(ret));
+		throw SslHandshakeFailed(err);
+	}
+	X509* client_cert = SSL_get_peer_certificate (ssl);
+	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
+	log[W_INFO] << "SSL connection established with: " << str;
+	OPENSSL_free (str);
+}
+
 Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
 {
 	int ret;
@@ -87,16 +104,13 @@ Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
 	SSL_set_fd(ssl, fd);
 	if((ret = SSL_accept(ssl)) <= 0)
 	{
-		std::string err = ERR_error_string(SSL_get_error(ssl, ret), NULL);
+		std::string err = ERR_error_string(ERR_get_error(), NULL);
 		throw SslHandshakeFailed(err);
 	}
+	CheckPeerCertificate(ssl);
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;
-	//	X509* client_cert = SSL_get_peer_certificate (ssl);
-	//	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
-	//	printf ("\t subject: %s\n", str);
-	//	OPENSSL_free (str);
 
 	return new_conn;
 }
@@ -108,12 +122,14 @@ Connection* SslSsl::Connect(int fd) throw(SslSsl::SslHandshakeFailed)
 	SSL_set_fd(ssl, fd);
 	if((ret = SSL_connect(ssl)) <= 0)
 	{
-		std::string err = ERR_error_string(SSL_get_error(ssl, ret), NULL);
+		std::string err = ERR_error_string(ERR_get_error(), NULL);
 		throw SslHandshakeFailed(err);
 	}
+	CheckPeerCertificate(ssl);
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;
+
 	return new_conn;
 }
 
