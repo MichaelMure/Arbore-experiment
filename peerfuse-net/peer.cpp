@@ -42,7 +42,6 @@ Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
 {
 	assert(conn);
 	addr.id = conn->GetCertificateID();
-	log[W_DEBUG] << "Dist id : " << addr.id;
 }
 
 Peer::~Peer()
@@ -109,7 +108,7 @@ void Peer::Send_net_peer_list(PeerList peers)
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
 		/* TODO: put certificate here! */
-		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
 		SendMsg(pckt);
 
@@ -138,11 +137,14 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		throw MustDisconnect();
 	}
 
+	/* Disallow broadcast for this message */
+	if(pckt->GetDstID() == 0)
+		throw MustDisconnect();
+
 	/* Flags */
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
-	addr.id = pckt->GetSrcID();		  /* TODO: we'll know ID with certificate, when connection is SSL. */
 	ts_diff = static_cast<uint32_t>(time(NULL)) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
@@ -174,13 +176,10 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		/* Tell to all of my other links that this peer is connected. */
 		Packet pckt(NET_PEER_CONNECTION, net.GetMyID(), 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
-		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, "TODO: put certificate here");
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
 		net.Broadcast(pckt, this);	  /* Don't send to this peer a creation message about him! */
 	}
-
-	/* Change dst ID of packet to NOT broadcast it. */
-	pckt->SetDstID(net.GetMyID());
 }
 
 void Peer::Handle_net_start_merge(struct Packet* pckt)
@@ -364,7 +363,7 @@ bool Peer::Receive()
 		incoming = new Packet(header);
 		delete []header;
 
-		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
+		log[W_PARSE] << "[" << GetFd() << "] Received a message header: type=" << incoming->GetType() << ", " <<
 			" srcid=" << incoming->GetSrcID() << ", " <<
 			" dstid=" << incoming->GetDstID() << ", " <<
 			" size=" << incoming->GetDataSize();
@@ -404,7 +403,10 @@ bool Peer::Receive()
 	{
 		Peer* relay_to = net.ID2Peer((*packet)->GetDstID());
 		if(relay_to)
+		{
+			log[W_DEBUG] << "Relay packet to " << relay_to->GetID();
 			relay_to->SendMsg(**packet);
+		}
 		else
 			log[W_WARNING] << "Received a message to an unknown ID !?"
 				<< "from=" << (*packet)->GetSrcID() << " to=" << (*packet)->GetDstID();
