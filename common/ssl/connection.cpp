@@ -46,7 +46,6 @@ Connection::~Connection()
 // returns false when not enough data is available
 bool Connection::Read(char **buf, size_t size)
 {
-	log[W_DEBUG] << "READ";
 	// Fill the buffer
 	SocketRead();
 
