@@ -34,6 +34,15 @@ function build_conf
 	then
 		exit 1
 	fi
+	if [ "$CERT" == "" ]
+	then
+		CERT=key${NB_P2PFS}.crt
+	fi
+
+	if [ "$KEY" == "" ]
+	then
+		KEY=key${NB_P2PFS}.key
+	fi
 
 	echo "
 ###########################
@@ -66,11 +75,11 @@ connection {
 
 ssl {
 
-	ca = cacert.pem
+	ca = $TESTS/conf/certs/ca.crt
 
-	key = server-key.pem
+	key = $TESTS/conf/certs/$KEY
 
-	cert = server-cert.pem
+	cert = $TESTS/conf/certs/$CERT
 }
 
 # Harddisk configuration
