@@ -73,4 +73,6 @@ enum net_rmfile
 	NET_RMFILE_PATH
 	// ...
 };
+
+extern const char* type2str[NET_NB_MESSAGES];
 #endif						  /* NET_PROTO_H */

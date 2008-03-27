@@ -95,8 +95,10 @@ public:
 		arg_lst[arg] = new PacketArg<T>(val);
 	}
 
+	virtual std::string GetPacketInfo() const;
+
 	template<typename T>
-		T GetArg(size_t arg)
+		T GetArg(size_t arg) const
 	{
 		assert(arg_lst.size() > arg);
 		assert(arg_lst[arg] != NULL);

@@ -21,6 +21,26 @@
 #include "packet_arg.h"
 #include "net_proto.h"
 
+const char* type2str[NET_NB_MESSAGES] =
+{
+	/* NET_NONE */                   NULL,
+	/* NET_HELLO */                  "HELLO",
+	/* NET_YOUR_ID */                "YOUR_ID",
+	/* NET_START_MERGE */            "START_MERGE",
+	/* NET_GET_STRUCT_DIFF */        "GET_STRUCT_DIFF",
+	/* NET_MKFILE */                 "MKFILE",
+	/* NET_RMFILE */                 "RMFILE",
+	/* NET_PEER_CONNECTION */        "PEER_CONNECTION",
+	/* NET_PEER_CONNECTION_ACK */    "PEER_CONNECTION_ACK",
+	/* NET_PEER_CONNECTION_RST */    "PEER_CONNECTION_RST",
+	/* NET_PEER_CONNECTION_REJECTED */ "PEER_CONNECTION_REJECTED",
+	/* NET_PEER_ALL_CONNECTED */     "PEER_ALL_CONNECTED",
+	/* NET_END_OF_DIFF */            "END_OF_DIFF",
+	/* NET_END_OF_MERGE */           "END_OF_MERGE",
+	/* NET_END_OF_MERGE_ACK */       "END_OF_MERGE_ACK",
+};
+
+
 const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 {
 	// NET_NONE

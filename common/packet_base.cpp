@@ -27,7 +27,6 @@
 #include "packet_arg.h"
 #include "pf_types.h"
 #include "net_proto.h"
-#include "log.h"
 #include "tools.h"
 
 #ifdef DEBUG
@@ -122,8 +121,6 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 {
 	char* new_datas = new char [size + sizeof nbr];
 
-	log[W_PARSE] << "Sending uint32: " << nbr;
-
 	nbr = htonl(nbr);
 	if(datas)
 		memcpy(new_datas, datas, size);
@@ -139,8 +136,6 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 PacketBase& PacketBase::Write(uint64_t nbr)
 {
 	char* new_datas = new char [size + sizeof nbr];
-
-	log[W_PARSE] << "Sending uint64: " << nbr;
 
 	nbr = htonll(nbr);
 	if(datas)
@@ -158,8 +153,6 @@ PacketBase& PacketBase::Write(pf_addr addr)
 {
 	char* new_datas = new char [size + sizeof addr];
 
-	log[W_PARSE] << "Sending addr";
-
 	addr = pf_addr_ton(addr);
 	if(datas)
 		memcpy(new_datas, datas, size);
@@ -176,7 +169,6 @@ PacketBase& PacketBase::Write(std::string str)
 {
 	uint32_t str_len = str.size();
 	Write(str_len);
-	log[W_PARSE] << "Sending str: " << str;
 	char* new_datas = new char [size + str_len];
 	if(datas)
 		memcpy(new_datas, datas, size);
@@ -194,7 +186,6 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 {
 	Write((uint32_t)addr_list.size());
 
-	log[W_PARSE] << "Sending addr";
 	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
 
 	if(datas)
@@ -221,19 +212,12 @@ void PacketBase::Send(Connection* conn)
 	char* buf = DumpBuffer();
 	conn->Write(buf, GetSize());
 	delete []buf;
-
-	log[W_PARSE] << "Send a message header: type=" << GetType() << ", " <<
-	//"srcid=" << id_src << ", " <<
-	//"dstid=" << id_dst << ", " <<
-		"size=" << GetDataSize();
 }
 
 uint32_t PacketBase::ReadInt32()
 {
 	ASSERT(size >= sizeof(uint32_t));
 	uint32_t val = ntohl(*(uint32_t*)datas);
-
-	log[W_PARSE] << "Reading uint32: " << val;
 
 	char* new_datas;
 	size -= sizeof(uint32_t);
@@ -258,8 +242,6 @@ uint64_t PacketBase::ReadInt64()
 	ASSERT(size >= sizeof(uint64_t));
 	uint64_t val = ntohll(*(uint64_t*)datas);
 
-	log[W_PARSE] << "Reading uint64: " << val;
-
 	char* new_datas;
 	size -= sizeof(uint64_t);
 	if(size > 0)
@@ -282,8 +264,6 @@ pf_addr PacketBase::ReadAddr()
 {
 	ASSERT(size >= sizeof(pf_addr));
 	pf_addr val = nto_pf_addr(*(pf_addr*)datas);
-
-	log[W_PARSE] << "Reading addr";
 
 	char* new_datas;
 	size -= sizeof(pf_addr);
@@ -312,7 +292,6 @@ std::string PacketBase::ReadStr()
 	memcpy(str, datas, str_size);
 	str[str_size] = '\0';
 	std::string val = std::string(str);
-	log[W_PARSE] << "Reading str: " << val;
 
 	char* new_datas;
 	size -= str_size;
@@ -338,8 +317,6 @@ AddrList PacketBase::ReadAddrList()
 	AddrList addr_list;
 	uint32_t list_size = ReadInt32();
 	ASSERT((size * sizeof(pf_addr)) >= list_size);
-
-	log[W_PARSE] << "Reading addr";
 
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
@@ -392,4 +369,29 @@ void PacketBase::BuildDataFromArgs()
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
 			default: throw Malformated();
 		}
+}
+
+std::string PacketBase::GetPacketInfo() const
+{
+	std::string s, info;
+
+	info = "<" + std::string(type2str[GetType()]) + "> ";
+
+	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
+	{
+		if(s.empty() == false)
+			s += ", ";
+		switch(packet_args[type][arg_no])
+		{
+			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
+			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
+			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
+			case T_ADDRLIST: s += "addr list"; break;
+			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
+			default: throw Malformated();
+		}
+	}
+
+	info += s;
+	return info;
 }

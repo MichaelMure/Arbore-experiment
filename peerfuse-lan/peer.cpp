@@ -64,6 +64,7 @@ void Peer::Flush()
 
 void Peer::SendMsg(const Packet& pckt)
 {
+	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 	send_queue.push(pckt);
 	net.HavePacketToSend(this);
 }
@@ -362,6 +363,8 @@ bool Peer::Receive()
 	// Continue receiving the packet
 	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
 		return false;			  // All the content couldn't be retrieved yet -> exit
+
+	log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
 
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance

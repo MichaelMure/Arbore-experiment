@@ -74,6 +74,8 @@ void Peer::Flush()
 
 void Peer::SendMsg(const Packet& pckt)
 {
+	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
+
 	send_queue.push(pckt);
 	net.HavePacketToSend(this);
 }
@@ -363,10 +365,6 @@ bool Peer::Receive()
 		incoming = new Packet(header);
 		delete []header;
 
-		log[W_PARSE] << "[" << GetFd() << "] Received a message header: type=" << incoming->GetType() << ", " <<
-			" srcid=" << incoming->GetSrcID() << ", " <<
-			" dstid=" << incoming->GetDstID() << ", " <<
-			" size=" << incoming->GetDataSize();
 
 		/* If there some data in packet, we wait for the rest on the next Receive() call.
 		 * In other case, it is because packet only contains headers and we can parse it.
@@ -375,6 +373,8 @@ bool Peer::Receive()
 
 	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
 		return false;
+
+	log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
 
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance

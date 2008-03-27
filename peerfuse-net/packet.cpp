@@ -77,10 +77,14 @@ char* Packet::DumpBuffer() const
 	return dump;
 }
 
-void Packet::Send(Connection* conn)
+std::string Packet::GetPacketInfo() const
 {
-	PacketBase::Send(conn);
-	log[W_PARSE] << "                       srcid=" << id_src << ", " <<
-		"dstid=" << id_dst << ", ";
+	std::string s;
 
+	s = "[" + TypToStr(GetSrcID());
+	s += "->" + TypToStr(GetDstID()) + "] ";
+	s += PacketBase::GetPacketInfo();
+
+	return s;
 }
+

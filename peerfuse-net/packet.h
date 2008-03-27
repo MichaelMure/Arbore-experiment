@@ -45,6 +45,6 @@ public:
 	Packet& SetSrcID(pf_id id) { id_src = id; return *this; }
 	Packet& SetDstID(pf_id id) { id_dst = id; return *this; }
 
-	virtual void Send(Connection* conn);
+	std::string GetPacketInfo() const;
 };
 #endif						  /* PACKET_H */
