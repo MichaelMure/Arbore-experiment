@@ -25,7 +25,6 @@ const char* type2str[NET_NB_MESSAGES] =
 {
 	/* NET_NONE */             NULL,
 	/* NET_HELLO */            "HELLO",
-	/* NET_START_MERGE */      "START_MERGE",
 	/* NET_MKFILE */           "MKFILE",
 	/* NET_RMFILE */           "RMFILE",
 	/* NET_PEER_CONNECTION */  "PEER_CONNECTION",
@@ -44,11 +43,6 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_HELLO_FLAGS */   T_UINT32,
 		/* NET_HELLO_PORT */    T_UINT32,
 		/* NET_HELLO_VERSION */ T_STR,
-		T_NONE
-	},
-
-	/* NET_MERGE */
-	{
 		T_NONE
 	},
 

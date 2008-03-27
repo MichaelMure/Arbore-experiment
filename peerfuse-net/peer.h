@@ -62,7 +62,6 @@ class Peer : public PeerInterface
 	void Handle_net_mkfile(struct Packet* pckt);
 	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
-	void Handle_net_start_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
 public:

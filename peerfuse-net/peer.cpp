@@ -160,20 +160,9 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	{
 		SetFlag(MERGING);
 
-		if(IsClient())
-		{
-
-			/* If I'm server, I tell client that merge is starting... He can give
-			 * me all of his links.
-			 */
-			SendMsg(Packet(NET_START_MERGE, net.GetMyID(), GetID()));
-
-			/* Step 1: I send all of my links */
-			log[W_DEBUG] << "Starting merge with " << this;
-
-			Send_net_peer_list(net.GetDirectHighLinks());
-			SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
-		}
+		/* I send all of my links */
+		Send_net_peer_list(net.GetDirectHighLinks());
+		SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
 
 		/* Tell to all of my other links that this peer is connected. */
 		Packet pckt(NET_PEER_CONNECTION, net.GetMyID(), 0);
@@ -182,26 +171,6 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 		net.Broadcast(pckt, this);	  /* Don't send to this peer a creation message about him! */
 	}
-}
-
-void Peer::Handle_net_start_merge(struct Packet* pckt)
-{
-	/* This peer is directly connected to me, so I
-	 * think this is me who merge with him.
-	 */
-	assert(IsServer());
-	assert(HasFlag(MERGING));
-	assert(IsDirectLink());
-
-	/* Step 2: client sends all of his links.
-	 * Note: this is a broadcast to this part of network (new part).
-	 */
-
-	log[W_DEBUG] << "Starting merge with " << this;
-
-	Send_net_peer_list(net.GetDirectHighLinks());
-
-	SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
@@ -216,7 +185,6 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	 * This function will send all messages to all new
 	 * responsibles of files I am not responsible anymore.
 	 */
-	log[W_DEBUG] << "End of merge... we send all files";
 	cache.UpdateRespFiles();
 }
 
@@ -326,7 +294,6 @@ void Peer::HandleMsg(Packet* pckt)
 	{
 		{ NULL,                               0              },
 		{ &Peer::Handle_net_hello,            PERM_ANONYMOUS },
-		{ &Peer::Handle_net_start_merge,      PERM_HIGHLINK  },
 		{ &Peer::Handle_net_mkfile,           PERM_HIGHLINK  },
 		{ &Peer::Handle_net_rmfile,           PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_connection,  PERM_HIGHLINK  },

@@ -220,16 +220,19 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		if(sender == NULL)
 			throw;
 
+		log[W_DEBUG] << "File already exists... Update it.";
+
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		time_t dist_ts = stat.mtime;
+		time_t dist_ts = sender->Timestamp(stat.mtime);
 
 		if(file->stat.mtime > dist_ts)
 		{
 			/* My file is more recent than peer's, so I send it a mkfile
 			 * to correct this.
 			 */
+			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
 			Packet pckt = cache.CreateMkFilePacket(file);
 			pckt.SetDstID(sender->GetID());
 			sender->SendMsg(pckt);
@@ -237,6 +240,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		}
 		else if(file->stat.mtime == dist_ts)
 		{
+			log[W_DEBUG] << "Same timestamp... What can we do ??";
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}

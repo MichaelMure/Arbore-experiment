@@ -32,14 +32,6 @@ Messages
 		port: port which I listen
 		version: peerfuse version string
 
-	START_MERGE
-	~~~~~~~~~~~
-
-		.------------.------------.------------.------------.
-		|   srcID    |   dstID    |    type    |    size    |
-		'------------'------------'------------'------------'
-
-
 	PEER_CONNECTION
 	~~~~~~~~~~~~~~~
 
@@ -117,10 +109,6 @@ Connection
 		D sends his own hello message, with own caracteristics.
 
 		* C sets flag MERGING
-
-	D -> C - START_MERGE
-
-		We start a merge. D asks C to begin merge.
 
 	C -> D - PEER_CONNECTION <pf_addr> <certificate>
 
