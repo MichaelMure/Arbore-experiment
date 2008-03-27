@@ -37,7 +37,7 @@ source bash/tests.sh
 
 cd "$ROOT"
 
-for test in $(grep -v '^#\|^$' "$TESTS/$BINNAME.conf")
+for test in $(grep -v '^#\|^$' "$TESTS/conf/$BINNAME.conf")
 do
 	start_test "$test" || exit 1
 done
