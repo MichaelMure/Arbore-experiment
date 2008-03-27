@@ -365,7 +365,6 @@ bool Peer::Receive()
 		incoming = new Packet(header);
 		delete []header;
 
-
 		/* If there some data in packet, we wait for the rest on the next Receive() call.
 		 * In other case, it is because packet only contains headers and we can parse it.
 		 */

@@ -111,5 +111,4 @@ enum net_peer_all_connected
 };
 
 extern const char* type2str[NET_NB_MESSAGES];
-
 #endif						  /* NET_PROTO_H */

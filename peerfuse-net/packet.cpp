@@ -87,4 +87,3 @@ std::string Packet::GetPacketInfo() const
 
 	return s;
 }
-

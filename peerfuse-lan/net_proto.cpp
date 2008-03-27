@@ -40,7 +40,6 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_END_OF_MERGE_ACK */       "END_OF_MERGE_ACK",
 };
 
-
 const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 {
 	// NET_NONE
