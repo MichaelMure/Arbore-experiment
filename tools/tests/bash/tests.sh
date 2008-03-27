@@ -22,7 +22,7 @@ alias valgrind="valgrind --tool=memcheck \
 				--leak-check=yes \
 				--show-reachable=yes \
 				--trace-children=yes"
-source "$TESTS/bash/conf.sh"
+source "$TESTS/bash/$BINNAME-conf.sh"
 
 function start_p2pfs
 {
