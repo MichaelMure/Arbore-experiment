@@ -80,6 +80,13 @@ SslSsl::~SslSsl()
 {
 }
 
+void SslSsl::ForceDisconnect(SSL* ssl, int fd)
+{
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+	close(fd);
+}
+
 void SslSsl::CheckPeerCertificate(SSL* ssl)
 {
 	int ret;
@@ -107,7 +114,16 @@ Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
 		std::string err = ERR_error_string(ERR_get_error(), NULL);
 		throw SslHandshakeFailed(err);
 	}
-	CheckPeerCertificate(ssl);
+
+	try
+	{
+		CheckPeerCertificate(ssl);
+	}
+	catch(SslHandshakeFailed)
+	{
+		ForceDisconnect(ssl, fd);
+		throw;
+	}
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;
@@ -122,10 +138,20 @@ Connection* SslSsl::Connect(int fd) throw(SslSsl::SslHandshakeFailed)
 	SSL_set_fd(ssl, fd);
 	if((ret = SSL_connect(ssl)) <= 0)
 	{
+		ForceDisconnect(ssl, fd);
 		std::string err = ERR_error_string(ERR_get_error(), NULL);
 		throw SslHandshakeFailed(err);
 	}
-	CheckPeerCertificate(ssl);
+
+	try
+	{
+		CheckPeerCertificate(ssl);
+	}
+	catch(SslHandshakeFailed)
+	{
+		ForceDisconnect(ssl, fd);
+		throw;
+	}
 
 	ConnectionSsl* new_conn = new ConnectionSsl(ssl, fd);
 	fd_map[fd] = new_conn;

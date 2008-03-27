@@ -37,6 +37,7 @@ private:
 
 	void SetCertificates(SSL_CTX* ctx);
 	void CheckPeerCertificate(SSL* ssl);
+	void ForceDisconnect(SSL* ssl, int fd);
 public:
 	class SslHandshakeFailed : public StrException
 	{
