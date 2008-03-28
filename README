@@ -1,0 +1,22 @@
+To try peerfuse:
+
+Compilation:
+# if you want to compile peerfuse-net
+make pfnet 
+#or if you want to compile peerfuse-lan
+make pflan 
+
+make install won't work, no need to try it.
+
+Running:
+On the root folder, run:
+# as root
+modprobe fuse
+# then check your normal user have access to /dev/fuse
+# the quick way:
+chmod 666 /dev/fuse
+# or tune your configuration of udev
+
+#  edit the default config file and you're ready to start peerfuse :
+./build.peerfuse-net/peerfuse-net pfnet.conf -d /path/to/mount/folder
+
