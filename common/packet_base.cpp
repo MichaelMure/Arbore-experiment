@@ -386,7 +386,20 @@ std::string PacketBase::GetPacketInfo() const
 			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
 			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
-			case T_ADDRLIST: s += "addr list"; break;
+			case T_ADDRLIST:
+			{
+				std::vector<pf_addr> v = GetArg<std::vector<pf_addr> >(arg_no);
+				std::string list;
+				for(std::vector<pf_addr>::const_iterator it = v.begin();
+					it != v.end();
+					++it)
+				{
+					if(!list.empty()) list += ",";
+					list += pf_addr2string(*it);
+				}
+				s += "[" + list + "]";
+				break;
+			}
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
 			default: throw Malformated();
 		}
