@@ -1,0 +1,1 @@
+[PFLAN] If a peer connects asks for a merge to a peer that is currently merging, there we'll be a desync
