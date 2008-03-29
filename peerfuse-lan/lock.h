@@ -43,12 +43,12 @@ class Lock
 	std::string filename;
 
 public:
-	Lock(Peer* _previous_owner, std::string _filename);
+	Lock(std::string _filename);
 	~Lock();
 
 	void Use()			  // Tell wether we have performed the operation
 	{
-		last_time = time(NULL);
+		last_use = time(NULL);
 		used = true;
 	}
 

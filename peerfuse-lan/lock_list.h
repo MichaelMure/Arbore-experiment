@@ -29,7 +29,6 @@ class LockList
 	std::map<std::string, Peer*> peers_locks;
 
 public:
-
 	LockList();
 	~LockList();
 
