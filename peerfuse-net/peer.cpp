@@ -74,6 +74,18 @@ void Peer::Flush()
 
 void Peer::SendMsg(const Packet& pckt)
 {
+	/* We aren't directly connected with him, so we send message
+	 * to uplink (if connected with).
+	 */
+	if(!conn)
+	{
+		if(uplink)
+			uplink->SendMsg(pckt);
+		else
+			log[W_ERR] << "Trying to send packet to " << this << " but this is my highlink"
+				<< " and there isn't any connection with him!?";
+		return;
+	}
 	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 
 	send_queue.push(pckt);
@@ -294,8 +306,8 @@ void Peer::HandleMsg(Packet* pckt)
 	{
 		{ NULL,                               0              },
 		{ &Peer::Handle_net_hello,            PERM_ANONYMOUS },
-		{ &Peer::Handle_net_mkfile,           PERM_HIGHLINK  },
-		{ &Peer::Handle_net_rmfile,           PERM_HIGHLINK  },
+		{ &Peer::Handle_net_mkfile,           0              },
+		{ &Peer::Handle_net_rmfile,           0              },
 		{ &Peer::Handle_net_peer_connection,  PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
@@ -310,10 +322,16 @@ void Peer::HandleMsg(Packet* pckt)
 	 * TODO: blacklist it?
 	 */
 	if(HasFlag(ANONYMOUS) ^ !!(handler[pckt->GetType()].perm & PERM_ANONYMOUS))
+	{
+		log[W_WARNING] << "Received an anonymous command from a registered peer, or a non anonymous command from an anonymous peer";
 		throw Peer::MustDisconnect();
+	}
 
-	if(!IsHighLink() && (handler[pckt->GetType()].perm & PERM_HIGHLINK))
+	if(GetID() == !IsHighLink() && (handler[pckt->GetType()].perm & PERM_HIGHLINK))
+	{
+		log[W_WARNING] << "Received an HIGHLINK command from a non highlink peer";
 		throw Peer::MustDisconnect();
+	}
 
 	(this->*handler[pckt->GetType()].func)(pckt);
 }
