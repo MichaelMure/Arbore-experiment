@@ -25,7 +25,9 @@ You can also allow all users to use fuse with:
 or tune your configuration of udev
 
 Now edit the default config file and you're ready to start peerfuse :
-# ./build.peerfuse-net/peerfuse-net pfnet.conf -d /path/to/mount/folder
+$ ./build.peerfuse-net/peerfuse-net pfnet.conf -d /path/to/mount/folder
+or
+$ ./build.peerfuse-lan/peerfuse-lan pflan.conf -d /path/to/mount/folder
 
 More information
 ----------------
