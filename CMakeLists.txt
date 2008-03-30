@@ -86,7 +86,7 @@ IF(NOT PF_SERVER_MODE)
 ENDIF(NOT PF_SERVER_MODE)
 
 INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_PATH} ${OPENSSL_INCLUDE_DIR}
-	"${BIN_NAME}/" "src/" "common/" "common/fuse" "common/ssl")
+	"${BIN_NAME}/" "common/" "common/fuse" "common/ssl")
 LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LIBRARY_PATH})
 TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY} ${OPENSSL_LIBRARIES})
 
