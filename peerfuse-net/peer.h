@@ -49,6 +49,8 @@ class Peer : public PeerInterface
 	 *
 	 *  If this Peer is "downpeer2", uplink points to "direct downpeer1",
 	 *  and downlinks contain "downpeer3".
+	 *
+	 *  NOTE: IT IS FOR HIGHLINKS ONLY!
 	 */
 	Peer* uplink;				  /**< Peer where this peer is connected */
 	std::vector<Peer*> downlinks;		  /**< Peer connected to this one */
@@ -93,11 +95,11 @@ public:
 	bool IsLowLink() const { return !(flags & HIGHLINK); }
 	void SetHighLink(bool l = true) { l ? SetFlag(HIGHLINK) : DelFlag(HIGHLINK); }
 
+	std::vector<Peer*> GetDownLinksButDontForgetToLockPeersListMutex() const { return downlinks; }
+
 	bool IsServer() const { return (flags & SERVER); }
 	bool IsClient() const { return !(flags & SERVER); }
 	bool IsAnonymous() const { return (flags & ANONYMOUS); }
-
-	bool IsDirectLink() const { return !uplink; }
 
 	void SetFlag(unsigned int f) { flags |= f; }
 	void DelFlag(unsigned int f) { flags &= ~f; }

@@ -22,7 +22,34 @@
 
 PeersList peers_list;
 
-void PeersList::Broadcast(Packet pckt, const Peer* but_one)
+Peer* PeersList::RemoveFromID(pf_id id)
+{
+        BlockLockMutex lock(this);
+        Peer* peer = NULL;
+        iterator it;
+        for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
+                ;
+
+        if(it == end())
+                return NULL;
+
+        erase(it);
+
+        PeerMap::iterator p = fd2peer.find(peer->GetFd());
+        if(p != fd2peer.end())
+                fd2peer.erase(p);
+
+        return peer;
+}
+
+void PeersList::EraseFromID(pf_id id)
+{
+        BlockLockMutex lock(this);
+        Peer* p = RemoveFromID(id);
+        delete p;
+}
+
+void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 {
 	BlockLockMutex lock(&peers_list);
 	pckt.SetDstID(0);
@@ -32,4 +59,9 @@ void PeersList::Broadcast(Packet pckt, const Peer* but_one)
 		(*it)->IsHighLink() &&
 		(*it) != but_one)
 			(*it)->SendMsg(pckt);
+}
+
+bool PeersList::IsIDOnNetwork(pf_id id)
+{
+	return PeerFromID(id);
 }

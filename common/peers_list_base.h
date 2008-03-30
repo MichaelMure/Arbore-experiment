@@ -27,7 +27,7 @@
 
 class PeersListBase: public std::vector<Peer*>, public Mutex
 {
-private:
+protected:
 	typedef std::map<int, Peer*> PeerMap;
 	PeerMap fd2peer;
 	pf_id my_id;
@@ -49,7 +49,7 @@ public:
 	/* Broadcast a packet to everybody.
 	 * If but_one != NULL, do not send a packet to him.
 	 */
-	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) = 0;
+	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) const = 0;
 
 	pf_id GetMyID() const		  // TODO:Protect-me
 	{

@@ -22,7 +22,7 @@
 
 PeersList peers_list;
 
-void PeersList::Broadcast(Packet pckt, const Peer* but_one)
+void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 {
 	BlockLockMutex lock(&peers_list);
 	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)

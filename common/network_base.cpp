@@ -96,11 +96,13 @@ Peer* NetworkBase::AddPeer(Peer* p)
 void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
 	Peer* p = peers_list.Remove(fd);
+
+	OnRemovePeer(p);
+
 	if(p && p->GetAddr().port > 0 && try_reconnect)
-	{
 		AddDisconnected(p->GetAddr());
-		delete p;
-	}
+
+	delete p;
 	if(FD_ISSET(fd, &global_read_set)) FD_CLR(fd, &global_read_set);
 	if(FD_ISSET(fd, &global_write_set)) FD_CLR(fd, &global_write_set);
 }
@@ -175,7 +177,6 @@ void NetworkBase::Main()
 							continue;
 						}
 
-						//addr.id = peer_conn->GetCertificateID();
 						AddPeer(new Peer(addr, peer_conn));
 
 						DelDisconnected(addr);
@@ -304,7 +305,6 @@ Peer* NetworkBase::Connect(pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	//addr.id = conn->GetCertificateID();
 	Peer* p = AddPeer(new Peer(addr, conn));
 
 	p->SetFlag(Peer::SERVER);

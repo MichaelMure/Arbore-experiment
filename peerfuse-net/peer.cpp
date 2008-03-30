@@ -43,6 +43,8 @@ Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
 {
 	assert(conn);
 	addr.id = conn->GetCertificateID();
+	if(uplink)
+		uplink->downlinks.push_back(this);
 }
 
 Peer::~Peer()
@@ -230,6 +232,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	{
 		p = net.Connect(addr);
 
+		p->SetHighLink(false);
 		p->SendHello();
 
 	}

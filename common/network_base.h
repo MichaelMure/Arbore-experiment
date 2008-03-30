@@ -87,7 +87,8 @@ public:
 	/** Main loop (select()) */
 	void Main();
 
-	Peer* AddPeer(Peer* peer);
+	virtual Peer* AddPeer(Peer* peer);
+	virtual void OnRemovePeer(Peer* peer) {}
 
 	bool IsRunning() const { return running; }
 

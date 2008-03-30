@@ -48,6 +48,9 @@ public:
 	virtual void AddDisconnected(const pf_addr& addr);
 	virtual void DelDisconnected(const pf_addr& addr);
 
+	virtual Peer* AddPeer(Peer* peer);
+	virtual void OnRemovePeer(Peer* peer);
+
 	virtual Peer* Start(MyConfig* conf);
 
 	void GivePacketTo(pf_id id, Packet* packet) const;

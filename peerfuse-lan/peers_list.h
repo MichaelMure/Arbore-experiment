@@ -31,7 +31,7 @@ public:
 	/* Broadcast a packet to everybody.
 	 * If but_one != NULL, do not send a packet to him.
 	 */
-	virtual void Broadcast(Packet pckt, const Peer* but_one = 0);
+	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) const;
 };
 
 extern PeersList peers_list;

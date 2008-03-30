@@ -28,7 +28,12 @@ public:
 	PeersList() {}
 	~PeersList() {}
 
-	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL);
+	void EraseFromID(pf_id id);
+	Peer* RemoveFromID(pf_id id);
+
+	bool IsIDOnNetwork(pf_id id);
+
+	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL) const;
 };
 
 extern PeersList peers_list;
