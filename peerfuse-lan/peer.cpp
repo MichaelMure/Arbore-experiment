@@ -33,6 +33,7 @@
 #include "job_other_connect.h"
 #include "session_config.h"
 #include "tools.h"
+#include "peers_list.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn)
 			: addr(_addr),
@@ -77,7 +78,7 @@ void Peer::SendHello()
 	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
 	pckt.SetArg(NET_HELLO_PORT, (uint32_t)net.GetListeningPort());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
-	pckt.SetArg(NET_HELLO_MY_ID, net.GetMyID());
+	pckt.SetArg(NET_HELLO_MY_ID, peers_list.GetMyID());
 	SendMsg(pckt);
 }
 
@@ -99,7 +100,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	if(IsServer())
 	{
 		// Initiate the merge if it's the first peer we connect to
-		if(net.GetPeerList().size() == 1)
+		if(peers_list.Size() == 1)
 		{
 			net.SetMerging(true);
 			SetFlag(MERGING);
@@ -114,7 +115,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		// The peer don't have an ID, give him one
 		// TODO: check it's not already used
 		Packet p(NET_YOUR_ID);
-		p.SetArg(NET_YOUR_ID_ID, net.CreateID());
+		p.SetArg(NET_YOUR_ID_ID, peers_list.CreateID());
 		SendMsg(p);
 	}
 	else
@@ -123,11 +124,11 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
 {
-	if(net.GetMyID() != 0)
+	if(peers_list.GetMyID() != 0)
 		throw MustDisconnect();
-	net.SetMyID(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
-	session_cfg.Set("my_id", net.GetMyID());
-	log[W_INFO] << "My ID now is " << net.GetMyID();
+	peers_list.SetMyID(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
+	session_cfg.Set("my_id", peers_list.GetMyID());
+	log[W_INFO] << "My ID now is " << peers_list.GetMyID();
 }
 
 void Peer::Handle_net_start_merge(struct Packet* pckt)
@@ -201,9 +202,8 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 	}
 
 	// notifiy the peer he can't be contacted by *this
-	PeerList peers = net.GetPeerList();
-
-	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
+	BlockLockMutex lock(&peers_list);
+	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
 		if((*it)->GetAddr() == new_peer)
 	{
 		Packet p(NET_PEER_CONNECTION_REJECTED);

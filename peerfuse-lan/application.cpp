@@ -33,6 +33,7 @@
 #include "log.h"
 #include "pf_file.h"
 #include "session_config.h"
+#include "peers_list.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -99,7 +100,7 @@ int Application::main(int argc, char *argv[])
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))
 		{
-			net.SetMyID((pf_id)my_id);
+			peers_list.SetMyID((pf_id)my_id);
 			log[W_INFO] << "I have ID " << my_id;
 		}
 		else

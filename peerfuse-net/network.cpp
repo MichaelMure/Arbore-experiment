@@ -36,6 +36,8 @@
 #include "job.h"
 #include "scheduler.h"
 #include "ssl/pf_ssl_ssl.h"
+#include "peers_list.h"
+#include "mutex.h"
 
 Network net;
 
@@ -49,11 +51,12 @@ Network::~Network()
 
 void Network::GivePacketTo(pf_id id, Packet* packet) const
 {
-	PeerList::const_iterator it;
-	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
+	BlockLockMutex lock(&peers_list);
+	PeersList::const_iterator it;
+	for(it = peers_list.begin(); it != peers_list.end() && (*it)->GetID() != id; ++it)
 		;
 
-	if(it != peer_list.end())
+	if(it != peers_list.end())
 		(*it)->HandleMsg(packet);
 	else
 		log[W_WARNING] << "Received a packet from unknown peer";
@@ -61,30 +64,24 @@ void Network::GivePacketTo(pf_id id, Packet* packet) const
 
 void Network::Broadcast(Packet pckt, const Peer* but_one)
 {
+	BlockLockMutex lock(&peers_list);
 	pckt.SetDstID(0);
-	for(PeerMap::iterator it = fd2peer.begin(); it != fd2peer.end(); ++it)
-		if(!it->second->IsAnonymous() &&
-		it->second->IsHighLink() &&
-		it->second != but_one)
-			it->second->SendMsg(pckt);
+	PeersList::iterator it;
+	for(it = peers_list.begin(); it != peers_list.end(); ++it)
+		if(!(*it)->IsAnonymous() &&
+		(*it)->IsHighLink() &&
+		(*it) != but_one)
+			(*it)->SendMsg(pckt);
 }
 
-Peer* Network::ID2Peer(pf_id id) const
+StaticPeersList Network::GetDirectHighLinks() const
 {
-	PeerList::const_iterator it;
-	for(it = peer_list.begin(); it != peer_list.end() && (*it)->GetID() != id; ++it)
-		;
-
-	return (it != peer_list.end() ? *it : NULL);
-}
-
-PeerList Network::GetDirectHighLinks() const
-{
-	PeerMap::const_iterator it = fd2peer.begin();
-	PeerList list;
-	for(; it != fd2peer.end(); ++it)
-		if(it->second->IsHighLink())
-			list.push_back(it->second);
+	BlockLockMutex lock(&peers_list);
+	StaticPeersList list;
+	PeersList::iterator it;
+	for(it = peers_list.begin(); it != peers_list.end(); ++it)
+		if((*it)->IsHighLink())
+			list.push_back(*it);
 
 	return list;
 }
@@ -127,7 +124,7 @@ Peer* Network::Start(MyConfig* config)
 
 	assert(sslssl != NULL);			  /* we MUST use a SSL connection on pfnet. */
 	Certificate cert = sslssl->GetCertificate();
-	my_id = cert.GetIDFromCertificate();
+	peers_list.SetMyID(cert.GetIDFromCertificate());
 
 	if(peer)
 	{

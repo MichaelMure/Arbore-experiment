@@ -28,8 +28,6 @@
 
 class Peer;
 
-typedef std::vector<Peer*> PeerList;
-
 class Peer : public PeerInterface
 {
 	pf_addr addr;

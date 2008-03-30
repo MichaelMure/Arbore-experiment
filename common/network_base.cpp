@@ -38,13 +38,13 @@
 #include "tools.h"
 #include "job.h"
 #include "scheduler.h"
+#include "peers_list.h"
 
 NetworkBase::NetworkBase() throw(CantRunThread)
 			: running(true),
 			serv_sock(-1),
 			highsock(-1),
 			listening_port(0),
-			my_id(0),
 			ssl(NULL)
 {
 	FD_ZERO(&global_write_set);
@@ -83,34 +83,26 @@ Peer* NetworkBase::AddPeer(Peer* p)
 	if(p->GetFd() >= 0)
 	{
 		FD_SET(p->GetFd(), &global_read_set);
-		fd2peer[p->GetFd()] = p;
 
 		if(p->GetFd() > highsock)
 			highsock = p->GetFd();
-
 	}
 
-	peer_list.push_back(p);
+	peers_list.Add(p);
 
 	return p;
 }
 
-void NetworkBase::RemovePeer(Peer* peer)
+void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
-	if(fd2peer[peer->GetFd()] == peer)
-		fd2peer.erase(peer->GetFd());
-	for(PeerList::iterator it = peer_list.begin(); it != peer_list.end();)
-		if(*it == peer)
-			it = peer_list.erase(it);
-	else
-		++it;
-
-	if(FD_ISSET(peer->GetFd(), &global_read_set)) FD_CLR(peer->GetFd(), &global_read_set);
-	if(FD_ISSET(peer->GetFd(), &global_write_set)) FD_CLR(peer->GetFd(), &global_write_set);
-
-	log[W_CONNEC] << "<- Removed a peer: " << peer->GetFd() << " (" << peer->GetID() << ")";
-
-	delete peer;
+	Peer* p = peers_list.Remove(fd);
+	if(p && p->GetAddr().port > 0 && try_reconnect)
+	{
+		AddDisconnected(p->GetAddr());
+		delete p;
+	}
+	if(FD_ISSET(fd, &global_read_set)) FD_CLR(fd, &global_read_set);
+	if(FD_ISSET(fd, &global_write_set)) FD_CLR(fd, &global_write_set);
 }
 
 void NetworkBase::Main()
@@ -145,27 +137,17 @@ void NetworkBase::Main()
 			{
 				if(FD_ISSET(i, &tmp_write_set))
 				{
-					PeerMap::iterator cl = fd2peer.find(i);
-
 					FD_CLR(i, &global_write_set);
 
-					if(cl != fd2peer.end())
+					try
 					{
-						try
-						{
-							cl->second->Flush();
-						}
-						catch(Connection::WriteError &e)
-						{
-							log[W_WARNING] << "send() error: " << e.GetString();
-							Peer* p = fd2peer[i];
-							if(p->GetAddr().port > 0)
-								AddDisconnected(p->GetAddr());
-							RemovePeer(p);
-						}
+						peers_list.PeerFlush(i);
 					}
-					else
-						log[W_WARNING] << "tmp_write_set(" << i << ") and " << i << " doesn't exist!";
+					catch(Connection::WriteError &e)
+					{
+						log[W_WARNING] << "send() error: " << e.GetString();
+						RemovePeer(i);
+					}
 				}
 				if(!FD_ISSET(i, &tmp_read_set)) continue;
 
@@ -203,27 +185,22 @@ void NetworkBase::Main()
 				{
 					try
 					{
-						while(fd2peer[i]->Receive()) ;
+						while(peers_list.PeerReceive(i)) ;
 					}
 					catch(Connection::RecvError &e)
 					{
 						log[W_WARNING] << "recv() error: " << e.GetString();
-						Peer* p = fd2peer[i];
-						  // TODO: explain this hack
-						if(p->GetAddr().port > 0)
-							AddDisconnected(p->GetAddr());
-						RemovePeer(p);
+						RemovePeer(i);
 					}
 					catch(Packet::Malformated &e)
 					{
 						log[W_ERR] << "Received malformed message!";
-						/* TODO: Take a decision. For now, we wait&see */
+						RemovePeer(i);
 					}
-					catch(Peer::MustDisconnect &e)
+					catch(Peer::MustDisconnect &e) // TODO:Rename me into something like BanPeer as we won't reconnect to him
 					{
 						log[W_WARNING] << "Must disconnected";
-						// TODO: Why don't we AddDisconnected() it ?
-						RemovePeer(fd2peer[i]);
+						RemovePeer(i, false);
 					}
 				}
 			}
@@ -238,10 +215,7 @@ void NetworkBase::Main()
 
 void NetworkBase::CloseAll()
 {
-	for(PeerList::iterator it = peer_list.begin(); it != peer_list.end(); ++it)
-		delete *it;
-
-	peer_list.clear();
+	peers_list.CloseAll();
 
 	if(serv_sock >= 0)
 	{
@@ -349,10 +323,7 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 		return;
 
 	/* Clear eventally current peers (it is NOT currently possible) */
-	fd2peer.clear();
-	for(PeerList::iterator it = peer_list.begin(); it != peer_list.end(); ++it)
-		delete *it;
-	peer_list.clear();
+	peers_list.CloseAll();
 
 	memset(&localhost, 0, sizeof localhost);
 
@@ -438,29 +409,4 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	return peer;
 }
 
-pf_id NetworkBase::CreateID()
-{
-	// TODO: optimize me
-	pf_id new_id = 0;
-	while(!new_id)
-	{
-		new_id = rand();
-		if(new_id == GetMyID())
-		{
-			new_id = 0;
-			continue;
-		}
-		for(PeerMap::iterator peer = fd2peer.begin();
-			peer != fd2peer.end();
-			++peer)
-		{
-			if(new_id == peer->second->GetID())
-			{
-				new_id = 0;
-				break;
-			}
-		}
-	}
 
-	return new_id;
-}

@@ -30,6 +30,7 @@
 
 #include "network_base.h"
 #include "pf_types.h"
+#include "peer.h"
 
 class Network: public NetworkBase
 {
@@ -41,10 +42,8 @@ public:
 	Network();
 	virtual ~Network();
 
-	Peer* ID2Peer(pf_id id) const;
-
 	/** Return a list of connected high linkes */
-	PeerList GetDirectHighLinks() const;
+	StaticPeersList GetDirectHighLinks() const;
 
 	virtual void AddDisconnected(const pf_addr& addr);
 	virtual void DelDisconnected(const pf_addr& addr);

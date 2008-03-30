@@ -33,7 +33,6 @@
 #include "peer.h"
 #include "pf_types.h"
 
-typedef std::map<unsigned int, Peer*> PeerMap;
 class MyConfig;
 
 class NetworkBase
@@ -71,13 +70,9 @@ private:
 	uint16_t listening_port;
 
 protected:
-	pf_id my_id;
 	Ssl *ssl;
 
-	PeerList peer_list;
-	PeerMap fd2peer;
-
-	void RemovePeer(Peer* peer);
+	void RemovePeer(int fd, bool try_reconnect = true);
 
 	void Listen(uint16_t port, const char* bind) throw (CantOpenSock, CantListen);
 	void CloseAll();
@@ -92,8 +87,6 @@ public:
 	/** Main loop (select()) */
 	void Main();
 
-	const PeerList& GetPeerList() { return peer_list; }
-	const PeerMap& GetPeerMap() { return fd2peer; }
 	Peer* AddPeer(Peer* peer);
 
 	bool IsRunning() const { return running; }
@@ -120,12 +113,6 @@ public:
 	/* Connect to a pf_addr.
 	 */
 	virtual Peer* Connect(pf_addr addr);
-
-	pf_id GetMyID() const { return my_id; }
-	void SetMyID(const pf_id id) { my_id = id; }
-
-	/* Create an ID not used by any other peer in network */
-	pf_id CreateID();
 
 	virtual void AddDisconnected(const pf_addr& addr) {}
 	virtual void DelDisconnected(const pf_addr& addr) {}

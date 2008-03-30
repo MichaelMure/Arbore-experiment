@@ -28,7 +28,7 @@
 
 class Peer;
 
-typedef std::vector<Peer*> PeerList;
+typedef std::vector<Peer*> StaticPeersList;
 
 class Peer : public PeerInterface
 {
@@ -56,7 +56,7 @@ class Peer : public PeerInterface
 	unsigned int flags;
 
 	// Sending functions
-	void Send_net_peer_list(PeerList list);
+	void Send_net_peer_list(StaticPeersList list);
 	// Receiving functions
 	void Handle_net_hello(struct Packet* pckt);
 	void Handle_net_mkfile(struct Packet* pckt);

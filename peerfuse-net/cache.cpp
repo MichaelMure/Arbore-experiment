@@ -23,7 +23,7 @@
 #include "cache.h"
 #include "log.h"
 #include "tools.h"
-#include "network.h"
+#include "peers_list.h"
 
 Cache cache;
 
@@ -96,7 +96,7 @@ FileEntry* Cache::Path2File(std::string path, std::string* filename)
 
 Packet Cache::CreateMkFilePacket(FileEntry* f)
 {
-	Packet pckt(NET_MKFILE, net.GetMyID());
+	Packet pckt(NET_MKFILE, peers_list.GetMyID());
 	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
 	pckt.SetArg(NET_MKFILE_MODE, f->stat.mode);
 	pckt.SetArg(NET_MKFILE_UID, f->stat.uid);
@@ -112,7 +112,7 @@ Packet Cache::CreateMkFilePacket(FileEntry* f)
 
 Packet Cache::CreateRmFilePacket(FileEntry* f)
 {
-	Packet pckt(NET_RMFILE, net.GetMyID());
+	Packet pckt(NET_RMFILE, peers_list.GetMyID());
 	pckt.SetArg(NET_RMFILE_PATH, f->GetFullName());
 
 	return pckt;

@@ -19,9 +19,10 @@
 
 #include <algorithm>
 #include "filedist.h"
-#include "network.h"
+#include "peers_list.h"
 #include "cache.h"
 #include "log.h"
+#include "network.h"
 
 FileDistribution::FileDistribution()
 {
@@ -68,7 +69,8 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
-		Peer* peer = net.ID2Peer(idl[(f->GetPathSerial()+i) % idl.size()]);
+		BlockLockMutex lock(&peers_list);
+		Peer* peer = peers_list.PeerFromID(idl[(f->GetPathSerial()+i) % idl.size()]);
 
 		/* It is possible that there isn't any Peer object for this
 		 * ID. For example, for me.
@@ -121,7 +123,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	std::set<Peer*> relayed_peers;
 
 	/* I'm responsible of this file. */
-	if(IsResponsible(net.GetMyID(), f))
+	if(IsResponsible(peers_list.GetMyID(), f))
 	{
 		/* this function can be called when this file is updated, so add
 		 * it in list only if it isn't already in. */
@@ -139,7 +141,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 				 * to all other responsibles. In other case, I only send it
 				 * to the a responsible who will relay message to other responsibles.
 				 */
-				if(IsResponsible(net.GetMyID(), f->GetParent()))
+				if(IsResponsible(peers_list.GetMyID(), f->GetParent()))
 				{
 					log[W_DEBUG] << "I'm responsible of this file which has been created, and I'm responsible "
 						<< "of parent dir, so I send creation to them.";
@@ -186,7 +188,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	}
 
 	if(f->GetParent() && sender != NULL &&
-		IsResponsible(net.GetMyID(), f->GetParent()) &&
+		IsResponsible(peers_list.GetMyID(), f->GetParent()) &&
 		!IsResponsible(sender->GetID(), f->GetParent()))
 	{
 		/* Someone sent this file to me, and I'm responsible of its parent directory,
@@ -240,10 +242,10 @@ void FileDistribution::UpdateRespFiles()
 
 	/* First set new list of id */
 	id_list.clear();
-	PeerList peers = net.GetPeerList();
+	id_list.push_back(peers_list.GetMyID());
 
-	id_list.push_back(net.GetMyID());
-	for(PeerList::const_iterator it = peers.begin(); it != peers.end(); ++it)
+	BlockLockMutex lock(&peers_list);
+	for(PeersList::const_iterator it = peers_list.begin(); it != peers_list.end(); ++it)
 		id_list.push_back((*it)->GetID());
 
 	/* Sort it */
@@ -253,7 +255,7 @@ void FileDistribution::UpdateRespFiles()
 	FileList last_resp = resp_files;
 	resp_files.clear();
 
-	resp_files = GetFiles(net.GetMyID());
+	resp_files = GetFiles(peers_list.GetMyID());
 
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{

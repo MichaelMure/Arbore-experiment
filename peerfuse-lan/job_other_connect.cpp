@@ -20,7 +20,8 @@
 #include <algorithm>
 #include "job_other_connect.h"
 #include "job_types.h"
-#include "network.h"
+#include "peers_list.h"
+#include "mutex.h"
 
 JobOtherConnect::JobOtherConnect(Peer* _connect_to) : Job(time(NULL)),
 			connect_to(_connect_to)
@@ -37,12 +38,12 @@ JobOtherConnect::JobOtherConnect(const JobOtherConnect* j) :
 
 void JobOtherConnect::Start()
 {
-	PeerList peers = net.GetPeerList();
+	BlockLockMutex lock(&peers_list);
 	AddrList addr_list;
 
 	bool everybody_connected = true;
 
-	if(find(peers.begin(), peers.end(), connect_to) == peers.end())
+	if(find(peers_list.begin(), peers_list.end(), connect_to) == peers_list.end())
 	{
 		// the peers disconnected, no need to ask others to connect to him
 		return;
@@ -51,7 +52,7 @@ void JobOtherConnect::Start()
 	// Ask all other peers to check their connection to this peer
 	// TODO: replace this loop+find with a while the 3 lists (peers, is_connecting
 	// and is connected) to spare some cpu
-	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
+	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
 	{
 		if(*it == connect_to)
 			continue;
@@ -79,8 +80,8 @@ void JobOtherConnect::Start()
 
 bool JobOtherConnect::IsConnectingTo(pf_addr addr)
 {
-	PeerList peers = net.GetPeerList();
-	if(find(peers.begin(), peers.end(), connect_to) == peers.end())
+	BlockLockMutex lock(&peers_list);
+	if(find(peers_list.begin(), peers_list.end(), connect_to) == peers_list.end())
 	{
 		// the peers disconnected
 		return false;

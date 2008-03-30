@@ -18,6 +18,8 @@
  */
 
 #include "network.h"
+#include "peers_list.h"
+#include "mutex.h"
 
 Network net;
 
@@ -38,7 +40,8 @@ Peer* Network::Connect(pf_addr addr)
 
 void Network::Broadcast(Packet pckt, const Peer* but_one)
 {
-	for(PeerMap::iterator it = fd2peer.begin(); it != fd2peer.end(); ++it)
-		if(it->second != but_one)
-			it->second->SendMsg(pckt);
+	BlockLockMutex lock(&peers_list);
+	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
+		if(*it != but_one)
+			(*it)->SendMsg(pckt);
 }

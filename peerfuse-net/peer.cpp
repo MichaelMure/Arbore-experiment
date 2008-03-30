@@ -31,6 +31,7 @@
 #include "pfnet.h"
 #include "log.h"
 #include "session_config.h"
+#include "peers_list.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
 			: addr(_addr),
@@ -95,7 +96,7 @@ void Peer::SendMsg(const Packet& pckt)
 void Peer::SendHello()
 {
 	// Make the message
-	Packet pckt(NET_HELLO, net.GetMyID(), addr.id);
+	Packet pckt(NET_HELLO, peers_list.GetMyID(), addr.id);
 
 	// Time / now
 	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
@@ -108,15 +109,15 @@ void Peer::SendHello()
 	SendMsg(pckt);
 }
 
-void Peer::Send_net_peer_list(PeerList peers)
+void Peer::Send_net_peer_list(StaticPeersList peers)
 {
-	for(PeerList::iterator it = peers.begin(); it != peers.end(); ++it)
+	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
 	{
 		/* Do not send information about himself! */
 		if(*it == this)
 			continue;
 
-		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : net.GetMyID();
+		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : peers_list.GetMyID();
 
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
@@ -174,10 +175,10 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 		/* I send all of my links */
 		Send_net_peer_list(net.GetDirectHighLinks());
-		SendMsg(Packet(NET_END_OF_MERGE, net.GetMyID(), 0));
+		SendMsg(Packet(NET_END_OF_MERGE, peers_list.GetMyID(), 0));
 
 		/* Tell to all of my other links that this peer is connected. */
-		Packet pckt(NET_PEER_CONNECTION, net.GetMyID(), 0);
+		Packet pckt(NET_PEER_CONNECTION, peers_list.GetMyID(), 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
@@ -190,7 +191,7 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	if(HasFlag(MERGING))
 	{
 		SetFlag(MERGING_ACK);
-		SendMsg(Packet(NET_END_OF_MERGE_ACK, net.GetMyID(), GetID()));
+		SendMsg(Packet(NET_END_OF_MERGE_ACK, peers_list.GetMyID(), GetID()));
 	}
 
 	/* Now we can update resp files :)))))))
@@ -218,7 +219,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
 	Certificate cert;
 
-	Peer* already_connected = net.ID2Peer(addr.id);
+	Peer* already_connected = peers_list.PeerFromID(addr.id);
 
 	if(already_connected)
 		return;				  /* I'm already connected to him. */
@@ -378,7 +379,7 @@ bool Peer::Receive()
 		throw Packet::Malformated();
 
 	/* Only handle this packet if it is a broadcast or if it is sent to me */
-	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == net.GetMyID())
+	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == peers_list.GetMyID())
 	{
 		/* If source is not me, I translate packet to real source. */
 		if((*packet)->GetSrcID() && (*packet)->GetSrcID() != GetID() && GetID())
@@ -391,7 +392,7 @@ bool Peer::Receive()
 	}
 	else if((*packet)->GetDstID())
 	{
-		Peer* relay_to = net.ID2Peer((*packet)->GetDstID());
+		Peer* relay_to = peers_list.PeerFromID((*packet)->GetDstID());
 		if(relay_to)
 		{
 			log[W_DEBUG] << "Relay packet to " << relay_to->GetID();
