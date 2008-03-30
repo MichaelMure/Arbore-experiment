@@ -50,4 +50,4 @@ public:
 	time_t GetStartTime() const { return start_time; }
 	virtual job_type GetType() const = 0;
 };
-#endif /* JOB_H */
+#endif						  /* JOB_H */
