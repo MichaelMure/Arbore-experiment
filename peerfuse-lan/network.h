@@ -27,8 +27,6 @@ class Network: public NetworkBase
 public:
 	Network() {merging = false; }
 
-	virtual void Broadcast(Packet pckt, const Peer* but_one = 0);
-
 	/* Overrided to send NET_HELLO message when connected. */
 	virtual Peer* Connect(pf_addr addr);
 

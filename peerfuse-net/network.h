@@ -50,8 +50,6 @@ public:
 
 	virtual Peer* Start(MyConfig* conf);
 
-	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL);
-
 	void GivePacketTo(pf_id id, Packet* packet) const;
 };
 

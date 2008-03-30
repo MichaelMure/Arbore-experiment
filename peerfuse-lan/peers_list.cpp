@@ -21,3 +21,12 @@
 #include "peers_list_base.h"
 
 PeersList peers_list;
+
+void PeersList::Broadcast(Packet pckt, const Peer* but_one)
+{
+	BlockLockMutex lock(&peers_list);
+	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
+		if(*it != but_one)
+			(*it)->SendMsg(pckt);
+}
+

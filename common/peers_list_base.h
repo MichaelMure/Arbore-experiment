@@ -35,7 +35,7 @@ private:
 	Peer* PeerFromFD(int fd);
 public:
 	PeersListBase();
-	~PeersListBase();
+	virtual ~PeersListBase();
 
 	unsigned int Size() const { return size(); }
 	void Add(Peer* p);
@@ -45,6 +45,11 @@ public:
 	bool PeerReceive(int fd);
 
 	void CloseAll();
+
+	/* Broadcast a packet to everybody.
+	 * If but_one != NULL, do not send a packet to him.
+	 */
+	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) = 0;
 
 	pf_id GetMyID() const		  // TODO:Protect-me
 	{

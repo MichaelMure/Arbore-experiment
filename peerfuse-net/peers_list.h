@@ -27,6 +27,8 @@ class PeersList: public PeersListBase
 public:
 	PeersList() {}
 	~PeersList() {}
+
+	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL);
 };
 
 extern PeersList peers_list;

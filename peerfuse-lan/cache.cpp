@@ -23,7 +23,8 @@
 #include "cache.h"
 #include "log.h"
 #include "tools.h"
-#include "network.h"
+#include "peer.h"
+#include "peers_list.h"
 
 Cache cache;
 
@@ -206,7 +207,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 
 	/* if it's me who created file */
 	if(sender == NULL)
-		net.Broadcast(CreateMkFilePacket(file));
+		peers_list.Broadcast(CreateMkFilePacket(file));
 }
 
 void Cache::RmFile(std::string path, Peer* sender)
@@ -234,7 +235,7 @@ void Cache::RmFile(std::string path, Peer* sender)
 
 	/* Send before removing file */
 	if(sender == NULL)
-		net.Broadcast(CreateRmFilePacket(f));
+		peers_list.Broadcast(CreateRmFilePacket(f));
 
 	f->GetParent()->RemFile(f);
 

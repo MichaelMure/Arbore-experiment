@@ -182,7 +182,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
-		net.Broadcast(pckt, this);	  /* Don't send to this peer a creation message about him! */
+		peers_list.Broadcast(pckt, this);	  /* Don't send to this peer a creation message about him! */
 	}
 }
 
@@ -405,7 +405,7 @@ bool Peer::Receive()
 
 	/* Route broadcast packets */
 	if((*packet)->GetDstID() == 0)
-		net.Broadcast(**packet, this);
+		peers_list.Broadcast(**packet, this);
 
 	return true;
 }

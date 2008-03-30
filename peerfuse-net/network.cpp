@@ -62,18 +62,6 @@ void Network::GivePacketTo(pf_id id, Packet* packet) const
 		log[W_WARNING] << "Received a packet from unknown peer";
 }
 
-void Network::Broadcast(Packet pckt, const Peer* but_one)
-{
-	BlockLockMutex lock(&peers_list);
-	pckt.SetDstID(0);
-	PeersList::iterator it;
-	for(it = peers_list.begin(); it != peers_list.end(); ++it)
-		if(!(*it)->IsAnonymous() &&
-		(*it)->IsHighLink() &&
-		(*it) != but_one)
-			(*it)->SendMsg(pckt);
-}
-
 StaticPeersList Network::GetDirectHighLinks() const
 {
 	BlockLockMutex lock(&peers_list);

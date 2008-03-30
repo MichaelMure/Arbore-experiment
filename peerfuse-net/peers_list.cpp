@@ -21,3 +21,17 @@
 #include "peers_list_base.h"
 
 PeersList peers_list;
+
+void PeersList::Broadcast(Packet pckt, const Peer* but_one)
+{
+	BlockLockMutex lock(&peers_list);
+	pckt.SetDstID(0);
+	PeersList::iterator it;
+	for(it = peers_list.begin(); it != peers_list.end(); ++it)
+		if(!(*it)->IsAnonymous() &&
+		(*it)->IsHighLink() &&
+		(*it) != but_one)
+			(*it)->SendMsg(pckt);
+}
+
+
