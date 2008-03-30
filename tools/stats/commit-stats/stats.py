@@ -522,7 +522,7 @@ def main():
 	<ul class='menu'>
 		<li><a href="/">Home</a></li><li class="separator"></li>
 		<li><a href="/download.html">Download</a></li><li class="separator"></li>
-		<li><a href="#">Documentation</a></li><li class="separator" />
+		<li><a href="/documentation.html">Documentation</a></li><li class="separator" />
 		<li><a class="current" href="http://peerfuse.org/stats/stats.html">SVN stats</a></li><li class="separator" />
 		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li>
 	</ul>
