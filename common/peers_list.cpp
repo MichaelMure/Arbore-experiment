@@ -52,7 +52,6 @@ Peer* PeersList::PeerFromID(pf_id id)
 	return (it != end() ? *it : NULL);
 }
 
-
 // Public methods
 void PeersList::Add(Peer* p)
 {

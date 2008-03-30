@@ -197,7 +197,8 @@ void NetworkBase::Main()
 						log[W_ERR] << "Received malformed message!";
 						RemovePeer(i);
 					}
-					catch(Peer::MustDisconnect &e) // TODO:Rename me into something like BanPeer as we won't reconnect to him
+						  // TODO:Rename me into something like BanPeer as we won't reconnect to him
+					catch(Peer::MustDisconnect &e)
 					{
 						log[W_WARNING] << "Must disconnected";
 						RemovePeer(i, false);
@@ -408,5 +409,3 @@ Peer* NetworkBase::Start(MyConfig* conf)
 	}
 	return peer;
 }
-
-

@@ -39,15 +39,21 @@ public:
 
 	unsigned int Size() const { return size(); }
 	void Add(Peer* p);
-	void Erase(int fd); /* Remove the peer from the list and erase it */
-	Peer* Remove(int fd); /* Remove the peer from the list */
+	void Erase(int fd);		  /* Remove the peer from the list and erase it */
+	Peer* Remove(int fd);		  /* Remove the peer from the list */
 	void PeerFlush(int fd);
 	bool PeerReceive(int fd);
 
 	void CloseAll();
 
-	pf_id GetMyID() const { return my_id; } // TODO:Protect-me
-	void SetMyID(const pf_id id) { my_id = id; } // TODO:Protect-me
+	pf_id GetMyID() const		  // TODO:Protect-me
+	{
+		return my_id;
+	}
+	void SetMyID(const pf_id id)	  // TODO:Protect-me
+	{
+		my_id = id;
+	}
 
 	/* Create an ID not used by any other peer in network */
 	pf_id CreateID();
@@ -57,6 +63,4 @@ public:
 };
 
 extern PeersList peers_list;
-
 #endif
-
