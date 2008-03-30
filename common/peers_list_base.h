@@ -17,15 +17,15 @@
  * $Id$
  */
 
-#ifndef PEERS_LIST_H
-#define PEERS_LIST_H
+#ifndef PEERS_LIST_BASE_H
+#define PEERS_LIST_BASE_H
 
 #include <map>
 #include <vector>
 #include "peer.h"
 #include "mutex.h"
 
-class PeersList: public std::vector<Peer*>, public Mutex
+class PeersListBase: public std::vector<Peer*>, public Mutex
 {
 private:
 	typedef std::map<int, Peer*> PeerMap;
@@ -34,8 +34,8 @@ private:
 
 	Peer* PeerFromFD(int fd);
 public:
-	PeersList();
-	~PeersList();
+	PeersListBase();
+	~PeersListBase();
 
 	unsigned int Size() const { return size(); }
 	void Add(Peer* p);
@@ -62,5 +62,4 @@ public:
 	Peer* PeerFromID(pf_id id);
 };
 
-extern PeersList peers_list;
 #endif

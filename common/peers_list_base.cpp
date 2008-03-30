@@ -22,20 +22,18 @@
 #include "mutex.h"
 #include "log.h"
 
-PeersList peers_list;
-
-PeersList::PeersList() : Mutex(RECURSIVE_MUTEX),
+PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX),
 			my_id(0)
 {
 }
 
-PeersList::~PeersList()
+PeersListBase::~PeersListBase()
 {
 	for(iterator it = begin(); it != end(); ++it)
 		delete *it;
 }
 
-Peer* PeersList::PeerFromFD(int fd)
+Peer* PeersListBase::PeerFromFD(int fd)
 {
 	PeerMap::iterator it = fd2peer.find(fd);
 	if(it == fd2peer.end())
@@ -43,7 +41,7 @@ Peer* PeersList::PeerFromFD(int fd)
 	return it->second;
 }
 
-Peer* PeersList::PeerFromID(pf_id id)
+Peer* PeersListBase::PeerFromID(pf_id id)
 {
 	iterator it;
 	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
@@ -53,14 +51,14 @@ Peer* PeersList::PeerFromID(pf_id id)
 }
 
 // Public methods
-void PeersList::Add(Peer* p)
+void PeersListBase::Add(Peer* p)
 {
 	BlockLockMutex lock(this);
 	push_back(p);
 	fd2peer[p->GetFd()] = p;
 }
 
-Peer* PeersList::Remove(int fd)
+Peer* PeersListBase::Remove(int fd)
 {
 	BlockLockMutex lock(this);
 	Peer* peer = NULL;
@@ -81,14 +79,14 @@ Peer* PeersList::Remove(int fd)
 	return peer;
 }
 
-void PeersList::Erase(int fd)
+void PeersListBase::Erase(int fd)
 {
 	BlockLockMutex lock(this);
 	Peer* p = Remove(fd);
 	delete p;
 }
 
-void PeersList::PeerFlush(int fd)
+void PeersListBase::PeerFlush(int fd)
 {
 	BlockLockMutex lock(this);
 	Peer* p = PeerFromFD(fd);
@@ -96,7 +94,7 @@ void PeersList::PeerFlush(int fd)
 		p->Flush();
 }
 
-bool PeersList::PeerReceive(int fd)
+bool PeersListBase::PeerReceive(int fd)
 {
 	BlockLockMutex lock(this);
 	bool res = 0;
@@ -106,7 +104,7 @@ bool PeersList::PeerReceive(int fd)
 	return res;
 }
 
-void PeersList::CloseAll()
+void PeersListBase::CloseAll()
 {
 	BlockLockMutex lock(this);
 	for(iterator it = begin(); it != end(); ++it)
@@ -115,7 +113,7 @@ void PeersList::CloseAll()
 	fd2peer.clear();
 }
 
-pf_id PeersList::CreateID()
+pf_id PeersListBase::CreateID()
 {
 	BlockLockMutex lock(this);
 	// TODO: optimize me

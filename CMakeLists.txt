@@ -7,7 +7,7 @@ SET(SRC
 	common/log.cpp
 	common/mutex.cpp
 	common/network_base.cpp
-	common/peers_list.cpp
+	common/peers_list_base.cpp
 	common/pf_dir.cpp
 	common/pf_filebase.cpp
 	common/packet_base.cpp
@@ -51,6 +51,7 @@ IF(PF_NET)
 		peerfuse-net/pf_file.cpp
 		peerfuse-net/filedist.cpp
 		peerfuse-net/packet.cpp
+		peerfuse-net/peers_list.cpp
 		peerfuse-net/net_proto.cpp
 		peerfuse-net/peer.cpp)
 	SET(BIN_NAME peerfuse-net)
@@ -65,6 +66,7 @@ ELSE(PF_NET)
 		peerfuse-lan/net_proto.cpp
 		peerfuse-lan/packet.cpp
 		peerfuse-lan/peer.cpp
+		peerfuse-lan/peers_list.cpp
 		peerfuse-lan/job_other_connect.cpp)
 	SET(BIN_NAME peerfuse-lan)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_LAN")
