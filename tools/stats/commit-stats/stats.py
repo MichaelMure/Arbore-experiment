@@ -457,7 +457,7 @@ def main():
     <title>Stats of commits</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel='stylesheet' href='http://peerfuse.org/style.css' type='text/css' />
-    <link rel="shortcut icon" type="image/png" href="http://vaginus.org/favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="http://peerfuse.org/favicon.png" />
     <script type="text/javascript">
 
     function getElementsByClass(searchClass,node,tag) {
@@ -516,10 +516,19 @@ def main():
 </head>
 
 <body>
-<div id="container">
-<h1><a href="http://vaginus.org">Stats of commits</a></h1>
-
-<div id="content">""")
+<div class="container">
+<div class='header'>
+	<img src="http://peerfuse.org/images/logo.gif" width="370" height="62" alt="logo" class="logo"/>
+	<ul class='menu'>
+		<li><a href="#">Home</a></li><li class="separator"></li>
+		<li><a href="download.html">Download</a></li><li class="separator"></li>
+		<li><a href="#">Documentation</a></li><li class="separator" />
+		<li><a class="current" href="http://peerfuse.org/stats/stats.html">SVN stats</a></li><li class="separator" />
+		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li>
+	</ul>
+</div>
+<div class='content'>
+""")
 
     html.write('<p class="graphlist">')
 
@@ -652,9 +661,12 @@ def main():
 
     html.write("""
 </div>
-<div class="foot">
-Generated on %02d/%02d/%02d at %02d:%02d
+<div class='bottom'>Generated on %02d/%02d/%02d at %02d:%02d</div>
 </div>
+
+<div class="foot">
+$Id$ <br/>
+Thanks to <a href="http://axestech.net">axestech.net</a> for this website.
 </div>
 </body>
 </html>""" % (t[2], t[1], t[0], t[3], t[4]))
