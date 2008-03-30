@@ -24,20 +24,12 @@
 #include "mutex.h"
 #include "network.h"
 
-JobOtherConnect::JobOtherConnect(Peer* _connect_to) : Job(time(NULL)),
+JobOtherConnect::JobOtherConnect(Peer* _connect_to) : Job(time(NULL), REPEAT_PERIODIC, 1),
 			connect_to(_connect_to)
 {
 }
 
-JobOtherConnect::JobOtherConnect(const JobOtherConnect* j) :
-			Job(time(NULL)+1)
-{
-	connect_to = j->connect_to;
-	is_connecting = j->is_connecting;
-	is_connected = j->is_connected;
-}
-
-void JobOtherConnect::Start()
+bool JobOtherConnect::Start()
 {
 	BlockLockMutex lock(&peers_list);
 	AddrList addr_list;
@@ -46,8 +38,8 @@ void JobOtherConnect::Start()
 
 	if(find(peers_list.begin(), peers_list.end(), connect_to) == peers_list.end())
 	{
-		// the peers disconnected, no need to ask others to connect to him
-		return;
+		// the peer disconnected, no need to ask others to connect to him
+		return false;
 	}
 
 	// Ask all other peers to check their connection to this peer
@@ -74,9 +66,9 @@ void JobOtherConnect::Start()
 	}
 
 	if(!everybody_connected)
-		net.scheduler.Queue(new JobOtherConnect(this));
-	else
-		connect_to->SendMsg(Packet(NET_PEER_ALL_CONNECTED));
+		return true;
+	connect_to->SendMsg(Packet(NET_PEER_ALL_CONNECTED));
+	return false;
 }
 
 bool JobOtherConnect::IsConnectingTo(pf_addr addr)

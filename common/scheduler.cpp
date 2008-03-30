@@ -50,8 +50,10 @@ void Scheduler::HandleJobs()
 		Job* job = job_queue.front();
 		job_queue.erase(job_queue.begin());
 
-		job->Start();
-		delete job;
+		if(job->DoStart())
+			Queue(job);
+		else
+			delete job;
 	}
 }
 

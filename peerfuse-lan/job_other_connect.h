@@ -30,13 +30,13 @@ class JobOtherConnect : public Job
 	std::list<Peer*> is_connecting;
 	std::list<Peer*> is_connected;
 
+protected:
+	bool Start();
 public:
 	JobOtherConnect(Peer* _connect_to);
-	JobOtherConnect(const JobOtherConnect* j);
 
 	bool IsConnectingTo(pf_addr addr);
 	void PeerConnected(Peer* peer);
-	void Start();
 	job_type GetType() const {return JOB_OTHER_CONNECT; }
 };
 #endif

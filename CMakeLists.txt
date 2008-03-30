@@ -2,6 +2,7 @@ PROJECT(peerfuse)
 
 SET(SRC
 	common/hdd.cpp
+	common/job.cpp
 	common/job_new_connection.cpp
 	common/libconfig.cpp
 	common/log.cpp

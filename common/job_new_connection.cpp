@@ -18,10 +18,9 @@
  */
 
 #include "job_new_connection.h"
-#include "scheduler.h"
 #include "network.h"
 
-void JobNewConnection::Start()
+bool JobNewConnection::Start()
 {
 	try
 	{
@@ -29,9 +28,9 @@ void JobNewConnection::Start()
 	}
 	catch(Network::CantConnectTo &e)
 	{
-		dt *= 2;
-		net.scheduler.Queue(new JobNewConnection(this));
+		return true;
 	}
+	return false;
 }
 
 bool JobNewConnection::IsMe(const pf_addr& addr)
