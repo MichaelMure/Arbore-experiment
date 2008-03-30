@@ -24,29 +24,29 @@ PeersList peers_list;
 
 Peer* PeersList::RemoveFromID(pf_id id)
 {
-        BlockLockMutex lock(this);
-        Peer* peer = NULL;
-        iterator it;
-        for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
-                ;
+	BlockLockMutex lock(this);
+	Peer* peer = NULL;
+	iterator it;
+	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
+		;
 
-        if(it == end())
-                return NULL;
+	if(it == end())
+		return NULL;
 
-        erase(it);
+	erase(it);
 
-        PeerMap::iterator p = fd2peer.find(peer->GetFd());
-        if(p != fd2peer.end())
-                fd2peer.erase(p);
+	PeerMap::iterator p = fd2peer.find(peer->GetFd());
+	if(p != fd2peer.end())
+		fd2peer.erase(p);
 
-        return peer;
+	return peer;
 }
 
 void PeersList::EraseFromID(pf_id id)
 {
-        BlockLockMutex lock(this);
-        Peer* p = RemoveFromID(id);
-        delete p;
+	BlockLockMutex lock(this);
+	Peer* p = RemoveFromID(id);
+	delete p;
 }
 
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const

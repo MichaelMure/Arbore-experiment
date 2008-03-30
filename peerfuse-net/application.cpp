@@ -68,11 +68,11 @@ int Application::main(int argc, char *argv[])
 {
 	if(argc < 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
 	{
-#ifdef PF_SERVER_MODE
+		#ifdef PF_SERVER_MODE
 		std::cerr << "Syntax: " << argv[0] << " <configpath>" << std::endl;
-#else
+		#else
 		std::cerr << "Syntax: " << argv[0] << " <configpath> <mount point> [fuse options]" << std::endl;
-#endif
+		#endif
 		exit(EXIT_FAILURE);
 	}
 
