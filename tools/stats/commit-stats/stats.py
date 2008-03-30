@@ -532,7 +532,7 @@ def main():
 
     html.write('<p class="graphlist">')
 
-    hours_histo = Histogram((4,3), 'Commits by hour', [i.name for i in users.values()])
+    hours_histo = Histogram((3.6,3), 'Commits by hour', [i.name for i in users.values()])
     for commits in hours:
         lst = []
         for i in users.values():
@@ -546,7 +546,7 @@ def main():
 
     html.write('<img src="hours.png" alt="hours" />')
 
-    weekdays_histo = Histogram((4,3), 'Commits by weekday', [i.name for i in users.values()])
+    weekdays_histo = Histogram((3.6,3), 'Commits by weekday', [i.name for i in users.values()])
     for commits in weekdays:
         lst = []
         for i in users.values():
@@ -562,7 +562,7 @@ def main():
 
 
     months_s = sorted(months.items())
-    months_histo = Histogram((4,3), 'Commits by months', [i.name for i in users.values()], legend=False)
+    months_histo = Histogram((3.6,3), 'Commits by months', [i.name for i in users.values()], legend=False)
     for key, commits in months_s:
         lst = []
         for i in users.values():
@@ -596,14 +596,14 @@ def main():
     html.write('<h2>User commits</h2>')
     html.write('<p class="graphlist">')
 
-    users_pie = Pie((6,2.5), title='Commits', legend=True)
+    users_pie = Pie((5.5,2.3), title='Commits', legend=True)
     for u in users.values():
         users_pie.add_entry(u.name, len(u.commits))
 
     users_pie.create_img(output + 'users.png')
     html.write('<img alt="users" src="users.png" />')
 
-    ulines_pie = Pie((6,2.5), title='Lines', legend=True)
+    ulines_pie = Pie((5.5,2.3), title='Lines', legend=True)
     for u in users.values():
         ulines_pie.add_entry(u.name, u.nb_lines)
 
@@ -620,7 +620,7 @@ def main():
         files_s = files_s[:15]
     except:
         pass
-    files_histo = Histogram((7,4), 'Files commits', [i.name for i in users.values()])
+    files_histo = Histogram((5,3), 'Files commits', [i.name for i in users.values()])
     html.write('<img alt="files" src="files.png" align="right" border="0" hspace="5" vspace="5" />')
     html.write('<ul>')
     cnt = 0
