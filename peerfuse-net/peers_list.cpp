@@ -33,5 +33,3 @@ void PeersList::Broadcast(Packet pckt, const Peer* but_one)
 		(*it) != but_one)
 			(*it)->SendMsg(pckt);
 }
-
-

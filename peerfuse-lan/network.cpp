@@ -37,5 +37,3 @@ Peer* Network::Connect(pf_addr addr)
 
 	return p;
 }
-
-

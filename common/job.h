@@ -34,5 +34,4 @@ public:
 	virtual void Start() = 0;
 	virtual job_type GetType() const = 0;
 };
-
 #endif
