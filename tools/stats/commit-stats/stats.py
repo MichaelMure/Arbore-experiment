@@ -456,7 +456,7 @@ def main():
 <head>
     <title>Stats of commits</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel='stylesheet' href='http://peerfuse.org/style.css' type='text/css' />
+    <link rel='stylesheet' href='file:///home/rom1/Projets/peerfuse/www/style.css' type='text/css' />
     <link rel="shortcut icon" type="image/png" href="http://peerfuse.org/favicon.png" />
     <script type="text/javascript">
 
@@ -520,8 +520,8 @@ def main():
 <div class='header'>
 	<img src="http://peerfuse.org/images/logo.gif" width="370" height="62" alt="logo" class="logo"/>
 	<ul class='menu'>
-		<li><a href="#">Home</a></li><li class="separator"></li>
-		<li><a href="download.html">Download</a></li><li class="separator"></li>
+		<li><a href="/">Home</a></li><li class="separator"></li>
+		<li><a href="/download.html">Download</a></li><li class="separator"></li>
 		<li><a href="#">Documentation</a></li><li class="separator" />
 		<li><a class="current" href="http://peerfuse.org/stats/stats.html">SVN stats</a></li><li class="separator" />
 		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li>
@@ -642,6 +642,7 @@ def main():
 
     html.write('<h2>ChangeLog</h2>')
 
+    html.write('<div class="changelog">')
     html.write('<p><a href="#" onClick="return showall(\'revision\')">Show all</a>/<a href="#" onClick="return hideall(\'revision\')">Hide all</a></p>')
 
     for i in all_commits:
@@ -656,6 +657,8 @@ def main():
         html.write('------------------------------------------------------------------------')
 
         html.write('</p>')
+
+    html.write('</div>')
 
     t = time.localtime()
 
