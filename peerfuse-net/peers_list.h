@@ -30,5 +30,4 @@ public:
 };
 
 extern PeersList peers_list;
-
 #endif

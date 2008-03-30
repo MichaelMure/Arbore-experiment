@@ -61,5 +61,4 @@ public:
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id);
 };
-
 #endif
