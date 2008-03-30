@@ -22,6 +22,7 @@
 #include "job_types.h"
 #include "peers_list.h"
 #include "mutex.h"
+#include "network.h"
 
 JobOtherConnect::JobOtherConnect(Peer* _connect_to) : Job(time(NULL)),
 			connect_to(_connect_to)

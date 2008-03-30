@@ -17,7 +17,7 @@
  * $Id$
  */
 
-#include "job.h"
+#include "job_new_connection.h"
 #include "scheduler.h"
 #include "network.h"
 
