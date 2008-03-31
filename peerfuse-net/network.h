@@ -51,7 +51,7 @@ public:
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer);
 
-	virtual Peer* Start(MyConfig* conf);
+	virtual Peer* StartNetwork(MyConfig* conf);
 
 	void GivePacketTo(pf_id id, Packet* packet) const;
 };

@@ -106,7 +106,7 @@ int Application::main(int argc, char *argv[])
 		else
 			log[W_INFO] << "I have no ID yet.";
 
-		net.Start(&conf);
+		net.StartNetwork(&conf);
 
 		umask(0);
 		#ifndef PF_SERVER_MODE
@@ -120,7 +120,7 @@ int Application::main(int argc, char *argv[])
 		log[W_ERR] << "Error while loading:";
 		log[W_ERR] << e.Reason();
 	}
-	catch(Network::CantRunThread &e)
+	catch(Thread::CantRun &e)
 	{
 		log[W_ERR] << "Unable to create network thread, exiting..";
 	}

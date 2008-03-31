@@ -39,10 +39,10 @@
 #include "job.h"
 #include "scheduler.h"
 #include "peers_list.h"
+#include "pf_thread.h"
 
-NetworkBase::NetworkBase() throw(CantRunThread)
-			: running(true),
-			serv_sock(-1),
+NetworkBase::NetworkBase()
+			: serv_sock(-1),
 			highsock(-1),
 			listening_port(0),
 			ssl(NULL)
@@ -51,24 +51,12 @@ NetworkBase::NetworkBase() throw(CantRunThread)
 	FD_ZERO(&global_read_set);
 
 	srand(time(NULL));
-	int r = pthread_create(&thread_id, NULL, StartThread, (void*)this);
-	if (r != 0)
-		throw CantRunThread();
+	Start(); // Start the network's loop
 }
 
 NetworkBase::~NetworkBase()
 {
-	running = false;
-	pthread_join(thread_id, NULL);
 	delete ssl;
-}
-
-void *NetworkBase::StartThread(void* arg)
-{
-	NetworkBase* thr = static_cast<NetworkBase*>(arg);
-	thr->Main();
-	pthread_exit(NULL);
-	return NULL;
 }
 
 void NetworkBase::HavePacketToSend(const Peer* peer)
@@ -107,110 +95,110 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 	if(FD_ISSET(fd, &global_write_set)) FD_CLR(fd, &global_write_set);
 }
 
-void NetworkBase::Main()
+void NetworkBase::Loop()
 {
-	while(running)
+	/* We wait only 1000ms because when an other thread wants to send a
+	 * message to someone, we change global_write_set, and it needs to call
+	 * an other time select().
+	 * If timeout was something like one minute, we may wait one minute before
+	 * message was sent...
+	 */
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 1000;
+
+	fd_set tmp_read_set = global_read_set;
+	fd_set tmp_write_set = global_write_set;
+	int events;
+
+	if((events = select(highsock + 1, &tmp_read_set, &tmp_write_set, NULL, &timeout)) < 0)
 	{
-		/* We wait only 1000ms because when an other thread wants to send a
-		 * message to someone, we change global_write_set, and it needs to call
-		 * an other time select().
-		 * If timeout was something like one minute, we may wait one minute before
-		 * message was sent...
-		 */
-		struct timeval timeout;
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 1000;
-
-		fd_set tmp_read_set = global_read_set;
-		fd_set tmp_write_set = global_write_set;
-		int events;
-
-		if((events = select(highsock + 1, &tmp_read_set, &tmp_write_set, NULL, &timeout)) < 0)
+		if(errno != EINTR)
 		{
-			if(errno != EINTR)
-			{
-				log[W_ERR] << "Error in select() (" << errno << ": " << strerror(errno) << ")";
-				break;
-			}
+			log[W_ERR] << "Error in select() (" << errno << ": " << strerror(errno) << ")";
+			return;
 		}
-		else if(events > 0)		  /* events = 0 means that there isn't any event (but timeout expired) */
+	}
+	else if(events > 0)		  /* events = 0 means that there isn't any event (but timeout expired) */
+	{
+		for(int i = 0;i <= highsock;++i)
 		{
-			for(int i = 0;i <= highsock;++i)
+			if(FD_ISSET(i, &tmp_write_set))
 			{
-				if(FD_ISSET(i, &tmp_write_set))
-				{
-					FD_CLR(i, &global_write_set);
+				FD_CLR(i, &global_write_set);
 
+				try
+				{
+					peers_list.PeerFlush(i);
+				}
+				catch(Connection::WriteError &e)
+				{
+					log[W_WARNING] << "send() error: " << e.GetString();
+					RemovePeer(i);
+				}
+			}
+			if(!FD_ISSET(i, &tmp_read_set)) continue;
+
+			if(i == serv_sock)
+			{
+				struct sockaddr_in newcon;
+				unsigned int addrlen = sizeof newcon;
+				int newfd = accept(serv_sock, (struct sockaddr *) &newcon, &addrlen);
+
+				if(newfd)
+				{
+					/* none_addr is initialized to NULL */
+					static pf_addr none_addr;
+					pf_addr addr = none_addr;
+					addr.ip[3] = newcon.sin_addr.s_addr;
+
+					Connection *peer_conn;
 					try
 					{
-						peers_list.PeerFlush(i);
+						peer_conn = ssl->Accept(newfd);
 					}
-					catch(Connection::WriteError &e)
+					catch(SslSsl::SslHandshakeFailed &e)
 					{
-						log[W_WARNING] << "send() error: " << e.GetString();
-						RemovePeer(i);
+						log [W_WARNING] << "SSL handshake failure: " << e.GetString();
+						continue;
 					}
+
+					AddPeer(new Peer(addr, peer_conn));
+
+					DelDisconnected(addr);
 				}
-				if(!FD_ISSET(i, &tmp_read_set)) continue;
-
-				if(i == serv_sock)
+			}
+			else
+			{
+				try
 				{
-					struct sockaddr_in newcon;
-					unsigned int addrlen = sizeof newcon;
-					int newfd = accept(serv_sock, (struct sockaddr *) &newcon, &addrlen);
-
-					if(newfd)
-					{
-						/* none_addr is initialized to NULL */
-						static pf_addr none_addr;
-						pf_addr addr = none_addr;
-						addr.ip[3] = newcon.sin_addr.s_addr;
-
-						Connection *peer_conn;
-						try
-						{
-							peer_conn = ssl->Accept(newfd);
-						}
-						catch(SslSsl::SslHandshakeFailed &e)
-						{
-							log [W_WARNING] << "SSL handshake failure: " << e.GetString();
-							continue;
-						}
-
-						AddPeer(new Peer(addr, peer_conn));
-
-						DelDisconnected(addr);
-					}
+					while(peers_list.PeerReceive(i)) ;
 				}
-				else
+				catch(Connection::RecvError &e)
 				{
-					try
-					{
-						while(peers_list.PeerReceive(i)) ;
-					}
-					catch(Connection::RecvError &e)
-					{
-						log[W_WARNING] << "recv() error: " << e.GetString();
-						RemovePeer(i);
-					}
-					catch(Packet::Malformated &e)
-					{
-						log[W_ERR] << "Received malformed message!";
-						RemovePeer(i);
-					}
-						  // TODO:Rename me into something like BanPeer as we won't reconnect to him
-					catch(Peer::MustDisconnect &e)
-					{
-						log[W_WARNING] << "Must disconnected";
-						RemovePeer(i, false);
-					}
+					log[W_WARNING] << "recv() error: " << e.GetString();
+					RemovePeer(i);
+				}
+				catch(Packet::Malformated &e)
+				{
+					log[W_ERR] << "Received malformed message!";
+					RemovePeer(i);
+				}
+					  // TODO:Rename me into something like BanPeer as we won't reconnect to him
+				catch(Peer::MustDisconnect &e)
+				{
+					log[W_WARNING] << "Must disconnected";
+					RemovePeer(i, false);
 				}
 			}
 		}
-
-		scheduler.HandleJobs();
 	}
 
+	scheduler.HandleJobs();
+}
+
+void NetworkBase::OnStop()
+{
 	/* We leave */
 	CloseAll();
 }
@@ -361,7 +349,7 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 	listening_port = port;
 }
 
-Peer* NetworkBase::Start(MyConfig* conf)
+Peer* NetworkBase::StartNetwork(MyConfig* conf)
 {
 	assert(ssl == NULL);
 
@@ -386,7 +374,7 @@ Peer* NetworkBase::Start(MyConfig* conf)
 		section->GetItem("bind")->String().c_str());
 
 	/* Connect to other servers */
-	Peer* peer = 0;
+	Peer* peer = NULL;
 	std::vector<ConfigSection*> sections = conf->GetSectionClones("connection");
 	for(std::vector<ConfigSection*>::iterator it = sections.begin(); it != sections.end(); ++it)
 	{

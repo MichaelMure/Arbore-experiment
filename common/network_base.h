@@ -20,7 +20,6 @@
 #ifndef NETWORK_BASE_H
 #define NETWORK_BASE_H
 
-#include <pthread.h>
 #include <exception>
 #include <vector>
 #include <list>
@@ -28,6 +27,7 @@
 #include <map>
 #include <time.h>
 
+#include "pf_thread.h"
 #include "pf_ssl.h"
 #include "scheduler.h"
 #include "peer.h"
@@ -35,12 +35,11 @@
 
 class MyConfig;
 
-class NetworkBase
+class NetworkBase : public Thread
 {
 public:
 
 	/* Exceptions */
-	class CantRunThread : public std::exception {};
 	class CantOpenSock : public std::exception {};
 	class CantListen : public std::exception
 	{
@@ -58,10 +57,6 @@ public:
 	};
 
 private:
-	bool running;
-	pthread_t thread_id;
-	static void* StartThread(void*);
-
 	fd_set global_read_set;
 	fd_set global_write_set;
 	int serv_sock;
@@ -76,21 +71,18 @@ protected:
 
 	void Listen(uint16_t port, const char* bind) throw (CantOpenSock, CantListen);
 	void CloseAll();
+	void Loop();
+	void OnStop();
 
 public:
 	Scheduler scheduler;
 
 	/* Constructors */
-	NetworkBase() throw (CantRunThread);
+	NetworkBase();
 	virtual ~NetworkBase();
-
-	/** Main loop (select()) */
-	void Main();
 
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer) {}
-
-	bool IsRunning() const { return running; }
 
 	uint16_t GetListeningPort() const { return listening_port; }
 
@@ -100,7 +92,7 @@ public:
 	void HavePacketToSend(const Peer* peer);
 
 	/* Read configuration and start listener, and connect to other servers */
-	virtual Peer* Start(MyConfig* conf);
+	virtual Peer* StartNetwork(MyConfig* conf);
 
 	/* Connect to a specific host and port.
 	 */

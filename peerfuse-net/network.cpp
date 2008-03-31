@@ -154,9 +154,9 @@ void Network::OnRemovePeer(Peer* peer)
 	/* TODO: Loop on all down_links of peer to disconnect from them. */
 }
 
-Peer* Network::Start(MyConfig* config)
+Peer* Network::StartNetwork(MyConfig* config)
 {
-	Peer* peer = NetworkBase::Start(config);
+	Peer* peer = NetworkBase::StartNetwork(config);
 
 	SslSsl* sslssl = dynamic_cast<SslSsl*>(ssl);
 

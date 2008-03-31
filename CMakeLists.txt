@@ -11,6 +11,7 @@ SET(SRC
 	common/peers_list_base.cpp
 	common/pf_dir.cpp
 	common/pf_filebase.cpp
+	common/pf_thread.cpp
 	common/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
