@@ -12,8 +12,6 @@
 
 	* Handle symbolic links
 
-	* Implement SslNoSsl class (if necessary) and test it.
-
 == Peerfuse NET ==
 
 == Peerfuse LAN ==

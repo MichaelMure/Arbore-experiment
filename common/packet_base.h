@@ -82,7 +82,7 @@ public:
 	 *
 	 * @param fd file descriptor of socket
 	 */
-	bool ReceiveContent(Connection* conn) throw(Malformated);
+	bool ReceiveContent(Connection* conn);
 
 	template<typename T>
 		void SetArg(size_t arg, T val)

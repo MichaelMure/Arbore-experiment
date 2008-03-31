@@ -84,7 +84,7 @@ PacketBase::~PacketBase()
 		delete *it;
 }
 
-bool PacketBase::ReceiveContent(Connection* conn) throw(Malformated)
+bool PacketBase::ReceiveContent(Connection* conn)
 {
 	char* buf;
 	if(!conn->Read(&buf, GetDataSize()))

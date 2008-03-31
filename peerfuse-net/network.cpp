@@ -149,10 +149,9 @@ void Network::OnRemovePeer(Peer* peer)
 		{
 			AddDisconnected((*it)->GetAddr());
 		}
-
-		/* TODO: Loop on all down_links of peer to disconnect from them. */
-
 	}
+
+	/* TODO: Loop on all down_links of peer to disconnect from them. */
 }
 
 Peer* Network::Start(MyConfig* config)
