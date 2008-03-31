@@ -427,4 +427,3 @@ void NetworkBase::DelDisconnected(const pf_addr& addr)
 		}
 	}
 }
-
