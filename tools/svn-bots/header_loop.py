@@ -2,6 +2,18 @@
 
 import os, sys, re, getopt
 
+# Load the list of dependancies to ignore
+def load_ignore_list(file):
+	f = open(file)
+	lst = {}
+	for line in f:
+		m = re.compile("^([^#].*)->(.*)$").search(line)
+		if m:
+			if m.group(1) not in lst:
+				lst[m.group(1)] = []
+			lst[m.group(1)].append(m.group(2))
+	return lst
+
 # Recursively check included file for a depency loop
 def check_loop(file, top = False):
 	# Looks for the file on all directories specified to gcc's command line
@@ -41,6 +53,10 @@ def check_loop(file, top = False):
 
 	# Recursively check all included files
 	for inc in includes:
+		# Check the include is not in the ignore list
+		if file in ignore_list and inc in ignore_list[file]:
+			continue
+
 		# Check the the header by itself
 		if inc not in header_checked and check_loop(inc):
 			print "Included by:", file
@@ -71,6 +87,8 @@ if arg[0][len(arg[0])-4:] != ".cpp":
 # We'll emit an error if someone include this file:
 forbidden_header = os.path.basename(arg[0])
 forbidden_header = forbidden_header[:len(forbidden_header)-4] + ".h"
+
+ignore_list = load_ignore_list("../tools/svn-bots/header_loop_ignore")
 
 # Add to the search path the parent folder of the file
 include_dirs.append(os.path.dirname(arg[0]))
