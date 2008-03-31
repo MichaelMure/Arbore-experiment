@@ -36,7 +36,7 @@
 #include "libconfig.h"
 #include "network_base.h"
 #include "tools.h"
-#include "job.h"
+#include "job_new_connection.h"
 #include "scheduler.h"
 #include "peers_list.h"
 #include "pf_thread.h"
@@ -397,3 +397,34 @@ Peer* NetworkBase::StartNetwork(MyConfig* conf)
 	}
 	return peer;
 }
+
+void NetworkBase::AddDisconnected(const pf_addr& addr)
+{
+	if(find(disconnected_list.begin(),
+		disconnected_list.end(), addr) == disconnected_list.end())
+	{
+		disconnected_list.push_back(addr);
+		scheduler.Queue(new JobNewConnection(addr));
+	}
+}
+
+void NetworkBase::DelDisconnected(const pf_addr& addr)
+{
+	log[W_INFO] << "Removed disconnected: " << addr;
+	disconnected_list.remove(addr);
+
+	/* Remove connection from queue. */
+	std::list<Job*> job_list = scheduler.GetQueue();
+	for(std::list<Job*>::iterator it = job_list.begin();
+		it != job_list.end();
+		++it)
+	{
+		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
+		if(job && job->IsMe(addr))
+		{
+			log[W_DEBUG] << "-> removed a job";
+			scheduler.Cancel(job);
+		}
+	}
+}
+

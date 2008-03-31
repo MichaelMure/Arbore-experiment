@@ -35,7 +35,6 @@
 class Network: public NetworkBase
 {
 private:
-	std::list<pf_addr> disconnected_list;
 
 public:
 	/* Constructors */
@@ -44,9 +43,6 @@ public:
 
 	/** Return a list of connected high linkes */
 	StaticPeersList GetDirectHighLinks() const;
-
-	virtual void AddDisconnected(const pf_addr& addr);
-	virtual void DelDisconnected(const pf_addr& addr);
 
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer);

@@ -74,36 +74,6 @@ StaticPeersList Network::GetDirectHighLinks() const
 	return list;
 }
 
-void Network::AddDisconnected(const pf_addr& addr)
-{
-	if(find(disconnected_list.begin(),
-		disconnected_list.end(), addr) == disconnected_list.end())
-	{
-		disconnected_list.push_back(addr);
-		scheduler.Queue(new JobNewConnection(addr));
-	}
-}
-
-void Network::DelDisconnected(const pf_addr& addr)
-{
-	log[W_INFO] << "Removed disconnected: " << addr;
-	disconnected_list.remove(addr);
-
-	/* Remove connection from queue. */
-	std::list<Job*> job_list = scheduler.GetQueue();
-	for(std::list<Job*>::iterator it = job_list.begin();
-		it != job_list.end();
-		++it)
-	{
-		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
-		if(job && job->IsMe(addr))
-		{
-			log[W_DEBUG] << "-> removed a job";
-			scheduler.Cancel(job);
-		}
-	}
-}
-
 Peer* Network::AddPeer(Peer* peer)
 {
 	Peer* p;

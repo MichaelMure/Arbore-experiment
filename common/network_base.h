@@ -64,6 +64,8 @@ private:
 
 	uint16_t listening_port;
 
+	std::list<pf_addr> disconnected_list;
+
 protected:
 	Ssl *ssl;
 
@@ -73,6 +75,9 @@ protected:
 	void CloseAll();
 	void Loop();
 	void OnStop();
+
+	void AddDisconnected(const pf_addr& addr);
+	void DelDisconnected(const pf_addr& addr);
 
 public:
 	Scheduler scheduler;
@@ -101,8 +106,5 @@ public:
 	/* Connect to a pf_addr.
 	 */
 	virtual Peer* Connect(pf_addr addr);
-
-	virtual void AddDisconnected(const pf_addr& addr) {}
-	virtual void DelDisconnected(const pf_addr& addr) {}
 };
 #endif
