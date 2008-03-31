@@ -51,7 +51,7 @@ NetworkBase::NetworkBase()
 	FD_ZERO(&global_read_set);
 
 	srand(time(NULL));
-	Start(); // Start the network's loop
+	Start();				  // Start the network's loop
 }
 
 NetworkBase::~NetworkBase()
@@ -119,7 +119,7 @@ void NetworkBase::Loop()
 			return;
 		}
 	}
-	else if(events > 0)		  /* events = 0 means that there isn't any event (but timeout expired) */
+	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		for(int i = 0;i <= highsock;++i)
 		{
@@ -184,7 +184,7 @@ void NetworkBase::Loop()
 					log[W_ERR] << "Received malformed message!";
 					RemovePeer(i);
 				}
-					  // TODO:Rename me into something like BanPeer as we won't reconnect to him
+				// TODO:Rename me into something like BanPeer as we won't reconnect to him
 				catch(Peer::MustDisconnect &e)
 				{
 					log[W_WARNING] << "Must disconnected";

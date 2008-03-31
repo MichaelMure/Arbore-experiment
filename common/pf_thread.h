@@ -49,5 +49,4 @@ public:
 	bool IsRunning();
 
 };
-
-#endif /* PF_THREAD_H */
+#endif						  /* PF_THREAD_H */
