@@ -17,7 +17,7 @@
  * $Id$
  */
 
-#include "peers_list.h"
+#include "peers_list_base.h"
 #include "peer.h"
 #include "mutex.h"
 #include "log.h"
