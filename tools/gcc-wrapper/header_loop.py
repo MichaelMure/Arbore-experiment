@@ -77,7 +77,7 @@ def check_loop(file, top = False):
 # Parse options, nicely ignore gcc flags
 include_dirs = []
 header_checked = []
-opt, arg = getopt.gnu_getopt(sys.argv[1:], "I:o:D:W:f:r:l:L:cg")
+opt, arg = getopt.gnu_getopt(sys.argv[2:], "I:o:D:W:f:r:l:L:cg")
 
 # Build the path to search for files
 for option in opt:
@@ -92,7 +92,7 @@ if arg[0][len(arg[0])-4:] != ".cpp":
 forbidden_header = os.path.basename(arg[0])
 forbidden_header = forbidden_header[:len(forbidden_header)-4] + ".h"
 
-ignore_list = load_ignore_list("../tools/svn-bots/header_loop_ignore")
+ignore_list = load_ignore_list("../tools/gcc-wrapper/header_loop_ignore")
 
 # Add to the search path the parent folder of the file
 include_dirs.append(os.path.dirname(arg[0]))

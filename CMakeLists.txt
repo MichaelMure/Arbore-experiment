@@ -100,3 +100,17 @@ TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY} ${OPENSSL
 SET(CMAKE_BUILD_TYPE ${BUILD})
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
+
+STRING(COMPARE EQUAL ${CMAKE_BUILD_TYPE} "Debug" DEBUG_BUILD)
+IF(DEBUG_BUILD)
+	MESSAGE(STATUS "We'll perform tests during compilation")
+	# Looks a bit like a hack.. should find a better way to do this
+	SET(CMAKE_C_FLAGS "${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_COMPILER} ${CMAKE_CXX_FLAGS}")
+	SET(CMAKE_C_COMPILER "${CMAKE_CURRENT_SOURCE_DIR}/tools/gcc-wrapper/my-gcc.sh")
+	SET(CMAKE_CXX_COMPILER "${CMAKE_CURRENT_SOURCE_DIR}/tools/gcc-wrapper/my-gcc.sh")
+ENDIF(DEBUG_BUILD)
+
+MESSAGE(STATUS "Using compiler ${CMAKE_CXX_COMPILER}")
+MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
