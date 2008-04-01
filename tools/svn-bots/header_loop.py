@@ -42,6 +42,10 @@ def check_loop(file, top = False):
 		m = re.compile('#include "([^"]*)"').search(line)
 		if m:
 			if m.group(1) == forbidden_header and not top:
+				# Check the include is not in the ignore list
+				if file in ignore_list and m.group(1) in ignore_list[file]:
+					continue
+
 				print "Dependencie loop detected:", arg[0], "->", file
 				return True
 

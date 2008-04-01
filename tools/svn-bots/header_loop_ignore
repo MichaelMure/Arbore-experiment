@@ -1,4 +1,8 @@
 # Specify a list include to ignore
-# NetworkBase instantiate Peer
+# NetworkBase instantiate a Peer before passing to the PeersList
 network_base.cpp->peer.h
 network_base.h->peer.h
+
+# NetworkBase instantiate a JobNewConnection before passing it to SchedulerQueue
+network_base.cpp->job_new_connection.h
+
