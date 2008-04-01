@@ -24,7 +24,8 @@
 
 class Job;
 
-class SchedulerQueue : public std::list<Job*>, public Mutex /* TODO: Make me private */
+						  /* TODO: Make me private */
+class SchedulerQueue : public std::list<Job*>, public Mutex
 {
 public:
 	SchedulerQueue() : Mutex(RECURSIVE_MUTEX) {}
@@ -47,4 +48,4 @@ public:
 };
 
 extern SchedulerQueue scheduler_queue;
-#endif /* SCHEDULER_QUEUE_H */
+#endif						  /* SCHEDULER_QUEUE_H */

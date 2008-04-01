@@ -77,4 +77,3 @@ size_t SchedulerQueue::GetQueueSize()
 	BlockLockMutex lock(this);
 	return size();
 }
-

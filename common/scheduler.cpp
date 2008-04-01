@@ -45,7 +45,7 @@ void Scheduler::Loop()
 		 */
 		Job* job = scheduler_queue.PopJob();
 
-		if(job) /* The queue may have been emptied externaly */
+		if(job)				  /* The queue may have been emptied externaly */
 		{
 			if(job->DoStart())
 				scheduler_queue.Queue(job);
@@ -54,4 +54,3 @@ void Scheduler::Loop()
 		}
 	}
 }
-

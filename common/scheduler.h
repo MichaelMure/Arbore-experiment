@@ -33,5 +33,4 @@ public:
 };
 
 extern Scheduler scheduler;
-
 #endif
