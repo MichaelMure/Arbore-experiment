@@ -156,7 +156,7 @@ function start_test
 		done
 	fi
 
-	sleep 1
+	sleep 2
 
 	cd - >/dev/null
 	rm -rf "$WORKDIR"

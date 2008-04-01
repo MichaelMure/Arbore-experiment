@@ -15,6 +15,7 @@ SET(SRC
 	common/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
+	common/scheduler_queue.cpp
 	common/tools.cpp
 
 	common/ssl/certificate.cpp

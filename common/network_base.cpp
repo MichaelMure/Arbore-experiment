@@ -37,7 +37,7 @@
 #include "network_base.h"
 #include "tools.h"
 #include "job_new_connection.h"
-#include "scheduler.h"
+#include "scheduler_queue.h"
 #include "peers_list.h"
 #include "pf_thread.h"
 
@@ -57,6 +57,11 @@ NetworkBase::NetworkBase()
 NetworkBase::~NetworkBase()
 {
 	delete ssl;
+	if(serv_sock != -1)
+	{
+		shutdown(serv_sock, SHUT_RDWR);
+		close(serv_sock);
+	}
 }
 
 void NetworkBase::HavePacketToSend(const Peer* peer)
@@ -193,8 +198,6 @@ void NetworkBase::Loop()
 			}
 		}
 	}
-
-	scheduler.HandleJobs();
 }
 
 void NetworkBase::OnStop()
@@ -404,7 +407,7 @@ void NetworkBase::AddDisconnected(const pf_addr& addr)
 		disconnected_list.end(), addr) == disconnected_list.end())
 	{
 		disconnected_list.push_back(addr);
-		scheduler.Queue(new JobNewConnection(addr));
+		scheduler_queue.Queue(new JobNewConnection(addr));
 	}
 }
 
@@ -414,16 +417,17 @@ void NetworkBase::DelDisconnected(const pf_addr& addr)
 	disconnected_list.remove(addr);
 
 	/* Remove connection from queue. */
-	std::list<Job*> job_list = scheduler.GetQueue();
-	for(std::list<Job*>::iterator it = job_list.begin();
-		it != job_list.end();
+	scheduler_queue.Lock();
+	for(SchedulerQueue::iterator it = scheduler_queue.begin();
+		it != scheduler_queue.end();
 		++it)
 	{
 		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
 		if(job && job->IsMe(addr))
 		{
 			log[W_DEBUG] << "-> removed a job";
-			scheduler.Cancel(job);
+			scheduler_queue.Cancel(job);
 		}
 	}
+	scheduler_queue.Unlock();
 }

@@ -27,9 +27,15 @@ export BINNAME="$1"
 export BIN="$TESTS/../../build.$1/$1"
 #export TOOL=valgrind
 
-if [ ! -x "$BIN" ] || [ "$BINNAME" == "" ]
+if [ "$BINNAME" == "" ]
 then
 	echo "Syntax: ./start_all.sh <peerfuse-net/peerfuse-lan>"
+	exit 1
+fi
+
+if [ ! -x "$BIN" ]
+then
+	echo "Can't start $BIN"
 	exit 1
 fi
 

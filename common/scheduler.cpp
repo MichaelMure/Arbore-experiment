@@ -22,73 +22,36 @@
 #include <algorithm>
 #include "job.h"
 #include "scheduler.h"
+#include "scheduler_queue.h"
 #include "log.h"
 
-Scheduler::Scheduler()
-{
-}
-
-Scheduler::~Scheduler()
-{
-}
+Scheduler scheduler;
 
 // Check if a queued job needs to be started
-void Scheduler::HandleJobs()
+void Scheduler::Loop()
 {
-	if(job_queue.size() == 0)
+	sleep(1);
+	if(scheduler_queue.GetQueueSize() == 0)
 		return;
 
 	time_t now = time(NULL);
 
-	while(job_queue.size() != 0 && job_queue.front()->GetStartTime() < now)
+	while(scheduler_queue.NextJobTime() && scheduler_queue.NextJobTime() < now)
 	{
-		log[W_DEBUG] << "Begining handling job." << job_queue.size();
+		log[W_DEBUG] << "Begining handling job." << scheduler_queue.GetQueueSize();
 
 		/* We remove job from queue before calling it, to prevent
 		 * crash if it tries to change queue list.
 		 */
-		Job* job = job_queue.front();
-		job_queue.erase(job_queue.begin());
+		Job* job = scheduler_queue.PopJob();
 
-		if(job->DoStart())
-			Queue(job);
-		else
-			delete job;
-	}
-}
-
-// Queue a new job
-void Scheduler::Queue(Job* job)
-{
-	log[W_INFO] << "New job queued";
-	for(std::list<Job*>::iterator it = job_queue.begin();
-		it != job_queue.end();
-		++it)
-	{
-		if(job->GetStartTime() < (*it)->GetStartTime())
+		if(job) /* The queue may have been emptied externaly */
 		{
-			job_queue.insert(it, job);
-			return;
+			if(job->DoStart())
+				scheduler_queue.Queue(job);
+			else
+				delete job;
 		}
 	}
-
-	job_queue.push_back(job);
 }
 
-void Scheduler::Cancel(Job* job)
-{
-	std::list<Job*>::iterator it = std::find(job_queue.begin(), job_queue.end(), job);
-
-	if(it == job_queue.end())
-		return;
-
-	job_queue.erase(it);
-	delete job;
-}
-
-time_t Scheduler::NextJobTime() const
-{
-	if(job_queue.size() == 0)
-		return 0;
-	return job_queue.front()->GetStartTime();
-}

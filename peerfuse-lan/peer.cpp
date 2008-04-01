@@ -34,6 +34,7 @@
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
+#include "scheduler_queue.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn)
 			: addr(_addr),
@@ -135,7 +136,7 @@ void Peer::Handle_net_start_merge(struct Packet* pckt)
 {
 	SetFlag(MERGING);
 
-	net.scheduler.Queue(new JobOtherConnect(this));
+	scheduler_queue.Queue(new JobOtherConnect(this));
 }
 
 void Peer::Handle_net_peer_connection(struct Packet* msg)
@@ -166,10 +167,10 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
 {
 	pf_addr new_peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ACK_ADDRESS);
-	std::list<Job*>& jobs = net.scheduler.GetQueue();
 
-	for(std::list<Job*>::iterator it = jobs.begin();
-		it != jobs.end();
+	scheduler_queue.Lock();
+	for(SchedulerQueue::iterator it = scheduler_queue.begin();
+		it != scheduler_queue.end();
 		++it)
 	{
 		if((*it)->GetType() == JOB_OTHER_CONNECT)
@@ -179,17 +180,18 @@ void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
 				j->PeerConnected(this);
 		}
 	}
+	scheduler_queue.Unlock();
 }
 
 void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 {
 	pf_addr new_peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_RST_ADDRESS);
 
+	scheduler_queue.Lock();
 	/* we will erase some data from scheduler's queue, so
 	 * do a copy of it here. */
-	std::list<Job*> jobs = net.scheduler.GetQueue();
-
-	for(std::list<Job*>::iterator it = jobs.begin();
+	SchedulerQueue jobs = scheduler_queue;
+	for(SchedulerQueue::iterator it = jobs.begin();
 		it != jobs.end();
 		++it)
 	{
@@ -197,9 +199,10 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 		{
 			JobOtherConnect* j = static_cast<JobOtherConnect*>(*it);
 			if(j->IsConnectingTo(new_peer))
-				net.scheduler.Cancel(j);
+				scheduler_queue.Cancel(j);
 		}
 	}
+	scheduler_queue.Unlock();
 
 	// notifiy the peer he can't be contacted by *this
 	BlockLockMutex lock(&peers_list);

@@ -29,7 +29,6 @@
 
 #include "pf_thread.h"
 #include "pf_ssl.h"
-#include "scheduler.h"
 #include "peer.h"
 #include "pf_types.h"
 
@@ -80,8 +79,6 @@ protected:
 	void DelDisconnected(const pf_addr& addr);
 
 public:
-	Scheduler scheduler;
-
 	/* Constructors */
 	NetworkBase();
 	virtual ~NetworkBase();

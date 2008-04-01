@@ -33,6 +33,7 @@
 #include "log.h"
 #include "pf_file.h"
 #include "session_config.h"
+#include "scheduler.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -92,6 +93,7 @@ int Application::main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String());
+		scheduler.Start();
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
@@ -123,7 +125,7 @@ int Application::main(int argc, char *argv[])
 	}
 	catch(Network::CantListen &e)
 	{
-		log[W_ERR] << "Unable to liston on port " << e.port << ", exiting..";
+		log[W_ERR] << "Unable to listen on port " << e.port << ", exiting..";
 	}
 	catch(Network::CantResolvHostname &e)
 	{

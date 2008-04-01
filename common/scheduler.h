@@ -21,29 +21,17 @@
 #define SCHEDULER_H
 #include <list>
 #include <time.h>
+#include "pf_thread.h"
 
-class Job;
-
-class Scheduler
+class Scheduler : public Thread
 {
-	std::list<Job*> job_queue;
+protected:
+	void Loop();
 public:
-	Scheduler();
-	~Scheduler();
-
-	// Check if a queued job needs to be started
-	void HandleJobs();
-
-	// Put a new job into queue
-	void Queue(Job* job);
-
-	// Remove a job from the queue
-	void Cancel(Job* job);
-
-	// Return the date of the next scheduled job
-	time_t NextJobTime() const;
-
-	size_t GetQueueSize() const { return job_queue.size(); }
-	std::list<Job*>& GetQueue() { return job_queue; }
+	Scheduler() {}
+	~Scheduler() {}
 };
+
+extern Scheduler scheduler;
+
 #endif
