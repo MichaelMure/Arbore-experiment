@@ -70,7 +70,7 @@ void NetworkBase::HavePacketToSend(const Peer* peer)
 
 Peer* NetworkBase::AddPeer(Peer* p)
 {
-	log[W_CONNEC] << "-> Added a new peer: " << p->GetFd();
+	log[W_CONNEC] << "-> Added a new peer: " << p->GetAddr() << " (" << p->GetFd() <<")";
 
 	if(p->GetFd() >= 0)
 	{

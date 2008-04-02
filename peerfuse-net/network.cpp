@@ -68,7 +68,7 @@ StaticPeersList Network::GetDirectHighLinks() const
 	StaticPeersList list;
 	PeersList::iterator it;
 	for(it = peers_list.begin(); it != peers_list.end(); ++it)
-		if((*it)->IsHighLink())
+		if((*it)->IsHighLink() && !(*it)->IsAnonymous())
 			list.push_back(*it);
 
 	return list;

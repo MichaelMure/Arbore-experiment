@@ -26,5 +26,7 @@ public:
 	Application();
 
 	int main(int argc, char *argv[]);
+
+	static void StartThreads();
 };
 #endif

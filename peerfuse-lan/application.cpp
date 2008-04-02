@@ -45,8 +45,7 @@ MyConfig conf;
 
 void* fuse_init(struct fuse_conn_info* fuse_info)
 {
-	scheduler.Start();
-	net.Start();
+	Application::StartThreads();
 	return NULL;
 }
 
@@ -72,6 +71,12 @@ Application::Application()
 	section = conf.AddSection("hdd", "Harddisk configuration", false);
 	section->AddItem(new ConfigItem_string("root", "Root directory of storage"));
 	section->AddItem(new ConfigItem_string("workdir", "Root directory of config files"));
+}
+
+void Application::StartThreads()
+{
+	scheduler.Start();
+	net.Start();
 }
 
 int Application::main(int argc, char *argv[])
@@ -120,6 +125,7 @@ int Application::main(int argc, char *argv[])
 		#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);
 		#else
+		StartThreads(); /* this function may be called by fuse_main, so without fuse we call it ourselves. */
 		while(1) sleep(1);
 		#endif
 	}
