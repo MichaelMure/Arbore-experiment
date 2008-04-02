@@ -51,7 +51,6 @@ NetworkBase::NetworkBase()
 	FD_ZERO(&global_read_set);
 
 	srand(time(NULL));
-	Start();				  // Start the network's loop
 }
 
 NetworkBase::~NetworkBase()
