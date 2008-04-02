@@ -43,6 +43,13 @@
 
 MyConfig conf;
 
+void* fuse_init(struct fuse_conn_info* fuse_info)
+{
+	scheduler.Start();
+	net.Start();
+	return NULL;
+}
+
 Application::Application()
 {
 	ConfigSection* section = conf.AddSection("listen", "Listening server", false);
@@ -91,7 +98,6 @@ int Application::main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String());
-		scheduler.Start();
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");

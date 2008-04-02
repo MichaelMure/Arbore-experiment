@@ -33,6 +33,7 @@ int pf_rename(const char* path, const char* new_path);
 int pf_rmdir(const char *path);
 int pf_unlink(const char *path);
 int pf_utimens(const char *path, const struct timespec ts[2]);
+void* fuse_init(struct fuse_conn_info* fuse_info);
 
 extern struct fuse_operations pf_oper;
 #endif						  // P2PFS_FUSE

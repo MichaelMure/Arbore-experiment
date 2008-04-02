@@ -71,7 +71,7 @@ struct fuse_operations pf_oper =
 	pf_readdir,
 	NULL,					  /* pf_releasedir */
 	NULL,					  /* pf_fsyncdir */
-	NULL,					  /* pf_init */
+	fuse_init,					  /* pf_init */
 	NULL,					  /* pf_destroy */
 	NULL,					  /* pf_access */
 	pf_create,
