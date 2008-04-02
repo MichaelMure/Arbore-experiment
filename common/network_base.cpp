@@ -150,7 +150,7 @@ void NetworkBase::Loop()
 				unsigned int addrlen = sizeof newcon;
 				int newfd = accept(serv_sock, (struct sockaddr *) &newcon, &addrlen);
 
-				if(newfd)
+				if(newfd != -1)
 				{
 					/* none_addr is initialized to NULL */
 					static pf_addr none_addr;
