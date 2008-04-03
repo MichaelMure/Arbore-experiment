@@ -42,6 +42,7 @@ function start_p2pfs
 	export $CONFDIR="$WORKDIR/confdir$NB_P2PFS"
 	mkdir ${!CONFDIR} || true 2>&1 # don't exit on error
 
+	# Set some default options if they are not set
 	CACHE="CACHE$NB_P2PFS"
 	if [ "$CACHE_ROOT" == "" ]
 	then
@@ -51,6 +52,11 @@ function start_p2pfs
 	else
 		export $CACHE="$CACHE_ROOT"
 	fi
+	if [ "$START_ARGS" == "" ]
+	then
+		START_ARGS="-d"
+	fi
+	echo $START_ARGS
 
 	build_conf "${!CONF}"
 	unset CACHE_ROOT
@@ -67,12 +73,12 @@ function start_p2pfs
 	# Start a peer and store its pid
 	case "$TOOL" in
 		"")
-			"$BIN" "${!CONF}" "${!MNT}" -d > "${!LOG}" 2>&1 &
+			"$BIN" "${!CONF}" "${!MNT}" $START_ARGS > "${!LOG}" 2>&1 &
 			;;
 		"valgrind")
 			export VAL="VAL$NB_P2PFS"
 			export $VAL="$WORKDIR/p2pfs_val$NB_P2PFS"
-			valgrind --log-file="${!VAL}" "$BIN" "$1" "${!MNT}" -d > "${!LOG}" 2>&1 &
+			valgrind --log-file="${!VAL}" "$BIN" "$1" "${!MNT}" $START_ARGS > "${!LOG}" 2>&1 &
 			;;
 	esac
 
