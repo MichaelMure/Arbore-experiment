@@ -39,7 +39,7 @@ Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent)
 			ts_diff(0),
 			incoming(NULL),
 			uplink(parent),
-			flags((conn ? ANONYMOUS : 0) | _flags)			  /* anonymous is only when this is a real connection */
+			flags((conn ? ANONYMOUS : 0) | _flags)		  /* anonymous is only when this is a real connection */
 {
 	assert(conn);
 	addr.id = conn->GetCertificateID();
