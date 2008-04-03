@@ -118,7 +118,7 @@ int Application::main(int argc, char *argv[])
 		#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);
 		#else
-		StartThreads(); /* this function may be called by fuse_main, so without fuse we call it ourselves. */
+		StartThreads();			  /* this function may be called by fuse_main, so without fuse we call it ourselves. */
 		while(1) sleep(1);
 		#endif
 	}
