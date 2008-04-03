@@ -82,7 +82,7 @@ public:
 	};
 
 	/* Constructors */
-	Peer(pf_addr addr, Connection* _conn, Peer* parent = 0);
+	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, Peer* parent = 0);
 	~Peer();
 
 	pf_id GetID() const { return addr.id; }

@@ -36,12 +36,12 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 
-Peer::Peer(pf_addr _addr, Connection* _conn)
+Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags)
 			: addr(_addr),
 			conn(_conn),
 			ts_diff(0),
 			incoming(NULL),
-			flags(0)
+			flags(_flags)
 {
 }
 

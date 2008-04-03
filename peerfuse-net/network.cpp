@@ -86,6 +86,12 @@ Peer* Network::AddPeer(Peer* peer)
 	else
 		peer->SetHighLink(peer);
 
+	if(peers_list.Size() == 0 && p->HasFlag(Peer::SERVER))
+	{
+		// This is the first peer to which we connected
+		peer->SetHighLink();
+		peer->SendHello();
+	}
 	return NetworkBase::AddPeer(peer);
 }
 
@@ -124,9 +130,9 @@ void Network::OnRemovePeer(Peer* peer)
 	/* TODO: Loop on all down_links of peer to disconnect from them. */
 }
 
-Peer* Network::StartNetwork(MyConfig* config)
+void Network::StartNetwork(MyConfig* conf)
 {
-	Peer* peer = NetworkBase::StartNetwork(config);
+	NetworkBase::StartNetwork(conf);
 
 	SslSsl* sslssl = dynamic_cast<SslSsl*>(ssl);
 
@@ -134,11 +140,4 @@ Peer* Network::StartNetwork(MyConfig* config)
 	Certificate cert = sslssl->GetCertificate();
 	peers_list.SetMyID(cert.GetIDFromCertificate());
 
-	if(peer)
-	{
-		peer->SetHighLink();
-		peer->SendHello();
-	}
-
-	return peer;
 }

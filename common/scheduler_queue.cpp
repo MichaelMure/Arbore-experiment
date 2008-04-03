@@ -21,6 +21,7 @@
 #include "scheduler_queue.h"
 #include "mutex.h"
 #include "job.h"
+#include "job_types.h"
 
 SchedulerQueue scheduler_queue;
 
@@ -62,6 +63,23 @@ void SchedulerQueue::Cancel(Job* job)
 
 	erase(it);
 	delete job;
+}
+
+void SchedulerQueue::CancelType(enum job_type jtype)
+{
+	BlockLockMutex lock(this);
+
+	iterator it = begin();
+	while(it != end())
+	{
+		if((*it)->GetType() == jtype)
+		{
+			delete *it;
+			it = erase(it);
+		}
+		else
+			++it;
+	}
 }
 
 time_t SchedulerQueue::NextJobTime()

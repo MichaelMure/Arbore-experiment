@@ -94,11 +94,11 @@ public:
 	void HavePacketToSend(const Peer* peer);
 
 	/* Read configuration and start listener, and connect to other servers */
-	virtual Peer* StartNetwork(MyConfig* conf);
+	virtual void StartNetwork(MyConfig* conf);
 
-	/* Connect to a specific host and port.
+	/* Make a pf_addr from a hostname/port
 	 */
-	Peer* Connect(const std::string& hostname, uint16_t port);
+	pf_addr MakeAddr(const std::string& hostname, uint16_t port);
 
 	/* Connect to a pf_addr.
 	 */

@@ -33,13 +33,13 @@
 #include "session_config.h"
 #include "peers_list.h"
 
-Peer::Peer(pf_addr _addr, Connection* _conn, Peer* parent)
+Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent)
 			: addr(_addr),
 			conn(dynamic_cast<ConnectionSsl*>(_conn)),
 			ts_diff(0),
 			incoming(NULL),
 			uplink(parent),
-			flags(conn ? ANONYMOUS : 0)			  /* anonymous is only when this is a real connection */
+			flags((conn ? ANONYMOUS : 0) | _flags)			  /* anonymous is only when this is a real connection */
 {
 	assert(conn);
 	addr.id = conn->GetCertificateID();

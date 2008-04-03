@@ -21,9 +21,9 @@
 #define SCHEDULER_QUEUE_H
 #include <list>
 #include "mutex.h"
+#include "job_types.h"
 
 class Job;
-
 						  /* TODO: Make me private */
 class SchedulerQueue : public std::list<Job*>, public Mutex
 {
@@ -39,6 +39,9 @@ public:
 
 	// Remove a job from the queue
 	void Cancel(Job* job);
+
+	// Remove all jobs of a specific type from the queue
+	void CancelType(enum job_type jtype);
 
 	// Return the date of the next scheduled job
 	time_t NextJobTime();

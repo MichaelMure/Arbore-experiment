@@ -80,6 +80,13 @@ Peer* NetworkBase::AddPeer(Peer* p)
 			highsock = p->GetFd();
 	}
 
+	if(peers_list.Size() == 0)
+	{
+		// This is the first peer to which we connect
+		// No need to make more connections attempt to other peers
+		scheduler_queue.CancelType(JOB_NEW_CONNECT);
+	}
+
 	peers_list.Add(p);
 
 	return p;
@@ -223,7 +230,7 @@ void NetworkBase::CloseAll()
 	ssl = 0;
 }
 
-Peer* NetworkBase::Connect(const std::string& hostname, uint16_t port)
+pf_addr NetworkBase::MakeAddr(const std::string& hostname, uint16_t port)
 {
 	assert(ssl);
 
@@ -247,7 +254,7 @@ Peer* NetworkBase::Connect(const std::string& hostname, uint16_t port)
 	else
 		addr.ip[3] = inet_addr(ip);
 
-	return Connect(addr);
+	return addr;
 }
 
 Peer* NetworkBase::Connect(pf_addr addr)
@@ -295,9 +302,8 @@ Peer* NetworkBase::Connect(pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	Peer* p = AddPeer(new Peer(addr, conn));
+	Peer* p = AddPeer(new Peer(addr, conn, Peer::SERVER));
 
-	p->SetFlag(Peer::SERVER);
 	DelDisconnected(addr);
 	return p;
 }
@@ -351,7 +357,7 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 	listening_port = port;
 }
 
-Peer* NetworkBase::StartNetwork(MyConfig* conf)
+void NetworkBase::StartNetwork(MyConfig* conf)
 {
 	assert(ssl == NULL);
 
@@ -376,28 +382,12 @@ Peer* NetworkBase::StartNetwork(MyConfig* conf)
 		section->GetItem("bind")->String().c_str());
 
 	/* Connect to other servers */
-	Peer* peer = NULL;
 	std::vector<ConfigSection*> sections = conf->GetSectionClones("connection");
 	for(std::vector<ConfigSection*>::iterator it = sections.begin(); it != sections.end(); ++it)
 	{
-		try
-		{
-			peer = Connect((*it)->GetItem("host")->String(),
-				static_cast<uint16_t>((*it)->GetItem("port")->Integer()));
-
-			/* If Connect() doesn't raise any exception, we are connected and we leave loop */
-			break;
-		}
-		catch(...)
-		{
-			/* We don't care about error and what it is, we'll so try to connect
-			 * to next server.
-			 * If there isn't any server, we wait alone.
-			 */
-			log[W_INFO] << "Unable to connect to " << (*it)->GetItem("host")->String() << ":" << (*it)->GetItem("port")->Integer();
-		}
+		pf_addr addr = MakeAddr((*it)->GetItem("host")->String(),static_cast<uint16_t>((*it)->GetItem("port")->Integer()));
+		scheduler_queue.Queue(new JobNewConnection(addr));
 	}
-	return peer;
 }
 
 void NetworkBase::AddDisconnected(const pf_addr& addr)

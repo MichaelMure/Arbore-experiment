@@ -72,7 +72,7 @@ public:
 	};
 
 	/* Constructors */
-	Peer(pf_addr addr, Connection* _conn);
+	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0);
 	~Peer();
 
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
