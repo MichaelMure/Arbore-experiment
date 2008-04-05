@@ -23,14 +23,14 @@
 #include "connection_ssl.h"
 #include "pf_types.h"
 #include "packet.h"
-#include "peer_interface.h"
+#include "peer_base.h"
 #include <queue>
 
 class Peer;
 
 typedef std::vector<Peer*> StaticPeersList;
 
-class Peer : public PeerInterface
+class Peer : public PeerBase
 {
 	pf_addr addr;
 	ConnectionSsl* conn;

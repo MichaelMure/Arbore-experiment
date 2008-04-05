@@ -23,12 +23,12 @@
 #include "connection.h"
 #include "pf_types.h"
 #include "packet.h"
-#include "peer_interface.h"
+#include "peer_base.h"
 #include <queue>
 
 class Peer;
 
-class Peer : public PeerInterface
+class Peer : public PeerBase
 {
 	pf_addr addr;
 	Connection* conn;

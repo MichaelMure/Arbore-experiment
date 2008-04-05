@@ -17,17 +17,17 @@
  * $Id$
  */
 
-#ifndef PEER_INTERFACE_H
-#define PEER_INTERFACE_H
+#ifndef PEER_BASE_H
+#define PEER_BASE_H
 
 #include "pf_types.h"
 #include "packet.h"
 
-class PeerInterface
+class PeerBase
 {
 
 public:
-	virtual ~PeerInterface() {};
+	virtual ~PeerBase() {};
 
 	virtual pf_id GetID() const = 0;
 	virtual int GetFd() const = 0;
@@ -49,4 +49,4 @@ public:
 	virtual void SendHello() = 0;
 	virtual bool Receive() = 0;
 };
-#endif						  /* PEER_INTERFACE_H */
+#endif						  /* PEER_BASE_H */
