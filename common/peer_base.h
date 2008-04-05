@@ -20,33 +20,61 @@
 #ifndef PEER_BASE_H
 #define PEER_BASE_H
 
+#include <queue>
 #include "pf_types.h"
+#include "connection.h"
 #include "packet.h"
 
 class PeerBase
 {
+protected:
+	pf_addr addr;
+	Connection* conn;
+
+	int ts_diff;				  // diff between our timestamp and its timestamp */
+	Packet* incoming;			  // packet we are receiving
+	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
+
+	unsigned int flags;
+
 
 public:
-	virtual ~PeerBase() {};
+	enum
+	{
+		/* Flags common to pfnet/pflan */
+		SERVER      = 1 << 0,	  /**< This peer is a server */
+		MERGING     = 1 << 1,	  /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
+		/* pfnet only flags */
+		MERGING_ACK = 1 << 2,	  /**< We are waiting for an ACK */
+		HIGHLINK    = 1 << 3,	  /**< This peer is a highlink */
+		ANONYMOUS   = 1 << 4,	  /**< We don't know this peer (between connection and HELLO) */
+	};
 
-	virtual pf_id GetID() const = 0;
-	virtual int GetFd() const = 0;
-	virtual pf_addr GetAddr() const = 0;
+	/* Exceptions */
+	class MustDisconnect : public std::exception {};
 
-	virtual time_t Timestamp(time_t ts) = 0;
+	PeerBase(pf_addr _addr, Connection* _conn, unsigned int _flags);
+	virtual ~PeerBase();
 
-	virtual bool IsServer() const = 0;
-	virtual bool IsClient() const = 0;
+	int GetFd() const { return conn ? conn->GetFd() : -1; }
+	pf_addr GetAddr() const { return addr; }
 
-	virtual void SetFlag(unsigned int f) = 0;
-	virtual void DelFlag(unsigned int f) = 0;
-	virtual bool HasFlag(unsigned int f) = 0;
+	time_t Timestamp(time_t ts) { return ts_diff + ts; }
+
+	pf_id GetID() const { return addr.id; }
+
+	bool IsServer() const { return (flags & SERVER); }
+	bool IsClient() const { return !(flags & SERVER); }
+
+	void SetFlag(unsigned int f) { flags |= f; }
+	void DelFlag(unsigned int f) { flags &= ~f; }
+	bool HasFlag(unsigned int f) { return flags & f; }
 
 	virtual void HandleMsg(struct Packet* pckt) = 0;
-
-	virtual void Flush() = 0;
 	virtual void SendMsg(const Packet& pckt) = 0;
 	virtual void SendHello() = 0;
-	virtual bool Receive() = 0;
+
+	virtual bool Receive();
+	void Flush();
 };
 #endif						  /* PEER_BASE_H */

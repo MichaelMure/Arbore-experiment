@@ -24,21 +24,11 @@
 #include "pf_types.h"
 #include "packet.h"
 #include "peer_base.h"
-#include <queue>
 
 class Peer;
 
 class Peer : public PeerBase
 {
-	pf_addr addr;
-	Connection* conn;
-
-	int ts_diff;				  // diff between our timestamp and its timestamp */
-	Packet* incoming;			  // packet we are receiving
-	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
-
-	unsigned int flags;
-
 	// Message handling functions
 	void Handle_net_hello(struct Packet* pckt);
 	void Handle_net_your_id(struct Packet* pckt);
@@ -55,9 +45,7 @@ class Peer : public PeerBase
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
 public:
-
 	/* Exceptions */
-	class MustDisconnect : public std::exception {};
 	class PeerCantConnect: public std::exception
 	{
 		public:
@@ -65,35 +53,13 @@ public:
 			PeerCantConnect(const pf_addr _addr) : addr(_addr) {}
 	};
 
-	enum
-	{
-		SERVER     = 1 << 0,
-		MERGING    = 1 << 1,
-	};
-
 	/* Constructors */
 	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0);
 	~Peer();
 
-	int GetFd() const { return conn ? conn->GetFd() : -1; }
-	pf_addr GetAddr() const { return addr; }
-
-	time_t Timestamp(time_t ts) { return ts_diff + ts; }
-
-	pf_id GetID() const { return addr.id; }
-
-	bool IsServer() const { return (flags & SERVER); }
-	bool IsClient() const { return !(flags & SERVER); }
-
-	void SetFlag(unsigned int f) { flags |= f; }
-	void DelFlag(unsigned int f) { flags &= ~f; }
-	bool HasFlag(unsigned int f) { return flags & f; }
-
 	void HandleMsg(struct Packet* pckt);
 
-	void Flush();
 	void SendMsg(const Packet& pckt);
 	void SendHello();
-	bool Receive();
 };
 #endif

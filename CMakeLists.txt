@@ -10,6 +10,7 @@ SET(SRC
 	common/log.cpp
 	common/mutex.cpp
 	common/network_base.cpp
+	common/peer_base.cpp
 	common/peers_list_base.cpp
 	common/pf_dir.cpp
 	common/pf_filebase.cpp

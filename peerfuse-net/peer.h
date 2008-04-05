@@ -24,7 +24,6 @@
 #include "pf_types.h"
 #include "packet.h"
 #include "peer_base.h"
-#include <queue>
 
 class Peer;
 
@@ -32,13 +31,6 @@ typedef std::vector<Peer*> StaticPeersList;
 
 class Peer : public PeerBase
 {
-	pf_addr addr;
-	ConnectionSsl* conn;
-
-	int ts_diff;				  // diff between our timestamp and its timestamp */
-	Packet* incoming;			  // packet we are receiving
-	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
-
 	/* Network is representer for me like this:
 	 *  me
 	 *  |- direct downpeer1
@@ -55,8 +47,6 @@ class Peer : public PeerBase
 	Peer* uplink;				  /**< Peer where this peer is connected */
 	std::vector<Peer*> downlinks;		  /**< Peer connected to this one */
 
-	unsigned int flags;
-
 	// Sending functions
 	void Send_net_peer_list(StaticPeersList list);
 	// Receiving functions
@@ -68,28 +58,9 @@ class Peer : public PeerBase
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
 public:
-
-	/* Exceptions */
-	class MustDisconnect : public std::exception {};
-
-	enum
-	{
-		SERVER      = 1 << 0,	  /**< This peer is a server */
-		HIGHLINK    = 1 << 1,	  /**< This peer is a highlink */
-		MERGING     = 1 << 2,	  /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
-		MERGING_ACK = 1 << 3,	  /**< We are waiting for an ACK */
-		ANONYMOUS   = 1 << 4,	  /**< We don't know this peer (between connection and HELLO) */
-	};
-
 	/* Constructors */
 	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, Peer* parent = 0);
 	~Peer();
-
-	pf_id GetID() const { return addr.id; }
-	int GetFd() const { return conn ? conn->GetFd() : -1; }
-	pf_addr GetAddr() const { return addr; }
-
-	time_t Timestamp(time_t ts) { return ts_diff + ts; }
 
 	bool IsHighLink() const { return flags & HIGHLINK; }
 	bool IsLowLink() const { return !(flags & HIGHLINK); }
@@ -97,19 +68,12 @@ public:
 
 	std::vector<Peer*> GetDownLinksButDontForgetToLockPeersListMutex() const { return downlinks; }
 
-	bool IsServer() const { return (flags & SERVER); }
-	bool IsClient() const { return !(flags & SERVER); }
 	bool IsAnonymous() const { return (flags & ANONYMOUS); }
-
-	void SetFlag(unsigned int f) { flags |= f; }
-	void DelFlag(unsigned int f) { flags &= ~f; }
-	bool HasFlag(unsigned int f) { return flags & f; }
 
 	void HandleMsg(struct Packet* pckt);
 
-	void Flush();
 	void SendMsg(const Packet& pckt);
 	void SendHello();
-	bool Receive();
+	virtual bool Receive();
 };
 #endif

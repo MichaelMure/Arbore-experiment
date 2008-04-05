@@ -31,6 +31,6 @@ done
 prop_count="$(svn status|grep ^\ M|wc -l)"
 if [ "$prop_count" != "0" ]
 then
-	svn ci --username=bot-propset -m "$prop_count properties set." > /dev/null
+	svn ci --username=bot-propset -m "$prop_count propertie(s) set." > /dev/null
 fi
 

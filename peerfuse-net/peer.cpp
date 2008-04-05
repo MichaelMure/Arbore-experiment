@@ -34,26 +34,21 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 #include "job_flush_peer.h"
+#include "connection_ssl.h"
 
-Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent)
-			: addr(_addr),
-			conn(dynamic_cast<ConnectionSsl*>(_conn)),
-			ts_diff(0),
-			incoming(NULL),
-			uplink(parent),
-			flags((conn ? ANONYMOUS : 0) | _flags)		  /* anonymous is only when this is a real connection */
+Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent) :
+			/* anonymous is only when this is a real connection */
+			PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
+			uplink(parent)
 {
 	assert(conn);
-	addr.id = conn->GetCertificateID();
+	addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
 	if(uplink)
 		uplink->downlinks.push_back(this);
 }
 
 Peer::~Peer()
 {
-	delete incoming;
-	delete conn;
-
 	if(uplink)
 	{
 		std::vector<Peer*>::iterator it = uplink->downlinks.begin();
@@ -61,15 +56,6 @@ Peer::~Peer()
 			;
 		if(it != uplink->downlinks.end())
 			uplink->downlinks.erase(it);
-	}
-}
-
-void Peer::Flush()
-{
-	while(!send_queue.empty())
-	{
-		send_queue.front().Send(conn);
-		send_queue.pop();
 	}
 }
 
@@ -350,27 +336,8 @@ void Peer::HandleMsg(Packet* pckt)
 
 bool Peer::Receive()
 {
-	// Receive the header
-	if(!incoming)
-	{
-		/* This is a new packet, we only receive the header */
-		char* header;
-
-		if(!conn->Read(&header, Packet::GetHeaderSize()))
-			return false;
-
-		incoming = new Packet(header);
-		delete []header;
-
-		/* If there some data in packet, we wait for the rest on the next Receive() call.
-		 * In other case, it is because packet only contains headers and we can parse it.
-		 */
-	}
-
-	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
+	if(!PeerBase::Receive())
 		return false;
-
-	log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
 
 	/* We use the Deleter class because we don't know how we will
 	 * exit this function. With it, we are *sure* than Packet instance
