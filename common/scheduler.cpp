@@ -30,7 +30,7 @@ Scheduler scheduler;
 // Check if a queued job needs to be started
 void Scheduler::Loop()
 {
-	usleep(100000); // every 0.1 sec
+	usleep(100000);				  // every 0.1 sec
 	if(scheduler_queue.GetQueueSize() == 0)
 		return;
 

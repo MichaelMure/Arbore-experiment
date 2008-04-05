@@ -33,5 +33,4 @@ public:
 	bool Start();
 	job_type GetType() const { return JOB_FLUSH_PEER; }
 };
-
-#endif /* JOB_FLUSH_PEER_H */
+#endif						  /* JOB_FLUSH_PEER_H */
