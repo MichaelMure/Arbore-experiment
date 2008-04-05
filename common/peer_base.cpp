@@ -82,4 +82,3 @@ bool PeerBase::Receive()
 	HandleMsg(*packet);
 	return true;
 }
-

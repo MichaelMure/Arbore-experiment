@@ -311,4 +311,3 @@ void Peer::HandleMsg(Packet* pckt)
 
 	(this->*handler[pckt->GetType()])(pckt);
 }
-

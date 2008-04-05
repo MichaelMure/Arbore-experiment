@@ -31,12 +31,11 @@ protected:
 	pf_addr addr;
 	Connection* conn;
 
-	int ts_diff;				  // diff between our timestamp and its timestamp */
-	Packet* incoming;			  // packet we are receiving
-	std::queue<Packet> send_queue;		  // packets we are sending (with flush)
+	int ts_diff;			  // diff between our timestamp and its timestamp */
+	Packet* incoming;		  // packet we are receiving
+	std::queue<Packet> send_queue;	  // packets we are sending (with flush)
 
 	unsigned int flags;
-
 
 public:
 	enum
