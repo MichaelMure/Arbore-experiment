@@ -24,6 +24,7 @@
 #include <vector>
 #include "peer.h"
 #include "mutex.h"
+#include "packet.h"
 
 class PeersListBase: public std::vector<Peer*>, public Mutex
 {
@@ -65,5 +66,6 @@ public:
 
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id);
+	void SendMsg(pf_id id, Packet &p);
 };
 #endif

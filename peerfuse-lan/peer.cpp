@@ -31,6 +31,7 @@
 #include "pflan.h"
 #include "log.h"
 #include "job_other_connect.h"
+#include "job_new_conn_req.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -143,25 +144,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
 	pf_addr new_peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
 
-	try
-	{
-		net.Connect(new_peer);
-
-		/* It is not necessary to send hello here, Network::Connect() do this. */
-	}
-	catch(Network::CantConnectTo &e)
-	{
-		// acknowledge the peer this peer can't be contacted
-		Packet p(NET_PEER_CONNECTION_RST);
-		p.SetArg(NET_PEER_CONNECTION_RST_ADDRESS, new_peer);
-		SendMsg(p);
-		return;
-	}
-
-	// acknowledge the peer the connection is established
-	Packet p(NET_PEER_CONNECTION_ACK);
-	p.SetArg(NET_PEER_CONNECTION_ACK_ADDRESS, new_peer);
-	SendMsg(p);
+	scheduler_queue.Queue(new JobNewConnReq(new_peer, addr.id));
 }
 
 void Peer::Handle_net_peer_connection_ack(struct Packet* msg)

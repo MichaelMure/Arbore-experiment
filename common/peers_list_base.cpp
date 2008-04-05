@@ -140,3 +140,11 @@ pf_id PeersListBase::CreateID()
 
 	return new_id;
 }
+
+void PeersListBase::SendMsg(pf_id id, Packet &p)
+{
+	BlockLockMutex lock(this);
+	Peer* peer = PeerFromID(id);
+	peer->SendMsg(p);
+}
+

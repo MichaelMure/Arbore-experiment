@@ -4,6 +4,7 @@ SET(SRC
 	common/hdd.cpp
 	common/job.cpp
 	common/job_new_connection.cpp
+	common/job_new_conn_req_base.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp
@@ -53,6 +54,7 @@ IF(PF_NET)
 		peerfuse-net/cache.cpp
 		peerfuse-net/pf_file.cpp
 		peerfuse-net/filedist.cpp
+		peerfuse-net/job_new_conn_req.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/peers_list.cpp
 		peerfuse-net/net_proto.cpp
@@ -70,6 +72,7 @@ ELSE(PF_NET)
 		peerfuse-lan/packet.cpp
 		peerfuse-lan/peer.cpp
 		peerfuse-lan/peers_list.cpp
+		peerfuse-lan/job_new_conn_req.cpp
 		peerfuse-lan/job_other_connect.cpp)
 	SET(BIN_NAME peerfuse-lan)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_LAN")
