@@ -33,4 +33,4 @@ public:
 	virtual void OnFailure() = 0;
 	pf_addr GetAddr() const { return (pf_addr)*this; }
 };
-#endif /* NEW_CONN_REQ_BASE_H */
+#endif						  /* NEW_CONN_REQ_BASE_H */

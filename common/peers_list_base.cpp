@@ -147,4 +147,3 @@ void PeersListBase::SendMsg(pf_id id, Packet &p)
 	Peer* peer = PeerFromID(id);
 	peer->SendMsg(p);
 }
-

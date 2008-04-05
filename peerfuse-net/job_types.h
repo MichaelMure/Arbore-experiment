@@ -22,8 +22,9 @@
 
 enum job_type
 {
-	JOB_NEW_CONNECT,	/* Tries connecting to a peer */
-	JOB_NEW_CONN_REQ,	/* Tries connecting to a peer because an other
-				   peer asked us to do it */
+	JOB_NEW_CONNECT,			  /* Tries connecting to a peer */
+	JOB_NEW_CONN_REQ,
+	/* Tries connecting to a peer because an other
+					   peer asked us to do it */
 };
 #endif

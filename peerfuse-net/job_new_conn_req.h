@@ -31,4 +31,4 @@ public:
 	void OnSuccess();
 	void OnFailure();
 };
-#endif /* JOB_NEW_CONN_REQ_H */
+#endif						  /* JOB_NEW_CONN_REQ_H */
