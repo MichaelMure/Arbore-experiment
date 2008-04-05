@@ -63,9 +63,9 @@ NetworkBase::~NetworkBase()
 	}
 }
 
-void NetworkBase::HavePacketToSend(const Peer* peer)
+void NetworkBase::HavePacketToSend(int fd)
 {
-	FD_SET(peer->GetFd(), &global_write_set);
+	FD_SET(fd, &global_write_set);
 }
 
 Peer* NetworkBase::AddPeer(Peer* p)

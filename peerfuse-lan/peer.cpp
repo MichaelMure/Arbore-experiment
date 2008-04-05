@@ -32,6 +32,7 @@
 #include "log.h"
 #include "job_other_connect.h"
 #include "job_new_conn_req.h"
+#include "job_flush_peer.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -69,7 +70,7 @@ void Peer::SendMsg(const Packet& pckt)
 {
 	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 	send_queue.push(pckt);
-	net.HavePacketToSend(this);
+	scheduler_queue.Queue(new JobFlushPeer(GetID()));
 }
 
 void Peer::SendHello()

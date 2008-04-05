@@ -25,7 +25,7 @@
 class JobNewConnReqBase : public Job, private pf_addr
 {
 public:
-	JobNewConnReqBase(pf_addr addr) : Job(time(NULL), REPEAT_NONE), pf_addr(addr) {}
+	JobNewConnReqBase(pf_addr addr) : Job(0 , REPEAT_NONE), pf_addr(addr) {}
 
 	bool Start();
 	job_type GetType() const {return JOB_NEW_CONN_REQ; }

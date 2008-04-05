@@ -7,3 +7,4 @@ network_base.h->peer.h
 network_base.cpp->job_new_connection.h
 # Peer instantiate NewJobConnReq
 peer.cpp->job_new_conn_req.h
+peer.cpp->job_flush_peer.h

@@ -91,7 +91,7 @@ public:
 	/* When a peer want to send a packet, set its fd on the
 	 * global_write_set to call peer->Flush() in Main() loop.
 	 */
-	void HavePacketToSend(const Peer* peer);
+	void HavePacketToSend(int fd);
 
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);

@@ -22,12 +22,15 @@
 
 enum job_type
 {
-	JOB_NEW_CONNECT,			  /* Tries connecting to a peer */
-	JOB_NEW_CONN_REQ,
+	/* Tries connecting to a peer */
+	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other
-					   peer asked us to it */
-	JOB_OTHER_CONNECT,
+	   peer asked us to it */
+	JOB_NEW_CONN_REQ,
 	/* We asked other peers to connect to a new peer
-					   this job checks wether they all answered */
+	   this job checks wether they all answered */
+	JOB_OTHER_CONNECT,
+	/* Make the peer send all packet he has in its sending queue */
+	JOB_FLUSH_PEER,
 };
 #endif

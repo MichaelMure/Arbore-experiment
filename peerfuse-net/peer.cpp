@@ -32,6 +32,8 @@
 #include "log.h"
 #include "session_config.h"
 #include "peers_list.h"
+#include "scheduler_queue.h"
+#include "job_flush_peer.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent)
 			: addr(_addr),
@@ -92,7 +94,7 @@ void Peer::SendMsg(const Packet& pckt)
 	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 
 	send_queue.push(pckt);
-	net.HavePacketToSend(this);
+	scheduler_queue.Queue(new JobFlushPeer(GetID()));
 }
 
 void Peer::SendHello()

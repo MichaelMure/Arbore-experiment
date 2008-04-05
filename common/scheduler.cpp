@@ -30,13 +30,13 @@ Scheduler scheduler;
 // Check if a queued job needs to be started
 void Scheduler::Loop()
 {
-	sleep(1);
+	usleep(100000); // every 0.1 sec
 	if(scheduler_queue.GetQueueSize() == 0)
 		return;
 
 	time_t now = time(NULL);
 
-	while(scheduler_queue.NextJobTime() && scheduler_queue.NextJobTime() < now)
+	while(scheduler_queue.NextJobTime() < now)
 	{
 		log[W_DEBUG] << "Begining handling job." << scheduler_queue.GetQueueSize();
 
