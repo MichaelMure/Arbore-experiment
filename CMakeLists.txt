@@ -2,12 +2,6 @@ PROJECT(peerfuse)
 
 SET(SRC
 	common/hdd.cpp
-	common/job.cpp
-	common/job_flush_peer.cpp
-	common/job_new_connection.cpp
-	common/job_new_conn_req_base.cpp
-	common/job_mkfile.cpp
-	common/job_rmfile.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp
@@ -22,6 +16,13 @@ SET(SRC
 	common/scheduler.cpp
 	common/scheduler_queue.cpp
 	common/tools.cpp
+
+	common/jobs/job.cpp
+	common/jobs/job_flush_peer.cpp
+	common/jobs/job_new_connection.cpp
+	common/jobs/job_new_conn_req_base.cpp
+	common/jobs/job_mkfile.cpp
+	common/jobs/job_rmfile.cpp
 
 	common/ssl/certificate.cpp
 	common/ssl/connection.cpp
@@ -99,7 +100,7 @@ IF(NOT PF_SERVER_MODE)
 ENDIF(NOT PF_SERVER_MODE)
 
 INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_PATH} ${OPENSSL_INCLUDE_DIR}
-	"${BIN_NAME}/" "common/" "common/fuse" "common/ssl")
+	"${BIN_NAME}/" "common/" "common/fuse" "common/jobs" "common/ssl")
 LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LIBRARY_PATH})
 TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LIBRARY} ${OPENSSL_LIBRARIES})
 
