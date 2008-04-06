@@ -35,5 +35,4 @@ public:
 
 	job_type GetType() const { return JOB_RMFILE; }
 };
-
-#endif /* JOB_RMFILE_H */
+#endif						  /* JOB_RMFILE_H */

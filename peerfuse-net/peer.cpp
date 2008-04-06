@@ -250,7 +250,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
-	
+
 	pf_stat stat;
 	stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 	stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);

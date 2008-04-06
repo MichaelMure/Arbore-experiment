@@ -36,5 +36,4 @@ public:
 
 	job_type GetType() const { return JOB_MKFILE; }
 };
-
-#endif /* JOB_MKFILE_H */
+#endif						  /* JOB_MKFILE_H */
