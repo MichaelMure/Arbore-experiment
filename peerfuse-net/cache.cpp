@@ -284,7 +284,7 @@ void Cache::RmFile(std::string path, pf_id sender)
 	delete f;
 }
 
-void Cache::RenameFile(std::string path, std::string new_path, Peer* sender)
+void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 {
 	Lock();
 
