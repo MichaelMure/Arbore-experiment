@@ -256,7 +256,7 @@ void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 	filedist.AddFile(file, peer);
 }
 
-void Cache::RmFile(std::string path, Peer* sender)
+void Cache::RmFile(std::string path, pf_id sender)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
@@ -278,7 +278,7 @@ void Cache::RmFile(std::string path, Peer* sender)
 	log[W_DEBUG] << "Removed " << path;
 
 	hdd.RmFile(f);
-	filedist.RemoveFile(f, sender);
+	filedist.RemoveFile(f, peers_list.PeerFromID(sender));
 
 	f->GetParent()->RemFile(f);
 	delete f;

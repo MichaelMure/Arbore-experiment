@@ -210,7 +210,7 @@ void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 		peers_list.Broadcast(CreateMkFilePacket(file));
 }
 
-void Cache::RmFile(std::string path, Peer* sender)
+void Cache::RmFile(std::string path, pf_id sender)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
@@ -234,7 +234,7 @@ void Cache::RmFile(std::string path, Peer* sender)
 	hdd.RmFile(f);
 
 	/* Send before removing file */
-	if(sender == NULL)
+	if(sender == 0)
 		peers_list.Broadcast(CreateRmFilePacket(f));
 
 	f->GetParent()->RemFile(f);

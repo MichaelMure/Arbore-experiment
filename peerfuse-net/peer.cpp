@@ -35,6 +35,7 @@
 #include "scheduler_queue.h"
 #include "job_flush_peer.h"
 #include "job_mkfile.h"
+#include "job_rmfile.h"
 #include "connection_ssl.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent) :
@@ -265,20 +266,8 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 
 void Peer::Handle_net_rmfile(struct Packet* msg)
 {
-	try
-	{
-		cache.RmFile(msg->GetArg<std::string>(NET_RMFILE_PATH));
-	}
-	catch(Cache::NoSuchFileOrDir &e)
-	{
-		log[W_DESYNCH] << "Unable to remove " << msg->GetArg<std::string>(NET_RMFILE_PATH) << ": No such file or directory";
-		/* TODO: Desynch, DO SOMETHING */
-	}
-	catch(Cache::DirNotEmpty &e)
-	{
-		log[W_DESYNCH] << "Unable to remove " << msg->GetArg<std::string>(NET_RMFILE_PATH) << ": Dir not empty";
-		/* TODO: Desynch, DO SOMETHING */
-	}
+	std::string filename = msg->GetArg<std::string>(NET_RMFILE_PATH);
+	scheduler_queue.Queue(new JobRmFile(filename, GetID()));
 }
 
 void Peer::HandleMsg(Packet* pckt)

@@ -7,6 +7,7 @@ SET(SRC
 	common/job_new_connection.cpp
 	common/job_new_conn_req_base.cpp
 	common/job_mkfile.cpp
+	common/job_rmfile.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp
