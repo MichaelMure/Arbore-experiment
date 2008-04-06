@@ -18,22 +18,7 @@
  */
 
 #include "network.h"
-#include "peers_list.h"
 #include "mutex.h"
 
 Network net;
 
-Peer* Network::Connect(pf_addr addr)
-{
-	/* The NetworkBase::_connect() method doesn't send
-	 * the Hello message, becaue pfnet must say if this is
-	 * a highlink or lowlink before.
-	 * As we don't care about link types, we can automatically
-	 * send the NET_HELLO message.
-	 */
-	Peer* p = NetworkBase::Connect(addr);
-	if(p)
-		p->SendHello();
-
-	return p;
-}

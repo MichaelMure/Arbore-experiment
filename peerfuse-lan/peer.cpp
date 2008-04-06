@@ -41,6 +41,8 @@
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags) :
 			PeerBase(_addr, _conn, _flags)
 {
+	if(IsServer())
+		SendHello();
 }
 
 Peer::~Peer()

@@ -27,9 +27,6 @@ class Network: public NetworkBase
 public:
 	Network() {merging = false; }
 
-	/* Overrided to send NET_HELLO message when connected. */
-	virtual Peer* Connect(pf_addr addr);
-
 	bool GetMerging() const { return merging; }
 	void SetMerging(bool m) { merging = m; }
 };
