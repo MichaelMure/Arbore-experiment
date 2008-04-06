@@ -27,8 +27,6 @@
 #include "packet.h"
 #include "hdd.h"
 
-class Peer;
-
 class Cache : public CacheInterface
 {
 	DirEntry tree;
@@ -61,7 +59,7 @@ public:
 	virtual void RmFile(std::string path, pf_id sender = 0);
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 
-	virtual void SendChanges(Peer* p, time_t last_view);
+	void SendChanges(pf_id peer, time_t last_view);
 
 	virtual Packet CreateMkFilePacket(FileEntry* file);
 	virtual Packet CreateRmFilePacket(FileEntry* file);

@@ -26,6 +26,8 @@ enum job_type
 	JOB_MKFILE,
 	/* Rmfile triggered by a peer */
 	JOB_RMFILE,
+	/* Send changes to the peer since his last connection */
+	JOB_SEND_CHANGES,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

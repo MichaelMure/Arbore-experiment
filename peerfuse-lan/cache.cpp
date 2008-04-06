@@ -23,7 +23,6 @@
 #include "cache.h"
 #include "log.h"
 #include "tools.h"
-#include "peer.h"
 #include "peers_list.h"
 
 Cache cache;
@@ -115,7 +114,7 @@ Packet Cache::CreateRmFilePacket(FileEntry* f)
 	return pckt;
 }
 
-void Cache::SendChanges(Peer* p, time_t last_view)
+void Cache::SendChanges(pf_id peer, time_t last_view)
 {
 	/* Stack used to store states of each directories */
 	std::stack<std::pair<FileMap::const_iterator, FileMap::const_iterator> > stack;
@@ -137,7 +136,10 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 
 			/* File is newer than Peer's */
 			if(it->second->stat.mtime > last_view)
-				p->SendMsg(CreateMkFilePacket(it->second));
+			{
+				Packet packet = CreateMkFilePacket(it->second);
+				peers_list.SendMsg(peer, packet);
+			}
 
 			if(dir)
 			{
@@ -172,8 +174,9 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 
 	}
 
+	Packet packet(NET_END_OF_DIFF);
+	peers_list.SendMsg(peer, packet);
 	Unlock();
-	p->SendMsg(Packet(NET_END_OF_DIFF));
 }
 
 void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)

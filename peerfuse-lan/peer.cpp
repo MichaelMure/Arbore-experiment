@@ -22,7 +22,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <time.h>
-#include "cache.h"
 #include "packet.h"
 #include "peer.h"
 #include "network.h"
@@ -35,6 +34,7 @@
 #include "job_flush_peer.h"
 #include "job_mkfile.h"
 #include "job_rmfile.h"
+#include "job_send_changes.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -210,7 +210,7 @@ void Peer::Handle_net_get_struct_diff(struct Packet* pckt)
 {
 	time_t last_view = Timestamp(pckt->GetArg<uint32_t>(NET_GET_STRUCT_DIFF_LAST_CONNECTION));
 
-	cache.SendChanges(this, last_view);
+	scheduler_queue.Queue(new JobSendChanges(GetID(), last_view));
 }
 
 void Peer::Handle_net_end_of_diff(struct Packet* pckt)
