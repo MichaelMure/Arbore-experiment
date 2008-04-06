@@ -22,6 +22,8 @@
 
 enum job_type
 {
+	/* MKfile triggered by a peer */
+	JOB_MKFILE,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

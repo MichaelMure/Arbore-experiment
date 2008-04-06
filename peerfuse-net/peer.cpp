@@ -34,6 +34,7 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 #include "job_flush_peer.h"
+#include "job_mkfile.h"
 #include "connection_ssl.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent) :
@@ -247,30 +248,19 @@ void Peer::Handle_net_peer_goodbye(struct Packet* msg)
 void Peer::Handle_net_mkfile(struct Packet* msg)
 {
 	std::string filename;
+	filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
+	
+	pf_stat stat;
+	stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+	stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
+	stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
+	stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
+	stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
+	stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
+	stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_META_MODIF_TIME));
+	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 
-	try
-	{
-		filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
-		pf_stat stat;
-		stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
-		stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
-		stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
-		stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
-		stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_ACCESS_TIME));
-		stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
-		stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
-		stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_META_MODIF_TIME));
-
-		cache.MkFile(filename, stat, this);
-	}
-	catch(Cache::NoSuchFileOrDir &e)
-	{
-		log[W_DESYNCH] << "Unable to create " << filename << ": No such file or directory";
-		/* XXX: Desync DO SOMETHING */
-
-		cache.Unlock();
-		return;
-	}
+	scheduler_queue.Queue(new JobMkFile(filename, stat, GetID()));
 }
 
 void Peer::Handle_net_rmfile(struct Packet* msg)

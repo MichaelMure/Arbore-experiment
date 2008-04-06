@@ -72,7 +72,7 @@ public:
 	virtual pf_stat GetAttr(std::string path) = 0;
 	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) = 0;
 
-	virtual void MkFile(std::string path, pf_stat stat, Peer* sender = NULL) = 0;
+	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0) = 0;
 	virtual void RmFile(std::string path, Peer* sender = NULL) = 0;
 	virtual void RenameFile(std::string path, std::string new_path, Peer* sender = NULL) = 0;
 

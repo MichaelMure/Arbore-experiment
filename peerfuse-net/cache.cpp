@@ -178,12 +178,14 @@ FileList Cache::GetAllFiles()
 	return list;
 }
 
-void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
+void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 {
 	std::string filename;
 	FileEntry* file = 0;
 
 	BlockLockMutex lock(this);
+	BlockLockMutex peer_lock(&peers_list);
+	Peer* peer = peers_list.PeerFromID(sender);
 
 	try
 	{
@@ -217,7 +219,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		/* If it me who wants to create this file, we go out
 		 * to let fuse returns an error.
 		 */
-		if(sender == NULL)
+		if(sender == 0)
 			throw;
 
 		log[W_DEBUG] << "File already exists... Update it.";
@@ -225,7 +227,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		time_t dist_ts = sender->Timestamp(stat.mtime);
+		time_t dist_ts = peer->Timestamp(stat.mtime);
 
 		if(file->stat.mtime > dist_ts)
 		{
@@ -234,8 +236,8 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 			 */
 			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
 			Packet pckt = cache.CreateMkFilePacket(file);
-			pckt.SetDstID(sender->GetID());
-			sender->SendMsg(pckt);
+			pckt.SetDstID(peer->GetID());
+			peer->SendMsg(pckt);
 			return;
 		}
 		else if(file->stat.mtime == dist_ts)
@@ -251,7 +253,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 	}
 
 	/* Add file on FileDistribution */
-	filedist.AddFile(file, sender);
+	filedist.AddFile(file, peer);
 }
 
 void Cache::RmFile(std::string path, Peer* sender)

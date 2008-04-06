@@ -6,6 +6,7 @@ SET(SRC
 	common/job_flush_peer.cpp
 	common/job_new_connection.cpp
 	common/job_new_conn_req_base.cpp
+	common/job_mkfile.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp

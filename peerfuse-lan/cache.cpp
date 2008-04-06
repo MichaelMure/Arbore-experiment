@@ -176,7 +176,7 @@ void Cache::SendChanges(Peer* p, time_t last_view)
 	p->SendMsg(Packet(NET_END_OF_DIFF));
 }
 
-void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
+void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 {
 	BlockLockMutex lock(this);
 	std::string filename;
@@ -196,7 +196,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 		file = new FileEntry(filename, dir);
 
 	/* Copy stat only if it's me who created this file! */
-	if(sender != NULL)
+	if(sender != 0)
 		file->stat = stat;
 
 	dir->AddFile(file);
@@ -206,7 +206,7 @@ void Cache::MkFile(std::string path, pf_stat stat, Peer* sender)
 	hdd.MkFile(file);
 
 	/* if it's me who created file */
-	if(sender == NULL)
+	if(sender == 0)
 		peers_list.Broadcast(CreateMkFilePacket(file));
 }
 
