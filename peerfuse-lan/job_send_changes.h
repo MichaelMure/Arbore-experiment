@@ -35,5 +35,4 @@ public:
 	bool Start();
 	job_type GetType() const { return JOB_SEND_CHANGES; }
 };
-
-#endif /* JOB_SEND_CHANGES_H */
+#endif						  /* JOB_SEND_CHANGES_H */
