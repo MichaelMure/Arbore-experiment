@@ -31,15 +31,12 @@ Scheduler scheduler;
 void Scheduler::Loop()
 {
 	usleep(100000);				  // every 0.1 sec
-	if(scheduler_queue.GetQueueSize() == 0)
-		return;
 
 	time_t now = time(NULL);
 
-	while(scheduler_queue.NextJobTime() < now)
+	while(scheduler_queue.GetQueueSize() != 0 && scheduler_queue.NextJobTime() < now)
 	{
 		log[W_DEBUG] << "Begining handling job." << scheduler_queue.GetQueueSize();
-
 		/* We remove job from queue before calling it, to prevent
 		 * crash if it tries to change queue list.
 		 */
