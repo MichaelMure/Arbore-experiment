@@ -21,5 +21,4 @@
 #define PFLAN_H
 
 #define PEERFUSE_VERSION        "peerfuse-lan 0.1"
-
 #endif						  /* PFLAN_H */

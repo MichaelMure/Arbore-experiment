@@ -28,4 +28,4 @@ public:
 };
 
 extern Environment environment;
-#endif /* ENVIRONMENT_H */
+#endif						  /* ENVIRONMENT_H */

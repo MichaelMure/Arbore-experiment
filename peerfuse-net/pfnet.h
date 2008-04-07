@@ -21,5 +21,4 @@
 #define PFNET_H
 
 #define PEERFUSE_VERSION        "peerfuse-net 0.1"
-
 #endif						  /* PFNET_H */
