@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <syslog.h>
+#include <sys/time.h>
 #include "tools.h"
 #include "log.h"
 
@@ -57,7 +58,15 @@ Log::flux::~flux()
 	{
 		if(all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING)
 			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
-		(all_flags[i].level == LOG_ERR ? std::cerr : std::cout) << "[" << all_flags[i].s << "] " << str << std::endl;
+
+		struct timeval t;
+		gettimeofday(&t, NULL);
+		(all_flags[i].level == LOG_ERR ? std::cerr : std::cout)
+			<< (t.tv_sec % (24 * 60 * 60)) / (24 * 60* 60)
+			<< ":" << (t.tv_sec % (60 * 60)) / (60* 60)
+			<< ":" << t.tv_sec % 60 
+			<< "." << t.tv_usec / 1000
+			<< "[" << all_flags[i].s << "] " << str << std::endl;
 	}
 }
 
