@@ -26,7 +26,7 @@ class JobNewConnReq: public JobNewConnReqBase
 {
 	pf_id requested_by;
 public:
-	JobNewConnReq(pf_addr addr, pf_id _requested_by) : JobNewConnReqBase(addr),  requested_by(_requested_by){}
+	JobNewConnReq(::pf_addr addr, pf_id _requested_by) : JobNewConnReqBase(addr),  requested_by(_requested_by){}
 
 	void OnSuccess();
 	void OnFailure();
