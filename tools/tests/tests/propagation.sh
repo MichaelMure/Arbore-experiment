@@ -36,7 +36,7 @@ touch "$MNT1/blh/plop"
 mkdir "$MNT2/truc/"
 touch "$MNT2/truc/bidule"
 rm "$MNT2/truc/bidule"
-sleep 1
+sleep 2
 rm -r "$MNT1/truc"
 
 sleep 3

@@ -218,6 +218,9 @@ void Cache::RmFile(std::string path, pf_id sender)
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
 
+	if(!f)
+		throw NoSuchFileOrDir();
+
 	// If it's a dir that isn't empty -> return error
 	if (f->stat.mode & S_IFDIR)
 	{
@@ -225,9 +228,6 @@ void Cache::RmFile(std::string path, pf_id sender)
 		if(d->GetSize() != 0)
 			throw DirNotEmpty();
 	}
-
-	if(!f)
-		throw NoSuchFileOrDir();
 
 	if(!f->GetParent())
 		throw NoPermission();
