@@ -37,6 +37,7 @@
 #include "job_mkfile.h"
 #include "job_rmfile.h"
 #include "connection_ssl.h"
+#include "environment.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent) :
 			/* anonymous is only when this is a real connection */
@@ -88,7 +89,7 @@ void Peer::SendMsg(const Packet& pckt)
 void Peer::SendHello()
 {
 	// Make the message
-	Packet pckt(NET_HELLO, peers_list.GetMyID(), addr.id);
+	Packet pckt(NET_HELLO, environment.my_id.Get(), addr.id);
 
 	// Time / now
 	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
@@ -96,7 +97,7 @@ void Peer::SendHello()
 	if(IsHighLink())
 		flags |= NET_HELLO_FLAGS_HIGHLINK;
 	pckt.SetArg(NET_HELLO_FLAGS, flags);
-	pckt.SetArg(NET_HELLO_PORT, (uint32_t)net.GetListeningPort());
+	pckt.SetArg(NET_HELLO_PORT, environment.listening_port.Get());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
 	SendMsg(pckt);
 }
@@ -109,7 +110,7 @@ void Peer::Send_net_peer_list(StaticPeersList peers)
 		if(*it == this)
 			continue;
 
-		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : peers_list.GetMyID();
+		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : environment.my_id.Get();
 
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
@@ -167,10 +168,10 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 		/* I send all of my links */
 		Send_net_peer_list(net.GetDirectHighLinks());
-		SendMsg(Packet(NET_END_OF_MERGE, peers_list.GetMyID(), 0));
+		SendMsg(Packet(NET_END_OF_MERGE, environment.my_id.Get(), 0));
 
 		/* Tell to all of my other links that this peer is connected. */
-		Packet pckt(NET_PEER_CONNECTION, peers_list.GetMyID(), 0);
+		Packet pckt(NET_PEER_CONNECTION, environment.my_id.Get(), 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
@@ -183,7 +184,7 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	if(HasFlag(MERGING))
 	{
 		SetFlag(MERGING_ACK);
-		SendMsg(Packet(NET_END_OF_MERGE_ACK, peers_list.GetMyID(), GetID()));
+		SendMsg(Packet(NET_END_OF_MERGE_ACK, environment.my_id.Get(), GetID()));
 	}
 
 	/* Now we can update resp files :)))))))
@@ -330,7 +331,7 @@ bool Peer::Receive()
 		throw Packet::Malformated();
 
 	/* Only handle this packet if it is a broadcast or if it is sent to me */
-	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == peers_list.GetMyID())
+	if((*packet)->GetDstID() == 0 || (*packet)->GetDstID() == environment.my_id.Get())
 	{
 		/* If source is not me, I translate packet to real source. */
 		if((*packet)->GetSrcID() && (*packet)->GetSrcID() != GetID() && GetID())

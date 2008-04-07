@@ -38,6 +38,7 @@
 #include "pf_ssl_ssl.h"
 #include "peers_list.h"
 #include "mutex.h"
+#include "environment.h"
 
 Network net;
 
@@ -138,6 +139,6 @@ void Network::StartNetwork(MyConfig* conf)
 
 	assert(sslssl != NULL);			  /* we MUST use a SSL connection on pfnet. */
 	Certificate cert = sslssl->GetCertificate();
-	peers_list.SetMyID(cert.GetIDFromCertificate());
+	environment.my_id.Set(cert.GetIDFromCertificate());
 
 }

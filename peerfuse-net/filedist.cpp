@@ -23,6 +23,7 @@
 #include "cache.h"
 #include "log.h"
 #include "network.h"
+#include "environment.h"
 
 FileDistribution::FileDistribution()
 {
@@ -123,7 +124,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	std::set<Peer*> relayed_peers;
 
 	/* I'm responsible of this file. */
-	if(IsResponsible(peers_list.GetMyID(), f))
+	if(IsResponsible(environment.my_id.Get(), f))
 	{
 		/* this function can be called when this file is updated, so add
 		 * it in list only if it isn't already in. */
@@ -141,7 +142,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 				 * to all other responsibles. In other case, I only send it
 				 * to the a responsible who will relay message to other responsibles.
 				 */
-				if(IsResponsible(peers_list.GetMyID(), f->GetParent()))
+				if(IsResponsible(environment.my_id.Get(), f->GetParent()))
 				{
 					log[W_DEBUG] << "I'm responsible of this file which has been created, and I'm responsible "
 						<< "of parent dir, so I send creation to them.";
@@ -188,7 +189,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	}
 
 	if(f->GetParent() && sender != NULL &&
-		IsResponsible(peers_list.GetMyID(), f->GetParent()) &&
+		IsResponsible(environment.my_id.Get(), f->GetParent()) &&
 		!IsResponsible(sender->GetID(), f->GetParent()))
 	{
 		/* Someone sent this file to me, and I'm responsible of its parent directory,
@@ -242,7 +243,7 @@ void FileDistribution::UpdateRespFiles()
 
 	/* First set new list of id */
 	id_list.clear();
-	id_list.push_back(peers_list.GetMyID());
+	id_list.push_back(environment.my_id.Get());
 
 	BlockLockMutex lock(&peers_list);
 	for(PeersList::const_iterator it = peers_list.begin(); it != peers_list.end(); ++it)
@@ -255,7 +256,7 @@ void FileDistribution::UpdateRespFiles()
 	FileList last_resp = resp_files;
 	resp_files.clear();
 
-	resp_files = GetFiles(peers_list.GetMyID());
+	resp_files = GetFiles(environment.my_id.Get());
 
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{

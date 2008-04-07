@@ -40,11 +40,11 @@
 #include "scheduler_queue.h"
 #include "peers_list.h"
 #include "pf_thread.h"
+#include "environment.h"
 
 NetworkBase::NetworkBase()
 			: serv_sock(-1),
 			highsock(-1),
-			listening_port(0),
 			ssl(NULL)
 {
 	FD_ZERO(&global_write_set);
@@ -354,7 +354,7 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 	FD_SET(serv_sock, &global_read_set);
 	FD_SET(serv_sock, &global_write_set);
 
-	listening_port = port;
+	environment.listening_port.Set(port);
 }
 
 void NetworkBase::StartNetwork(MyConfig* conf)

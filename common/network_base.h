@@ -61,8 +61,6 @@ private:
 	int serv_sock;
 	int highsock;
 
-	uint16_t listening_port;
-
 	std::list<pf_addr> disconnected_list;
 
 protected:
@@ -85,8 +83,6 @@ public:
 
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer) {}
-
-	uint16_t GetListeningPort() const { return listening_port; }
 
 	/* When a peer want to send a packet, set its fd on the
 	 * global_write_set to call peer->Flush() in Main() loop.

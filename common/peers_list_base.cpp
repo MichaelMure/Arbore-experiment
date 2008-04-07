@@ -21,9 +21,9 @@
 #include "peer.h"
 #include "mutex.h"
 #include "log.h"
+#include "environment.h"
 
-PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX),
-			my_id(0)
+PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX)
 {
 }
 
@@ -121,7 +121,7 @@ pf_id PeersListBase::CreateID()
 	while(!new_id)
 	{
 		new_id = rand();
-		if(new_id == GetMyID())
+		if(new_id == environment.my_id.Get())
 		{
 			new_id = 0;
 			continue;

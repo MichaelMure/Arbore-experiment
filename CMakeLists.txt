@@ -53,6 +53,7 @@ ENDIF(NOT PF_SERVER_MODE)
 IF(PF_NET)
 	SET(SRC ${SRC}
 		peerfuse-net/application.cpp
+		peerfuse-net/environment.cpp
 		peerfuse-net/network.cpp
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp
@@ -69,6 +70,7 @@ IF(PF_NET)
 ELSE(PF_NET)
 	SET(SRC ${SRC}
 		peerfuse-lan/application.cpp
+		peerfuse-lan/environment.cpp
 		peerfuse-lan/network.cpp
 		peerfuse-lan/pflan.cpp
 		peerfuse-lan/pflan_fuse.cpp

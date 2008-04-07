@@ -24,7 +24,7 @@
 #include <time.h>
 #include "packet.h"
 #include "peer.h"
-#include "network.h"
+#include "environment.h"
 #include "net_proto.h"
 #include "pf_types.h"
 #include "pflan.h"
@@ -68,9 +68,9 @@ void Peer::SendHello()
 	Packet pckt(NET_HELLO);
 						  // Time / now
 	pckt.SetArg(NET_HELLO_NOW, (uint32_t)time(NULL));
-	pckt.SetArg(NET_HELLO_PORT, (uint32_t)net.GetListeningPort());
+	pckt.SetArg(NET_HELLO_PORT, (uint32_t)environment.listening_port.Get());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
-	pckt.SetArg(NET_HELLO_MY_ID, peers_list.GetMyID());
+	pckt.SetArg(NET_HELLO_MY_ID, environment.my_id.Get());
 	SendMsg(pckt);
 }
 
@@ -94,7 +94,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		// Initiate the merge if it's the first peer we connect to
 		if(peers_list.Size() == 1)
 		{
-			net.SetMerging(true);
+			environment.merging.Set(true);
 			SetFlag(MERGING);
 			SendMsg(Packet(NET_START_MERGE));
 		}
@@ -116,11 +116,11 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
 {
-	if(peers_list.GetMyID() != 0)
+	if(environment.my_id.Get() != 0)
 		throw MustDisconnect();
-	peers_list.SetMyID(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
-	session_cfg.Set("my_id", peers_list.GetMyID());
-	log[W_INFO] << "My ID now is " << peers_list.GetMyID();
+	environment.my_id.Set(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
+	session_cfg.Set("my_id", environment.my_id.Get());
+	log[W_INFO] << "My ID now is " << environment.my_id.Get();
 }
 
 void Peer::Handle_net_start_merge(struct Packet* pckt)
@@ -245,7 +245,7 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
 {
-	net.SetMerging(false);
+	environment.merging.Set(false);
 	DelFlag(MERGING);
 	if(IsClient())
 	{

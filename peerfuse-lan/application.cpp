@@ -35,6 +35,7 @@
 #include "session_config.h"
 #include "peers_list.h"
 #include "scheduler.h"
+#include "environment.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -113,7 +114,7 @@ int Application::main(int argc, char *argv[])
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))
 		{
-			peers_list.SetMyID((pf_id)my_id);
+			environment.my_id.Set((pf_id)my_id);
 			log[W_INFO] << "I have ID " << my_id;
 		}
 		else
