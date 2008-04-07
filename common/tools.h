@@ -32,8 +32,8 @@ std::string pf_addr2string(const pf_addr addr);
 pf_addr nto_pf_addr(pf_addr addr);
 pf_addr pf_addr_ton(pf_addr addr);
 
-extern uint64_t htonll(uint64_t number);
-extern uint64_t ntohll(uint64_t number);
+uint64_t htonll(uint64_t number);
+uint64_t ntohll(uint64_t number);
 
 template<typename T>
 T StrToTyp(const std::string & Str)

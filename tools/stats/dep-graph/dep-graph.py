@@ -10,6 +10,7 @@ class gv:
 		s.f.write('\tlabelfloat="true";\n')
 		s.f.write('\tsplines="true";\n')
 		s.links = {}
+		s.styles = {}
 
 	def new_link(s, src, dst):
 		if src == dst:
@@ -18,8 +19,12 @@ class gv:
 			s.links[src] = []
 		if dst not in s.links[src]:
 			s.links[src].append(dst)
+	def set_style(s, node):
+		s.styles[node] = 'style="filled",color="#FF0000"'
 
 	def write(s):
+		for node in s.styles.keys():
+			s.f.write('\t%s [%s];\n' % (node, s.styles[node]))
 		for src in s.links.keys():
 			for dst in s.links[src]:
 				s.f.write('\t%s->%s;\n' % (src, dst))
@@ -56,6 +61,14 @@ def graph_deps(file):
 			dst = m.group(1)
 			dst = dst[:len(dst) - 2]
 			g.new_link(src, dst)
+
+		m = re.compile('^extern').search(line)
+		if m:
+			# remove the path from the filename
+			src = os.path.basename(file)
+			# remove the file extension
+			src = re.compile('^([^\.]*)\..*$').search(src).group(1)
+			g.set_style(src)
 
 	f.close()
 
