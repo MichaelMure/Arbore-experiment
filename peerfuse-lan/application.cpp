@@ -42,8 +42,6 @@
 #include "pf_fuse.h"
 #endif						  // PF_SERVER_MODE
 
-MyConfig conf;
-
 void* fuse_init(struct fuse_conn_info* fuse_info)
 {
 	Application::StartThreads();

@@ -23,6 +23,8 @@
 #include <iostream>
 #include "libconfig.h"
 
+MyConfig conf;
+
 /* Définition de quelques macros utiles */
 #undef FOR
 #define FOR(T, v, x) \

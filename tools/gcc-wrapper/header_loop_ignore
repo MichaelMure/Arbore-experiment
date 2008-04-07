@@ -15,3 +15,15 @@ peer.cpp->job_other_connect.h
 peer.cpp->job_send_changes.h
 
 pf_dir.h->pf_file.h
+
+# pflan.h / pfnet.h don't anything dangerous
+network.cpp->pflan.h
+network.cpp->pfnet.h
+application.cpp->pflan.h
+application.cpp->pfnet.h
+peer.cpp->pflan.h
+peer.cpp->pfnet.h
+
+# Peer can call the peers_list as any Peer have to be accessed through the peers_list
+peer.h->peers_list.h
+peer.cpp->peers_list.h

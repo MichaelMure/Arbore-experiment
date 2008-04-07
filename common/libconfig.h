@@ -487,4 +487,6 @@ public:
 private:
 	bool value;
 };
+
+extern MyConfig conf;
 #endif						  /* LIBCONFIG_H */

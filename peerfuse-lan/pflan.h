@@ -20,9 +20,6 @@
 #ifndef PFLAN_H
 #define PFLAN_H
 
-#include "libconfig.h"
-
 #define PEERFUSE_VERSION        "peerfuse-lan 0.1"
 
-extern MyConfig conf;
 #endif						  /* PFLAN_H */

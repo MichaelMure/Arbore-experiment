@@ -20,9 +20,6 @@
 #ifndef PFNET_H
 #define PFNET_H
 
-#include "libconfig.h"
-
 #define PEERFUSE_VERSION        "peerfuse-net 0.1"
 
-extern MyConfig conf;
 #endif						  /* PFNET_H */
