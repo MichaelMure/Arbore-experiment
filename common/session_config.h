@@ -24,6 +24,7 @@
 #include <string>
 #include <typeinfo>
 #include "log.h"
+#include "mutex.h"
 
 class SessionConfigValueBase
 {
@@ -69,7 +70,7 @@ public:
 
 };
 
-class SessionConfig
+class SessionConfig : private Mutex
 {
 	std::string filename;
 
@@ -85,9 +86,10 @@ public:
 	void Display();
 
 	template<class T>
-		bool Get(const std::string& opt, T& val) const
+		bool Get(const std::string& opt, T& val)
 	{
-		std::map<std::string, SessionConfigValueBase*>::const_iterator it;
+		BlockLockMutex lock(this);
+		std::map<std::string, SessionConfigValueBase*>::iterator it;
 		it = list.find(opt);
 		if(it == list.end())
 			return false;
@@ -102,6 +104,7 @@ public:
 	template<class T>
 		void Set(const std::string& opt, const T& val)
 	{
+		BlockLockMutex lock(this);
 		std::map<std::string, SessionConfigValueBase*>::iterator it;
 		it = list.find(opt);
 		if(it == list.end())

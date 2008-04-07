@@ -33,12 +33,13 @@ std::string SessionConfigValue<std::string>::GetAsString() const
 SessionConfig session_cfg;
 SessionConfig tree_cfg;
 
-SessionConfig::SessionConfig() : filename("")
+SessionConfig::SessionConfig() : Mutex(RECURSIVE_MUTEX), filename("")
 {
 }
 
 SessionConfig::~SessionConfig()
 {
+	Lock();
 	Save();
 
 	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
@@ -47,6 +48,7 @@ SessionConfig::~SessionConfig()
 	{
 		delete it->second;
 	}
+	Unlock();
 }
 
 static ssize_t getline(std::string& line, std::fstream& file)
@@ -60,6 +62,7 @@ static ssize_t getline(std::string& line, std::fstream& file)
 
 void SessionConfig::Load(const std::string& _filename)
 {
+	BlockLockMutex lock(this);
 	filename = _filename;
 
 	std::fstream fin;
@@ -93,6 +96,7 @@ void SessionConfig::Load(const std::string& _filename)
 
 void SessionConfig::Save()
 {
+	BlockLockMutex lock(this);
 	std::fstream fout;
 	fout.open(filename.c_str(), std::fstream::out);
 	if(!fout)
@@ -113,6 +117,7 @@ void SessionConfig::Save()
 
 void SessionConfig::Parse(const std::string& line)
 {
+	BlockLockMutex lock(this);
 	std::string::size_type equ_pos = line.find('=',0);
 	if(equ_pos == std::string::npos)
 		return;
@@ -134,6 +139,7 @@ void SessionConfig::Parse(const std::string& line)
 
 void SessionConfig::Display()
 {
+	BlockLockMutex lock(this);
 	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
 		it != list.end();
 		++it)
