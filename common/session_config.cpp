@@ -39,7 +39,6 @@ SessionConfig::SessionConfig() : Mutex(RECURSIVE_MUTEX), filename("")
 
 SessionConfig::~SessionConfig()
 {
-	Lock();
 	Save();
 
 	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
@@ -48,7 +47,6 @@ SessionConfig::~SessionConfig()
 	{
 		delete it->second;
 	}
-	Unlock();
 }
 
 static ssize_t getline(std::string& line, std::fstream& file)

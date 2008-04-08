@@ -32,5 +32,6 @@ public:
 	virtual void OnSuccess() = 0;
 	virtual void OnFailure() = 0;
 	pf_addr GetAddr() const { return (pf_addr)*this; }
+	std::string GetName() const { return "JobNewConnReq"; }
 };
 #endif						  /* NEW_CONN_REQ_BASE_H */

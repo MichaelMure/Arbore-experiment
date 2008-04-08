@@ -34,5 +34,6 @@ public:
 	bool Start();
 
 	job_type GetType() const { return JOB_RMFILE; }
+	std::string GetName() const { return "JobRmFile"; }
 };
 #endif						  /* JOB_RMFILE_H */

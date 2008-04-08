@@ -34,5 +34,6 @@ public:
 
 	bool Start();
 	job_type GetType() const { return JOB_SEND_CHANGES; }
+	std::string GetName() const { return "JobSendChanges"; }
 };
 #endif						  /* JOB_SEND_CHANGES_H */

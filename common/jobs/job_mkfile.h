@@ -35,5 +35,6 @@ public:
 	bool Start();
 
 	job_type GetType() const { return JOB_MKFILE; }
+	std::string GetName() const { return "JobMkFile"; }
 };
 #endif						  /* JOB_MKFILE_H */

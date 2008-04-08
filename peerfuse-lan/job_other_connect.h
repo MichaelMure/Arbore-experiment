@@ -38,5 +38,6 @@ public:
 	bool IsConnectingTo(pf_addr addr);
 	void PeerConnected(Peer* peer);
 	job_type GetType() const {return JOB_OTHER_CONNECT; }
+	std::string GetName() const { return "JobOtherConnect"; }
 };
 #endif

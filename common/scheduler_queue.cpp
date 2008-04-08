@@ -22,6 +22,7 @@
 #include "mutex.h"
 #include "job.h"
 #include "job_types.h"
+#include "log.h"
 
 SchedulerQueue scheduler_queue;
 
@@ -40,6 +41,7 @@ void SchedulerQueue::Queue(Job* job)
 		}
 	}
 
+	log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
 	push_back(job);
 }
 

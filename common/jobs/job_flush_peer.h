@@ -32,5 +32,6 @@ public:
 
 	bool Start();
 	job_type GetType() const { return JOB_FLUSH_PEER; }
+	std::string GetName() const { return "JobFlushPeer"; }
 };
 #endif						  /* JOB_FLUSH_PEER_H */

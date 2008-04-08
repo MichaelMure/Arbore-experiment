@@ -19,6 +19,7 @@
 
 #ifndef JOB_NEW_CONNECTION_H
 #define JOB_NEW_CONNECTION_H
+#include <string>
 #include "job.h"
 #include "pf_types.h"
 
@@ -28,7 +29,8 @@ public:
 	JobNewConnection(pf_addr addr) : Job(time(NULL), REPEAT_LESS_AND_LESS, 1), pf_addr(addr) {}
 
 	bool Start();
-	job_type GetType() const {return JOB_NEW_CONNECT; }
 	bool IsMe(const pf_addr&);
+	job_type GetType() const {return JOB_NEW_CONNECT; }
+	std::string GetName() const {return "JobNewConnection"; }
 };
 #endif

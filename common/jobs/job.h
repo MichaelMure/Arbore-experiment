@@ -21,6 +21,7 @@
 #define JOB_H
 #include <list>
 #include <time.h>
+#include <string>
 #include "job_types.h"
 
 class Job
@@ -49,5 +50,6 @@ public:
 	bool DoStart();
 	time_t GetStartTime() const { return start_time; }
 	virtual job_type GetType() const = 0;
+	virtual std::string GetName() const = 0;
 };
 #endif						  /* JOB_H */
