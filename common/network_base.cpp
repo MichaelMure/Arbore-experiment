@@ -214,7 +214,7 @@ void NetworkBase::Loop()
 		}
 	}
 	Unlock();
-	usleep(10000); // sleep 0.001 sec -> give the other thread a chance to lock
+	usleep(10000);				  // sleep 0.001 sec -> give the other thread a chance to lock
 }
 
 void NetworkBase::OnStop()
