@@ -34,7 +34,7 @@
 
 class MyConfig;
 
-class NetworkBase : public Thread
+class NetworkBase : public Thread, protected Mutex
 {
 public:
 

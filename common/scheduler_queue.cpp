@@ -30,6 +30,8 @@ SchedulerQueue scheduler_queue;
 void SchedulerQueue::Queue(Job* job)
 {
 	BlockLockMutex lock(this);
+	log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
+
 	for(iterator it = begin();
 		it != end();
 		++it)
@@ -41,7 +43,6 @@ void SchedulerQueue::Queue(Job* job)
 		}
 	}
 
-	log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
 	push_back(job);
 }
 

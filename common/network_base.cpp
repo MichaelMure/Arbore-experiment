@@ -43,7 +43,8 @@
 #include "environment.h"
 
 NetworkBase::NetworkBase()
-			: serv_sock(-1),
+			: Mutex(RECURSIVE_MUTEX),
+			serv_sock(-1),
 			highsock(-1),
 			ssl(NULL)
 {
@@ -65,7 +66,9 @@ NetworkBase::~NetworkBase()
 
 void NetworkBase::HavePacketToSend(int fd)
 {
+	Lock();
 	FD_SET(fd, &global_write_set);
+	Unlock();
 }
 
 Peer* NetworkBase::AddPeer(Peer* p)
@@ -74,10 +77,12 @@ Peer* NetworkBase::AddPeer(Peer* p)
 
 	if(p->GetFd() >= 0)
 	{
+		Lock();
 		FD_SET(p->GetFd(), &global_read_set);
 
 		if(p->GetFd() > highsock)
 			highsock = p->GetFd();
+		Unlock();
 	}
 
 	if(peers_list.Size() == 0)
@@ -102,8 +107,10 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 		AddDisconnected(p->GetAddr());
 
 	delete p;
+	Lock();
 	if(FD_ISSET(fd, &global_read_set)) FD_CLR(fd, &global_read_set);
 	if(FD_ISSET(fd, &global_write_set)) FD_CLR(fd, &global_write_set);
+	Unlock();
 }
 
 void NetworkBase::Loop()
@@ -118,6 +125,7 @@ void NetworkBase::Loop()
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 1000;
 
+	Lock();
 	fd_set tmp_read_set = global_read_set;
 	fd_set tmp_write_set = global_write_set;
 	int events;
@@ -205,6 +213,8 @@ void NetworkBase::Loop()
 			}
 		}
 	}
+	Unlock();
+	usleep(10000); // sleep 0.001 sec -> give the other thread a chance to lock
 }
 
 void NetworkBase::OnStop()
@@ -217,6 +227,7 @@ void NetworkBase::CloseAll()
 {
 	peers_list.CloseAll();
 
+	Lock();
 	if(serv_sock >= 0)
 	{
 		close(serv_sock);
@@ -229,6 +240,7 @@ void NetworkBase::CloseAll()
 
 	delete ssl;
 	ssl = 0;
+	Unlock();
 }
 
 pf_addr NetworkBase::MakeAddr(const std::string& hostname, uint16_t port)
@@ -311,6 +323,7 @@ Peer* NetworkBase::Connect(pf_addr addr)
 
 void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock, CantListen)
 {
+	BlockLockMutex lock(this);
 	assert(ssl);
 
 	unsigned int reuse_addr = 1;
@@ -393,6 +406,7 @@ void NetworkBase::StartNetwork(MyConfig* conf)
 
 void NetworkBase::AddDisconnected(const pf_addr& addr)
 {
+	BlockLockMutex lock(this);
 	if(find(disconnected_list.begin(),
 		disconnected_list.end(), addr) == disconnected_list.end())
 	{
@@ -403,6 +417,7 @@ void NetworkBase::AddDisconnected(const pf_addr& addr)
 
 void NetworkBase::DelDisconnected(const pf_addr& addr)
 {
+	BlockLockMutex lock(this);
 	log[W_INFO] << "Removed disconnected: " << addr;
 	disconnected_list.remove(addr);
 
