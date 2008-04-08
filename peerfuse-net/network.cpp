@@ -87,7 +87,7 @@ Peer* Network::AddPeer(Peer* peer)
 	else
 		peer->SetHighLink(peer);
 
-	if(peers_list.Size() == 0 && p->HasFlag(Peer::SERVER))
+	if(peers_list.Size() == 0 && peer->HasFlag(Peer::SERVER))
 	{
 		// This is the first peer to which we connected
 		peer->SetHighLink();
