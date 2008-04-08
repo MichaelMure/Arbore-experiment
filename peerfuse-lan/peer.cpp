@@ -89,6 +89,17 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
+	if(pckt->GetArg<uint32_t>(NET_HELLO_MY_ID) == 0)
+	{
+		// The peer don't have an ID, give him one
+		// TODO: check it's not already used
+		Packet p(NET_YOUR_ID);
+		p.SetArg(NET_YOUR_ID_ID, peers_list.CreateID());
+		SendMsg(p);
+	}
+	else
+		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
+
 	if(IsServer())
 	{
 		// Initiate the merge if it's the first peer we connect to
@@ -101,17 +112,6 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	}
 	else
 		SendHello();
-
-	if(pckt->GetArg<uint32_t>(NET_HELLO_MY_ID) == 0)
-	{
-		// The peer don't have an ID, give him one
-		// TODO: check it's not already used
-		Packet p(NET_YOUR_ID);
-		p.SetArg(NET_YOUR_ID_ID, peers_list.CreateID());
-		SendMsg(p);
-	}
-	else
-		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
 }
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
