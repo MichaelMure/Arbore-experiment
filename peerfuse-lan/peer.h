@@ -61,5 +61,7 @@ public:
 
 	void SendMsg(const Packet& pckt);
 	void SendHello();
+
+	bool Receive();
 };
 #endif

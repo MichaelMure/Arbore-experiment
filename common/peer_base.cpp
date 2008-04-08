@@ -47,7 +47,7 @@ void PeerBase::Flush()
 }
 
 // true when there is still data available, false elsewise
-bool PeerBase::Receive()
+bool PeerBase::ReceivePacket()
 {
 	// Receive the header
 	if(!incoming)
@@ -72,13 +72,5 @@ bool PeerBase::Receive()
 
 	log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
 
-	/* We use the Deleter class because we don't know how we will
-	 * exit this function. With it, we are *sure* than Packet instance
-	 * will be free'd.
-	 */
-	Deleter<Packet> packet(incoming);
-	incoming = NULL;
-
-	HandleMsg(*packet);
 	return true;
 }

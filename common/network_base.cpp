@@ -183,7 +183,8 @@ void NetworkBase::Loop()
 			{
 				try
 				{
-					while(peers_list.PeerReceive(i)) ;
+					while(peers_list.PeerReceive(i))
+						;
 				}
 				catch(Connection::RecvError &e)
 				{

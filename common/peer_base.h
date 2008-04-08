@@ -37,6 +37,8 @@ protected:
 
 	unsigned int flags;
 
+	bool ReceivePacket();
+
 public:
 	enum
 	{
@@ -73,7 +75,7 @@ public:
 	virtual void SendMsg(const Packet& pckt) = 0;
 	virtual void SendHello() = 0;
 
-	virtual bool Receive();
+	virtual bool Receive() = 0;
 	void Flush();
 };
 #endif						  /* PEER_BASE_H */

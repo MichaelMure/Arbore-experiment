@@ -290,3 +290,20 @@ void Peer::HandleMsg(Packet* pckt)
 
 	(this->*handler[pckt->GetType()])(pckt);
 }
+
+bool Peer::Receive()
+{
+	if(!PeerBase::ReceivePacket())
+		return false;
+
+	/* We use the Deleter class because we don't know how we will
+	 *  * exit this function. With it, we are *sure* than Packet instance
+	 *   * will be free'd.
+	 *    */
+	Deleter<Packet> packet(incoming);
+	incoming = NULL;
+
+	HandleMsg(*packet);
+
+	return false;
+}

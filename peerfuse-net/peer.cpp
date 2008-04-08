@@ -316,7 +316,7 @@ void Peer::HandleMsg(Packet* pckt)
 
 bool Peer::Receive()
 {
-	if(!PeerBase::Receive())
+	if(!PeerBase::ReceivePacket())
 		return false;
 
 	/* We use the Deleter class because we don't know how we will
