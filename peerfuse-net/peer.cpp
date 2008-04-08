@@ -96,8 +96,8 @@ void Peer::SendHello()
 	uint32_t flags = 0;
 	if(IsHighLink())
 		flags |= NET_HELLO_FLAGS_HIGHLINK;
-	pckt.SetArg(NET_HELLO_FLAGS, flags);
-	pckt.SetArg(NET_HELLO_PORT, environment.listening_port.Get());
+	pckt.SetArg(NET_HELLO_FLAGS, (uint32_t)flags);
+	pckt.SetArg(NET_HELLO_PORT, (uint32_t)environment.listening_port.Get());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
 	SendMsg(pckt);
 }
