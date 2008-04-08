@@ -91,7 +91,7 @@ bool PacketBase::ReceiveContent(Connection* conn)
 		return false;
 
 	memcpy(datas, buf, GetDataSize());
-	delete []buf;
+	free(buf); // Don't use delete[]
 
 	BuildArgsFromData();
 	return true;

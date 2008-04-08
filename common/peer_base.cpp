@@ -59,7 +59,7 @@ bool PeerBase::ReceivePacket()
 			return false;		  // All the content couldn't be retrieved yet -> exit
 
 		incoming = new Packet(header);
-		delete []header;
+		free(header); // Don't use delete []
 
 		log[W_PARSE] << "Received a message header: type=" << incoming->GetType() << ", " <<
 			" size=" << incoming->GetDataSize();
