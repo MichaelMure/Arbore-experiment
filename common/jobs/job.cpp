@@ -35,7 +35,7 @@ bool Job::DoStart()
 				start_time = time(NULL) + repeat_delta;
 				break;
 			case REPEAT_LESS_AND_LESS:
-				start_time += time(NULL) + repeat_delta;
+				start_time = time(NULL) + repeat_delta;
 				repeat_delta *= 2;
 				break;
 			default:
