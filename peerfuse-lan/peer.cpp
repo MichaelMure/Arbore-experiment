@@ -59,7 +59,7 @@ void Peer::SendMsg(const Packet& pckt)
 {
 	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 	send_queue.push(pckt);
-	scheduler_queue.Queue(new JobFlushPeer(GetID()));
+	scheduler_queue.Queue(new JobFlushPeer(GetFd()));
 }
 
 void Peer::SendHello()
@@ -94,7 +94,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		// The peer don't have an ID, give him one
 		// TODO: check it's not already used
 		Packet p(NET_YOUR_ID);
-		p.SetArg(NET_YOUR_ID_ID, peers_list.CreateID());
+		addr.id = peers_list.CreateID();
+		p.SetArg(NET_YOUR_ID_ID, addr.id);
 		SendMsg(p);
 	}
 	else

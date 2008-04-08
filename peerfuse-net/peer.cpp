@@ -83,7 +83,7 @@ void Peer::SendMsg(const Packet& pckt)
 	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 
 	send_queue.push(pckt);
-	scheduler_queue.Queue(new JobFlushPeer(GetID()));
+	scheduler_queue.Queue(new JobFlushPeer(GetFd()));
 }
 
 void Peer::SendHello()

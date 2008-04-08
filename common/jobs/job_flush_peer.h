@@ -21,13 +21,12 @@
 #define JOB_FLUSH_PEER_H
 #include "job.h"
 #include "job_types.h"
-#include "pf_types.h"
 
 class JobFlushPeer : public Job
 {
-	pf_id id;
+	int fd;
 public:
-	JobFlushPeer(pf_id _id) : Job(0, REPEAT_NONE), id(_id) {};
+	JobFlushPeer(int _fd) : Job(0, REPEAT_NONE), fd(_fd) {};
 	~JobFlushPeer() {};
 
 	bool Start();
