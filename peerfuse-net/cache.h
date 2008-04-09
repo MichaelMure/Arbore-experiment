@@ -68,7 +68,9 @@ public:
 	virtual void ChOwn(std::string path, uid_t uid, gid_t gid);
 	virtual void ChMod(std::string path, mode_t mode);
 	virtual pf_stat GetAttr(std::string path);
+#ifndef PF_SERVER_MODE
 	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
+#endif
 
 	void MkFile(std::string path, pf_stat stat, pf_id sender = 0);
 	void RmFile(std::string path, pf_id sender = 0);

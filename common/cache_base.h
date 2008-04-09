@@ -20,6 +20,7 @@
 #ifndef CACHE_BASE_H
 #define CACHE_BASE_H
 
+#ifndef PF_SERVER_MODE
 #ifndef FUSE_USE_VERSION
 #define FUSE_USE_VERSION 26
 #endif						  /* FUSE_USE_VERSION */
@@ -31,6 +32,7 @@
 #endif						  /* _XOPEN_SOURCE */
 
 #include <fuse.h>
+#endif /* PF_SERVER_MODE */
 
 #include <vector>
 #include "mutex.h"
@@ -69,7 +71,9 @@ public:
 	virtual void ChOwn(std::string path, uid_t uid, gid_t gid) = 0;
 	virtual void ChMod(std::string path, mode_t mode) = 0;
 	virtual pf_stat GetAttr(std::string path) = 0;
+#ifndef PF_SERVER_MODE
 	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) = 0;
+#endif
 
 	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0) = 0;
 	virtual void RmFile(std::string path, pf_id sender = 0) = 0;

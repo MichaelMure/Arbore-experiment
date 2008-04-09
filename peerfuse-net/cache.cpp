@@ -352,6 +352,7 @@ pf_stat Cache::GetAttr(std::string path)
 	return stat;
 }
 
+#ifndef PF_SERVER_MODE
 void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 			off_t offset, struct fuse_file_info *fi)
 {
@@ -379,6 +380,7 @@ void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 	Unlock();
 
 }
+#endif /* PF_SERVER_MODE */
 
 void Cache::UpdateRespFiles()
 {
