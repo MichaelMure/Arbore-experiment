@@ -380,7 +380,7 @@ void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 	Unlock();
 
 }
-#endif /* PF_SERVER_MODE */
+#endif						  /* PF_SERVER_MODE */
 
 void Cache::UpdateRespFiles()
 {

@@ -32,7 +32,7 @@
 #endif						  /* _XOPEN_SOURCE */
 
 #include <fuse.h>
-#endif /* PF_SERVER_MODE */
+#endif						  /* PF_SERVER_MODE */
 
 #include <vector>
 #include "mutex.h"
