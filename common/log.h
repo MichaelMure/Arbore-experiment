@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "tools.h"
+#include "mutex.h"
 
 enum
 {
@@ -56,6 +57,7 @@ enum
 class Log
 {
 public:
+	Mutex std_lock;
 
 	Log();
 

@@ -61,12 +61,14 @@ Log::flux::~flux()
 
 		struct timeval t;
 		gettimeofday(&t, NULL);
+		log.std_lock.Lock();
 		(all_flags[i].level == LOG_ERR ? std::cerr : std::cout)
 			<< (t.tv_sec % (24 * 60 * 60)) / (60 * 60)
 			<< ":" << (t.tv_sec % (60 * 60)) / 60
 			<< ":" << t.tv_sec % 60
 			<< "." << t.tv_usec / 1000
 			<< "[" << all_flags[i].s << "] " << str << std::endl;
+		log.std_lock.Unlock();
 	}
 }
 
