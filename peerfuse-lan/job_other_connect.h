@@ -21,22 +21,22 @@
 #define JOB_OTHER_CONNECT_H
 
 #include <list>
+#include "pf_types.h"
 #include "job.h"
-#include "peer.h"
 
 class JobOtherConnect : public Job
 {
-	Peer* connect_to;
-	std::list<Peer*> is_connecting;
-	std::list<Peer*> is_connected;
+	pf_id connect_to;
+	std::list<id_t> is_connecting;
+	std::list<id_t> is_connected;
 
 protected:
 	bool Start();
 public:
-	JobOtherConnect(Peer* _connect_to);
+	JobOtherConnect(pf_id _connect_to);
 
 	bool IsConnectingTo(pf_addr addr);
-	void PeerConnected(Peer* peer);
+	void PeerConnected(pf_id peer);
 	job_type GetType() const {return JOB_OTHER_CONNECT; }
 	std::string GetName() const { return "JobOtherConnect"; }
 };

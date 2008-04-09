@@ -89,6 +89,9 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
+	if(IsClient())
+		SendHello();
+
 	if(pckt->GetArg<uint32_t>(NET_HELLO_MY_ID) == 0)
 	{
 		// The peer don't have an ID, give him one
@@ -111,8 +114,6 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 			SendMsg(Packet(NET_START_MERGE));
 		}
 	}
-	else
-		SendHello();
 }
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
@@ -128,7 +129,7 @@ void Peer::Handle_net_start_merge(struct Packet* pckt)
 {
 	SetFlag(MERGING);
 
-	scheduler_queue.Queue(new JobOtherConnect(this));
+	scheduler_queue.Queue(new JobOtherConnect(GetID()));
 }
 
 void Peer::Handle_net_peer_connection(struct Packet* msg)
@@ -151,7 +152,7 @@ void Peer::Handle_net_peer_connection_ack(struct Packet* msg)
 		{
 			JobOtherConnect* j = static_cast<JobOtherConnect*>(*it);
 			if(j->IsConnectingTo(new_peer))
-				j->PeerConnected(this);
+				j->PeerConnected(GetID());
 		}
 	}
 	scheduler_queue.Unlock();
