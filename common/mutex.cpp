@@ -65,8 +65,7 @@ Mutex::Mutex(const Mutex& m)
 
 Mutex::~Mutex()
 {
-	int r = pthread_mutex_destroy(mutex);
-	assert(r == 0);
+	pthread_mutex_destroy(mutex);
 	delete mutex;
 }
 
