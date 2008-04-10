@@ -74,6 +74,18 @@ void Peer::SendHello()
 	SendMsg(pckt);
 }
 
+void Peer::SendStartMerge()
+{
+	log[W_DEBUG] << "Merge should start";
+	// Initiate the merge if it's the first peer we connect to
+	if(peers_list.Size() == 1)
+	{
+		environment.merging.Set(true);
+		SetFlag(MERGING);
+		SendMsg(Packet(NET_START_MERGE));
+	}
+}
+
 /*******************************
  * Handers
  */
@@ -104,16 +116,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	else
 		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
 
-	if(IsServer())
-	{
-		// Initiate the merge if it's the first peer we connect to
-		if(peers_list.Size() == 1)
-		{
-			environment.merging.Set(true);
-			SetFlag(MERGING);
-			SendMsg(Packet(NET_START_MERGE));
-		}
-	}
+	if(IsServer() && environment.my_id.Get()) // Wait this peer send us an id before syncing
+		SendStartMerge();
 }
 
 void Peer::Handle_net_your_id(struct Packet* pckt)
@@ -123,6 +127,9 @@ void Peer::Handle_net_your_id(struct Packet* pckt)
 	environment.my_id.Set(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
 	session_cfg.Set("my_id", environment.my_id.Get());
 	log[W_INFO] << "My ID now is " << environment.my_id.Get();
+
+	if(IsServer())
+		SendStartMerge();
 }
 
 void Peer::Handle_net_start_merge(struct Packet* pckt)
