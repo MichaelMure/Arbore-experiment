@@ -99,7 +99,9 @@ void SessionConfig::Save()
 	fout.open(filename.c_str(), std::fstream::out);
 	if(!fout)
 	{
-		log[W_ERR] << "SessionConfig: Unable to save config file to " << filename;
+		// Save is called by SessionConfig's destructor
+		// the log functions may not be available at this moment
+		//log[W_ERR] << "SessionConfig: Unable to save config file to " << filename;
 		return;
 	}
 
@@ -110,7 +112,7 @@ void SessionConfig::Save()
 		fout << it->first << "=" << it->second->GetAsString() << std::endl;
 	}
 	fout.close();
-	log[W_INFO] << "SessionConfig: Config saved in " << filename;
+	//log[W_INFO] << "SessionConfig: Config saved in " << filename;
 }
 
 void SessionConfig::Parse(const std::string& line)
