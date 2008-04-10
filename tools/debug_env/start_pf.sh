@@ -52,13 +52,13 @@ function start_fs
 			done
 			;;
 		valgrind)
-			tail -f stdin$i | valgrind "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>&1 | while read line
+			tail -f stdin$i | valgrind "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>log_val${i} | while read line
 			do
 				echo "$i $line" >> stdout$i
 			done
 			;;
 		helgrind)
-			tail -f stdin$i | valgrind --tool=helgrind "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>&1 | while read line
+			tail -f stdin$i | valgrind --tool=helgrind "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>log_hel${i} | while read line
 			do
 				echo "$i $line" >> stdout$i
 			done

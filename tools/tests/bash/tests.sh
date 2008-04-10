@@ -78,7 +78,12 @@ function start_p2pfs
 		"valgrind")
 			export VAL="VAL$NB_P2PFS"
 			export $VAL="$WORKDIR/p2pfs_val$NB_P2PFS"
-			valgrind --log-file="${!VAL}" "$BIN" "$1" "${!MNT}" $START_ARGS > "${!LOG}" 2>&1 &
+			valgrind --log-file="${!VAL}" "$BIN" "${!CONF}" "${!MNT}" $START_ARGS > "${!LOG}" 2>&1 &
+			;;
+		"helgrind")
+			export VAL="VAL$NB_P2PFS"
+			export $VAL="$WORKDIR/p2pfs_val$NB_P2PFS"
+			valgrind --tool=helgrind --log-file="${!VAL}" "$BIN" "${!CONF}" "${!MNT}" $START_ARGS > "${!LOG}" 2>&1 &
 			;;
 	esac
 
@@ -144,6 +149,11 @@ function start_test
 				echo
 				echo "Files in MNT$i:"
 				ls "${!MNT}"
+				if [ "$TOOL" == "valgrind" ] || [ "$TOOL" == "helgrind" ]
+				then
+					echo "Valgrind logs:"
+					cat "$WORKDIR/p2pfs_val$i"
+				fi
 			done
 		fi
 	fi
