@@ -116,7 +116,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	else
 		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
 
-	if(IsServer() && environment.my_id.Get()) // Wait this peer send us an id before syncing
+	if(IsServer() && environment.my_id.Get())  // Wait this peer send us an id before syncing
 		SendStartMerge();
 }
 
