@@ -43,6 +43,7 @@ Peer* PeersListBase::PeerFromFD(int fd)
 
 Peer* PeersListBase::PeerFromID(pf_id id)
 {
+	BlockLockMutex lock(this);
 	iterator it;
 	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
 		;
