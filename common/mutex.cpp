@@ -18,6 +18,7 @@
  */
 
 #include <map>
+#include <iostream>
 #include <stdio.h>
 #include <pthread.h>
 #include <assert.h>
@@ -72,11 +73,15 @@ Mutex::~Mutex()
 void Mutex::Lock()
 {
 	int res = pthread_mutex_lock(mutex);
-	assert(res == 0);
+	//assert(res == 0);
+	if(res) // Don't use log[] !
+		std::cerr << "Failed to lock " << this;
 }
 
 void Mutex::Unlock()
 {
 	int res = pthread_mutex_unlock(mutex);
-	assert(res == 0);
+	//assert(res == 0);
+	if(res) // Don't use log[] !
+		std::cerr << "Failed to unlock " << this;
 }
