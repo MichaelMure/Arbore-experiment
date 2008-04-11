@@ -45,12 +45,9 @@
 NetworkBase::NetworkBase()
 			: Mutex(RECURSIVE_MUTEX),
 			serv_sock(-1),
-			highsock(-1),
 			ssl(NULL)
 {
-	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
-
 	srand(time(NULL));
 }
 
@@ -64,17 +61,11 @@ NetworkBase::~NetworkBase()
 	}
 }
 
-void NetworkBase::HavePacketToSend(int fd)
-{
-	Lock();
-	FD_SET(fd, &global_write_set);
-	Unlock();
-}
-
 Peer* NetworkBase::AddPeer(Peer* p)
 {
 	log[W_CONNEC] << "-> Added a new peer: " << p->GetAddr() << " (" << p->GetFd() <<")";
 
+#if 0
 	if(p->GetFd() >= 0)
 	{
 		Lock();
@@ -84,6 +75,7 @@ Peer* NetworkBase::AddPeer(Peer* p)
 			highsock = p->GetFd();
 		Unlock();
 	}
+#endif
 
 	if(peers_list.Size() == 0)
 	{
@@ -109,7 +101,6 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 	delete p;
 	Lock();
 	if(FD_ISSET(fd, &global_read_set)) FD_CLR(fd, &global_read_set);
-	if(FD_ISSET(fd, &global_write_set)) FD_CLR(fd, &global_write_set);
 	Unlock();
 }
 
@@ -125,12 +116,12 @@ void NetworkBase::Loop()
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 1000;
 
-	Lock();
+	usleep(1000);				  // sleep 0.001 sec -> give the other thread a chance to lock
+	BlockLockMutex lock(this);
 	fd_set tmp_read_set = global_read_set;
-	fd_set tmp_write_set = global_write_set;
 	int events;
 
-	if((events = select(highsock + 1, &tmp_read_set, &tmp_write_set, NULL, &timeout)) < 0)
+	if((events = select(serv_sock + 1, &tmp_read_set, NULL, NULL, &timeout)) < 0)
 	{
 		if(errno != EINTR)
 		{
@@ -140,81 +131,74 @@ void NetworkBase::Loop()
 	}
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
-		for(int i = 0;i <= highsock;++i)
+		if(FD_ISSET(serv_sock, &tmp_read_set))
 		{
-			if(FD_ISSET(i, &tmp_write_set))
-			{
-				FD_CLR(i, &global_write_set);
+			struct sockaddr_in newcon;
+			unsigned int addrlen = sizeof newcon;
+			int newfd = accept(serv_sock, (struct sockaddr *) &newcon, &addrlen);
 
+			if(newfd != -1)
+			{
+				/* none_addr is initialized to NULL */
+				static pf_addr none_addr;
+				pf_addr addr = none_addr;
+				addr.ip[3] = newcon.sin_addr.s_addr;
+
+				Connection *peer_conn;
 				try
 				{
-					peers_list.PeerFlush(i);
-				}
-				catch(Connection::WriteError &e)
-				{
-					log[W_WARNING] << "send() error: " << e.GetString();
-					RemovePeer(i);
-				}
-			}
-			if(!FD_ISSET(i, &tmp_read_set)) continue;
-
-			if(i == serv_sock)
-			{
-				struct sockaddr_in newcon;
-				unsigned int addrlen = sizeof newcon;
-				int newfd = accept(serv_sock, (struct sockaddr *) &newcon, &addrlen);
-
-				if(newfd != -1)
-				{
-					/* none_addr is initialized to NULL */
-					static pf_addr none_addr;
-					pf_addr addr = none_addr;
-					addr.ip[3] = newcon.sin_addr.s_addr;
-
-					Connection *peer_conn;
-					try
-					{
-						peer_conn = ssl->Accept(newfd);
-					}
-					catch(SslSsl::SslHandshakeFailed &e)
-					{
-						log [W_WARNING] << "SSL handshake failure: " << e.GetString();
-						continue;
-					}
-
+					peer_conn = ssl->Accept(newfd);
 					AddPeer(new Peer(addr, peer_conn));
-
 					DelDisconnected(addr);
 				}
-			}
-			else
-			{
-				try
+				catch(SslSsl::SslHandshakeFailed &e)
 				{
-					while(peers_list.PeerReceive(i))
-						;
+					log [W_WARNING] << "SSL handshake failure: " << e.GetString();
 				}
-				catch(Connection::RecvError &e)
-				{
-					log[W_WARNING] << "recv() error: " << e.GetString();
-					RemovePeer(i);
-				}
-				catch(Packet::Malformated &e)
-				{
-					log[W_ERR] << "Received malformed message!";
-					RemovePeer(i);
-				}
-				// TODO:Rename me into something like BanPeer as we won't reconnect to him
-				catch(Peer::MustDisconnect &e)
-				{
-					log[W_WARNING] << "Must disconnected";
-					RemovePeer(i, false);
-				}
+
 			}
 		}
 	}
-	Unlock();
-	usleep(10000);				  // sleep 0.001 sec -> give the other thread a chance to lock
+
+	BlockLockMutex peers_lock(&peers_list);
+	for(PeersList::iterator p = peers_list.begin();
+			p != peers_list.end();
+			++p)
+	{
+		// Perform read operations
+		try
+		{
+			while(peers_list.PeerReceive((*p)->GetFd()))
+				;
+		}
+		catch(Connection::RecvError &e)
+		{
+			log[W_WARNING] << "recv() error: " << e.GetString();
+			RemovePeer((*p)->GetFd());
+		}
+		catch(Packet::Malformated &e)
+		{
+			log[W_ERR] << "Received malformed message!";
+			RemovePeer((*p)->GetFd());
+		}
+		// TODO:Rename me into something like BanPeer as we won't reconnect to him
+		catch(Peer::MustDisconnect &e)
+		{
+			log[W_WARNING] << "Must disconnected";
+			RemovePeer((*p)->GetFd(), false);
+		}
+
+		// Perform write operations
+		try
+		{
+			peers_list.PeerFlush((*p)->GetFd());
+		}
+		catch(Connection::WriteError &e)
+		{
+			log[W_WARNING] << "send() error: " << e.GetString();
+			RemovePeer((*p)->GetFd());
+		}
+	}
 }
 
 void NetworkBase::OnStop()
@@ -234,9 +218,7 @@ void NetworkBase::CloseAll()
 		serv_sock = -1;
 	}
 
-	FD_ZERO(&global_write_set);
 	FD_ZERO(&global_read_set);
-	highsock = -1;
 
 	delete ssl;
 	ssl = 0;
@@ -359,14 +341,8 @@ void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock
 		throw CantListen(port);
 	}
 
-	highsock = 0;
-
 	listen(serv_sock, 5);
-	if(serv_sock > highsock)
-		highsock = serv_sock;
-
 	FD_SET(serv_sock, &global_read_set);
-	FD_SET(serv_sock, &global_write_set);
 
 	environment.listening_port.Set(port);
 }

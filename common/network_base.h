@@ -57,9 +57,7 @@ public:
 
 private:
 	fd_set global_read_set;
-	fd_set global_write_set;
 	int serv_sock;
-	int highsock;
 
 	std::list<pf_addr> disconnected_list;
 
@@ -83,11 +81,6 @@ public:
 
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer) {}
-
-	/* When a peer want to send a packet, set its fd on the
-	 * global_write_set to call peer->Flush() in Main() loop.
-	 */
-	void HavePacketToSend(int fd);
 
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);

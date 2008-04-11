@@ -18,11 +18,10 @@
  */
 
 #include "job_flush_peer.h"
-#include "mutex.h"
-#include "network.h"
+#include "peers_list.h"
 
 bool JobFlushPeer::Start()
 {
-	net.HavePacketToSend(fd);
+	peers_list.PeerFlush(fd);
 	return false;
 }
