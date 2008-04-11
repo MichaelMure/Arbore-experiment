@@ -65,7 +65,7 @@ Peer* NetworkBase::AddPeer(Peer* p)
 {
 	log[W_CONNEC] << "-> Added a new peer: " << p->GetAddr() << " (" << p->GetFd() <<")";
 
-#if 0
+	#if 0
 	if(p->GetFd() >= 0)
 	{
 		Lock();
@@ -75,7 +75,7 @@ Peer* NetworkBase::AddPeer(Peer* p)
 			highsock = p->GetFd();
 		Unlock();
 	}
-#endif
+	#endif
 
 	if(peers_list.Size() == 0)
 	{
@@ -162,8 +162,8 @@ void NetworkBase::Loop()
 
 	BlockLockMutex peers_lock(&peers_list);
 	for(PeersList::iterator p = peers_list.begin();
-			p != peers_list.end();
-			++p)
+		p != peers_list.end();
+		++p)
 	{
 		// Perform read operations
 		try
