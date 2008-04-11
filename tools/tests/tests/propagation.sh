@@ -21,7 +21,7 @@
 source "$TESTS/bash/tests.sh"
 
 export LISTEN_PORT=9876
-export CONNECT_PORT=6789
+export CONNECT_PORT=6790
 start_p2pfs
 
 export LISTEN_PORT=6789

@@ -24,7 +24,7 @@ export LISTEN_PORT=9876
 export CONNECT_PORT=6789
 start_p2pfs
 
-export LISTEN_PORT=6789
+export LISTEN_PORT=6790
 export CONNECT_PORT=9876
 start_p2pfs
 
