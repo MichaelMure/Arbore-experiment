@@ -170,18 +170,18 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 	pf_addr new_peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_RST_ADDRESS);
 
 	scheduler_queue.Lock();
-	/* we will erase some data from scheduler's queue, so
-	 * do a copy of it here. */
-	SchedulerQueue jobs = scheduler_queue;
-	for(SchedulerQueue::iterator it = jobs.begin();
-		it != jobs.end();
+	for(SchedulerQueue::iterator it = scheduler_queue.begin();
+		it != scheduler_queue.end();
 		++it)
 	{
 		if((*it)->GetType() == JOB_OTHER_CONNECT)
 		{
 			JobOtherConnect* j = static_cast<JobOtherConnect*>(*it);
 			if(j->IsConnectingTo(new_peer))
+			{
 				scheduler_queue.Cancel(j);
+				break;
+			}
 		}
 	}
 	scheduler_queue.Unlock();
