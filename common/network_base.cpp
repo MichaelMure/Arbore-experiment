@@ -161,6 +161,15 @@ void NetworkBase::Loop()
 	}
 
 	BlockLockMutex peers_lock(&peers_list);
+	/* About exceptions, when in a catch block we remove a peer,
+	 * the p iterator isn't valid anymore.
+	 * So, as we can't get a new iterator value for peers_list, we must
+	 * exit loop. It is not really a problem, because all active fd will
+	 * wait for the next iteration.
+	 * There would be a problem if peer wasn't deleted, because the first peers
+	 * would have a priority on other peers.
+	 * So, don't forget the "break" after a RemovePeer() call!
+	 */
 	for(PeersList::iterator p = peers_list.begin();
 		p != peers_list.end();
 		++p)
@@ -169,23 +178,27 @@ void NetworkBase::Loop()
 		try
 		{
 			while(peers_list.PeerReceive((*p)->GetFd()))
-				;
+			;
 		}
 		catch(Connection::RecvError &e)
 		{
 			log[W_WARNING] << "recv() error: " << e.GetString();
 			RemovePeer((*p)->GetFd());
+			break;
 		}
 		catch(Packet::Malformated &e)
 		{
 			log[W_ERR] << "Received malformed message!";
 			RemovePeer((*p)->GetFd());
+			break;
 		}
 		// TODO:Rename me into something like BanPeer as we won't reconnect to him
+		/* Yes and no, it is not the good name because it's not really a ban -romain */
 		catch(Peer::MustDisconnect &e)
 		{
 			log[W_WARNING] << "Must disconnected";
 			RemovePeer((*p)->GetFd(), false);
+			break;
 		}
 
 		// Perform write operations
@@ -197,7 +210,9 @@ void NetworkBase::Loop()
 		{
 			log[W_WARNING] << "send() error: " << e.GetString();
 			RemovePeer((*p)->GetFd());
+			break;
 		}
+
 	}
 }
 
