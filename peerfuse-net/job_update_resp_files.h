@@ -27,12 +27,11 @@ class JobUpdateRespFiles : public Job
 public:
 	JobUpdateRespFiles()
 		: Job(0, REPEAT_NONE)
-	{}
+		{}
 
 	bool Start();
 
 	job_type GetType() const { return JOB_UPDATE_RESP_FILES; }
 	std::string GetName() const { return "JobUpdateRespFiles"; }
 };
-
 #endif						  /* JOB_UPDATE_RESP_FILES_H */

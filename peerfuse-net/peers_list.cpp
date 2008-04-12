@@ -100,8 +100,8 @@ StaticPeersList PeersList::GetDownLinks(Peer* p) const
 	StaticPeersList list;
 	std::vector<pf_id> downlinks = p->GetDownLinks();
 	for(std::vector<pf_id>::iterator it = downlinks.begin();
-			it != downlinks.end();
-			++it)
+		it != downlinks.end();
+		++it)
 	{
 		Peer* peer = PeerFromID(*it);
 		assert(peer);

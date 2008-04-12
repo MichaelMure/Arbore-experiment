@@ -178,7 +178,7 @@ void NetworkBase::Loop()
 		try
 		{
 			while(peers_list.PeerReceive((*p)->GetFd()))
-			;
+				;
 		}
 		catch(Connection::RecvError &e)
 		{

@@ -39,9 +39,9 @@
 #include "environment.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
-	: /* anonymous is only when this is a real connection */
-	PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
-	uplink(parent)
+			:						  /* anonymous is only when this is a real connection */
+			PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
+			uplink(parent)
 {
 	assert(conn);
 	addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
@@ -179,7 +179,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
 
 	if(peers_list.IsIDOnNetwork(addr.id))
-		return;  /* I'm already connected to him. */
+		return;				  /* I'm already connected to him. */
 
 	Peer* p = new Peer(addr, NULL, 0, GetID());
 	peers_list.Add(p);
