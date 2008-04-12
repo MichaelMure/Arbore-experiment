@@ -24,6 +24,10 @@
 
 class PeersList: public PeersListBase
 {
+	StaticPeersList GetDownLinks(Peer* p) const;
+
+	void _send_peer_list(Peer* to, Peer* from) const;
+
 public:
 	PeersList() {}
 	~PeersList() {}
@@ -31,10 +35,18 @@ public:
 	void EraseFromID(pf_id id);
 	Peer* RemoveFromID(pf_id id);
 
+	/* Remove all downlinks from a peer */
+	void RemoveDownLinks(Peer* p);
+
 	bool IsIDOnNetwork(pf_id id);
+	/** Return a list of connected high linkes */
+	StaticPeersList GetDirectHighLinks() const;
 
 	void GivePacketTo(pf_id id, Packet* packet) const;
+
 	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL) const;
+	void SendMsg(pf_id to, const Packet& pckt) const;
+	void SendPeerList(Peer* to) const;
 };
 
 extern PeersList peers_list;

@@ -41,9 +41,6 @@ public:
 	Network();
 	virtual ~Network();
 
-	/** Return a list of connected high linkes */
-	StaticPeersList GetDirectHighLinks() const;
-
 	virtual Peer* AddPeer(Peer* peer);
 	virtual void OnRemovePeer(Peer* peer);
 

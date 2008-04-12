@@ -50,18 +50,6 @@ Network::~Network()
 {
 }
 
-StaticPeersList Network::GetDirectHighLinks() const
-{
-	BlockLockMutex lock(&peers_list);
-	StaticPeersList list;
-	PeersList::iterator it;
-	for(it = peers_list.begin(); it != peers_list.end(); ++it)
-		if((*it)->IsHighLink() && !(*it)->IsAnonymous())
-			list.push_back(*it);
-
-	return list;
-}
-
 Peer* Network::AddPeer(Peer* peer)
 {
 	Peer* p;
@@ -85,37 +73,29 @@ Peer* Network::AddPeer(Peer* peer)
 
 void Network::OnRemovePeer(Peer* peer)
 {
-	if(peer->IsHighLink() && !peer->IsAnonymous())
-	{
-		/* A       C
-		 * '---B---'
-		 *     |       .--F
-		 * .---D----E--|
-		 * H           '--G
-		 *
-		 * E = me
-		 * D = peer (who is disconnecting)
-		 *
-		 * I send a broadcast NET_PEER_GOODBYE message to F et G,
-		 * and I try to connect to H and B as highlink.
-		 */
+	if(!peer->IsHighLink() || peer->IsAnonymous())
+		return;
 
-		BlockLockMutex lock(&peers_list);
-		Packet pckt(NET_PEER_GOODBYE, peer->GetID(), 0);
-		peers_list.Broadcast(pckt, peer);
+	/* A       C
+	 * '---B---'
+	 *     |       .--F
+	 * .---D----E--|
+	 * H           '--G
+	 *
+	 * E = me
+	 * D = peer (who is disconnecting)
+	 *
+	 * I send a broadcast NET_PEER_GOODBYE message to F et G,
+	 * and I try to connect to H and B as highlink.
+	 */
 
-		/* Added direct down_links of this peer in my scheduler queue
-		 * to connect to them like a highlink*/
-		std::vector<Peer*> down_links = peer->GetDownLinksButDontForgetToLockPeersListMutex();
-		for(std::vector<Peer*>::iterator it = down_links.begin();
-			it != down_links.end();
-			++it)
-		{
-			AddDisconnected((*it)->GetAddr());
-		}
-	}
+	BlockLockMutex lock(&peers_list);
+	Packet pckt(NET_PEER_GOODBYE, peer->GetID(), 0);
+	peers_list.Broadcast(pckt, peer);
 
-	/* TODO: Loop on all down_links of peer to disconnect from them. */
+	/* Added direct down_links of this peer in my scheduler queue
+	 * to connect to them like a highlink*/
+	peers_list.RemoveDownLinks(peer);
 }
 
 void Network::StartNetwork(MyConfig* conf)

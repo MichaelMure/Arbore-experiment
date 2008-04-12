@@ -46,11 +46,31 @@ Messages
 		'---------------------------------------------------'
 
 	PEER_GOODBYE
-	~~~~~~~~
+	~~~~~~~~~~~~
 
 		.------------.------------.------------.------------.
 		|   srcID    |   dstID    |    type    |    size    |
 		'------------'------------'------------'------------'
+
+	BECOME_HIGHLINK
+	~~~~~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		'------------'------------'------------'------------'
+
+		This message can be used when there is a network split.
+		For example, in this case:
+
+		A       C
+                '---B---'
+                    |       .--F
+                .---D----E--|
+                H           '--G
+
+		If D is disconnected from E, E will look for a new highlink.
+		If E has a low link with C, he can send a BECOME_HIGHLINK message
+		to C.
 
 	END_OF_MERGE
 	~~~~~~~~~~~

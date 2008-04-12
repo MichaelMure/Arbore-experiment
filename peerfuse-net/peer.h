@@ -44,29 +44,29 @@ class Peer : public PeerBase
 	 *
 	 *  NOTE: IT IS FOR HIGHLINKS ONLY!
 	 */
-	Peer* uplink;				  /**< Peer where this peer is connected */
-	std::vector<Peer*> downlinks;		  /**< Peer connected to this one */
+	pf_id uplink;				  /**< Peer where this peer is connected */
+	std::vector<pf_id> downlinks;		  /**< Peer connected to this one */
 
-	// Sending functions
-	void Send_net_peer_list(StaticPeersList list);
 	// Receiving functions
 	void Handle_net_hello(struct Packet* pckt);
 	void Handle_net_mkfile(struct Packet* pckt);
 	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
 	void Handle_net_peer_goodbye(struct Packet* pckt);
+	void Handle_net_become_highlink(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
 public:
 	/* Constructors */
-	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, Peer* parent = 0);
+	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, pf_id parent = 0);
 	~Peer();
 
 	bool IsHighLink() const { return flags & HIGHLINK; }
 	bool IsLowLink() const { return !(flags & HIGHLINK); }
 	void SetHighLink(bool l = true) { l ? SetFlag(HIGHLINK) : DelFlag(HIGHLINK); }
 
-	std::vector<Peer*> GetDownLinksButDontForgetToLockPeersListMutex() const { return downlinks; }
+	pf_id GetUpLink() const { return uplink; }
+	std::vector<pf_id> GetDownLinks() const { return downlinks; }
 
 	bool IsAnonymous() const { return (flags & ANONYMOUS); }
 

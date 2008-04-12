@@ -31,6 +31,7 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_END_OF_MERGE */     "END_OF_MERGE",
 	/* NET_END_OF_MERGE_ACK */ "END_OF_MERGE_ACK",
 	/* NET_PEER_BYE */         "PEER_BYE",
+	/* NET_BECOME_HIGHLINK */  "BECOME_HIGHLINK",
 };
 
 const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
@@ -81,6 +82,9 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 	{ T_NONE},
 
 	// NET_PEER_BYE
+	{ T_NONE},
+
+	// NET_BECOME_HIGHLINK
 	{ T_NONE},
 
 };

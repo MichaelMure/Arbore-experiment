@@ -22,10 +22,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <time.h>
-#include "cache.h"
 #include "packet.h"
 #include "peer.h"
-#include "network.h"
 #include "net_proto.h"
 #include "pf_types.h"
 #include "pfnet.h"
@@ -38,28 +36,19 @@
 #include "job_rmfile.h"
 #include "connection_ssl.h"
 #include "environment.h"
+#include "cache.h"
 
-Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, Peer* parent) :
-			/* anonymous is only when this is a real connection */
-			PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
-			uplink(parent)
+Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
+	: /* anonymous is only when this is a real connection */
+	PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
+	uplink(parent)
 {
 	assert(conn);
 	addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
-	if(uplink)
-		uplink->downlinks.push_back(this);
 }
 
 Peer::~Peer()
 {
-	if(uplink)
-	{
-		std::vector<Peer*>::iterator it = uplink->downlinks.begin();
-		while(it != uplink->downlinks.end() && *it != this)
-			;
-		if(it != uplink->downlinks.end())
-			uplink->downlinks.erase(it);
-	}
 }
 
 /****************************
@@ -73,8 +62,9 @@ void Peer::SendMsg(const Packet& pckt)
 	 */
 	if(!conn)
 	{
+		/* TODO: find the fast path */
 		if(uplink)
-			uplink->SendMsg(pckt);
+			peers_list.SendMsg(uplink, pckt);
 		else
 			log[W_ERR] << "Trying to send packet to " << this << " but this is my highlink"
 				<< " and there isn't any connection with him!?";
@@ -100,29 +90,6 @@ void Peer::SendHello()
 	pckt.SetArg(NET_HELLO_PORT, (uint32_t)environment.listening_port.Get());
 	pckt.SetArg(NET_HELLO_VERSION, std::string(PEERFUSE_VERSION));
 	SendMsg(pckt);
-}
-
-void Peer::Send_net_peer_list(StaticPeersList peers)
-{
-	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
-	{
-		/* Do not send information about himself! */
-		if(*it == this)
-			continue;
-
-		pf_id id = (*it)->uplink ? (*it)->uplink->GetID() : environment.my_id.Get();
-
-		/* It broadcasts. */
-		Packet pckt(NET_PEER_CONNECTION, id, 0);
-		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
-		/* TODO: put certificate here! */
-		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
-
-		SendMsg(pckt);
-
-		if((*it)->downlinks.empty() == false)
-			Send_net_peer_list((*it)->downlinks);
-	}
 }
 
 /*******************************
@@ -167,7 +134,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		SetFlag(MERGING);
 
 		/* I send all of my links */
-		Send_net_peer_list(net.GetDirectHighLinks());
+		peers_list.SendPeerList(this);
 		SendMsg(Packet(NET_END_OF_MERGE, environment.my_id.Get(), 0));
 
 		/* Tell to all of my other links that this peer is connected. */
@@ -210,39 +177,23 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
-	Certificate cert;
 
-	Peer* already_connected = peers_list.PeerFromID(addr.id);
+	if(peers_list.IsIDOnNetwork(addr.id))
+		return;  /* I'm already connected to him. */
 
-	if(already_connected)
-		return;				  /* I'm already connected to him. */
+	Peer* p = new Peer(addr, NULL, 0, GetID());
+	peers_list.Add(p);
 
-	Peer* p;
-
-	try
-	{
-		p = net.Connect(addr);
-
-		p->SetHighLink(false);
-		p->SendHello();
-
-	}
-	catch(Network::CantConnectTo &e)
-	{
-		// BUG: ??? -lds
-		/* No, we can't connect to this peer, so we create
-		 * a Peer object with no connection. -romain
-		 */
-		p = net.AddPeer(new Peer(addr, NULL));
-	}
-
-	/* This is my child */
-	p->uplink = this;
-	downlinks.push_back(p);
+	downlinks.push_back(addr.id);
 
 }
 
 void Peer::Handle_net_peer_goodbye(struct Packet* msg)
+{
+	/* */
+}
+
+void Peer::Handle_net_become_highlink(struct Packet* msg)
 {
 	/* */
 }
@@ -289,6 +240,7 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_goodbye,     PERM_HIGHLINK  },
+		{ &Peer::Handle_net_become_highlink,  0              },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

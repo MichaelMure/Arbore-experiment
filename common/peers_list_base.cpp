@@ -41,10 +41,10 @@ Peer* PeersListBase::PeerFromFD(int fd)
 	return it->second;
 }
 
-Peer* PeersListBase::PeerFromID(pf_id id)
+Peer* PeersListBase::PeerFromID(pf_id id) const
 {
 	BlockLockMutex lock(this);
-	iterator it;
+	const_iterator it;
 	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
 		;
 

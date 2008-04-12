@@ -55,7 +55,7 @@ public:
 	pf_id CreateID();
 
 	// TODO: move-me into private section
-	Peer* PeerFromID(pf_id id);
+	Peer* PeerFromID(pf_id id) const;
 	void SendMsg(pf_id id, Packet &p);
 };
 #endif

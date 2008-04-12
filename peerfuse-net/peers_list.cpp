@@ -19,6 +19,7 @@
 
 #include "peers_list.h"
 #include "peers_list_base.h"
+#include "environment.h"
 
 PeersList peers_list;
 
@@ -33,6 +34,80 @@ void PeersList::GivePacketTo(pf_id id, Packet* packet) const
 		(*it)->HandleMsg(packet);
 	else
 		log[W_WARNING] << "Received a packet from unknown peer";
+}
+
+void PeersList::SendPeerList(Peer* to) const
+{
+	/* This is an alias, to disallow usage of _send_peer_list
+	 * with second argument out of PeersList object.
+	 */
+	_send_peer_list(to, NULL);
+}
+
+void PeersList::_send_peer_list(Peer* to, Peer* from) const
+{
+	BlockLockMutex lock(&peers_list);
+	StaticPeersList peers = from ? GetDownLinks(from) : GetDirectHighLinks();
+	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
+	{
+		/* Do not send information about himself! */
+		if(*it == to)
+			continue;
+
+		pf_id id = (*it)->GetUpLink() ? (*it)->GetUpLink() : environment.my_id.Get();
+
+		/* It broadcasts. */
+		Packet pckt(NET_PEER_CONNECTION, id, 0);
+		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
+		/* TODO: put certificate here! */
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
+
+		to->SendMsg(pckt);
+
+		_send_peer_list(to, *it);
+	}
+}
+
+void PeersList::RemoveDownLinks(Peer* p)
+{
+	BlockLockMutex lock(this);
+
+	/* Become highlink */
+	std::vector<Peer*> down_links = GetDownLinks(p);
+	for(std::vector<Peer*>::iterator it = down_links.begin();
+		it != down_links.end();
+		++it)
+	{
+		//AddDisconnected((*it)->GetAddr());
+	}
+}
+
+StaticPeersList PeersList::GetDirectHighLinks() const
+{
+	BlockLockMutex lock(&peers_list);
+	StaticPeersList list;
+	const_iterator it;
+	for(it = begin(); it != end(); ++it)
+		if((*it)->IsHighLink() && !(*it)->IsAnonymous())
+			list.push_back(*it);
+
+	return list;
+}
+
+StaticPeersList PeersList::GetDownLinks(Peer* p) const
+{
+	BlockLockMutex lock(&peers_list);
+	StaticPeersList list;
+	std::vector<pf_id> downlinks = p->GetDownLinks();
+	for(std::vector<pf_id>::iterator it = downlinks.begin();
+			it != downlinks.end();
+			++it)
+	{
+		Peer* peer = PeerFromID(*it);
+		assert(peer);
+		list.push_back(peer);
+	}
+	return list;
 }
 
 Peer* PeersList::RemoveFromID(pf_id id)
@@ -60,6 +135,13 @@ void PeersList::EraseFromID(pf_id id)
 	BlockLockMutex lock(this);
 	Peer* p = RemoveFromID(id);
 	delete p;
+}
+
+void PeersList::SendMsg(pf_id to, const Packet& pckt) const
+{
+	BlockLockMutex lock(this);
+	Peer* p = PeerFromID(to);
+	p->SendMsg(pckt);
 }
 
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
