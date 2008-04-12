@@ -17,23 +17,12 @@
  * $Id$
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#include "job_update_resp_files.h"
+#include "cache.h"
 
-enum job_type
+bool JobUpdateRespFiles::Start()
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
-};
-#endif
+	cache.UpdateRespFiles();
+
+	return false;
+}

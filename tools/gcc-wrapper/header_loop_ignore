@@ -13,6 +13,8 @@ peer.cpp->job_rmfile.h
 # pflan only:
 peer.cpp->job_other_connect.h
 peer.cpp->job_send_changes.h
+# pfnet only:
+peer.cpp->job_update_resp_files.h
 
 pf_dir.h->pf_file.h
 
@@ -27,3 +29,6 @@ peer.cpp->pfnet.h
 # Peer can call the peers_list as any Peer have to be accessed through the peers_list
 peer.h->peers_list.h
 peer.cpp->peers_list.h
+
+# Filedist
+cache.cpp->filedist.h

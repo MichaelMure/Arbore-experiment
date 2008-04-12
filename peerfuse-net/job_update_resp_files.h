@@ -17,23 +17,22 @@
  * $Id$
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#ifndef JOB_UPDATE_RESP_FILES_H
+#define JOB_UPDATE_RESP_FILES_H
 
-enum job_type
+#include "job.h"
+
+class JobUpdateRespFiles : public Job
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
+public:
+	JobUpdateRespFiles()
+		: Job(0, REPEAT_NONE)
+	{}
+
+	bool Start();
+
+	job_type GetType() const { return JOB_UPDATE_RESP_FILES; }
+	std::string GetName() const { return "JobUpdateRespFiles"; }
 };
-#endif
+
+#endif						  /* JOB_UPDATE_RESP_FILES_H */

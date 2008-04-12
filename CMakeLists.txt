@@ -61,6 +61,7 @@ IF(PF_NET)
 		peerfuse-net/pf_file.cpp
 		peerfuse-net/filedist.cpp
 		peerfuse-net/job_new_conn_req.cpp
+		peerfuse-net/job_update_resp_files.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/peers_list.cpp
 		peerfuse-net/net_proto.cpp

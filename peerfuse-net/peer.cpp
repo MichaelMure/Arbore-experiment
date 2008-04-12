@@ -34,9 +34,9 @@
 #include "job_flush_peer.h"
 #include "job_mkfile.h"
 #include "job_rmfile.h"
+#include "job_update_resp_files.h"
 #include "connection_ssl.h"
 #include "environment.h"
-#include "cache.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
 	: /* anonymous is only when this is a real connection */
@@ -158,7 +158,7 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	 * This function will send all messages to all new
 	 * responsibles of files I am not responsible anymore.
 	 */
-	cache.UpdateRespFiles();
+	scheduler_queue.Queue(new JobUpdateRespFiles());
 }
 
 void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
