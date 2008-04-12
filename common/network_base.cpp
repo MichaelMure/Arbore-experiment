@@ -174,11 +174,13 @@ void NetworkBase::Loop()
 		p != peers_list.end();
 		++p)
 	{
+		if((*p)->GetFd() < 0)
+			continue;
+
 		// Perform read operations
 		try
 		{
-			while(peers_list.PeerReceive((*p)->GetFd()))
-				;
+			while((*p)->Receive());
 		}
 		catch(Connection::RecvError &e)
 		{

@@ -35,6 +35,8 @@ PeersListBase::~PeersListBase()
 
 Peer* PeersListBase::PeerFromFD(int fd)
 {
+	if(fd < 0) return NULL;
+
 	PeerMap::iterator it = fd2peer.find(fd);
 	if(it == fd2peer.end())
 		return NULL;
@@ -43,6 +45,8 @@ Peer* PeersListBase::PeerFromFD(int fd)
 
 Peer* PeersListBase::PeerFromID(pf_id id) const
 {
+	if(!id) return NULL;
+
 	BlockLockMutex lock(this);
 	const_iterator it;
 	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)

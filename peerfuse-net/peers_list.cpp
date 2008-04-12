@@ -27,7 +27,8 @@ void PeersList::GivePacketTo(pf_id id, Packet* packet) const
 {
 	BlockLockMutex lock(&peers_list);
 	const_iterator it;
-	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
+	/* Packets are not given to anonymous Peers */
+	for(it = begin(); it != end() && ((*it)->GetID() != id || (*it)->IsAnonymous()); ++it)
 		;
 
 	if(it != end())
