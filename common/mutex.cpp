@@ -70,7 +70,7 @@ Mutex::~Mutex()
 	delete mutex;
 }
 
-void Mutex::Lock()
+void Mutex::Lock() const
 {
 	int res = pthread_mutex_lock(mutex);
 	//assert(res == 0);
@@ -78,7 +78,7 @@ void Mutex::Lock()
 		std::cerr << "Failed to lock " << this;
 }
 
-void Mutex::Unlock()
+void Mutex::Unlock() const
 {
 	int res = pthread_mutex_unlock(mutex);
 	//assert(res == 0);

@@ -39,8 +39,8 @@ public:
 	Mutex(const Mutex &m);
 	~Mutex();
 
-	void Lock();
-	void Unlock();
+	void Lock() const;
+	void Unlock() const;
 };
 
 /** Lock a Mutex locally.
@@ -54,12 +54,12 @@ public:
  */
 class BlockLockMutex
 {
-	Mutex* p;
+	const Mutex* p;
 	BlockLockMutex(const BlockLockMutex&);
 	BlockLockMutex& operator=(const BlockLockMutex&);
 
 public:
-	explicit BlockLockMutex(Mutex* _p)
+	explicit BlockLockMutex(const Mutex* _p)
 		: p(_p)
 	{
 		p->Lock();
