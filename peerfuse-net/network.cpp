@@ -50,19 +50,6 @@ Network::~Network()
 {
 }
 
-void Network::GivePacketTo(pf_id id, Packet* packet) const
-{
-	BlockLockMutex lock(&peers_list);
-	PeersList::const_iterator it;
-	for(it = peers_list.begin(); it != peers_list.end() && (*it)->GetID() != id; ++it)
-		;
-
-	if(it != peers_list.end())
-		(*it)->HandleMsg(packet);
-	else
-		log[W_WARNING] << "Received a packet from unknown peer";
-}
-
 StaticPeersList Network::GetDirectHighLinks() const
 {
 	BlockLockMutex lock(&peers_list);

@@ -337,7 +337,7 @@ bool Peer::Receive()
 		if((*packet)->GetSrcID() && (*packet)->GetSrcID() != GetID() && GetID())
 		{
 			log[W_DEBUG] << "Translate packet from " << GetID() << " to " << (*packet)->GetSrcID();
-			net.GivePacketTo((*packet)->GetSrcID(), *packet);
+			peers_list.GivePacketTo((*packet)->GetSrcID(), *packet);
 		}
 		else
 			HandleMsg(*packet);

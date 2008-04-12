@@ -48,8 +48,6 @@ public:
 	virtual void OnRemovePeer(Peer* peer);
 
 	virtual void StartNetwork(MyConfig* conf);
-
-	void GivePacketTo(pf_id id, Packet* packet) const;
 };
 
 extern Network net;

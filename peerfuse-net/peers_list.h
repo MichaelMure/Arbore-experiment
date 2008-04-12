@@ -33,6 +33,7 @@ public:
 
 	bool IsIDOnNetwork(pf_id id);
 
+	void GivePacketTo(pf_id id, Packet* packet) const;
 	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL) const;
 };
 

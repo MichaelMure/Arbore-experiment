@@ -22,6 +22,19 @@
 
 PeersList peers_list;
 
+void PeersList::GivePacketTo(pf_id id, Packet* packet) const
+{
+	BlockLockMutex lock(&peers_list);
+	const_iterator it;
+	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
+		;
+
+	if(it != end())
+		(*it)->HandleMsg(packet);
+	else
+		log[W_WARNING] << "Received a packet from unknown peer";
+}
+
 Peer* PeersList::RemoveFromID(pf_id id)
 {
 	BlockLockMutex lock(this);
