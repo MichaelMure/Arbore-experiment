@@ -43,8 +43,10 @@ Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
 			PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
 			uplink(parent)
 {
-	assert(conn);
-	addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
+	/* If there isn't any connection with this peer, it must have an ID in addr */
+	assert(conn != NULL || addr.id > 0);
+	if(conn)
+		addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
 }
 
 Peer::~Peer()
