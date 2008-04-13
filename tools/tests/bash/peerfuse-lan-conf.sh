@@ -106,7 +106,7 @@ logging {
 
 	level = ALL
 
-
+	to_syslog = false
 }
 	" > "$1"
 }

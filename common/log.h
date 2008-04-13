@@ -63,8 +63,9 @@ public:
 
 	~Log();
 
-	void SetLoggedFlags(std::string s);
+	void SetLoggedFlags(std::string s, bool to_syslog = true);
 	uint32_t LoggedFlags() const { return logged_flags; }
+	bool ToSyslog() const { return to_syslog; }
 
 	class flux
 	{
@@ -96,6 +97,7 @@ public:
 private:
 
 	uint32_t logged_flags;
+	bool to_syslog;
 };
 
 template<>

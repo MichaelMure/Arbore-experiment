@@ -56,7 +56,7 @@ Log::flux::~flux()
 		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", flag, str.c_str());
 	else
 	{
-		if(all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING)
+		if((all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING) && log.ToSyslog())
 			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
 
 		struct timeval t;
@@ -83,10 +83,11 @@ Log::~Log()
 	closelog();
 }
 
-void Log::SetLoggedFlags(std::string s)
+void Log::SetLoggedFlags(std::string s, bool _to_syslog)
 {
 	std::string token;
 
+	to_syslog = _to_syslog;
 	logged_flags = 0;
 
 	while((token = stringtok(s, " ")).empty() == false)

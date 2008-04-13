@@ -63,6 +63,7 @@ Application::Application()
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
+	section->AddItem(new ConfigItem_bool("to_syslog", "Log error and warnings to syslog"));
 
 	section = conf.AddSection("hdd", "Harddisk configuration", false);
 	section->AddItem(new ConfigItem_string("root", "Root directory of storage"));
@@ -102,7 +103,7 @@ int Application::main(int argc, char *argv[])
 			log[W_ERR] << "Unable to load configuration, exiting..";
 			exit(EXIT_FAILURE);
 		}
-		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String());
+		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
