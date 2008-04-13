@@ -356,7 +356,7 @@ def get_commits(path, users, all_commits, files):
 
         elif commit_declaration and len(line) > 0:
             all_commits[-1].changed_files += [line]
-            freg = re.match('^[ ]+([MA]) ([a-zA-Z0-9_./-]+)', line)
+            freg = re.match('^[ ]+([MA]) /trunk/([a-zA-Z0-9_./-]+)', line)
             if freg:
                 try:
                     file = files[freg.group(2)]
