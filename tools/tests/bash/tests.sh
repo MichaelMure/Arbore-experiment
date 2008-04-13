@@ -60,6 +60,8 @@ function start_p2pfs
 
 	build_conf "${!CONF}"
 	unset CACHE_ROOT
+	unset CERT
+	unset KEY
 
 	if [ ! -d ${!MNT} ]
 	then
