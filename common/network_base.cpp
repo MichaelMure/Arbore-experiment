@@ -180,7 +180,8 @@ void NetworkBase::Loop()
 		// Perform read operations
 		try
 		{
-			while((*p)->Receive());
+			while((*p)->Receive())
+				;
 		}
 		catch(Connection::RecvError &e)
 		{

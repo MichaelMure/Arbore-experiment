@@ -32,3 +32,5 @@ peer.cpp->peers_list.h
 
 # Filedist
 cache.cpp->filedist.h
+cache.h->filedist.h
+filedist.cpp->cache.h
