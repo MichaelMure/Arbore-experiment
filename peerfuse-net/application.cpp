@@ -108,9 +108,10 @@ int Application::main(int argc, char *argv[])
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
 
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
-		cache.UpdateRespFiles();
 
 		net.StartNetwork(&conf);
+
+		cache.UpdateRespFiles();
 
 		umask(0);
 		#ifndef PF_SERVER_MODE

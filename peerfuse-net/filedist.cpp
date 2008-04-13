@@ -42,7 +42,10 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 		;
 
 	if(it == id_list.end())
+	{
+		log[W_WARNING] << "FileDistribution::_is_responsible(): " << peer_id << " isn't in list";
 		return false;
+	}
 
 	size_t id_n = it - begin;
 	size_t i = 0;
