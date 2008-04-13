@@ -28,6 +28,8 @@ export LISTEN_PORT=6789
 export CONNECT_PORT=9876
 start_p2pfs
 
+sleep 5
+
 mkdir -p "$MNT1/blh/aze"
 mkdir -p "$MNT1/blh/ca"
 touch "$MNT1/blh/plop"
