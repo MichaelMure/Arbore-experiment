@@ -56,6 +56,6 @@ public:
 
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id) const;
-	void SendMsg(pf_id id, Packet &p);
+	void SendMsg(pf_id id, const Packet &p) const;
 };
 #endif

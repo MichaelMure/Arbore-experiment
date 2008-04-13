@@ -138,13 +138,6 @@ void PeersList::EraseFromID(pf_id id)
 	delete p;
 }
 
-void PeersList::SendMsg(pf_id to, const Packet& pckt) const
-{
-	BlockLockMutex lock(this);
-	Peer* p = PeerFromID(to);
-	p->SendMsg(pckt);
-}
-
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 {
 	BlockLockMutex lock(&peers_list);

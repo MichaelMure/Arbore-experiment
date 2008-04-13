@@ -45,7 +45,6 @@ public:
 	void GivePacketTo(pf_id id, Packet* packet) const;
 
 	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL) const;
-	void SendMsg(pf_id to, const Packet& pckt) const;
 	void SendPeerList(Peer* to) const;
 };
 
