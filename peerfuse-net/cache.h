@@ -76,9 +76,6 @@ public:
 	void RmFile(std::string path, pf_id sender = 0);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 
-	Packet CreateMkFilePacket(FileEntry* file);
-	Packet CreateRmFilePacket(FileEntry* file);
-
 	/* FileDistributino functions... */
 	void UpdateRespFiles();
 };

@@ -24,6 +24,7 @@
 
 #include "pf_types.h"
 #include "pf_file.h"
+#include "packet.h"
 
 class Peer;
 
@@ -83,5 +84,18 @@ public:
 	/* Flags are defined in cache.h */
 	void AddFile(FileEntry* f, Peer* sender);
 	void RemoveFile(FileEntry* f, Peer* sender);
+
+	/** Create a packet that create a file.
+	 * @param file file to send
+	 * @return packet created
+	 */
+	Packet CreateMkFilePacket(FileEntry* file);
+
+	/** Create a packet that remove a file.
+	 * @param file file to remove
+	 * @return packet created
+	 */
+	Packet CreateRmFilePacket(FileEntry* file);
+
 };
 #endif						  /* FILEDIST_H */

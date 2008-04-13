@@ -24,6 +24,7 @@
 #include "log.h"
 #include "network.h"
 #include "environment.h"
+#include "packet.h"
 
 FileDistribution::FileDistribution()
 {
@@ -117,6 +118,22 @@ FileList FileDistribution::GetFiles(pf_id id) const
 	return result;
 }
 
+Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
+{
+	Packet pckt(NET_MKFILE, environment.my_id.Get());
+	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
+	pckt.SetArg(NET_MKFILE_MODE, f->stat.mode);
+	pckt.SetArg(NET_MKFILE_UID, f->stat.uid);
+	pckt.SetArg(NET_MKFILE_GID, f->stat.gid);
+	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->stat.size);
+	pckt.SetArg(NET_MKFILE_ACCESS_TIME, (uint32_t)f->stat.atime);
+	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->stat.mtime);
+	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
+	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->stat.ctime);
+
+	return pckt;
+}
+
 void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 {
 	assert(f != NULL);			  /* exists */
@@ -204,7 +221,7 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	}
 
 	/* Create and send message to relayed peers. */
-	Packet pckt = cache.CreateMkFilePacket(f);
+	Packet pckt = CreateMkFilePacket(f);
 
 	if(sender != NULL)
 		relayed_peers.erase(sender);
@@ -217,13 +234,21 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 
 }
 
+Packet FileDistribution::CreateRmFilePacket(FileEntry* f)
+{
+	Packet pckt(NET_RMFILE, environment.my_id.Get());
+	pckt.SetArg(NET_RMFILE_PATH, f->GetFullName());
+
+	return pckt;
+}
+
 void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)
 {
 	assert(f != NULL);			  /* exists */
 	assert(f->GetParent() != NULL);		  /* isn't the root dir */
 
 	std::set<Peer*> peers = GetRespPeers(f);
-	Packet pckt = cache.CreateRmFilePacket(f);
+	Packet pckt = CreateRmFilePacket(f);
 
 	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
 	{
@@ -260,7 +285,7 @@ void FileDistribution::UpdateRespFiles()
 
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
-		Packet pckt = cache.CreateMkFilePacket(*it);
+		Packet pckt = CreateMkFilePacket(*it);
 		/* get actual peer list */
 		std::set<Peer*> peers = GetRespPeers(*it);
 

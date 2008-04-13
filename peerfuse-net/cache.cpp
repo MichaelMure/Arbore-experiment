@@ -95,30 +95,6 @@ FileEntry* Cache::Path2File(std::string path, std::string* filename)
 	return current_dir;
 }
 
-Packet Cache::CreateMkFilePacket(FileEntry* f)
-{
-	Packet pckt(NET_MKFILE, environment.my_id.Get());
-	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
-	pckt.SetArg(NET_MKFILE_MODE, f->stat.mode);
-	pckt.SetArg(NET_MKFILE_UID, f->stat.uid);
-	pckt.SetArg(NET_MKFILE_GID, f->stat.gid);
-	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->stat.size);
-	pckt.SetArg(NET_MKFILE_ACCESS_TIME, (uint32_t)f->stat.atime);
-	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->stat.mtime);
-	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
-	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->stat.ctime);
-
-	return pckt;
-}
-
-Packet Cache::CreateRmFilePacket(FileEntry* f)
-{
-	Packet pckt(NET_RMFILE, environment.my_id.Get());
-	pckt.SetArg(NET_RMFILE_PATH, f->GetFullName());
-
-	return pckt;
-}
-
 FileList Cache::GetAllFiles()
 {
 	/* Stack used to store states of each directories */
@@ -236,7 +212,7 @@ void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 			 * to correct this.
 			 */
 			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
-			Packet pckt = cache.CreateMkFilePacket(file);
+			Packet pckt = filedist.CreateMkFilePacket(file);
 			pckt.SetDstID(peer->GetID());
 			peer->SendMsg(pckt);
 			return;
