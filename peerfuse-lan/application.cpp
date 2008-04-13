@@ -152,10 +152,6 @@ int Application::main(int argc, char *argv[])
 		 */
 		log[W_ERR] << "Unable to resolve hostname, exiting..";
 	}
-	catch(Peer::PeerCantConnect &e)
-	{
-		log[W_ERR]  << "Host " << e.addr << " can't connect.";
-	}
 	catch(Certificate::BadCertificate &e)
 	{
 		log[W_ERR] << "Unable to read certificate: " << e.GetString();

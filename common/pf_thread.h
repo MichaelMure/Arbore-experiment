@@ -38,7 +38,8 @@ protected:
 	virtual void OnStart() {};
 	/* Called after the main loop finished */
 	virtual void OnStop() {};
-
+	/* Use it to catch exceptions from the main loop */
+	virtual void ThrowHandler();
 public:
 	Thread();
 	virtual ~Thread();

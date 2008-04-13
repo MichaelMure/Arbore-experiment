@@ -19,5 +19,23 @@
 
 #include "network.h"
 #include "mutex.h"
+#include "log.h"
+#include "scheduler_queue.h"
+#include "job_types.h"
 
 Network net;
+
+void Network::ThrowHandler()
+{
+	try
+	{
+		Loop();
+	}
+	catch(Peer::PeerCantConnect &e)
+	{
+		scheduler_queue.CancelType(JOB_NEW_CONNECT);
+		CloseAll();
+		log[W_ERR]  << "Host " << e.addr << " can't connect.";
+		log[W_ERR]  << "We'll stay disconnected.";
+	}
+}

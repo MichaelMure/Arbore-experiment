@@ -24,6 +24,8 @@
 class Network: public NetworkBase
 {
 	bool merging;
+protected:
+	void ThrowHandler();
 public:
 	Network() {merging = false; }
 

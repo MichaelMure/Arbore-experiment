@@ -60,7 +60,12 @@ void Thread::Stop()
 void Thread::DoLoop()
 {
 	while(IsRunning())
-		Loop();
+		ThrowHandler();
+}
+
+void Thread::ThrowHandler()
+{
+	Loop();
 }
 
 bool Thread::IsRunning()
