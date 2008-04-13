@@ -170,8 +170,9 @@ void NetworkBase::Loop()
 	 * would have a priority on other peers.
 	 * So, don't forget the "break" after a RemovePeer() call!
 	 */
-	for(PeersList::iterator p = peers_list.begin();
-		p != peers_list.end();
+	std::vector<Peer*> peers = peers_list;
+	for(std::vector<Peer*>::iterator p = peers.begin();
+		p != peers.end();
 		++p)
 	{
 		if((*p)->GetFd() < 0)
