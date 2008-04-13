@@ -73,7 +73,7 @@ def check_loop(file, top = False):
 			return True
 	return False
 
-
+enable_check = False
 # Parse options, nicely ignore gcc flags
 include_dirs = []
 header_checked = []
@@ -83,6 +83,11 @@ opt, arg = getopt.gnu_getopt(sys.argv[2:], "I:o:D:W:f:r:l:L:cg")
 for option in opt:
 	if option[0] == "-I":
 		include_dirs.append(option[1])
+	elif option[0] == "-c":
+		enable_check = True
+
+if not enable_check:
+	sys.exit(0)
 
 if arg[0][len(arg[0])-4:] != ".cpp":
 	print "Don't know how to handle", arg[0]
