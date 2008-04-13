@@ -32,6 +32,8 @@ mkdir -p "$MNT1/blh/aze"
 mkdir -p "$MNT2/blh/ca"
 touch "$MNT1/blh/plop"
 
+sleep 1
+
 export LISTEN_PORT=1414
 export CONNECT_PORT=9876
 start_p2pfs
