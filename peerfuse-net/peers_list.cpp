@@ -114,7 +114,6 @@ StaticPeersList PeersList::GetDownLinks(Peer* p) const
 Peer* PeersList::RemoveFromID(pf_id id)
 {
 	BlockLockMutex lock(this);
-	Peer* peer = NULL;
 	iterator it;
 	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
 		;
@@ -122,11 +121,15 @@ Peer* PeersList::RemoveFromID(pf_id id)
 	if(it == end())
 		return NULL;
 
+	Peer* peer = *it;
 	erase(it);
 
-	PeerMap::iterator p = fd2peer.find(peer->GetFd());
-	if(p != fd2peer.end())
-		fd2peer.erase(p);
+	if(peer->IsConnection())
+	{
+		PeerMap::iterator p = fd2peer.find(peer->GetFd());
+		if(p != fd2peer.end())
+			fd2peer.erase(p);
+	}
 
 	return peer;
 }

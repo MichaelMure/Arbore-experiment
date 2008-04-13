@@ -57,6 +57,7 @@ public:
 	PeerBase(pf_addr _addr, Connection* _conn, unsigned int _flags);
 	virtual ~PeerBase();
 
+	bool IsConnection() const { return !!conn; }
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 
