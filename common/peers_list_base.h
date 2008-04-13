@@ -28,6 +28,11 @@
 
 class PeersListBase: public std::vector<Peer*>, public Mutex
 {
+public:
+	/* Exceptions */
+
+	class ListChanged : public std::exception {};
+
 protected:
 	typedef std::map<int, Peer*> PeerMap;
 	PeerMap fd2peer;
