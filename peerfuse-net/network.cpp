@@ -33,7 +33,6 @@
 #include "network_base.h"
 #include "network.h"
 #include "tools.h"
-#include "job_new_connection.h"
 #include "scheduler.h"
 #include "pf_ssl_ssl.h"
 #include "peers_list.h"
