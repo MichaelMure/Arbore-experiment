@@ -174,25 +174,26 @@ void NetworkBase::Loop()
 		p != peers_list.end() && !peers_list.IsChanged();
 		++p)
 	{
-		if((*p)->GetFd() < 0)
+		Peer* peer = *p;
+		if(peer->GetFd() < 0)
 			continue;
 
 		// Perform read operations
 		try
 		{
-			while((*p)->Receive())
+			while(peer->Receive())
 				;
 		}
 		catch(Connection::RecvError &e)
 		{
 			log[W_WARNING] << "recv() error: " << e.GetString();
-			RemovePeer((*p)->GetFd());
+			RemovePeer(peer->GetFd());
 			break;
 		}
 		catch(Packet::Malformated &e)
 		{
 			log[W_ERR] << "Received malformed message!";
-			RemovePeer((*p)->GetFd());
+			RemovePeer(peer->GetFd());
 			break;
 		}
 		// TODO:Rename me into something like BanPeer as we won't reconnect to him
@@ -200,19 +201,19 @@ void NetworkBase::Loop()
 		catch(Peer::MustDisconnect &e)
 		{
 			log[W_WARNING] << "Must disconnected";
-			RemovePeer((*p)->GetFd(), false);
+			RemovePeer(peer->GetFd(), false);
 			break;
 		}
 
 		// Perform write operations
 		try
 		{
-			peers_list.PeerFlush((*p)->GetFd());
+			peers_list.PeerFlush(peer->GetFd());
 		}
 		catch(Connection::WriteError &e)
 		{
 			log[W_WARNING] << "send() error: " << e.GetString();
-			RemovePeer((*p)->GetFd());
+			RemovePeer(peer->GetFd());
 			break;
 		}
 
