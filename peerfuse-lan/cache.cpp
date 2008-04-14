@@ -176,6 +176,12 @@ void Cache::SendChanges(pf_id peer, time_t last_view)
 
 	Packet packet(NET_END_OF_DIFF);
 	peers_list.SendMsg(peer, packet);
+
+	BlockLockMutex lock(&peers_list);
+	Peer* p = peers_list.PeerFromID(peer);
+	if(p->IsClient())
+		p->SendGetStructDiff();
+
 	Unlock();
 }
 

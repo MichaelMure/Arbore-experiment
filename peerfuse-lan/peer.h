@@ -62,6 +62,7 @@ public:
 	void SendMsg(const Packet& pckt);
 	void SendHello();
 	void SendStartMerge();
+	void SendGetStructDiff();
 
 	bool Receive();
 };

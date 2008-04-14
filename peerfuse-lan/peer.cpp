@@ -86,6 +86,15 @@ void Peer::SendStartMerge()
 	}
 }
 
+void Peer::SendGetStructDiff()
+{
+	Packet pckt(NET_GET_STRUCT_DIFF);
+	uint32_t last_v = 0;
+	session_cfg.Get("last_view", last_v);
+	pckt.SetArg(NET_GET_STRUCT_DIFF_LAST_CONNECTION, last_v);
+	SendMsg(pckt);
+}
+
 /*******************************
  * Handers
  */
@@ -211,11 +220,7 @@ void Peer::Handle_net_peer_connection_rejected(struct Packet* msg)
 
 void Peer::Handle_net_peer_all_connected(struct Packet* msg)
 {
-	Packet pckt(NET_GET_STRUCT_DIFF);
-	uint32_t last_v = 0;
-	session_cfg.Get("last_view", last_v);
-	pckt.SetArg(NET_GET_STRUCT_DIFF_LAST_CONNECTION, last_v);
-	SendMsg(pckt);
+	SendGetStructDiff();
 }
 
 void Peer::Handle_net_get_struct_diff(struct Packet* pckt)
@@ -227,8 +232,8 @@ void Peer::Handle_net_get_struct_diff(struct Packet* pckt)
 
 void Peer::Handle_net_end_of_diff(struct Packet* pckt)
 {
-	/* TODO: send my own modifications */
-	SendMsg(Packet(NET_END_OF_MERGE));
+	if(IsClient())
+		SendMsg(Packet(NET_END_OF_MERGE));
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
