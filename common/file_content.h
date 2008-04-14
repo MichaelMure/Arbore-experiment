@@ -30,5 +30,4 @@ public:
 	FileChunk GetChunk(size_t offset, size_t size);
 	void SetChunk(FileChunk chunk, size_t offset);
 };
-
 #endif

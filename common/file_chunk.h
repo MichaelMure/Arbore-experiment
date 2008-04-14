@@ -37,5 +37,4 @@ public:
 	const size_t GetOffset() const { return offset; }
 	const size_t GetSize() const { return size; }
 };
-
-#endif /* FILE_CHUNK_H */
+#endif						  /* FILE_CHUNK_H */

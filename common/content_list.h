@@ -40,5 +40,4 @@ public:
 };
 
 extern ContentList content_list;
-
 #endif
