@@ -171,7 +171,7 @@ void NetworkBase::Loop()
 	 * So, don't forget the "break" after a RemovePeer() call!
 	 */
 	for(PeersList::iterator p = peers_list.begin();
-		p != peers_list.end();
+		p != peers_list.end() && !peers_list.IsChanged();
 		++p)
 	{
 		if((*p)->GetFd() < 0)
@@ -203,11 +203,6 @@ void NetworkBase::Loop()
 			RemovePeer((*p)->GetFd(), false);
 			break;
 		}
-		catch(PeersList::ListChanged &e)
-		{
-			/* If peers_list has changed we must stop iteration. */
-			break;
-		}
 
 		// Perform write operations
 		try
@@ -222,6 +217,8 @@ void NetworkBase::Loop()
 		}
 
 	}
+
+	peers_list.ClearChanged();
 }
 
 void NetworkBase::OnStop()

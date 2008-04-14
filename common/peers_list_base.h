@@ -28,12 +28,8 @@
 
 class PeersListBase: public std::vector<Peer*>, public Mutex
 {
-public:
-	/* Exceptions */
-
-	class ListChanged : public std::exception {};
-
 protected:
+	bool changed;
 	typedef std::map<int, Peer*> PeerMap;
 	PeerMap fd2peer;
 
@@ -50,6 +46,10 @@ public:
 	bool PeerReceive(int fd);
 
 	void CloseAll();
+
+	/* This status variable can be used to know if list has changed. */
+	bool IsChanged() const;
+	void ClearChanged();
 
 	/* Broadcast a packet to everybody.
 	 * If but_one != NULL, do not send a packet to him.

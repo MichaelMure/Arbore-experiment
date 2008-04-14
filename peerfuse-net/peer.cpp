@@ -189,9 +189,6 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	peers_list.Add(p);
 
 	downlinks.push_back(addr.id);
-
-	/* To tell NetworkBase::Loop() the peerslist has changed. */
-	throw PeersList::ListChanged();
 }
 
 void Peer::Handle_net_peer_goodbye(struct Packet* msg)

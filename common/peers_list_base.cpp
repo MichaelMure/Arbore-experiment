@@ -23,7 +23,7 @@
 #include "log.h"
 #include "environment.h"
 
-PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX)
+PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX), changed(false)
 {
 }
 
@@ -31,6 +31,18 @@ PeersListBase::~PeersListBase()
 {
 	for(iterator it = begin(); it != end(); ++it)
 		delete *it;
+}
+
+bool PeersListBase::IsChanged() const
+{
+	BlockLockMutex lock(this);
+	return changed;
+}
+
+void PeersListBase::ClearChanged()
+{
+	BlockLockMutex lock(this);
+	changed = false;
 }
 
 Peer* PeersListBase::PeerFromFD(int fd)
@@ -61,6 +73,7 @@ void PeersListBase::Add(Peer* p)
 	BlockLockMutex lock(this);
 	push_back(p);
 	fd2peer[p->GetFd()] = p;
+	changed = true;
 }
 
 Peer* PeersListBase::Remove(int fd)
@@ -81,6 +94,7 @@ Peer* PeersListBase::Remove(int fd)
 		peer = p->second;
 		fd2peer.erase(p);
 	}
+	changed = true;
 	return peer;
 }
 
@@ -116,6 +130,7 @@ void PeersListBase::CloseAll()
 		delete *it;
 	clear();
 	fd2peer.clear();
+	changed = true;
 }
 
 pf_id PeersListBase::CreateID()
