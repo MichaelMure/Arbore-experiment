@@ -53,6 +53,7 @@ public:
 
 	/* Exceptions */
 	class MustDisconnect : public std::exception {};
+	class SelfConnect : public std::exception {};
 
 	PeerBase(pf_addr _addr, Connection* _conn, unsigned int _flags);
 	virtual ~PeerBase();

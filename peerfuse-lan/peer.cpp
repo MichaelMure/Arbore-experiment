@@ -114,6 +114,9 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		SendMsg(p);
 	}
 	else
+	if(pckt->GetArg<uint32_t>(NET_HELLO_MY_ID) == environment.my_id.Get())
+		throw SelfConnect();
+	else
 		addr.id = pckt->GetArg<uint32_t>(NET_HELLO_MY_ID);
 
 	if(IsServer() && environment.my_id.Get())  // Wait this peer send us an id before syncing

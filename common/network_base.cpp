@@ -155,6 +155,15 @@ void NetworkBase::Loop()
 				{
 					log [W_WARNING] << "SSL handshake failure: " << e.GetString();
 				}
+				catch(PeerBase::SelfConnect &e)
+				{
+					/* pfnet throws this while handling the SSL handshake */
+					/* We are connecting to ourself, this is quiet dangerous */
+					log[W_ERR] << "I'm trying to connect to myself, this is bad.";
+					log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
+					throw;
+				}
+
 
 			}
 		}
@@ -207,6 +216,14 @@ void NetworkBase::Loop()
 		{
 			/* If peers_list has changed we must stop iteration. */
 			break;
+		}
+		catch(PeerBase::SelfConnect &e)
+		{
+			/* pflan throws this while handling the hello packet */
+			/* We are connecting to ourself, this is quiet dangerous */
+			log[W_ERR] << "I'm trying to connect to myself, this is bad.";
+			log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
+			throw;
 		}
 
 		// Perform write operations
