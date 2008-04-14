@@ -36,6 +36,8 @@ class Network: public NetworkBase
 {
 private:
 
+protected:
+	void ThrowHandler();
 public:
 	/* Constructors */
 	Network();

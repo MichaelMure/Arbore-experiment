@@ -108,3 +108,19 @@ void Network::StartNetwork(MyConfig* conf)
 	environment.my_id.Set(cert.GetIDFromCertificate());
 
 }
+
+void Network::ThrowHandler()
+{
+	try
+	{
+		Loop();
+	}
+	catch(PeerBase::SelfConnect &e)
+	{
+		/* pfnet throws this while handling the SSL handshake */
+		/* We are connecting to ourself, this is quiet dangerous */
+		log[W_ERR] << "I'm trying to connect to myself, this is bad.";
+		log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
+		exit(EXIT_FAILURE);
+	}
+}

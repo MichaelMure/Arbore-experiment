@@ -47,7 +47,7 @@ Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
 	assert(conn != NULL || addr.id > 0);
 	if(conn)
 		addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
-	if(GetID() == environment.my_id.Get())
+	if(GetID() == environment.my_id.Get() && IsServer())
 		throw SelfConnect();
 }
 
