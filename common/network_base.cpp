@@ -164,7 +164,6 @@ void NetworkBase::Loop()
 					throw;
 				}
 
-
 			}
 		}
 	}
