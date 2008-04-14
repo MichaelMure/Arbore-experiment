@@ -18,5 +18,5 @@
 #
 
 ../tools/gcc-wrapper/header_check.py "$@" || exit 1
-../tools/gcc-wrapper/header_loop.py "$@"
+../tools/gcc-wrapper/header_loop.py "$@" || exit 1
 exec "$@"
