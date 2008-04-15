@@ -100,7 +100,7 @@ void FileContent::Truncate(off_t offset)
 {
 	BlockLockMutex lock(this);
 
-	if(offset > file_size)
+	if(offset > (off_t)file_size)
 		return;
 
 	iterator it = begin();
