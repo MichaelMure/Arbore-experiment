@@ -15,7 +15,7 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 {
 	FileContent& file = content_list.GetFile(path);
 
-	if(off > file.GetFileSize())
+	if(off > (off_t)file.GetFileSize())
 		return 0;
 
 	/* Limit the read to the size of the file */
