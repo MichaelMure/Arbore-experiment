@@ -71,6 +71,7 @@ public:
 	virtual void ChOwn(std::string path, uid_t uid, gid_t gid) = 0;
 	virtual void ChMod(std::string path, mode_t mode) = 0;
 	virtual pf_stat GetAttr(std::string path) = 0;
+	virtual void SetAttr(std::string path, pf_stat _stat) = 0;
 #ifndef PF_SERVER_MODE
 	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) = 0;
 #endif
@@ -78,5 +79,8 @@ public:
 	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0) = 0;
 	virtual void RmFile(std::string path, pf_id sender = 0) = 0;
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0) = 0;
+
+	void Write(std::string path, const char* buf, size_t size, off_t offset);
+	int Read(std::string path, char* buf, size_t size, off_t offset);
 };
 #endif						  /* CACHE_BASE_H */

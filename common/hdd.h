@@ -24,8 +24,9 @@
 #include <exception>
 #include "pf_file.h"
 #include "pf_dir.h"
+#include "mutex.h"
 
-class Hdd
+class Hdd : public Mutex
 {
 	std::string root;
 
@@ -57,5 +58,7 @@ public:
 	void MkFile(FileEntry* f);
 	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
 	void RmFile(FileEntry* f);
+
+	FILE* GetFd(std::string path);
 };
 #endif

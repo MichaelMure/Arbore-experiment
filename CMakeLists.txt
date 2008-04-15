@@ -1,7 +1,11 @@
 PROJECT(peerfuse)
 
 SET(SRC
+	common/cache_base.cpp
+	common/content_list.cpp
 	common/hdd.cpp
+	common/file_chunk.cpp
+	common/file_content.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp
@@ -18,6 +22,7 @@ SET(SRC
 	common/tools.cpp
 
 	common/jobs/job.cpp
+	common/jobs/job_change_filesize.cpp
 	common/jobs/job_flush_peer.cpp
 	common/jobs/job_new_connection.cpp
 	common/jobs/job_new_conn_req_base.cpp
@@ -41,11 +46,13 @@ IF(NOT PF_SERVER_MODE)
 		common/fuse/flush.cpp
 		common/fuse/getattr.cpp
 		common/fuse/mkdir.cpp
+		common/fuse/read.cpp
 		common/fuse/readdir.cpp
 		common/fuse/rename.cpp
 		common/fuse/rmdir.cpp
 		common/fuse/unlink.cpp
-		common/fuse/utimens.cpp)
+		common/fuse/utimens.cpp
+		common/fuse/write.cpp)
 ELSE(NOT PF_SERVER_MODE)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")
 ENDIF(NOT PF_SERVER_MODE)

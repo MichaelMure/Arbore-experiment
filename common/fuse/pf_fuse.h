@@ -33,6 +33,8 @@ int pf_rename(const char* path, const char* new_path);
 int pf_rmdir(const char *path);
 int pf_unlink(const char *path);
 int pf_utimens(const char *path, const struct timespec ts[2]);
+int pf_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi);
+int pf_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi);
 void* fuse_init(struct fuse_conn_info* fuse_info);
 
 extern struct fuse_operations pf_oper;

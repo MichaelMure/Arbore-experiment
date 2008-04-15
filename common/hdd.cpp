@@ -25,10 +25,11 @@
 #include <stack>
 #include <string.h>
 #include "hdd.h"
+#include "mutex.h"
 #include "log.h"
 #include "session_config.h"
 
-Hdd::Hdd()
+Hdd::Hdd() : Mutex(RECURSIVE_MUTEX)
 {
 }
 
@@ -43,6 +44,7 @@ Hdd::~Hdd()
 			
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
+	BlockLockMutex lock(this);
 	root = _root;
 
 	if(root.empty())
@@ -140,6 +142,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 
 void Hdd::MkFile(FileEntry* f)
 {
+	BlockLockMutex lock(this);
 	std::string path = root + f->GetFullName();
 	if(f->stat.mode & S_IFDIR)
 	{
@@ -165,6 +168,7 @@ void Hdd::MkFile(FileEntry* f)
 
 void Hdd::RmFile(FileEntry* f)
 {
+	BlockLockMutex lock(this);
 	std::string path = root + f->GetFullName();
 	if(f->stat.mode & S_IFDIR)
 	{
@@ -180,4 +184,11 @@ void Hdd::RmFile(FileEntry* f)
 			throw HddWriteFailure(path);
 		log[W_INFO] << "unlink on " << path;
 	}
+}
+
+FILE* Hdd::GetFd(std::string path)
+{
+	BlockLockMutex lock(this);
+	std::string full_path = root + "/" + path;
+	return fopen(path.c_str(), "rw");
 }

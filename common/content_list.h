@@ -25,7 +25,7 @@
 #include "pf_thread.h"
 #include "file_content.h"
 
-class ContentList : public Thread, std::map<std::string, FileContent>
+class ContentList : public Thread, private std::map<std::string, FileContent>
 {
 public:
 	/** Returns the content of the file we already have in memory
@@ -34,9 +34,7 @@ public:
 	 */
 	FileContent& GetFile(std::string path);
 
-	/** Tells if we have a FileContent in our list
-	 */
-	bool HaveFile(std::string path);
+	void Loop();
 };
 
 extern ContentList content_list;

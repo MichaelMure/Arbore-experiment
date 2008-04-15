@@ -328,6 +328,14 @@ pf_stat Cache::GetAttr(std::string path)
 	return stat;
 }
 
+void Cache::SetAttr(std::string path, pf_stat stat)
+{
+	BlockLockMutex lock(this);
+	FileEntry* file = Path2File(path);
+	if(file)
+		file->stat = stat;
+}
+
 #ifndef PF_SERVER_MODE
 void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 			off_t offset, struct fuse_file_info *fi)

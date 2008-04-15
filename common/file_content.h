@@ -20,14 +20,27 @@
 #ifndef FILE_CONTENT_H
 #define FILE_CONTENT_H
 
+#include <string>
 #include <list>
 #include "mutex.h"
 #include "file_chunk.h"
 
 class FileContent : public Mutex, private std::list<FileChunk>
 {
+	std::string filename;
+	size_t file_size;
 public:
-	FileChunk GetChunk(size_t offset, size_t size);
-	void SetChunk(FileChunk chunk, size_t offset);
+	FileContent(std::string _filename, size_t _file_size) : filename(_filename), file_size(_file_size) {}
+
+	/* Returns a copy of the chunk */
+	FileChunk GetChunk(off_t offset, size_t size);
+
+	/* Return true or false if we have it */
+	/* Triggers loading the file from the cache or download from the network */
+	bool HaveChunk(off_t offset, size_t size);
+
+	void SetChunk(FileChunk chunk);
+
+	const size_t GetFileSize() const;
 };
 #endif
