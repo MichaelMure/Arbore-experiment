@@ -86,15 +86,20 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			f->stat.mode = stats.st_mode;
 			f->stat.uid = stats.st_uid;
 			f->stat.gid = stats.st_gid;
-			f->stat.size = stats.st_size;
 			f->stat.atime = stats.st_atime;
 			f->stat.mtime = stats.st_mtime;
 			f->stat.ctime = stats.st_ctime;
-			if(!tree_cfg.Get(f_path, f->stat.meta_mtime))
+			if(!tree_cfg.Get(f->GetFullName() + "#meta", f->stat.meta_mtime))
 			{
 				f->stat.meta_mtime = f->stat.mtime;
-				tree_cfg.Set(f_path, f->stat.meta_mtime);
+				tree_cfg.Set(f->GetFullName() + "#meta", f->stat.meta_mtime);
 			}
+
+			uint32_t cfg_size = 0;
+			tree_cfg.Get(f->GetFullName() + "#size", cfg_size);
+			f->stat.size = (size_t)cfg_size;
+
+			log[W_INFO] << f->GetFullName() << " loaded.";
 
 			cache_dir->AddFile(f);
 			if(dir->d_type & DT_DIR)
@@ -163,7 +168,7 @@ void Hdd::MkFile(FileEntry* f)
 	if(lchown(path.c_str(), f->stat.uid, f->stat.gid) != 0)
 		throw HddWriteFailure(path);
 
-	tree_cfg.Set(f->GetFullName(), f->stat.meta_mtime);
+	tree_cfg.Set(f->GetFullName() + "#meta", f->stat.meta_mtime);
 }
 
 void Hdd::RmFile(FileEntry* f)

@@ -103,12 +103,14 @@ int Application::main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
-		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
 		session_cfg.Display();
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
 		tree_cfg.Display();
+
+		/* cache.Load() depends on tree_cfg */
+		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
 		uint32_t my_id;
 		if(session_cfg.Get("my_id", my_id))

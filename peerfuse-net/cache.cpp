@@ -25,6 +25,7 @@
 #include "tools.h"
 #include "peers_list.h"
 #include "environment.h"
+#include "session_config.h"
 
 Cache cache;
 
@@ -332,6 +333,8 @@ void Cache::SetAttr(std::string path, pf_stat stat)
 {
 	BlockLockMutex lock(this);
 	FileEntry* file = Path2File(path);
+	if(file->stat.size != stat.size)
+		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
 	if(file)
 		file->stat = stat;
 }
