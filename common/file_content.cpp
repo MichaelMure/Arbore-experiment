@@ -101,4 +101,3 @@ const size_t FileContent::GetFileSize() const
 	BlockLockMutex loch(this);
 	return file_size;
 }
-

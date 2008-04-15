@@ -33,5 +33,4 @@ public:
 	job_type GetType() const { return JOB_CHANGE_FILESIZE; }
 	std::string GetName() const { return "JobChangeFileSize"; }
 };
-
-#endif /* JOB_CHANGE_FILESIZE_H */
+#endif						  /* JOB_CHANGE_FILESIZE_H */

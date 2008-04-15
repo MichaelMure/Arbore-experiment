@@ -41,10 +41,9 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	size_t to_read = off + size > file.GetFileSize() ? file.GetFileSize() - off : size;
 
 	while(!file.HaveChunk(off, to_read))
-		usleep(10000); /* 0.01 sec */
+		usleep(10000);			  /* 0.01 sec */
 	FileChunk chunk;
 	chunk = file.GetChunk(off, to_read);
 	memcpy(buf, chunk.GetData(), to_read);
 	return to_read;
 }
-
