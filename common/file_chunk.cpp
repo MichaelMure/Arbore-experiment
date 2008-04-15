@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <string.h>
 #include "file_chunk.h"
+#include "log.h"
 
 FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_offset), size(_size)
 {
@@ -87,4 +88,46 @@ void FileChunk::Merge(FileChunk chunk)
 	assert(begin_off + merge_size <= size);
 	assert(chunk_off + merge_size <= chunk.GetSize());
 	memcpy(data + begin_off, chunk.GetData() + chunk_off, size);
+}
+
+void FileChunk::Concatenate(FileChunk other)
+{
+	if(!data)
+	{
+		*this = other;
+		return;
+	}
+
+	if(offset + (off_t)size != other.GetOffset())
+		log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
+
+	size_t new_size = other.GetOffset() + other.GetSize() - offset;
+	char* new_data = new char[new_size];
+	memset(new_data, 0, new_size);
+
+	if(data)
+	{
+		memcpy(new_data, data, size);
+		delete []data;
+	}
+
+	if(other.GetData())
+		memcpy(new_data + other.GetOffset() - offset, other.GetData(), other.GetSize());
+
+	size = new_size;
+	data = new_data;
+}
+
+FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
+{
+	if(_offset >= offset + (off_t)size)
+		return FileChunk();
+	if(_offset + (off_t)_size <= offset)
+		return FileChunk();
+
+	off_t data_offset = _offset > offset ? _offset - offset : 0;
+	off_t data_end = _offset + (off_t)_size < offset + (off_t)size ? _offset + (off_t)_size : offset + (off_t)size;
+	size_t data_size = data_end - offset - data_offset;
+
+	return FileChunk(data + data_offset, offset + data_offset, data_size);
 }

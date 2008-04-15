@@ -43,6 +43,9 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	/* Limit the read to the size of the file */
 	size_t to_read = (size_t) ((off + size > file.GetFileSize()) ? file.GetFileSize() - off : size);
 
+	if(!to_read)
+		return 0;
+
 	while(!file.HaveChunk(off, to_read))
 		usleep(10000);			  /* 0.01 sec */
 	FileChunk chunk;

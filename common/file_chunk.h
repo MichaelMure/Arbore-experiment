@@ -43,5 +43,7 @@ public:
 	const char* GetData() const { return data; }
 
 	void Merge(FileChunk chunk);
+	void Concatenate(FileChunk chunk);
+	FileChunk GetPart(off_t _offset, size_t _size);
 };
 #endif						  /* FILE_CHUNK_H */
