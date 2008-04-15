@@ -59,7 +59,7 @@ struct fuse_operations pf_oper =
 	NULL,					  /* pf_utime */
 	NULL,					  /* pf_open */
 	pf_read,
-	NULL,					  /* pf_write */
+	pf_write,
 	NULL,					  /* pf_statfs */
 	pf_flush,
 	NULL,					  /* pf_release */
