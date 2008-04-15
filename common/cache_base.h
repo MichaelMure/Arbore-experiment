@@ -82,5 +82,6 @@ public:
 
 	void Write(std::string path, const char* buf, size_t size, off_t offset);
 	int Read(std::string path, char* buf, size_t size, off_t offset);
+	int Truncate(std::string path, off_t offset);
 };
 #endif						  /* CACHE_BASE_H */

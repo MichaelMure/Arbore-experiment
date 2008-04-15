@@ -55,7 +55,7 @@ struct fuse_operations pf_oper =
 	NULL,					  /* pf_link */
 	pf_chmod,
 	pf_chown,
-	NULL,					  /* pf_truncate */
+	truncate,
 	NULL,					  /* pf_utime */
 	NULL,					  /* pf_open */
 	pf_read,

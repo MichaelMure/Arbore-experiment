@@ -24,7 +24,8 @@
 
 void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t off)
 {
-	/* TODO: modify metadata of the file */
+	/* No need to lock cache, we don't touch its members */
+
 	FileContent& file = content_list.GetFile(path);
 	FileChunk chunk(buf, off, size);
 	file.SetChunk(chunk);
@@ -32,6 +33,8 @@ void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t
 
 int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 {
+	/* No need to lock cache, we don't touch its members */
+
 	FileContent& file = content_list.GetFile(path);
 
 	if(off > (off_t)file.GetFileSize())
@@ -47,3 +50,13 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	memcpy(buf, chunk.GetData(), to_read);
 	return to_read;
 }
+
+int CacheInterface::Truncate(std::string path, off_t offset)
+{
+	/* No need to lock cache, we don't touch its members */
+
+	FileContent& file = content_list.GetFile(path);
+	file.Truncate(offset);
+	return 0;
+}
+

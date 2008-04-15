@@ -96,8 +96,33 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	return (it != end());
 }
 
+void FileContent::Truncate(off_t offset)
+{
+	BlockLockMutex lock(this);
+
+	if(offset > file_size)
+		return;
+
+	iterator it = begin();
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() < offset)
+		++it;
+
+	if(it != end() && it->GetOffset() < offset)
+	{
+		/* Split the first Chunk */
+		FileChunk chunk(it->GetData(), it->GetOffset(), offset - it->GetOffset());
+		insert(it, chunk);
+	}
+
+	while(it != end())
+		it = erase(it);
+
+	file_size = offset;
+	scheduler_queue.Queue(new JobChangeFileSize(filename, file_size));
+}
+
 const size_t FileContent::GetFileSize() const
 {
-	BlockLockMutex loch(this);
+	BlockLockMutex lock(this);
 	return file_size;
 }

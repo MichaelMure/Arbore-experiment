@@ -41,6 +41,8 @@ public:
 
 	void SetChunk(FileChunk chunk);
 
+	void Truncate(off_t offset);
+
 	const size_t GetFileSize() const;
 };
 #endif

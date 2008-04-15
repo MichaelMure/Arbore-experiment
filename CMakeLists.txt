@@ -50,6 +50,7 @@ IF(NOT PF_SERVER_MODE)
 		common/fuse/readdir.cpp
 		common/fuse/rename.cpp
 		common/fuse/rmdir.cpp
+		common/fuse/truncate.cpp
 		common/fuse/unlink.cpp
 		common/fuse/utimens.cpp
 		common/fuse/write.cpp)

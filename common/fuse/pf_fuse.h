@@ -35,6 +35,7 @@ int pf_unlink(const char *path);
 int pf_utimens(const char *path, const struct timespec ts[2]);
 int pf_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi);
 int pf_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi);
+int pf_truncate(const char* path, off_t offset);
 void* fuse_init(struct fuse_conn_info* fuse_info);
 
 extern struct fuse_operations pf_oper;
