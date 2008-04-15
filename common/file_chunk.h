@@ -37,9 +37,9 @@ public:
 	FileChunk& operator=(const FileChunk &other);
 	~FileChunk();
 
-	const time_t GetAccessTime() const { return access_time; }
-	const off_t GetOffset() const { return offset; }
-	const size_t GetSize() const { return size; }
+	time_t GetAccessTime() const { return access_time; }
+	off_t GetOffset() const { return offset; }
+	size_t GetSize() const { return size; }
 	const char* GetData() const { return data; }
 
 	void Merge(FileChunk chunk);

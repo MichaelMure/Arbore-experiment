@@ -65,14 +65,14 @@ void FileContent::SetChunk(FileChunk chunk)
 
 	/* Add any remaining data at the end */
 	off_t offset = back().GetOffset() + back().GetSize();
-	size_t size = chunk.GetOffset() + chunk.GetSize() - offset;
+	size_t size = (size_t) (chunk.GetOffset() + chunk.GetSize() - offset);
 	char* buf = new char[size];
 	memcpy(buf, chunk.GetData(), size);
 	FileChunk new_chunk(buf, offset, size);
 	push_back(new_chunk);
 
 	/* Update the file size */
-	file_size = back().GetOffset() + back().GetSize();
+	file_size = (size_t) back().GetOffset() + back().GetSize();
 
 	scheduler_queue.Queue(new JobChangeFileSize(filename, file_size));
 }
@@ -110,18 +110,18 @@ void FileContent::Truncate(off_t offset)
 	if(it != end() && it->GetOffset() < offset)
 	{
 		/* Split the first Chunk */
-		FileChunk chunk(it->GetData(), it->GetOffset(), offset - it->GetOffset());
+		FileChunk chunk(it->GetData(), it->GetOffset(), (size_t)(offset - it->GetOffset()));
 		insert(it, chunk);
 	}
 
 	while(it != end())
 		it = erase(it);
 
-	file_size = offset;
+	file_size = (size_t)offset;
 	scheduler_queue.Queue(new JobChangeFileSize(filename, file_size));
 }
 
-const size_t FileContent::GetFileSize() const
+size_t FileContent::GetFileSize() const
 {
 	BlockLockMutex lock(this);
 	return file_size;
