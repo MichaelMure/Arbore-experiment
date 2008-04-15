@@ -26,7 +26,7 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
 	iterator it = begin();
-	while(it != end() && it->GetOffset() + it->GetSize() <= offset)
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
 		++it;
 
 	if(it == end())
@@ -37,7 +37,7 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 
 	/* Build the requested chunk */
 	FileChunk chunk;
-	while(it != end() && it->GetOffset() + it->GetSize() <= offset + (off_t)size)
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset + (off_t)size)
 	{
 		chunk.Concatenate(it->GetPart(offset, size));
 		++it;
