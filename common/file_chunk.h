@@ -38,7 +38,7 @@ public:
 	~FileChunk();
 
 	const time_t GetAccessTime() const { return access_time; }
-	const size_t GetOffset() const { return offset; }
+	const off_t GetOffset() const { return offset; }
 	const size_t GetSize() const { return size; }
 	const char* GetData() const { return data; }
 

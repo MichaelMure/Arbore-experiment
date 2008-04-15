@@ -54,10 +54,10 @@ FileChunk::~FileChunk()
 void FileChunk::Merge(FileChunk chunk)
 {
 	/* Check we are overlapping */
-	if(offset + size < chunk.GetOffset())
+	if(offset + (off_t)size < chunk.GetOffset())
 		return;
 
-	if(offset > chunk.GetOffset() + chunk.GetSize())
+	if(offset > chunk.GetOffset() + (off_t)chunk.GetSize())
 		return;
 
 	/* Merge */

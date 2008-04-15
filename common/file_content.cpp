@@ -24,7 +24,7 @@ void FileContent::SetChunk(FileChunk chunk)
 	BlockLockMutex lock(this);
 	/* Merge into the chunk set */
 	iterator it = begin();
-	while(it != end() && it->GetOffset() + it->GetSize() < chunk.GetOffset())
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() < chunk.GetOffset())
 		++it;
 
 	if(it == end())
@@ -38,7 +38,7 @@ void FileContent::SetChunk(FileChunk chunk)
 	}
 
 	/* Replace the current chunks */
-	while(it != end() && it->GetOffset() < chunk.GetOffset() + chunk.GetSize())
+	while(it != end() && it->GetOffset() < chunk.GetOffset() + (off_t)chunk.GetSize())
 		it->Merge(chunk);
 
 	if(it == end())
@@ -62,7 +62,7 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
 	iterator it = begin();
-	while(it != end() && it->GetOffset() + it->GetSize() < offset)
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() < offset)
 		++it;
 
 	if(it == end())
@@ -71,7 +71,7 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
 
-	while(it != end() && it->GetOffset() + it->GetSize() < offset + size)
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size)
 		++it;
 
 	return (it != end());
