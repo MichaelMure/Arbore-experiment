@@ -58,7 +58,7 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	FileChunk chunk;
 	chunk = file.GetChunk(off, to_read);
 
-	if(!chunk.GetData()) /* shouldn't happen */
+	if(!chunk.GetData())			  /* shouldn't happen */
 		return 0;
 
 	memcpy(buf, chunk.GetData(), to_read);

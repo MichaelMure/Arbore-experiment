@@ -44,12 +44,12 @@ FileContent::FileContent(std::string _filename) :
 }
 
 FileContent::FileContent(const FileContent& other) :
-	Mutex(RECURSIVE_MUTEX),
-	std::list<FileChunk>(), /* to avoid a warning */
-	filename(other.filename),
-	ondisk_offset(other.ondisk_offset),
-	ondisk_size(other.ondisk_size),
-	ondisk_fd(-1)
+			Mutex(RECURSIVE_MUTEX),
+std::list<FileChunk>(),				  /* to avoid a warning */
+			filename(other.filename),
+			ondisk_offset(other.ondisk_offset),
+			ondisk_size(other.ondisk_size),
+			ondisk_fd(-1)
 {
 	if(other.ondisk_fd != -1)
 		ondisk_fd = dup(other.ondisk_fd);
@@ -89,7 +89,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 {
 	if(chunk.GetOffset() >= ondisk_offset
-			&& (chunk.GetOffset() + (off_t)chunk.GetSize() <= ondisk_offset + (off_t)ondisk_size))
+		&& (chunk.GetOffset() + (off_t)chunk.GetSize() <= ondisk_offset + (off_t)ondisk_size))
 	{
 		if(!OnDiskLoad(chunk))
 		{
@@ -200,4 +200,3 @@ void FileContent::Truncate(off_t offset)
 	while(it != end())
 		it = erase(it);
 }
-

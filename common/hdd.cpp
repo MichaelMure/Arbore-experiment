@@ -203,4 +203,3 @@ int Hdd::GetFd(std::string path)
 		log[W_ERR] << "Unable to load file \"" << full_path << "\" from harddisk :" << strerror(errno);
 	return f;
 }
-

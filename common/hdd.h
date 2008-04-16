@@ -63,5 +63,4 @@ public:
 };
 
 extern Hdd hdd;
-
 #endif
