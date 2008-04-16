@@ -284,7 +284,7 @@ void FileContent::Truncate(off_t offset)
 			ondisk_size = 0;
 		}
 		else
-			ondisk_size = offset - ondisk_offset;
+			ondisk_size = (size_t) (offset - ondisk_offset);
 		tree_cfg.Set(filename + "#ondisk_off", (uint32_t)ondisk_offset);
 	}
 }

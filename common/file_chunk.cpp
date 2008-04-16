@@ -96,7 +96,7 @@ void FileChunk::Merge(FileChunk chunk)
 	off_t begin_off = chunk.offset - offset > 0 ? chunk.offset - offset : 0;
 	off_t chunk_off = offset - chunk.offset > 0 ? offset - chunk.offset: 0;
 	off_t merge_end = MIN(offset + (off_t)size, chunk.GetOffset() + (off_t)chunk.GetSize());
-	size_t merge_size = merge_end - begin_off - offset;
+	size_t merge_size = (size_t) (merge_end - begin_off - offset);
 
 	assert(begin_off + merge_size <= size);
 	assert(chunk_off + merge_size <= chunk.GetSize());
