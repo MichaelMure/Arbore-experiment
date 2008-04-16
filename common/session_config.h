@@ -56,7 +56,7 @@ public:
 
 	void Set(const A& val)
 	{
-		log[W_INFO] << "Setting option " << opt << "=" << value;
+		log[W_DEBUG] << "Setting option " << opt << "=" << val;
 		value = val;
 	}
 	A Get() const { return value; }
@@ -95,7 +95,10 @@ public:
 			return false;
 
 		if(it->second->GetType() != typeid(val).name())
+		{
+			log[W_DEBUG] << "Trying to retrieve \"" << opt << "\" with a different type";
 			return false;
+		}
 
 		val = dynamic_cast<SessionConfigValue<T>*>(it->second)->Get();
 		return true;
@@ -110,7 +113,10 @@ public:
 		if(it == list.end())
 			list[opt] = new SessionConfigValue<T>(opt, val);
 		else if(it->second->GetType() != typeid(val).name())
+		{
+			log[W_DEBUG] << "Won't set \"" << opt << "\" as it has a different type";
 			return;
+		}
 		else
 			dynamic_cast<SessionConfigValue<T> *>(it->second)->Set(val);
 	}
