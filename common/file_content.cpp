@@ -286,7 +286,7 @@ void FileContent::SyncToHdd()
 		return;
 
 	iterator it = begin();
-	if(it != end() && it->GetOffset() != 0) /* TODO */
+	if(it != end() && it->GetOffset() != 0)	  /* TODO */
 		return;
 
 	/* Blocks must follow themself */
