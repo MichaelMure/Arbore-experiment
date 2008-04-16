@@ -181,8 +181,8 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	 * Check we have it until the end */
 	off_t next_off = 0;
 	while(it != end()
-			&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
-			&& (next_off == 0 || next_off == it->GetOffset()))
+		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
+		&& (next_off == 0 || next_off == it->GetOffset()))
 	{
 		/* Blocks must follow themself */
 		next_off = it->GetOffset() + (off_t)it->GetSize();
@@ -229,4 +229,3 @@ void FileContent::Truncate(off_t offset)
 		tree_cfg.Set(filename + "#ondisk_size", (uint32_t)ondisk_size);
 	}
 }
-
