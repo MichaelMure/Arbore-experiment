@@ -88,6 +88,8 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 
 bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 {
+	/* TODO: load only the missing part of the chunk */
+	log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	if(chunk.GetOffset() >= ondisk_offset
 		&& (chunk.GetOffset() + (off_t)chunk.GetSize() <= ondisk_offset + (off_t)ondisk_size))
 	{
@@ -182,14 +184,14 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	off_t next_off = 0;
 	while(it != end()
 		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
-		&& (next_off == 0 || next_off == it->GetOffset()))
+		&& (!next_off || next_off == it->GetOffset()))
 	{
 		/* Blocks must follow themself */
 		next_off = it->GetOffset() + (off_t)it->GetSize();
 		++it;
 	}
 
-	bool res = (it != end()) && (next_off == it->GetOffset() + (off_t)it->GetSize());
+	bool res = (it != end()) && (!next_off || next_off == it->GetOffset());
 
 	/* If we don't have the chunk, try to load it */
 	if(!res)
@@ -218,7 +220,16 @@ void FileContent::Truncate(off_t offset)
 
 	if(offset < ondisk_offset + (off_t)ondisk_size)
 	{
-		if(offset < ondisk_offset)
+		if(ondisk_fd == -1)
+		{
+			ondisk_fd = hdd.GetFd(filename);
+			if(ondisk_fd == -1)
+				return; /* TODO:return an error */
+		}
+
+		ftruncate(ondisk_fd, offset); /* TODO:return an error */
+
+		if(offset <= ondisk_offset)
 		{
 			ondisk_offset = 0;
 			ondisk_size = 0;
