@@ -49,7 +49,7 @@ function start_fs
 			rm -f log_stdout$i 
 			tail -f stdin$i | gdb --args "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>&1| while read line
 			do
-				echo "$i $line" | tee -a log_stdout$i >> stdout$i
+				echo "$i $line" >> stdout$i
 			done
 			;;
 		valgrind)

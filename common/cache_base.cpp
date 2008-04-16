@@ -41,7 +41,7 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 {
 	size_t file_size = (size_t)GetAttr(path).size;
 
-	if(off > (off_t)file_size)
+	if(off >= (off_t)file_size)
 	{
 		log[W_DEBUG] << "Fuse trying to read out of file";
 		return 0;
@@ -53,7 +53,10 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	size_t to_read = (size_t) ((off + size > file_size) ? file_size - off : size);
 
 	if(!to_read)
+	{
+		log[W_DEBUG] << "Fuse trying to read out of file";
 		return 0;
+	}
 
 	while(!file.HaveChunk(off, to_read))
 		usleep(10000);			  /* 0.01 sec */
@@ -62,7 +65,10 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	chunk = file.GetChunk(off, to_read);
 
 	if(!chunk.GetData())			  /* shouldn't happen */
+	{
+		log[W_DEBUG] << "FileContent returned an empty chunk ??";
 		return 0;
+	}
 
 	memcpy(buf, chunk.GetData(), to_read);
 	return to_read;

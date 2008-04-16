@@ -222,10 +222,10 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
-	off_t next_off = 0;
+	off_t next_off = it->GetOffset() + (off_t)it->GetSize();
 	while(it != end()
 		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
-		&& (!next_off || next_off == it->GetOffset()))
+		&& next_off == it->GetOffset())
 	{
 		/* Blocks must follow themself */
 		next_off = it->GetOffset() + (off_t)it->GetSize();
