@@ -151,5 +151,8 @@ FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
 	off_t data_end = MIN(_offset + (off_t)_size, offset + (off_t)size);
 	size_t data_size = (size_t) (data_end - offset - data_offset);
 
-	return FileChunk(data + data_offset, offset + data_offset, data_size);
+	FileChunk chunk(data + data_offset, offset + data_offset, data_size);
+	if(hdd_synced)
+		chunk.SetHddSynced(true);
+	return chunk;
 }

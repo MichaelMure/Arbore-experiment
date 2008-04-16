@@ -117,6 +117,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 	if(read(ondisk_fd, buf, chunk.GetSize()) == -1)
 		log[W_ERR] << "Error while loading \"" << filename << "\": "<< strerror(errno);
 	FileChunk new_chunk(buf, chunk.GetOffset(), chunk.GetSize());
+	new_chunk.SetHddSynced(true);
 	delete []buf;
 	SetChunk(new_chunk);
 
@@ -285,6 +286,9 @@ void FileContent::SyncToHdd()
 		return;
 
 	iterator it = begin();
+	if(it != end() && it->GetOffset() != 0) /* TODO */
+		return;
+
 	/* Blocks must follow themself */
 	off_t next_off = 0;
 	while(it != end() && (!next_off || next_off == it->GetOffset()))
