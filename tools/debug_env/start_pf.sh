@@ -38,10 +38,10 @@ function start_fs
 		export NB_P2PFS=$1
 		export CONNECT_PORT=$((8000+$i))
 		export LISTEN_PORT=$((8001+$i))
-		export CACHE_ROOT=pf$i/cache
-		export WORKDIR=pf$i/work
+		export CACHE_ROOT="$PWD/pf$i/cache"
+		export WORKDIR="$PWD/pf$i/work"
 		export CONFDIR=WORKDIR
-		build_conf pf$i/pfconf.conf
+		build_conf "$PWD/pf$i/pfconf.conf"
 	fi
 
 	case $TOOL in

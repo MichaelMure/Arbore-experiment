@@ -24,10 +24,13 @@
 #include <dirent.h>
 #include <stack>
 #include <string.h>
+#include <errno.h>
 #include "hdd.h"
 #include "mutex.h"
 #include "log.h"
 #include "session_config.h"
+
+Hdd hdd;
 
 Hdd::Hdd() : Mutex(RECURSIVE_MUTEX)
 {
@@ -191,9 +194,13 @@ void Hdd::RmFile(FileEntry* f)
 	}
 }
 
-FILE* Hdd::GetFd(std::string path)
+int Hdd::GetFd(std::string path)
 {
 	BlockLockMutex lock(this);
-	std::string full_path = root + "/" + path;
-	return fopen(path.c_str(), "rw");
+	std::string full_path = root + path;
+	int f = open(full_path.c_str(), O_CREAT|O_RDWR);
+	if(f == -1)
+		log[W_ERR] << "Unable to load file \"" << full_path << "\" from harddisk :" << strerror(errno);
+	return f;
 }
+

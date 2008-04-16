@@ -34,6 +34,7 @@
 #include "pf_file.h"
 #include "session_config.h"
 #include "scheduler.h"
+#include "hdd.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>

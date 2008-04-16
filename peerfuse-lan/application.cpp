@@ -36,6 +36,7 @@
 #include "peers_list.h"
 #include "scheduler.h"
 #include "environment.h"
+#include "hdd.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>

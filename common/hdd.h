@@ -59,6 +59,9 @@ public:
 	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
 	void RmFile(FileEntry* f);
 
-	FILE* GetFd(std::string path);
+	int GetFd(std::string path);
 };
+
+extern Hdd hdd;
+
 #endif

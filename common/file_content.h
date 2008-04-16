@@ -27,10 +27,29 @@
 
 class FileContent : public Mutex, private std::list<FileChunk>
 {
+private:
 	std::string filename;
-	size_t file_size;
+
+	/* Information about what's currently stored on hardrive */
+	off_t ondisk_offset;
+	size_t ondisk_size;
+	int ondisk_fd;
+
+	bool OnDiskLoad(FileChunk chunk);
+	void OnDiskWrite(FileChunk chunk);
+
+	/** Load a chunk from the hdd or ask it on the network
+	 * @param chunk the part to load
+	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
+	 * @return returns true if the chunk is available after returning from this method
+	 */
+	bool LoadChunk(FileChunk chunk, bool blockant_load = false);
+
+	FileChunk& operator=(const FileChunk &other);
 public:
-	FileContent(std::string _filename, size_t _file_size) : filename(_filename), file_size(_file_size) {}
+	FileContent(std::string _filename);
+	FileContent(const FileContent&);
+	~FileContent();
 
 	/* Returns a copy of the chunk */
 	FileChunk GetChunk(off_t offset, size_t size);
@@ -41,7 +60,6 @@ public:
 
 	void SetChunk(FileChunk chunk);
 
-	size_t GetFileSize() const;
 	void Truncate(off_t offset);
 };
 #endif

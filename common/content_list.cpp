@@ -26,7 +26,8 @@ FileContent& ContentList::GetFile(std::string path)
 {
 	iterator it = find(path);
 	if(it == end())
-		insert(make_pair(path, FileContent(path, 0)));
+		insert(make_pair(path, FileContent(path)));
+
 	it = find(path);
 	return it->second;
 }

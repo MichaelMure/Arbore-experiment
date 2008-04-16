@@ -25,13 +25,11 @@
 #include "pf_dir.h"
 #include "pf_file.h"
 #include "packet.h"
-#include "hdd.h"
 #include "filedist.h"
 
 class Cache : public CacheInterface
 {
 	DirEntry tree;
-	Hdd hdd;
 	FileDistribution filedist;
 	std::vector<FileEntry*> files;
 

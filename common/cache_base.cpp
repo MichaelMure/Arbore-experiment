@@ -25,6 +25,12 @@
 void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t off)
 {
 	/* No need to lock cache, we don't touch its members */
+	pf_stat stat = GetAttr(path);
+	if(off + (off_t)size > (off_t)stat.size)
+	{
+		stat.size = (size_t)off + size;
+		SetAttr(path, stat);
+	}
 
 	FileContent& file = content_list.GetFile(path);
 	FileChunk chunk(buf, off, size);
@@ -33,32 +39,39 @@ void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t
 
 int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 {
-	/* No need to lock cache, we don't touch its members */
+	size_t file_size = GetAttr(path).size;
+
+	if(off > (off_t)file_size)
+		return 0;
 
 	FileContent& file = content_list.GetFile(path);
 
-	if(off > (off_t)file.GetFileSize())
-		return 0;
-
 	/* Limit the read to the size of the file */
-	size_t to_read = (size_t) ((off + size > file.GetFileSize()) ? file.GetFileSize() - off : size);
+	size_t to_read = (size_t) ((off + size > file_size) ? file_size - off : size);
 
 	if(!to_read)
 		return 0;
 
 	while(!file.HaveChunk(off, to_read))
 		usleep(10000);			  /* 0.01 sec */
+
 	FileChunk chunk;
 	chunk = file.GetChunk(off, to_read);
+
+	if(!chunk.GetData()) /* shouldn't happen */
+		return 0;
+
 	memcpy(buf, chunk.GetData(), to_read);
 	return to_read;
 }
 
 int CacheInterface::Truncate(std::string path, off_t offset)
 {
-	/* No need to lock cache, we don't touch its members */
-
+	pf_stat stat = GetAttr(path);
+	stat.size = offset;
+	SetAttr(path, stat);
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);
+
 	return 0;
 }

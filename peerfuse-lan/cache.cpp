@@ -25,6 +25,7 @@
 #include "tools.h"
 #include "peers_list.h"
 #include "session_config.h"
+#include "hdd.h"
 
 Cache cache;
 

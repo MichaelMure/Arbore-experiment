@@ -25,12 +25,10 @@
 #include "pf_dir.h"
 #include "pf_file.h"
 #include "packet.h"
-#include "hdd.h"
 
 class Cache : public CacheInterface
 {
 	DirEntry tree;
-	Hdd hdd;
 
 	virtual DirEntry* GetTree() { return &tree; }
 	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL);

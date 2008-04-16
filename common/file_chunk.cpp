@@ -88,10 +88,15 @@ void FileChunk::Merge(FileChunk chunk)
 	assert(begin_off + merge_size <= size);
 	assert(chunk_off + merge_size <= chunk.GetSize());
 	memcpy(data + begin_off, chunk.GetData() + chunk_off, size);
+
+	log[W_DEBUG] << "Chunk merged: off:" << chunk.GetOffset() << ", size:" << chunk.GetSize() << " inside off:" << offset << ", size:" << size;
 }
 
 void FileChunk::Concatenate(FileChunk other)
 {
+	if(!other.data)
+		return;
+
 	if(!data)
 	{
 		*this = other;
@@ -116,6 +121,7 @@ void FileChunk::Concatenate(FileChunk other)
 
 	size = new_size;
 	data = new_data;
+	log[W_DEBUG] << "Chunk concatenated: off:" << other.GetOffset() << ", size:" << other.GetSize() << " to off:" << offset << ", size:" << size;
 }
 
 FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
