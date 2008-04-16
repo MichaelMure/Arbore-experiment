@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include "file_content.h"
 #include "file_chunk.h"
 #include "scheduler_queue.h"
@@ -27,20 +28,19 @@
 #include "session_config.h"
 #include "hdd.h"
 
+const time_t write_to_hdd_timeout = 10;
+
 FileContent::FileContent(std::string _filename) :
 			Mutex(RECURSIVE_MUTEX),
 			filename(_filename),
 			ondisk_offset(0),
 			ondisk_size(0),
-			ondisk_fd(-1)
+			ondisk_fd(-1),
+			ondisk_synced(true)
 {
 	uint32_t nbr = 0;
 	tree_cfg.Get(filename + "#ondisk_off", nbr);
 	ondisk_offset = nbr;
-
-	nbr = 0;
-	tree_cfg.Get(filename + "#ondisk_size", nbr);
-	ondisk_size = nbr;
 }
 
 FileContent::FileContent(const FileContent& other) :
@@ -63,14 +63,51 @@ FileContent::~FileContent()
 		close(ondisk_fd);
 }
 
-bool FileContent::OnDiskLoad(FileChunk chunk)
+bool FileContent::LoadFd()
 {
 	if(ondisk_fd == -1)
 	{
 		ondisk_fd = hdd.GetFd(filename);
-		if(ondisk_fd == -1)
+		off_t size = lseek(ondisk_fd, 0, SEEK_END);
+		if(size == (off_t)-1)
+		{
+			log[W_ERR] << "Error loading \"" << filename << "\": " << strerror(errno);
+			close(ondisk_fd);
+			ondisk_fd = -1;
 			return false;
+		}
+		ondisk_size = (size_t) size;
+		log[W_DEBUG] << "\"" << filename << "\" have " << ondisk_size << " oct on hdd";
 	}
+	return (ondisk_fd != -1);
+}
+
+void FileContent::OnDiskWrite(FileChunk& chunk)
+{
+	ondisk_offset = 0;
+	if(!LoadFd())
+	{
+		log[W_ERR] << "Unable to save \"" << filename <<"\" in cache.";
+		return;
+	}
+
+	if(lseek(ondisk_fd, chunk.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1
+		|| (size_t)write(ondisk_fd, chunk.GetData(), chunk.GetSize()) != chunk.GetSize())
+	{
+		log[W_ERR] << "Unable to save \"" << filename <<"\" in cache: " <<strerror(errno);
+		return;
+	}
+	fsync(ondisk_fd);
+
+	log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+	ondisk_size = MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), ondisk_size);
+	chunk.SetHddSynced(true);
+}
+
+bool FileContent::OnDiskLoad(FileChunk chunk)
+{
+	if(!LoadFd())
+		return false;
 
 	if(lseek(ondisk_fd, chunk.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1)
 		return false;
@@ -88,6 +125,8 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 
 bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 {
+	LoadFd(); /* Needed to update the ondisk_size value */
+
 	/* TODO: load only the missing part of the chunk */
 	log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	if(chunk.GetOffset() >= ondisk_offset
@@ -131,6 +170,8 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 void FileContent::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
+	ondisk_synced = false;
+
 	/* Merge into the chunk set */
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= chunk.GetOffset())
@@ -218,14 +259,11 @@ void FileContent::Truncate(off_t offset)
 	while(it != end())
 		it = erase(it);
 
+	LoadFd(); /* Needed to update the ondisk_size value */
 	if(offset < ondisk_offset + (off_t)ondisk_size)
 	{
 		if(ondisk_fd == -1)
-		{
-			ondisk_fd = hdd.GetFd(filename);
-			if(ondisk_fd == -1)
-				return;		  /* TODO:return an error */
-		}
+			return;		  /* TODO:return an error */
 
 		ftruncate(ondisk_fd, offset);	  /* TODO:return an error */
 
@@ -237,6 +275,30 @@ void FileContent::Truncate(off_t offset)
 		else
 			ondisk_size = offset - ondisk_offset;
 		tree_cfg.Set(filename + "#ondisk_off", (uint32_t)ondisk_offset);
-		tree_cfg.Set(filename + "#ondisk_size", (uint32_t)ondisk_size);
 	}
 }
+
+void FileContent::SyncToHdd()
+{
+	BlockLockMutex lock(this);
+	if(ondisk_synced)
+		return;
+
+	iterator it = begin();
+	/* Blocks must follow themself */
+	off_t next_off = 0;
+	while(it != end() && (!next_off || next_off == it->GetOffset()))
+	{
+		if(!it->GetHddSynced() && it->GetAccessTime() + write_to_hdd_timeout > time(NULL))
+			return;
+
+		if(!it->GetHddSynced())
+			OnDiskWrite(*it);
+
+		next_off = it->GetOffset() + (off_t)it->GetSize();
+		++it;
+	}
+
+	ondisk_synced = true;
+}
+

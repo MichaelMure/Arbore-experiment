@@ -29,9 +29,10 @@ class FileChunk
 	char* data;
 	off_t offset;
 	size_t size;
+	bool hdd_synced;
 
 public:
-	FileChunk() : access_time(0), data(NULL), offset(0), size(0) {}
+	FileChunk() : access_time(0), data(NULL), offset(0), size(0), hdd_synced(false) {}
 	FileChunk(const char* _data, off_t _offset, size_t _size);
 	FileChunk(const FileChunk &other);
 	FileChunk& operator=(const FileChunk &other);
@@ -40,7 +41,9 @@ public:
 	time_t GetAccessTime() const { return access_time; }
 	off_t GetOffset() const { return offset; }
 	size_t GetSize() const { return size; }
-	const char* GetData() const { return data; }
+	bool GetHddSynced() const { return hdd_synced; }
+	void SetHddSynced(bool _hdd_synced) { hdd_synced = _hdd_synced; }
+	const char* GetData();
 
 	void Merge(FileChunk chunk);
 	void Concatenate(FileChunk chunk);

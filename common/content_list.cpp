@@ -35,4 +35,7 @@ FileContent& ContentList::GetFile(std::string path)
 void ContentList::Loop()
 {
 	sleep(1);
+	for(iterator it = begin(); it != end(); ++it)
+		it->second.SyncToHdd();
 }
+

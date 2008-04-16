@@ -35,6 +35,7 @@
 #include "session_config.h"
 #include "scheduler.h"
 #include "hdd.h"
+#include "content_list.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -75,6 +76,7 @@ void Application::StartThreads()
 {
 	scheduler.Start();
 	net.Start();
+	content_list.Start();
 }
 
 int Application::main(int argc, char *argv[])

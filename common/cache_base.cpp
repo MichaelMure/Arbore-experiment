@@ -42,7 +42,10 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	size_t file_size = (size_t)GetAttr(path).size;
 
 	if(off > (off_t)file_size)
+	{
+		log[W_DEBUG] << "Fuse trying to read out of file";
 		return 0;
+	}
 
 	FileContent& file = content_list.GetFile(path);
 

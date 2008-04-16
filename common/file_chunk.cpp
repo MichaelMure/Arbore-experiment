@@ -22,7 +22,7 @@
 #include "file_chunk.h"
 #include "log.h"
 
-FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_offset), size(_size)
+FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_offset), size(_size), hdd_synced(false)
 {
 	access_time = time(NULL);
 	if(_data)
@@ -36,7 +36,8 @@ FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_o
 
 FileChunk::FileChunk(const FileChunk& other) : access_time(other.access_time),
 			offset(other.offset),
-			size(other.size)
+			size(other.size),
+			hdd_synced(other.hdd_synced)
 {
 	if(other.data)
 	{
@@ -51,6 +52,8 @@ FileChunk& FileChunk::operator=(const FileChunk& other)
 {
 	size = other.size;
 	offset = other.offset;
+	access_time = other.access_time;
+	hdd_synced = other.hdd_synced;
 
 	if(data)
 		delete []data;
@@ -71,6 +74,12 @@ FileChunk::~FileChunk()
 		delete []data;
 }
 
+const char* FileChunk::GetData()
+{
+	access_time = time(NULL);
+	return data;
+}
+
 void FileChunk::Merge(FileChunk chunk)
 {
 	/* Check we are overlapping */
@@ -79,6 +88,9 @@ void FileChunk::Merge(FileChunk chunk)
 
 	if(offset >= chunk.GetOffset() + (off_t)chunk.GetSize())
 		return;
+
+	access_time = time(NULL);
+	hdd_synced = false;
 
 	/* Merge */
 	off_t begin_off = chunk.offset - offset > 0 ? chunk.offset - offset : 0;
@@ -107,6 +119,8 @@ void FileChunk::Concatenate(FileChunk other)
 	if(offset + (off_t)size != other.GetOffset())
 		log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
 
+	access_time = time(NULL);
+	hdd_synced = false;
 	size_t new_size = (size_t) (other.GetOffset() + other.GetSize() - offset);
 	char* new_data = new char[new_size];
 	memset(new_data, 0, new_size);
@@ -132,6 +146,7 @@ FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
 	if(_offset + (off_t)_size <= offset)
 		return FileChunk();
 
+	access_time = time(NULL);
 	off_t data_offset = _offset > offset ? _offset - offset : 0;
 	off_t data_end = MIN(_offset + (off_t)_size, offset + (off_t)size);
 	size_t data_size = (size_t) (data_end - offset - data_offset);

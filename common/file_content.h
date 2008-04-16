@@ -34,9 +34,11 @@ private:
 	off_t ondisk_offset;
 	size_t ondisk_size;
 	int ondisk_fd;
+	bool ondisk_synced;
 
+	bool LoadFd();
 	bool OnDiskLoad(FileChunk chunk);
-	void OnDiskWrite(FileChunk chunk);
+	void OnDiskWrite(FileChunk& chunk);
 
 	/** Load a chunk from the hdd or ask it on the network
 	 * @param chunk the part to load
@@ -61,5 +63,7 @@ public:
 	void SetChunk(FileChunk chunk);
 
 	void Truncate(off_t offset);
+
+	void SyncToHdd();
 };
 #endif
