@@ -320,4 +320,3 @@ time_t FileContent::GetAccessTime() const
 	BlockLockMutex lock(this);
 	return access_time;
 }
-
