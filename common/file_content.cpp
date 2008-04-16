@@ -100,7 +100,7 @@ void FileContent::OnDiskWrite(FileChunk& chunk)
 	fsync(ondisk_fd);
 
 	log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
-	ondisk_size = MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), ondisk_size);
+	ondisk_size = (size_t)MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), (off_t)ondisk_size);
 	chunk.SetHddSynced(true);
 }
 
