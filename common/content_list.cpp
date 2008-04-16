@@ -18,9 +18,13 @@
  */
 
 #include <string>
+#include <time.h>
 #include "content_list.h"
+#include "log.h"
 
 ContentList content_list;
+
+const time_t remove_from_list_timeout = 15;
 
 ContentList::~ContentList()
 {
@@ -31,6 +35,7 @@ ContentList::~ContentList()
 
 FileContent& ContentList::GetFile(std::string path)
 {
+	BlockLockMutex lock(this);
 	iterator it = find(path);
 	if(it == end())
 		insert(make_pair(path, FileContent(path)));
@@ -42,6 +47,29 @@ FileContent& ContentList::GetFile(std::string path)
 void ContentList::Loop()
 {
 	sleep(1);
-	for(iterator it = begin(); it != end(); ++it)
-		it->second.SyncToHdd();
+
+	BlockLockMutex lock(this);
+	iterator it = begin();
+	while(it != end())
+	{
+		if(it->second.GetAccessTime() + remove_from_list_timeout < time(NULL))
+		{
+			log[W_DEBUG] << "Remove \"" << it->first << "\" from the content_list";
+			/* Force a sync to the disc */
+			it->second.SyncToHdd(true);
+			erase(it);
+			break;
+		}
+		else
+			++it;
+	}
+}
+
+void ContentList::RemoveFile(std::string path)
+{
+	BlockLockMutex lock(this);
+
+	iterator it = find(path);
+	if(it != end())
+		erase(it);
 }

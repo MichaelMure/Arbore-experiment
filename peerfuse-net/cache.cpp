@@ -27,6 +27,7 @@
 #include "environment.h"
 #include "session_config.h"
 #include "hdd.h"
+#include "content_list.h"
 
 Cache cache;
 
@@ -258,6 +259,7 @@ void Cache::RmFile(std::string path, pf_id sender)
 
 	hdd.RmFile(f);
 	filedist.RemoveFile(f, peers_list.PeerFromID(sender));
+	content_list.RemoveFile(f->GetFullName());
 
 	f->GetParent()->RemFile(f);
 	delete f;

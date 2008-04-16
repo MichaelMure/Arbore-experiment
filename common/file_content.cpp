@@ -41,6 +41,7 @@ FileContent::FileContent(std::string _filename) :
 	uint32_t nbr = 0;
 	tree_cfg.Get(filename + "#ondisk_off", nbr);
 	ondisk_offset = nbr;
+	access_time = time(NULL);
 }
 
 FileContent::FileContent(const FileContent& other) :
@@ -55,6 +56,7 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 		ondisk_fd = dup(other.ondisk_fd);
 	for(const_iterator it = other.begin(); it != other.end(); ++it)
 		push_back(*it);
+	access_time = other.access_time;
 }
 
 FileContent::~FileContent()
@@ -65,6 +67,7 @@ FileContent::~FileContent()
 
 bool FileContent::LoadFd()
 {
+	BlockLockMutex lock(this);
 	if(ondisk_fd == -1)
 	{
 		ondisk_fd = hdd.GetFd(filename);
@@ -84,6 +87,7 @@ bool FileContent::LoadFd()
 
 void FileContent::OnDiskWrite(FileChunk& chunk)
 {
+	BlockLockMutex lock(this);
 	ondisk_offset = 0;
 	if(!LoadFd())
 	{
@@ -106,6 +110,7 @@ void FileContent::OnDiskWrite(FileChunk& chunk)
 
 bool FileContent::OnDiskLoad(FileChunk chunk)
 {
+	BlockLockMutex lock(this);
 	if(!LoadFd())
 		return false;
 
@@ -126,6 +131,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 
 bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 {
+	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
 
 	/* TODO: load only the missing part of the chunk */
@@ -146,6 +152,7 @@ bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 FileChunk FileContent::GetChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
+	access_time = time(NULL);
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
 		++it;
@@ -172,6 +179,7 @@ void FileContent::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
 	ondisk_synced = false;
+	access_time = time(NULL);
 
 	/* Merge into the chunk set */
 	iterator it = begin();
@@ -214,6 +222,7 @@ void FileContent::SetChunk(FileChunk chunk)
 bool FileContent::HaveChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
+	access_time = time(NULL);
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
 		++it;
@@ -245,6 +254,7 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 void FileContent::Truncate(off_t offset)
 {
 	BlockLockMutex lock(this);
+	access_time = time(NULL);
 
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
@@ -304,3 +314,10 @@ void FileContent::SyncToHdd(bool force)
 		}
 	}
 }
+
+time_t FileContent::GetAccessTime() const
+{
+	BlockLockMutex lock(this);
+	return access_time;
+}
+

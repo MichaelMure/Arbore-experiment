@@ -22,6 +22,7 @@
 
 #include <string>
 #include <list>
+#include <time.h>
 #include "mutex.h"
 #include "file_chunk.h"
 
@@ -35,6 +36,7 @@ private:
 	size_t ondisk_size;
 	int ondisk_fd;
 	bool ondisk_synced;
+	time_t access_time;
 
 	bool LoadFd();
 	bool OnDiskLoad(FileChunk chunk);
@@ -65,5 +67,6 @@ public:
 	void Truncate(off_t offset);
 
 	void SyncToHdd(bool force = false);
+	time_t GetAccessTime() const;
 };
 #endif

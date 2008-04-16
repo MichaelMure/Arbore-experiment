@@ -22,11 +22,15 @@
 
 #include <string.h>
 #include <map>
+#include "mutex.h"
 #include "pf_thread.h"
 #include "file_content.h"
 
-class ContentList : public Thread, private std::map<std::string, FileContent>
+class ContentList : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
+protected:
+	void Loop();
+
 public:
 	~ContentList();
 
@@ -36,7 +40,10 @@ public:
 	 */
 	FileContent& GetFile(std::string path);
 
-	void Loop();
+	/** Remove a file from the list. It's content is not flushed to the disk
+	 * @param path path to the file
+	 */
+	void RemoveFile(std::string path);
 };
 
 extern ContentList content_list;
