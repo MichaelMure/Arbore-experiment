@@ -106,7 +106,7 @@ void FileChunk::Concatenate(FileChunk other)
 	if(offset + (off_t)size != other.GetOffset())
 		log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
 
-	size_t new_size = other.GetOffset() + other.GetSize() - offset;
+	size_t new_size = (size_t) (other.GetOffset() + other.GetSize() - offset);
 	char* new_data = new char[new_size];
 	memset(new_data, 0, new_size);
 
@@ -133,7 +133,7 @@ FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
 
 	off_t data_offset = _offset > offset ? _offset - offset : 0;
 	off_t data_end = _offset + (off_t)_size < offset + (off_t)size ? _offset + (off_t)_size : offset + (off_t)size;
-	size_t data_size = data_end - offset - data_offset;
+	size_t data_size = (size_t) (data_end - offset - data_offset);
 
 	return FileChunk(data + data_offset, offset + data_offset, data_size);
 }
