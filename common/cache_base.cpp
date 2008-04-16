@@ -76,4 +76,3 @@ int CacheInterface::Truncate(std::string path, off_t offset)
 
 	return 0;
 }
-

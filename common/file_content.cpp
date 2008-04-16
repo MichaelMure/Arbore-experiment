@@ -224,10 +224,10 @@ void FileContent::Truncate(off_t offset)
 		{
 			ondisk_fd = hdd.GetFd(filename);
 			if(ondisk_fd == -1)
-				return; /* TODO:return an error */
+				return;		  /* TODO:return an error */
 		}
 
-		ftruncate(ondisk_fd, offset); /* TODO:return an error */
+		ftruncate(ondisk_fd, offset);	  /* TODO:return an error */
 
 		if(offset <= ondisk_offset)
 		{
