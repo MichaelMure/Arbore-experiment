@@ -74,16 +74,17 @@ FileChunk::~FileChunk()
 void FileChunk::Merge(FileChunk chunk)
 {
 	/* Check we are overlapping */
-	if(offset + (off_t)size < chunk.GetOffset())
+	if(offset + (off_t)size <= chunk.GetOffset())
 		return;
 
-	if(offset > chunk.GetOffset() + (off_t)chunk.GetSize())
+	if(offset >= chunk.GetOffset() + (off_t)chunk.GetSize())
 		return;
 
 	/* Merge */
 	off_t begin_off = chunk.offset - offset > 0 ? chunk.offset - offset : 0;
-	off_t chunk_off = offset - chunk.offset> 0 ? offset - chunk.offset: 0;
-	size_t merge_size = (size_t) ((offset + size > chunk.GetOffset() + chunk.GetSize()) ? (chunk.GetOffset() + chunk.GetSize() - chunk_off) : offset + size - begin_off);
+	off_t chunk_off = offset - chunk.offset > 0 ? offset - chunk.offset: 0;
+	off_t merge_end = MIN(offset + (off_t)size, chunk.GetOffset() + (off_t)chunk.GetSize());
+	size_t merge_size = merge_end - begin_off - offset;
 
 	assert(begin_off + merge_size <= size);
 	assert(chunk_off + merge_size <= chunk.GetSize());
@@ -132,7 +133,7 @@ FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
 		return FileChunk();
 
 	off_t data_offset = _offset > offset ? _offset - offset : 0;
-	off_t data_end = _offset + (off_t)_size < offset + (off_t)size ? _offset + (off_t)_size : offset + (off_t)size;
+	off_t data_end = MIN(_offset + (off_t)_size, offset + (off_t)size);
 	size_t data_size = (size_t) (data_end - offset - data_offset);
 
 	return FileChunk(data + data_offset, offset + data_offset, data_size);

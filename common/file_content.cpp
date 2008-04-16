@@ -117,7 +117,7 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 
 	/* Build the requested chunk */
 	FileChunk chunk;
-	while(it != end() && it->GetOffset() <= offset + (off_t)size)
+	while(it != end() && it->GetOffset() < offset + (off_t)size)
 	{
 		chunk.Concatenate(it->GetPart(offset, size));
 		++it;
@@ -138,6 +138,7 @@ void FileContent::SetChunk(FileChunk chunk)
 	{
 		/* It doesn't overlap with previous data
 		 * add it to the end */
+		log[W_DEBUG] << "Adding chunk at the end of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 		push_back(chunk);
 		return;
 	}
@@ -153,18 +154,21 @@ void FileContent::SetChunk(FileChunk chunk)
 		return;
 
 	/* Add any remaining data at the end */
-	off_t offset = back().GetOffset() + back().GetSize();
+	off_t offset = chunk.GetOffset();
+	if(it != begin())
+	{
+		--it;
+		offset = it->GetOffset() + it->GetSize();
+		++it;
+	}
 	size_t size = (size_t) (chunk.GetOffset() + chunk.GetSize() - offset);
-	char* buf = new char[size];
-	memcpy(buf, chunk.GetData() + offset - chunk.GetOffset(), size);
-	FileChunk new_chunk(buf, offset, size);
-	delete []buf;
-	push_back(new_chunk);
+	log[W_DEBUG] << "Inserting chunk in the middle of \"" << filename << "\" off:" << offset << " size:" << size;
+	FileChunk new_chunk = chunk.GetPart(offset, size);
+	insert(it, new_chunk);
 }
 
 bool FileContent::HaveChunk(off_t offset, size_t size)
 {
-	// TODO: Check reqquested chunks are contiguous
 	BlockLockMutex lock(this);
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
@@ -175,11 +179,23 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
-
-	while(it != end() && it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size)
+	off_t next_off = 0;
+	while(it != end()
+			&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
+			&& (next_off == 0 || next_off == it->GetOffset()))
+	{
+		/* Blocks must follow themself */
+		next_off = it->GetOffset() + (off_t)it->GetSize();
 		++it;
+	}
 
-	return (it != end() ? true : LoadChunk(FileChunk(NULL, offset, size), true));
+	bool res = (it != end()) && (next_off == it->GetOffset() + (off_t)it->GetSize());
+
+	/* If we don't have the chunk, try to load it */
+	if(!res)
+		res = LoadChunk(FileChunk(NULL, offset, size), true);
+
+	return res;
 }
 
 void FileContent::Truncate(off_t offset)
@@ -199,4 +215,18 @@ void FileContent::Truncate(off_t offset)
 
 	while(it != end())
 		it = erase(it);
+
+	if(offset < ondisk_offset + (off_t)ondisk_size)
+	{
+		if(offset < ondisk_offset)
+		{
+			ondisk_offset = 0;
+			ondisk_size = 0;
+		}
+		else
+			ondisk_size = offset - ondisk_offset;
+		tree_cfg.Set(filename + "#ondisk_off", (uint32_t)ondisk_offset);
+		tree_cfg.Set(filename + "#ondisk_size", (uint32_t)ondisk_size);
+	}
 }
+

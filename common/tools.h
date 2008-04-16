@@ -51,4 +51,8 @@ std::string TypToStr( const T & Value )
 	oss << Value;
 	return oss.str();
 }
+
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+
 #endif						  /* TOOLS_H */
