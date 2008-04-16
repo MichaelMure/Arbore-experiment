@@ -125,7 +125,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 
 bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
 {
-	LoadFd(); /* Needed to update the ondisk_size value */
+	LoadFd();				  /* Needed to update the ondisk_size value */
 
 	/* TODO: load only the missing part of the chunk */
 	log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
@@ -259,11 +259,11 @@ void FileContent::Truncate(off_t offset)
 	while(it != end())
 		it = erase(it);
 
-	LoadFd(); /* Needed to update the ondisk_size value */
+	LoadFd();				  /* Needed to update the ondisk_size value */
 	if(offset < ondisk_offset + (off_t)ondisk_size)
 	{
 		if(ondisk_fd == -1)
-			return;		  /* TODO:return an error */
+			return;			  /* TODO:return an error */
 
 		ftruncate(ondisk_fd, offset);	  /* TODO:return an error */
 
@@ -301,4 +301,3 @@ void FileContent::SyncToHdd()
 
 	ondisk_synced = true;
 }
-

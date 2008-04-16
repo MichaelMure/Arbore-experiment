@@ -38,4 +38,3 @@ void ContentList::Loop()
 	for(iterator it = begin(); it != end(); ++it)
 		it->second.SyncToHdd();
 }
-
