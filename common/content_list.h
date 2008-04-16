@@ -28,6 +28,8 @@
 class ContentList : public Thread, private std::map<std::string, FileContent>
 {
 public:
+	~ContentList();
+
 	/** Returns the content of the file we already have in memory
 	 * @param path path to the file
 	 * @return the file content

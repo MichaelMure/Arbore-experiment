@@ -22,6 +22,13 @@
 
 ContentList content_list;
 
+ContentList::~ContentList()
+{
+	/* Force saving chunk to disk */
+	for(iterator it = begin(); it != end(); ++it)
+		it->second.SyncToHdd(true);
+}
+
 FileContent& ContentList::GetFile(std::string path)
 {
 	iterator it = find(path);

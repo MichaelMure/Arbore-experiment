@@ -218,12 +218,12 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
 		++it;
 
-	if(it == end())
+	if(it == end() || it->GetOffset() > offset)
 		return LoadChunk(FileChunk(NULL, offset, size), true);
 
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
-	off_t next_off = it->GetOffset() + (off_t)it->GetSize();
+	off_t next_off = it->GetOffset();
 	while(it != end()
 		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
 		&& next_off == it->GetOffset())
@@ -233,7 +233,7 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 		++it;
 	}
 
-	bool res = (it != end()) && (!next_off || next_off == it->GetOffset());
+	bool res = (it != end()) && next_off == it->GetOffset();
 
 	/* If we don't have the chunk, try to load it */
 	if(!res)
@@ -279,29 +279,28 @@ void FileContent::Truncate(off_t offset)
 	}
 }
 
-void FileContent::SyncToHdd()
+void FileContent::SyncToHdd(bool force)
 {
 	BlockLockMutex lock(this);
 	if(ondisk_synced)
 		return;
 
-	iterator it = begin();
-	if(it != end() && it->GetOffset() != 0)	  /* TODO */
-		return;
-
-	/* Blocks must follow themself */
-	off_t next_off = 0;
-	while(it != end() && (!next_off || next_off == it->GetOffset()))
-	{
-		if(!it->GetHddSynced() && it->GetAccessTime() + write_to_hdd_timeout > time(NULL))
-			return;
-
-		if(!it->GetHddSynced())
-			OnDiskWrite(*it);
-
-		next_off = it->GetOffset() + (off_t)it->GetSize();
-		++it;
-	}
-
 	ondisk_synced = true;
+	log[W_DEBUG] << "Trying to sync " << filename;
+	/* Write on disk, without doing "blanks" in the file */
+	iterator it = begin();
+	while(it != end() && it->GetOffset() <= ondisk_offset + (off_t)ondisk_size)
+	{
+		if(it->GetAccessTime() + write_to_hdd_timeout < time(NULL) || force)
+		{
+			if(!it->GetHddSynced())
+				OnDiskWrite(*it);
+			it = erase(it);
+		}
+		else
+		{
+			ondisk_synced = false;
+			++it;
+		}
+	}
 }

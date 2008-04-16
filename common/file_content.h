@@ -64,6 +64,6 @@ public:
 
 	void Truncate(off_t offset);
 
-	void SyncToHdd();
+	void SyncToHdd(bool force = false);
 };
 #endif
