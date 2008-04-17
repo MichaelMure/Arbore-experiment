@@ -219,7 +219,7 @@ void FileContent::SetChunk(FileChunk chunk)
 	insert(it, new_chunk);
 }
 
-bool FileContent::HaveChunk(off_t offset, size_t size)
+enum FileContent::chunk_availability FileContent::HaveChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -228,7 +228,11 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 		++it;
 
 	if(it == end() || it->GetOffset() > offset)
-		return LoadChunk(FileChunk(NULL, offset, size), true);
+	{
+		if(LoadChunk(FileChunk(NULL, offset, size), true))
+			return CHUNK_READY;
+		return CHUNK_UNAVAILABLE;
+	}
 
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
@@ -245,10 +249,9 @@ bool FileContent::HaveChunk(off_t offset, size_t size)
 	bool res = (it != end()) && next_off == it->GetOffset();
 
 	/* If we don't have the chunk, try to load it */
-	if(!res)
-		res = LoadChunk(FileChunk(NULL, offset, size), true);
-
-	return res;
+	if(res || LoadChunk(FileChunk(NULL, offset, size), true))
+		return CHUNK_READY;
+	return CHUNK_UNAVAILABLE;
 }
 
 void FileContent::Truncate(off_t offset)

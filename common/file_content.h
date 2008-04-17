@@ -51,6 +51,13 @@ private:
 
 	FileChunk& operator=(const FileChunk &other);
 public:
+	enum chunk_availability
+	{
+		CHUNK_READY,		/** it's ready to be read */
+		CHUNK_NOT_READY,	/** it's not yet loaded from hdd/not yet received */
+		CHUNK_UNAVAILABLE	/** we don't have it on hdd and nobody has it on network */
+	};
+
 	FileContent(std::string _filename);
 	FileContent(const FileContent&);
 	~FileContent();
@@ -60,7 +67,7 @@ public:
 
 	/* Return true or false if we have it */
 	/* Triggers loading the file from the cache or download from the network */
-	bool HaveChunk(off_t offset, size_t size);
+	enum chunk_availability HaveChunk(off_t offset, size_t size);
 
 	void SetChunk(FileChunk chunk);
 

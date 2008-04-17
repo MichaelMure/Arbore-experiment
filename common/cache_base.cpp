@@ -58,8 +58,12 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 		return 0;
 	}
 
-	while(!file.HaveChunk(off, to_read))
+	enum FileContent::chunk_availability chunk_state;
+	while((chunk_state = file.HaveChunk(off, to_read)) == FileContent::CHUNK_NOT_READY)
 		usleep(10000);			  /* 0.01 sec */
+
+	if(chunk_state == FileContent::CHUNK_UNAVAILABLE)
+		throw FileUnavailable();
 
 	FileChunk chunk;
 	chunk = file.GetChunk(off, to_read);

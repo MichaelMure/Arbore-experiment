@@ -35,9 +35,14 @@ off_t offset, struct fuse_file_info *fi)
 		int bytes_read = cache.Read(std::string(path), buf, size, offset);
 		return bytes_read;
 	}
+	catch(Cache::FileUnavailable e)
+	{
+		log[W_INFO] << "File \"" << path << "\" is not available.";
+		return -ENOENT;
+	}
 	catch(...)
 	{
-		log[W_ERR] << "Failed to write to " << path;
+		log[W_ERR] << "Failed to read to " << path;
 		return -ENOENT;
 	}
 	return 0;

@@ -57,6 +57,7 @@ public:
 	class FileAlreadyExists : public std::exception {};
 	class NoSuchFileOrDir : public std::exception {};
 	class NoPermission : public std::exception {};
+	class FileUnavailable : public std::exception {};
 
 	CacheInterface() : Mutex(RECURSIVE_MUTEX) {}
 	virtual ~CacheInterface() {}
