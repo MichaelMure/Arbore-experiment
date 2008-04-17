@@ -43,7 +43,8 @@ source bash/tests.sh
 
 cd "$ROOT"
 
-for test in $(grep -v '^#\|^$' "$TESTS/conf/$BINNAME.conf")
+
+for test in $(cat "$TESTS/conf/common.conf" "$TESTS/conf/$BINNAME.conf" | grep -v '^#\|^$')
 do
 	start_test "$test" || exit 1
 done
