@@ -26,35 +26,12 @@
 #include "pf_file.h"
 #include "packet.h"
 
-class Cache : public CacheInterface
+class Cache : public CacheBase
 {
-	DirEntry tree;
-
-	virtual DirEntry* GetTree() { return &tree; }
-	virtual FileEntry* Path2File(std::string path, std::string *filename = NULL);
-
-	/* XXX It appears that this function is NOT used anymore! */
-	std::vector<FileEntry*> GetModifiedEntries(time_t last_conn);
-
 public:
 
 	Cache();
 	~Cache();
-
-	/** Load all tree from an hard drive path.
-	 * It will call the Hdd object to load it.
-	 *
-	 * @param hd_param path on hard drive
-	 */
-	virtual void Load(std::string hd_path);
-
-	virtual void ChOwn(std::string path, uid_t uid, gid_t gid);
-	virtual void ChMod(std::string path, mode_t mode);
-	virtual pf_stat GetAttr(std::string path);
-	virtual void SetAttr(std::string path, pf_stat _stat);
-#ifndef PF_SERVER_MODE
-	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
-#endif
 
 	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0);
 	virtual void RmFile(std::string path, pf_id sender = 0);

@@ -21,8 +21,159 @@
 #include "cache_base.h"
 #include "content_list.h"
 #include "file_content.h"
+#include "hdd.h"
+#include "session_config.h"
 
-void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t off)
+FileEntry* CacheBase::Path2File(std::string path, std::string* filename)
+{
+	BlockLockMutex lock(this);
+	DirEntry* current_dir = &tree;
+
+	std::string name;
+
+	while((name = stringtok(path, "/")).empty() == false)
+	{
+		FileEntry* tmp = current_dir->GetFile(name);
+		if(!tmp)
+		{
+			if(path.find('/') == std::string::npos && filename)
+			{			  /* we are in last dir, but this file doesn't exist */
+				*filename = name;
+				return current_dir;
+			}
+			/* we aren't in last dir, so the path isn't found. */
+			return NULL;
+		}
+
+		if(!(current_dir = dynamic_cast<DirEntry*>(tmp)))
+		{
+			/* This isn't a directory. */
+			if(path.empty())
+			{
+				/* We are on last dir, so it is a file. */
+				return tmp;
+			}
+			/* it isn't a file in path, so the path isn't found. */
+
+			return NULL;
+		}
+	}
+
+	return current_dir;
+}
+
+void CacheBase::Load(std::string hd_path)
+{
+	BlockLockMutex lock(this);
+	try
+	{
+		hdd.BuildTree(GetTree(), hd_path);
+	}
+	catch(...)
+	{
+		throw;
+	}
+}
+
+void CacheBase::ChOwn(std::string path, uid_t uid, gid_t gid)
+{
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+	{
+		Unlock();
+		throw NoSuchFileOrDir();
+	}
+
+	file->stat.uid = uid;
+	file->stat.gid = gid;
+	file->stat.meta_mtime = time(NULL);
+
+	/* TODO propagate it */
+
+	Unlock();
+}
+
+void CacheBase::ChMod(std::string path, mode_t mode)
+{
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+	{
+		Unlock();
+		throw NoSuchFileOrDir();
+	}
+
+	file->stat.mode = mode;
+	file->stat.meta_mtime = time(NULL);
+
+	/* TODO propagate it */
+
+	Unlock();
+}
+
+pf_stat CacheBase::GetAttr(std::string path)
+{
+	pf_stat stat;
+
+	Lock();
+
+	FileEntry* file = Path2File(path);
+	if(!file)
+	{
+		Unlock();
+		throw NoSuchFileOrDir();
+	}
+
+	stat = file->stat;
+	Unlock();
+
+	return stat;
+}
+
+void CacheBase::SetAttr(std::string path, pf_stat stat)
+{
+	BlockLockMutex lock(this);
+	FileEntry* file = Path2File(path);
+	if(file->stat.size != stat.size)
+		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
+	if(file)
+		file->stat = stat;
+}
+
+#ifndef PF_SERVER_MODE
+void CacheBase::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
+			off_t offset, struct fuse_file_info *fi)
+{
+	Lock();
+	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path));
+
+	if(!dir)
+	{
+		Unlock();
+		throw NoSuchFileOrDir();
+	}
+
+	FileMap files = dir->GetFiles();
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		struct stat st;
+		memset(&st, 0, sizeof st);
+		/*st.st_ino = de->d_ino;
+		st.st_mode = de->d_type << 12;*/
+
+		if(filler(buf, it->second->GetName().c_str(), &st, 0))
+			break;
+	}
+
+	Unlock();
+
+}
+#endif						  /* PF_SERVER_MODE */
+
+void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 {
 	FileContent& file = content_list.GetFile(path);
 	FileChunk chunk(buf, off, size);
@@ -37,7 +188,7 @@ void CacheInterface::Write(std::string path, const char* buf, size_t size, off_t
 	}
 }
 
-int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
+int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 {
 	size_t file_size = (size_t)GetAttr(path).size;
 
@@ -78,7 +229,7 @@ int CacheInterface::Read(std::string path, char* buf, size_t size, off_t off)
 	return to_read;
 }
 
-int CacheInterface::Truncate(std::string path, off_t offset)
+int CacheBase::Truncate(std::string path, off_t offset)
 {
 	log[W_DEBUG] << "Truncating \"" << path << "\" at " << offset;
 	pf_stat stat = GetAttr(path);

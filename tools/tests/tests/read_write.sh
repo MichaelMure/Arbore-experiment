@@ -29,6 +29,8 @@ cp "$TMPFILE" "$MNT1/tmp"
 
 if [ "$(cat "$TMPFILE"|md5sum)" != "$(cat "$MNT1/tmp"|md5sum)" ]
 then
+	rm "$TMPFILE"
 	exit 1
 fi
+rm "$TMPFILE"
 

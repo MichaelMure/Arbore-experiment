@@ -32,70 +32,11 @@
 Cache cache;
 
 Cache::Cache()
-			: tree("", NULL)
 {
 }
 
 Cache::~Cache()
 {
-}
-
-void Cache::Load(std::string hd_path)
-{
-	Lock();
-	try
-	{
-		hdd.BuildTree(GetTree(), hd_path);
-	}
-	catch(...)
-	{					  /* U G L Y, I think we MUST find a solution. */
-		Unlock();
-		throw;
-	}
-	Unlock();
-}
-
-FileEntry* Cache::Path2File(std::string path, std::string* filename)
-{
-	Lock();
-	DirEntry* current_dir = &tree;
-
-	std::string name;
-
-	while((name = stringtok(path, "/")).empty() == false)
-	{
-		FileEntry* tmp = current_dir->GetFile(name);
-		if(!tmp)
-		{
-			if(path.find('/') == std::string::npos && filename)
-			{			  /* we are in last dir, but this file doesn't exist */
-				*filename = name;
-				Unlock();
-				return current_dir;
-			}
-			/* we aren't in last dir, so the path isn't found. */
-			Unlock();
-			return NULL;
-		}
-
-		if(!(current_dir = dynamic_cast<DirEntry*>(tmp)))
-		{
-			/* This isn't a directory. */
-			if(path.empty())
-			{
-				/* We are on last dir, so it is a file. */
-				Unlock();
-				return tmp;
-			}
-			/* it isn't a file in path, so the path isn't found. */
-
-			Unlock();
-			return NULL;
-		}
-	}
-
-	Unlock();
-	return current_dir;
 }
 
 FileList Cache::GetAllFiles()
@@ -273,104 +214,6 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 
 	Unlock();
 }
-
-void Cache::ChOwn(std::string path, uid_t uid, gid_t gid)
-{
-	Lock();
-
-	FileEntry* file = Path2File(path);
-	if(!file)
-	{
-		Unlock();
-		throw NoSuchFileOrDir();
-	}
-
-	file->stat.uid = uid;
-	file->stat.gid = gid;
-	file->stat.meta_mtime = time(NULL);
-
-	/* TODO propagate it */
-
-	Unlock();
-}
-
-void Cache::ChMod(std::string path, mode_t mode)
-{
-	Lock();
-
-	FileEntry* file = Path2File(path);
-	if(!file)
-	{
-		Unlock();
-		throw NoSuchFileOrDir();
-	}
-
-	file->stat.mode = mode;
-	file->stat.meta_mtime = time(NULL);
-
-	/* TODO propagate it */
-
-	Unlock();
-}
-
-pf_stat Cache::GetAttr(std::string path)
-{
-	pf_stat stat;
-
-	Lock();
-
-	FileEntry* file = Path2File(path);
-	if(!file)
-	{
-		Unlock();
-		throw NoSuchFileOrDir();
-	}
-
-	stat = file->stat;
-	Unlock();
-
-	return stat;
-}
-
-void Cache::SetAttr(std::string path, pf_stat stat)
-{
-	BlockLockMutex lock(this);
-	FileEntry* file = Path2File(path);
-	if(file->stat.size != stat.size)
-		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
-	if(file)
-		file->stat = stat;
-}
-
-#ifndef PF_SERVER_MODE
-void Cache::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
-			off_t offset, struct fuse_file_info *fi)
-{
-	Lock();
-	DirEntry* dir = dynamic_cast<DirEntry*>(cache.Path2File(path));
-
-	if(!dir)
-	{
-		Unlock();
-		throw NoSuchFileOrDir();
-	}
-
-	FileMap files = dir->GetFiles();
-	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
-	{
-		struct stat st;
-		memset(&st, 0, sizeof st);
-		/*st.st_ino = de->d_ino;
-		st.st_mode = de->d_type << 12;*/
-
-		if(filler(buf, it->second->GetName().c_str(), &st, 0))
-			break;
-	}
-
-	Unlock();
-
-}
-#endif						  /* PF_SERVER_MODE */
 
 void Cache::UpdateRespFiles()
 {

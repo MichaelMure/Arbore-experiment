@@ -37,18 +37,25 @@
 #include <vector>
 #include "mutex.h"
 #include "pf_file.h"
+#include "pf_dir.h"
 #include "packet.h"
 
 class FileEntry;
-class DirEntry;
 
 /** This class is interface for the Cache classes.
  *
  * \warning It is really important to NOT return ANY part
  * of this class from functions (FileEntry*, etc)
  */
-class CacheInterface : public Mutex
+
+class CacheBase : public Mutex
 {
+protected:
+	DirEntry tree;
+
+	DirEntry* GetTree() { return &tree; }
+
+	FileEntry* Path2File(std::string path, std::string *filename = NULL);
 
 public:
 
@@ -59,22 +66,22 @@ public:
 	class NoPermission : public std::exception {};
 	class FileUnavailable : public std::exception {};
 
-	CacheInterface() : Mutex(RECURSIVE_MUTEX) {}
-	virtual ~CacheInterface() {}
+	CacheBase() : Mutex(RECURSIVE_MUTEX), tree("",NULL) {}
+	virtual ~CacheBase() {}
 
 	/** Load all tree from an hard drive path.
 	 * It will call the Hdd object to load it.
 	 *
 	 * @param hd_param path on hard drive
 	 */
-	virtual void Load(std::string hd_path) = 0;
+	void Load(std::string hd_path);
 
-	virtual void ChOwn(std::string path, uid_t uid, gid_t gid) = 0;
-	virtual void ChMod(std::string path, mode_t mode) = 0;
-	virtual pf_stat GetAttr(std::string path) = 0;
-	virtual void SetAttr(std::string path, pf_stat _stat) = 0;
+	void ChOwn(std::string path, uid_t uid, gid_t gid);
+	void ChMod(std::string path, mode_t mode);
+	pf_stat GetAttr(std::string path);
+	void SetAttr(std::string path, pf_stat _stat);
 #ifndef PF_SERVER_MODE
-	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi) = 0;
+	void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 #endif
 
 	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0) = 0;
