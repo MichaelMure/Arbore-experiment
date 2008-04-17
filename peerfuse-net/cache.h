@@ -40,7 +40,6 @@ protected:
 	 */
 	friend class FileDistribution;
 
-
 	/* This method will explore all arborescence. It can be
 	 * slow, so do NOT call this function too frequently.
 	 */
