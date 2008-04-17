@@ -53,9 +53,9 @@ private:
 public:
 	enum chunk_availability
 	{
-		CHUNK_READY,		/** it's ready to be read */
-		CHUNK_NOT_READY,	/** it's not yet loaded from hdd/not yet received */
-		CHUNK_UNAVAILABLE	/** we don't have it on hdd and nobody has it on network */
+		CHUNK_READY,		  /** it's ready to be read */
+		CHUNK_NOT_READY,	  /** it's not yet loaded from hdd/not yet received */
+		CHUNK_UNAVAILABLE	  /** we don't have it on hdd and nobody has it on network */
 	};
 
 	FileContent(std::string _filename);
