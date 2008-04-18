@@ -29,11 +29,11 @@
 #include <time.h>
 
 #include "log.h"
-#include "libconfig.h"
 #include "network_base.h"
 #include "network.h"
 #include "tools.h"
-#include "scheduler.h"
+#include "scheduler_queue.h"
+#include "job_new_connection_queue.h"
 #include "pf_ssl_ssl.h"
 #include "peers_list.h"
 #include "mutex.h"
@@ -94,10 +94,11 @@ void Network::OnRemovePeer(Peer* peer)
 
 	/* Added direct down_links of this peer in my scheduler queue
 	 * to connect to them like a highlink*/
-	pf_addr addr = peers_list.RemoveDownLinks(peer);
+	std::vector<pf_addr> addr_list = peers_list.RemoveDownLinks(peer);
 
-	if(addr.port > 0)
-		AddDisconnected(addr);
+	/* Connect to them. */
+	if(addr_list.empty() == false)
+		scheduler_queue.Queue(new JobNewConnQueue(addr_list));
 }
 
 void Network::StartNetwork(MyConfig* conf)

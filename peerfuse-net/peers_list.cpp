@@ -97,30 +97,31 @@ StaticPeersList PeersList::GetDownLinks(Peer* p) const
 	return list;
 }
 
-pf_addr PeersList::RemoveDownLinks(Peer* p)
+std::vector<pf_addr> PeersList::RemoveDownLinks(Peer* p)
 {
 	BlockLockMutex lock(this);
-	pf_addr addr;
-	addr.port = 0;
-
-	std::vector<Peer*> down_links = GetDownLinks(p);
-	if(down_links.empty() == false)
-		addr = down_links.front()->GetAddr();
+	std::vector<pf_addr> addr_list;
 
 	/* Remove all downlinks, and recursively all downlinks
 	 * of every downlinks */
+	std::vector<Peer*> down_links = GetDownLinks(p);
 	for(std::vector<Peer*>::iterator it = down_links.begin();
 		it != down_links.end();
 		++it)
 	{
-		RemoveDownLinks(*it);
+		std::vector<pf_addr> local_addr_lst;
+		local_addr_lst = RemoveDownLinks(*it);
+
+		/* Add downlinks and peer addresses */
+		addr_list.push_back((*it)->GetAddr());
+		addr_list.insert(addr_list.begin(), local_addr_lst.begin(), local_addr_lst.end());
+
 		Remove(*it);
 	}
 
 	/* This addr is used by Network::OnRemove() to trying to
-	 * connect to it.
-	 */
-	return addr;
+	 * connect to it. */
+	return addr_list;
 }
 
 Peer* PeersList::RemoveFromID(pf_id id)

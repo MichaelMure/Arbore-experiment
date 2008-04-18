@@ -37,9 +37,9 @@ public:
 
 	/** Remove all downlinks from a peer
 	 * @param p remove all downlinks of this peer
-	 * @return a pf_addr of one downlink
+	 * @return a vector of all pf_addr removed
 	 */
-	pf_addr RemoveDownLinks(Peer* p);
+	std::vector<pf_addr> RemoveDownLinks(Peer* p);
 
 	bool IsIDOnNetwork(pf_id id);
 	/** Return a list of connected high linkes */

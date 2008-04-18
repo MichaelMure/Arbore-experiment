@@ -5,6 +5,7 @@ network_base.h->peer.h
 
 # NetworkBase instantiate a JobNewConnection before passing it to SchedulerQueue
 network_base.cpp->job_new_connection.h
+network.cpp->job_new_connection_queue.h
 file_content.cpp->job_change_filesize.h
 # Peer instantiate Job*
 peer.cpp->job_new_conn_req.h
