@@ -295,6 +295,10 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 	DelFlag(MERGING);
 }
 
+void Peer::Handle_net_who_has_file(struct Packet* msg)
+{
+}
+
 void Peer::HandleMsg(Packet* pckt)
 {
 	void (Peer::*handler[NET_NB_MESSAGES]) (Packet*) =
@@ -315,6 +319,7 @@ void Peer::HandleMsg(Packet* pckt)
 		&Peer::Handle_net_end_of_diff,
 		&Peer::Handle_net_end_of_merge,
 		&Peer::Handle_net_end_of_merge_ack,
+		&Peer::Handle_net_who_has_file,
 	};
 
 	/* Note that we can safely cast pckt->type to unsigned after check pkct->type > 0 */

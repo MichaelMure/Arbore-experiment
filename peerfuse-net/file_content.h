@@ -20,6 +20,7 @@
 #ifndef FILE_CONTENT_H
 #define FILE_CONTENT_H
 #include "file_content_base.h"
+#include "file_chunk.h"
 
 class FileContent : public FileContentBase
 {
@@ -27,5 +28,7 @@ class FileContent : public FileContentBase
 public:
 	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
+
+	void NetworkRequestChunk(FileChunk chunk) {}
 };
 #endif						  /* FILE_CONTENT_H */

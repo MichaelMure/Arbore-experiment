@@ -22,6 +22,11 @@
 #include "file_chunk.h"
 #include "log.h"
 
+bool CompFileChunk::operator() (const FileChunk c1, const FileChunk c2)
+{
+	return c1.GetOffset() == c2.GetOffset() && c1.GetSize() == c2.GetSize();
+}
+
 FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_offset), size(_size), hdd_synced(false)
 {
 	access_time = time(NULL);

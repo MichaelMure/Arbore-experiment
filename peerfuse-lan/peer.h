@@ -45,6 +45,7 @@ class Peer : public PeerBase
 	void Handle_net_start_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
+	void Handle_net_who_has_file(struct Packet* pckt);
 public:
 	/* Exceptions */
 	class PeerCantConnect: public std::exception

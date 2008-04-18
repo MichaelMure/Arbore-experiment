@@ -22,6 +22,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include <time.h>
 #include "mutex.h"
 #include "file_chunk.h"
@@ -36,8 +37,6 @@ public:
 		CHUNK_UNAVAILABLE	  /** we don't have it on hdd and nobody has it on network */
 	};
 private:
-	std::string filename;
-
 	/* Information about what's currently stored on hardrive */
 	off_t ondisk_offset;
 	size_t ondisk_size;
@@ -45,9 +44,12 @@ private:
 	bool ondisk_synced;
 	time_t access_time;
 
-	std::list<FileChunk> net_requested;
-	std::list<FileChunk> net_unavailable;
+	/* Network related */
+	std::set<FileChunk, CompFileChunk> net_requested;
+	std::set<FileChunk, CompFileChunk> net_unavailable;
+	virtual void NetworkRequestChunk(FileChunk chunk) = 0;
 
+	/* Hdd related */
 	bool LoadFd();
 	bool OnDiskLoad(FileChunk chunk);
 	void OnDiskWrite(FileChunk& chunk);
@@ -62,6 +64,10 @@ private:
 	enum chunk_availability NetworkHaveChunk(FileChunk chunk);
 
 	FileChunk& operator=(const FileChunk &other);
+
+protected:
+	std::string filename;
+
 public:
 	FileContentBase(std::string _filename);
 	FileContentBase(const FileContentBase&);

@@ -49,4 +49,10 @@ public:
 	void Concatenate(FileChunk chunk);
 	FileChunk GetPart(off_t _offset, size_t _size);
 };
+
+struct CompFileChunk
+{
+	bool operator() (const FileChunk c1, const FileChunk c2);
+};
+
 #endif						  /* FILE_CHUNK_H */

@@ -27,16 +27,17 @@
 #include "job_change_filesize.h"
 #include "session_config.h"
 #include "hdd.h"
+#include "peers_list.h"
 
 const time_t write_to_hdd_timeout = 10;
 
 FileContentBase::FileContentBase(std::string _filename) :
 			Mutex(RECURSIVE_MUTEX),
-			filename(_filename),
 			ondisk_offset(0),
 			ondisk_size(0),
 			ondisk_fd(-1),
-			ondisk_synced(true)
+			ondisk_synced(true),
+			filename(_filename)
 {
 	uint32_t nbr = 0;
 	tree_cfg.Get(filename + "#ondisk_off", nbr);
@@ -47,10 +48,10 @@ FileContentBase::FileContentBase(std::string _filename) :
 FileContentBase::FileContentBase(const FileContentBase& other) :
 			Mutex(RECURSIVE_MUTEX),
 std::list<FileChunk>(),				  /* to avoid a warning */
-			filename(other.filename),
 			ondisk_offset(other.ondisk_offset),
 			ondisk_size(other.ondisk_size),
-			ondisk_fd(-1)
+			ondisk_fd(-1),
+			filename(other.filename)
 {
 	if(other.ondisk_fd != -1)
 		ondisk_fd = dup(other.ondisk_fd);
@@ -201,12 +202,23 @@ bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 
 enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunk chunk)
 {
-	#if 0
 	/* If nobody's connected we won't receive anything */
-	if(peers_list.GetSize() == 0)
-	#endif
+	if(peers_list.Size() == 0)
 		return CHUNK_UNAVAILABLE;
 
+	std::set<FileChunk>::iterator net_it;
+	if((net_it = net_unavailable.find(chunk)) != net_unavailable.end())
+	{
+		net_unavailable.erase(*net_it);
+		return CHUNK_UNAVAILABLE;
+	}
+
+	if(net_requested.find(chunk) != net_requested.end())
+		return CHUNK_NOT_READY;
+
+	net_requested.insert(chunk);
+	NetworkRequestChunk(chunk);
+	return CHUNK_NOT_READY;
 }
 
 enum FileContentBase::chunk_availability FileContentBase::HaveChunk(off_t offset, size_t size)
@@ -231,6 +243,10 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	BlockLockMutex lock(this);
 	ondisk_synced = false;
 	access_time = time(NULL);
+
+	std::set<FileChunk>::iterator net_it;
+	if((net_it = net_requested.find(chunk)) != net_requested.end())
+		net_requested.erase(*net_it);
 
 	/* Merge into the chunk set */
 	iterator it = begin();

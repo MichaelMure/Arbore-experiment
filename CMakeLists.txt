@@ -83,6 +83,7 @@ ELSE(PF_NET)
 		peerfuse-lan/application.cpp
 		peerfuse-lan/environment.cpp
 		peerfuse-lan/network.cpp
+		peerfuse-lan/file_content.cpp
 		peerfuse-lan/pflan.cpp
 		peerfuse-lan/pflan_fuse.cpp
 		peerfuse-lan/cache.cpp
