@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef CONTENT_LIST_H
-#define CONTENT_LIST_H
+#ifndef CONTENT_LIST_BASE_H
+#define CONTENT_LIST_BASE_H
 
 #include <string.h>
 #include <map>
@@ -26,13 +26,13 @@
 #include "pf_thread.h"
 #include "file_content.h"
 
-class ContentList : public Thread, private Mutex, private std::map<std::string, FileContent>
+class ContentListBase : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
 protected:
 	void Loop();
 
 public:
-	~ContentList();
+	virtual ~ContentListBase();
 
 	/** Returns the content of the file we already have in memory
 	 * @param path path to the file
@@ -46,5 +46,4 @@ public:
 	void RemoveFile(std::string path);
 };
 
-extern ContentList content_list;
-#endif
+#endif /* CONTENT_LIST_BASE_H */

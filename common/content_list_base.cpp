@@ -19,21 +19,19 @@
 
 #include <string>
 #include <time.h>
-#include "content_list.h"
+#include "content_list_base.h"
 #include "log.h"
-
-ContentList content_list;
 
 const time_t remove_from_list_timeout = 15;
 
-ContentList::~ContentList()
+ContentListBase::~ContentListBase()
 {
 	/* Force saving chunk to disk */
 	for(iterator it = begin(); it != end(); ++it)
 		it->second.SyncToHdd(true);
 }
 
-FileContent& ContentList::GetFile(std::string path)
+FileContent& ContentListBase::GetFile(std::string path)
 {
 	BlockLockMutex lock(this);
 	iterator it = find(path);
@@ -44,7 +42,7 @@ FileContent& ContentList::GetFile(std::string path)
 	return it->second;
 }
 
-void ContentList::Loop()
+void ContentListBase::Loop()
 {
 	sleep(1);
 
@@ -65,7 +63,7 @@ void ContentList::Loop()
 	}
 }
 
-void ContentList::RemoveFile(std::string path)
+void ContentListBase::RemoveFile(std::string path)
 {
 	BlockLockMutex lock(this);
 

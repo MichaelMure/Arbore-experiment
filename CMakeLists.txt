@@ -2,7 +2,7 @@ PROJECT(peerfuse)
 
 SET(SRC
 	common/cache_base.cpp
-	common/content_list.cpp
+	common/content_list_base.cpp
 	common/hdd.cpp
 	common/file_chunk.cpp
 	common/file_content_base.cpp
@@ -65,6 +65,7 @@ IF(PF_NET)
 		peerfuse-net/application.cpp
 		peerfuse-net/environment.cpp
 		peerfuse-net/network.cpp
+		peerfuse-net/content_list.cpp
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp
 		peerfuse-net/cache.cpp
@@ -84,6 +85,7 @@ ELSE(PF_NET)
 		peerfuse-lan/environment.cpp
 		peerfuse-lan/network.cpp
 		peerfuse-lan/file_content.cpp
+		peerfuse-lan/content_list.cpp
 		peerfuse-lan/pflan.cpp
 		peerfuse-lan/pflan_fuse.cpp
 		peerfuse-lan/cache.cpp
