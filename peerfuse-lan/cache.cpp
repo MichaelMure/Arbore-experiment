@@ -235,4 +235,3 @@ void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
 		peers_list.Broadcast(pckt);
 	}
 }
-

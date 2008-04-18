@@ -236,4 +236,3 @@ void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
 	if(sender == 0)
 		filedist.SetAttr(file, peers_list.PeerFromID(sender));
 }
-
