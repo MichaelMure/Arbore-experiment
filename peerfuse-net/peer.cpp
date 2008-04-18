@@ -196,11 +196,6 @@ void Peer::Handle_net_peer_goodbye(struct Packet* msg)
 	/* */
 }
 
-void Peer::Handle_net_become_highlink(struct Packet* msg)
-{
-	/* */
-}
-
 void Peer::Handle_net_mkfile(struct Packet* msg)
 {
 	std::string filename;
@@ -243,7 +238,6 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_goodbye,     PERM_HIGHLINK  },
-		{ &Peer::Handle_net_become_highlink,  0              },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

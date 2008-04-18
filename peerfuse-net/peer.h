@@ -53,7 +53,6 @@ class Peer : public PeerBase
 	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
 	void Handle_net_peer_goodbye(struct Packet* pckt);
-	void Handle_net_become_highlink(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
 public:
