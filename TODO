@@ -30,5 +30,7 @@
 	present in the peers_list, do not remove the first Peer, but do it only
 	when we receive the HELLO message.
 
+	* Store owner and group of file somewhere else of cache's file properties
+
 == Peerfuse LAN ==
 
