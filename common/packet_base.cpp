@@ -229,6 +229,7 @@ PacketBase& PacketBase::Write(IDList id_list)
 
 	return *this;
 }
+
 void PacketBase::Send(Connection* conn)
 {
 	BuildDataFromArgs();

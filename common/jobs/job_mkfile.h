@@ -36,7 +36,7 @@ public:
 		stat(_stat),
 		sender(_sender),
 		sharers(_sharers)
-	{}
+		{}
 	~JobMkFile() {}
 
 	bool Start();
