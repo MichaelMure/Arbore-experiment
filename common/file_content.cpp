@@ -129,7 +129,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 	return true;
 }
 
-bool FileContent::LoadChunk(FileChunk chunk, bool blockant_load)
+bool FileContent::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
 {
 	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
@@ -175,6 +175,57 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 	return chunk;
 }
 
+bool FileContent::FileContentHaveChunk(off_t offset, size_t size)
+{
+	iterator it = begin();
+	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
+		++it;
+
+	if(it == end() || it->GetOffset() > offset)
+		return false;
+
+	/* We have the begining of the chunk
+	 * Check we have it until the end */
+	off_t next_off = it->GetOffset();
+	while(it != end()
+		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
+		&& next_off == it->GetOffset())
+	{
+		/* Blocks must follow themself */
+		next_off = it->GetOffset() + (off_t)it->GetSize();
+		++it;
+	}
+
+	return (it != end()) && next_off == it->GetOffset();
+}
+
+enum FileContent::chunk_availability FileContent::NetworkHaveChunk(FileChunk chunk)
+{
+#if 0
+	/* If nobody's connected we won't receive anything */
+	if(peers_list.GetSize() == 0)
+#endif
+		return CHUNK_UNAVAILABLE;
+
+}
+
+enum FileContent::chunk_availability FileContent::HaveChunk(off_t offset, size_t size)
+{
+	BlockLockMutex lock(this);
+	access_time = time(NULL);
+
+	/* Check if the chunk is already loaded */
+	if(FileContentHaveChunk(offset, size))
+		return CHUNK_READY;
+
+	/* Check if we have it on Hdd */
+	if(OnDiskHaveChunk(FileChunk(NULL, offset, size), true))
+		return CHUNK_READY;
+
+	/* Ask it on the network */
+	return NetworkHaveChunk(FileChunk(NULL, offset, size));
+}
+
 void FileContent::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
@@ -217,41 +268,6 @@ void FileContent::SetChunk(FileChunk chunk)
 	log[W_DEBUG] << "Inserting chunk in the middle of \"" << filename << "\" off:" << offset << " size:" << size;
 	FileChunk new_chunk = chunk.GetPart(offset, size);
 	insert(it, new_chunk);
-}
-
-enum FileContent::chunk_availability FileContent::HaveChunk(off_t offset, size_t size)
-{
-	BlockLockMutex lock(this);
-	access_time = time(NULL);
-	iterator it = begin();
-	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
-		++it;
-
-	if(it == end() || it->GetOffset() > offset)
-	{
-		if(LoadChunk(FileChunk(NULL, offset, size), true))
-			return CHUNK_READY;
-		return CHUNK_UNAVAILABLE;
-	}
-
-	/* We have the begining of the chunk
-	 * Check we have it until the end */
-	off_t next_off = it->GetOffset();
-	while(it != end()
-		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
-		&& next_off == it->GetOffset())
-	{
-		/* Blocks must follow themself */
-		next_off = it->GetOffset() + (off_t)it->GetSize();
-		++it;
-	}
-
-	bool res = (it != end()) && next_off == it->GetOffset();
-
-	/* If we don't have the chunk, try to load it */
-	if(res || LoadChunk(FileChunk(NULL, offset, size), true))
-		return CHUNK_READY;
-	return CHUNK_UNAVAILABLE;
 }
 
 void FileContent::Truncate(off_t offset)

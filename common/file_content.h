@@ -28,6 +28,13 @@
 
 class FileContent : public Mutex, private std::list<FileChunk>
 {
+public:
+	enum chunk_availability
+	{
+		CHUNK_READY,		  /** it's ready to be read */
+		CHUNK_NOT_READY,	  /** it's not yet loaded from hdd/not yet received */
+		CHUNK_UNAVAILABLE	  /** we don't have it on hdd and nobody has it on network */
+	};
 private:
 	std::string filename;
 
@@ -38,6 +45,9 @@ private:
 	bool ondisk_synced;
 	time_t access_time;
 
+	std::list<FileChunk> net_requested;
+	std::list<FileChunk> net_unavailable;
+
 	bool LoadFd();
 	bool OnDiskLoad(FileChunk chunk);
 	void OnDiskWrite(FileChunk& chunk);
@@ -47,17 +57,12 @@ private:
 	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
 	 * @return returns true if the chunk is available after returning from this method
 	 */
-	bool LoadChunk(FileChunk chunk, bool blockant_load = false);
+	bool FileContentHaveChunk(off_t offset, size_t size);
+	bool OnDiskHaveChunk(FileChunk chunk, bool blockant_load = false);
+	enum chunk_availability NetworkHaveChunk(FileChunk chunk);
 
 	FileChunk& operator=(const FileChunk &other);
 public:
-	enum chunk_availability
-	{
-		CHUNK_READY,		  /** it's ready to be read */
-		CHUNK_NOT_READY,	  /** it's not yet loaded from hdd/not yet received */
-		CHUNK_UNAVAILABLE	  /** we don't have it on hdd and nobody has it on network */
-	};
-
 	FileContent(std::string _filename);
 	FileContent(const FileContent&);
 	~FileContent();
