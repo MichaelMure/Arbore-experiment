@@ -76,13 +76,13 @@ class SessionConfig : private Mutex
 
 	std::map<std::string, SessionConfigValueBase*> list;
 
-	void Save();
 	void Parse(const std::string& line);
 public:
 	SessionConfig();
 	~SessionConfig();
 
 	void Load(const std::string& file);
+	void Save();
 	void Display();
 
 	template<class T>

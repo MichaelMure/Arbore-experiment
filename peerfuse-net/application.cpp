@@ -48,6 +48,11 @@ void* fuse_init(struct fuse_conn_info* fuse_info)
 	return NULL;
 }
 
+void fuse_destroy(void*)
+{
+	Application::Exit();
+}
+
 Application::Application()
 {
 	ConfigSection* section = conf.AddSection("listen", "Listening server", false);
@@ -77,6 +82,15 @@ void Application::StartThreads()
 	scheduler.Start();
 	net.Start();
 	content_list.Start();
+}
+
+void Application::Exit()
+{
+	content_list.Stop();
+	net.Stop();
+	scheduler.Stop();
+	tree_cfg.Save();
+	session_cfg.Save();
 }
 
 int Application::main(int argc, char *argv[])
@@ -123,6 +137,10 @@ int Application::main(int argc, char *argv[])
 		#else
 		StartThreads();			  /* this function may be called by fuse_main, so without fuse we call it ourselves. */
 		while(1) sleep(1);
+
+		// TODO: Catch SIGTERM
+		// and do:
+		Exit();
 		#endif
 	}
 	catch(MyConfig::error &e)

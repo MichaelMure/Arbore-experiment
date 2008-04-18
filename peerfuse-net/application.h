@@ -28,5 +28,6 @@ public:
 	int main(int argc, char *argv[]);
 
 	static void StartThreads();
+	static void Exit();
 };
 #endif

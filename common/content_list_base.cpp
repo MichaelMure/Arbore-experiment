@@ -26,20 +26,6 @@ const time_t remove_from_list_timeout = 15;
 
 ContentListBase::~ContentListBase()
 {
-	/* Force saving chunk to disk */
-	for(iterator it = begin(); it != end(); ++it)
-		it->second.SyncToHdd(true);
-}
-
-FileContent& ContentListBase::GetFile(std::string path)
-{
-	BlockLockMutex lock(this);
-	iterator it = find(path);
-	if(it == end())
-		insert(make_pair(path, FileContent(path)));
-
-	it = find(path);
-	return it->second;
 }
 
 void ContentListBase::Loop()
@@ -61,6 +47,24 @@ void ContentListBase::Loop()
 		else
 			++it;
 	}
+}
+
+void ContentListBase::OnStop()
+{
+	/* Force saving chunk to disk */
+	for(iterator it = begin(); it != end(); ++it)
+		it->second.SyncToHdd(true);
+}
+
+FileContent& ContentListBase::GetFile(std::string path)
+{
+	BlockLockMutex lock(this);
+	iterator it = find(path);
+	if(it == end())
+		insert(make_pair(path, FileContent(path)));
+
+	it = find(path);
+	return it->second;
 }
 
 void ContentListBase::RemoveFile(std::string path)

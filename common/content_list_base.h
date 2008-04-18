@@ -30,6 +30,7 @@ class ContentListBase : public Thread, private Mutex, private std::map<std::stri
 {
 protected:
 	void Loop();
+	void OnStop();
 
 public:
 	virtual ~ContentListBase();
