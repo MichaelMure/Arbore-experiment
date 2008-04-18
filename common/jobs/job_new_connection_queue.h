@@ -17,27 +17,27 @@
  * $Id$
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#ifndef JOB_NEW_CONNECTION_QUEUE_H
+#define JOB_NEW_CONNECTION_QUEUE_H
 
-enum job_type
+#include <string>
+#include <vector>
+#include "job.h"
+#include "pf_types.h"
+
+class JobNewConnQueue : public Job, private std::vector<pf_addr>
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
-	/* Notify the cache and the network about filesize modification */
-	JOB_CHANGE_FILESIZE,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Tries connecting to a list of peers */
-	JOB_NEW_CONN_QUEUE,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
+	iterator current;
+public:
+	JobNewConnQueue(std::vector<pf_addr> addr_list)
+		: Job(time(NULL), REPEAT_LESS_AND_LESS, 1),
+		std::vector<pf_addr>(addr_list),
+		current(begin())
+	{}
+
+	bool Start();
+	job_type GetType() const {return JOB_NEW_CONN_QUEUE; }
+	std::string GetName() const {return "JobNewConnQueue"; }
 };
+
 #endif

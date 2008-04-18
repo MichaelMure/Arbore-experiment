@@ -17,27 +17,25 @@
  * $Id$
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#include "job_new_connection_queue.h"
+#include "log.h"
+#include "network.h"
 
-enum job_type
+bool JobNewConnQueue::Start()
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
-	/* Notify the cache and the network about filesize modification */
-	JOB_CHANGE_FILESIZE,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Tries connecting to a list of peers */
-	JOB_NEW_CONN_QUEUE,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
-};
-#endif
+	if(current == end())
+		return false;
+
+	try
+	{
+		net.Connect(*current);
+	}
+	catch(Network::CantConnectTo &e)
+	{
+		log[W_INFO] << "Unable to connect to " << *current;
+		++current;
+		return true;
+	}
+	return false;
+}
+
