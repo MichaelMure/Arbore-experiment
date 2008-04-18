@@ -17,14 +17,24 @@
  * $Id$
  */
 
-#include "job_change_filesize.h"
-#include "cache.h"
-#include "log.h"
+#ifndef JOB_FILE_SETATTR_H
+#define JOB_FILE_SETATTR_H
+#include "job.h"
+#include "pf_file.h"
+#include "pf_types.h"
 
-bool JobChangeFileSize::Start()
+class JobFileSetAttr : public Job
 {
-	pf_stat stat = cache.GetAttr(path);
-	stat.size = size;
-	cache.SetAttr(path, stat, 1 /* TODO: put the real sender */);
-	return false;
-}
+	std::string file;
+	pf_stat stat;
+	pf_id sender;
+public:
+	JobFileSetAttr(std::string _file, pf_stat _stat, pf_id _sender): Job(0, REPEAT_NONE), file(_file), stat(_stat), sender(_sender) {}
+	~JobFileSetAttr() {}
+
+	bool Start();
+
+	job_type GetType() const { return JOB_FILE_SETATTR; }
+	std::string GetName() const { return "JobFileSetAttr"; }
+};
+#endif						  /* JOB_MKFILE_H */

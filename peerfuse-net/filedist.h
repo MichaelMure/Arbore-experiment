@@ -84,6 +84,7 @@ public:
 	/* Flags are defined in cache.h */
 	void AddFile(FileEntry* f, Peer* sender);
 	void RemoveFile(FileEntry* f, Peer* sender);
+	void SetAttr(FileEntry* f, Peer* sender);
 
 	/** Create a packet that create a file.
 	 * @param file file to send

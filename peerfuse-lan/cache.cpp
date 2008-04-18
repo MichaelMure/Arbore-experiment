@@ -156,6 +156,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	if(sender != 0)
 		file->stat = stat;
 
+	tree_cfg.Set(path + "#size", (uint32_t)file->stat.size);
 	dir->AddFile(file);
 
 	log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
@@ -208,3 +209,30 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 
 	Unlock();
 }
+
+void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
+{
+	BlockLockMutex lock(this);
+	FileEntry* file = Path2File(path);
+	if(file->stat.size != stat.size)
+		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
+	if(file)
+		file->stat = stat;
+
+	if(sender == 0)
+	{
+		/* Notify peers */
+		Packet pckt(NET_FILE_SETATTR);
+		pckt.SetArg(NET_FILE_SETATTR_PATH, file->GetFullName());
+		pckt.SetArg(NET_FILE_SETATTR_MODE, file->stat.mode);
+		pckt.SetArg(NET_FILE_SETATTR_UID, file->stat.uid);
+		pckt.SetArg(NET_FILE_SETATTR_GID, file->stat.gid);
+		pckt.SetArg(NET_FILE_SETATTR_SIZE, (uint64_t)file->stat.size);
+		pckt.SetArg(NET_FILE_SETATTR_ACCESS_TIME, (uint32_t)file->stat.atime);
+		pckt.SetArg(NET_FILE_SETATTR_CREATE_TIME, (uint32_t)file->stat.ctime);
+		pckt.SetArg(NET_FILE_SETATTR_MODIF_TIME, (uint32_t)file->stat.mtime);
+		pckt.SetArg(NET_FILE_SETATTR_META_MODIF_TIME, (uint32_t)file->stat.meta_mtime);
+		peers_list.Broadcast(pckt);
+	}
+}
+

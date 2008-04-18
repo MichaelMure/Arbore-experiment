@@ -68,6 +68,20 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		T_NONE
 	},
 
+	/* NET_FILE_SETATTR */
+	{
+		/* NET_MKFILE_PATH */            T_STR,
+		/* NET_MKFILE_MODE */            T_UINT32,
+		/* NET_MKFILE_UID */             T_UINT32,
+		/* NET_MKFILE_GID */             T_UINT32,
+		/* NET_MKFILE_SIZE */            T_UINT64,
+		/* NET_MKFILE_ACCESS_TIME */     T_UINT32,
+		/* NET_MKFILE_CREATE_TIME */     T_UINT32,
+		/* NET_MKFILE_MODIF_TIME */      T_UINT32,
+		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32,
+		T_NONE
+	},
+
 	// NET_PEER_CONNECTION
 	{
 		/* NET_PEER_LIST_ADDRESSES */ T_ADDR,

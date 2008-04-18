@@ -133,16 +133,6 @@ pf_stat CacheBase::GetAttr(std::string path)
 	return stat;
 }
 
-void CacheBase::SetAttr(std::string path, pf_stat stat)
-{
-	BlockLockMutex lock(this);
-	FileEntry* file = Path2File(path);
-	if(file->stat.size != stat.size)
-		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
-	if(file)
-		file->stat = stat;
-}
-
 #ifndef PF_SERVER_MODE
 void CacheBase::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 			off_t offset, struct fuse_file_info *fi)
@@ -234,6 +224,8 @@ int CacheBase::Truncate(std::string path, off_t offset)
 	log[W_DEBUG] << "Truncating \"" << path << "\" at " << offset;
 	pf_stat stat = GetAttr(path);
 	stat.size = (size_t)offset;
+	stat.ctime = time(NULL);
+	stat.mtime = stat.ctime;
 	SetAttr(path, stat);
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);

@@ -17,14 +17,26 @@
  * $Id$
  */
 
-#include "job_change_filesize.h"
+#include "job_file_setattr.h"
 #include "cache.h"
 #include "log.h"
 
-bool JobChangeFileSize::Start()
+bool JobFileSetAttr::Start()
 {
-	pf_stat stat = cache.GetAttr(path);
-	stat.size = size;
-	cache.SetAttr(path, stat, 1 /* TODO: put the real sender */);
+	try
+	{
+		cache.SetAttr(file, stat, sender);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
+		log[W_DESYNCH] << "Unable to create " << file << ": No such file or directory";
+		/* XXX: Desync DO SOMETHING */
+	}
+	catch(Cache::FileAlreadyExists &e)
+	{
+		log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
+		/* XXX: DO SOMETHING */
+	}
+
 	return false;
 }

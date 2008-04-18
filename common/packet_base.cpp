@@ -61,6 +61,9 @@ PacketBase& PacketBase::operator=(const PacketBase& p)
 	type = p.type;
 	size = p.size;
 
+	if(datas)
+		delete []datas;
+
 	if(size)
 	{
 		datas = new char [size];

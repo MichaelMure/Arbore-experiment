@@ -26,6 +26,8 @@ enum job_type
 	JOB_MKFILE,
 	/* Rmfile triggered by a peer */
 	JOB_RMFILE,
+	/* SetAttr triggered by a peer */
+	JOB_FILE_SETATTR,
 	/* Notify the cache and the network about filesize modification */
 	JOB_CHANGE_FILESIZE,
 	/* Send changes to the peer since his last connection */

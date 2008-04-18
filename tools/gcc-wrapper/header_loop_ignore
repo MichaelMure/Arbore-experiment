@@ -12,6 +12,7 @@ peer.cpp->job_new_conn_req.h
 peer.cpp->job_flush_peer.h
 peer.cpp->job_mkfile.h
 peer.cpp->job_rmfile.h
+peer.cpp->job_file_setattr.h
 # pflan only:
 peer.cpp->job_other_connect.h
 peer.cpp->job_send_changes.h

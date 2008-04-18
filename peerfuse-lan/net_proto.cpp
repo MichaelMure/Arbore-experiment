@@ -30,6 +30,7 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_GET_STRUCT_DIFF */        "GET_STRUCT_DIFF",
 	/* NET_MKFILE */                 "MKFILE",
 	/* NET_RMFILE */                 "RMFILE",
+	/* NET_FILE_SETATTR */           "FILE_SETATTR",
 	/* NET_PEER_CONNECTION */        "PEER_CONNECTION",
 	/* NET_PEER_CONNECTION_ACK */    "PEER_CONNECTION_ACK",
 	/* NET_PEER_CONNECTION_RST */    "PEER_CONNECTION_RST",
@@ -88,6 +89,20 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 	/* NET_RMFILE */
 	{
 		/* NET_RMFILE_PATH */ T_STR,
+		T_NONE
+	},
+
+	/* NET_FILE_SETATTR */
+	{
+		/* NET_MKFILE_PATH */            T_STR,
+		/* NET_MKFILE_MODE */            T_UINT32,
+		/* NET_MKFILE_UID */             T_UINT32,
+		/* NET_MKFILE_GID */             T_UINT32,
+		/* NET_MKFILE_SIZE */            T_UINT64,
+		/* NET_MKFILE_ACCESS_TIME */     T_UINT32,
+		/* NET_MKFILE_CREATE_TIME */     T_UINT32,
+		/* NET_MKFILE_MODIF_TIME */      T_UINT32,
+		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32,
 		T_NONE
 	},
 

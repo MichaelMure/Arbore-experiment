@@ -170,6 +170,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		file->stat = stat;
 		file->SetSharers(sharers);
+		tree_cfg.Set(path + "#size", (uint32_t)file->stat.size);
 
 		hdd.UpdateFile(file);
 	}
@@ -222,3 +223,17 @@ void Cache::UpdateRespFiles()
 	filedist.UpdateRespFiles();
 	Unlock();
 }
+
+void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
+{
+	BlockLockMutex lock(this);
+	FileEntry* file = Path2File(path);
+	if(file->stat.size != stat.size)
+		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
+	if(file)
+		file->stat = stat;
+
+	if(sender == 0)
+		filedist.SetAttr(file, peers_list.PeerFromID(sender));
+}
+
