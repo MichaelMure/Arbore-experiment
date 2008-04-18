@@ -29,6 +29,7 @@ enum PacketArgType
 	T_STR,
 	T_ADDR,
 	T_ADDRLIST,
+	T_IDLIST,
 	T_NONE
 };
 

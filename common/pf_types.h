@@ -48,6 +48,7 @@ public:
 };
 
 typedef std::vector<pf_addr> AddrList;
+typedef std::vector<pf_id> IDList;
 
 template<typename T>
 class Deleter

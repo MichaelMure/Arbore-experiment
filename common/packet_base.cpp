@@ -206,6 +206,29 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	return *this;
 }
 
+PacketBase& PacketBase::Write(IDList id_list)
+{
+	Write((uint32_t)id_list.size());
+
+	char* new_datas = new char [size + (id_list.size() * sizeof(pf_id))];
+
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+
+	char* ptr = new_datas + size;
+
+	for(IDList::iterator it = id_list.begin(); it != id_list.end(); ++it)
+	{
+		pf_id id = *it;
+		memcpy(ptr, &id, sizeof(pf_id));
+	}
+	size += id_list.size() * sizeof(pf_id);
+	datas = new_datas;
+
+	return *this;
+}
 void PacketBase::Send(Connection* conn)
 {
 	BuildDataFromArgs();
@@ -343,6 +366,37 @@ AddrList PacketBase::ReadAddrList()
 	return addr_list;
 }
 
+IDList PacketBase::ReadIDList()
+{
+	IDList id_list;
+	uint32_t list_size = ReadInt32();
+	ASSERT((size * sizeof(pf_id)) >= list_size);
+
+	for(uint32_t i = 0; i < list_size; ++i)
+	{
+		pf_id id;
+		memcpy(&id, datas, sizeof(pf_id));
+		id_list.push_back(id);
+	}
+
+	char* new_datas;
+	size -= list_size * sizeof(pf_id);
+	if(size > 0)
+	{
+		new_datas = new char [size];
+		memcpy(new_datas, datas + (list_size * sizeof(pf_id)), size);
+	}
+
+	delete []datas;
+
+	if(size > 0)
+		datas = new_datas;
+	else
+		datas = NULL;
+
+	return id_list;
+}
+
 void PacketBase::BuildArgsFromData()
 {
 	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
@@ -352,6 +406,7 @@ void PacketBase::BuildArgsFromData()
 			case T_UINT64: SetArg(arg_no, ReadInt64()); break;
 			case T_STR: SetArg(arg_no, ReadStr()); break;
 			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
+			case T_IDLIST: SetArg(arg_no, ReadIDList()); break;
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
 			default: throw Malformated();
 		}
@@ -366,6 +421,7 @@ void PacketBase::BuildDataFromArgs()
 			case T_UINT64: Write(GetArg<uint64_t>(arg_no)); break;
 			case T_STR: Write(GetArg<std::string>(arg_no)); break;
 			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
+			case T_IDLIST: Write(GetArg<IDList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
 			default: throw Malformated();
 		}
@@ -388,14 +444,28 @@ std::string PacketBase::GetPacketInfo() const
 			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
 			case T_ADDRLIST:
 			{
-				std::vector<pf_addr> v = GetArg<std::vector<pf_addr> >(arg_no);
+				AddrList v = GetArg<AddrList>(arg_no);
 				std::string list;
-				for(std::vector<pf_addr>::const_iterator it = v.begin();
+				for(AddrList::const_iterator it = v.begin();
 					it != v.end();
 					++it)
 				{
 					if(!list.empty()) list += ",";
 					list += pf_addr2string(*it);
+				}
+				s += "[" + list + "]";
+				break;
+			}
+			case T_IDLIST:
+			{
+				IDList v = GetArg<IDList>(arg_no);
+				std::string list;
+				for(IDList::const_iterator it = v.begin();
+					it != v.end();
+					++it)
+				{
+					if(!list.empty()) list += ",";
+					list += TypToStr(*it);
 				}
 				s += "[" + list + "]";
 				break;

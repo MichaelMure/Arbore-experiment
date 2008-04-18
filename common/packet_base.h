@@ -43,6 +43,7 @@ class PacketBase
 	PacketBase& Write(pf_addr addr);
 	PacketBase& Write(std::string str);
 	PacketBase& Write(AddrList addr_list);
+	PacketBase& Write(IDList id_list);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();
@@ -50,6 +51,7 @@ class PacketBase
 	pf_addr ReadAddr();
 	std::string ReadStr();
 	AddrList ReadAddrList();
+	IDList ReadIDList();
 
 protected:
 	msg_type type;
