@@ -42,6 +42,7 @@ enum msg_type
 	NET_END_OF_MERGE_ACK,
 
 	NET_WHO_HAS_FILE,
+	NET_I_HAVE_FILE,
 
 	NET_NB_MESSAGES
 };
@@ -130,6 +131,11 @@ enum net_peer_all_connected
 enum net_who_has_file
 {
 	NET_WHO_HAS_FILE_PATH,
+};
+
+enum net_i_have_file
+{
+	NET_I_HAVE_FILE_FILENAME
 };
 
 extern const char* type2str[NET_NB_MESSAGES];
