@@ -24,11 +24,10 @@
 
 class FileContent : public FileContentBase
 {
-	FileChunk& operator=(const FileChunk &other);
 public:
 	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 
-	void NetworkRequestChunk(FileChunk chunk) {}
+	void NetworkRequestChunk(FileChunk chunk);
 };
 #endif						  /* FILE_CONTENT_H */

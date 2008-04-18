@@ -21,28 +21,14 @@
 #define FILE_CONTENT_H
 #include "file_content_base.h"
 #include "file_chunk.h"
-#include "pf_types.h"
 
 class FileContent : public FileContentBase
 {
-	struct sharedchunks
-	{
-		pf_id sharer;
-		FileChunk part;
-	};
-	bool waiting_for_sharers;
-	std::list<struct sharedchunks> sharers;
-	std::set<FileChunk, CompFileChunk> net_pending_request;
-
-	FileChunk& operator=(const FileChunk &other);
-
-	void FlushRequests();
 public:
-	FileContent(std::string path) : FileContentBase(path), waiting_for_sharers(false) {}
+	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 
 	void NetworkRequestChunk(FileChunk chunk);
-	void SetSharer(pf_id, off_t offset, size_t size);
 	bool WantsChunks();
 };
 #endif						  /* FILE_CONTENT_H */

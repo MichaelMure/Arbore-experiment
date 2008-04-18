@@ -36,11 +36,7 @@ void FileContent::NetworkRequestChunk(FileChunk chunk)
 		}
 	}
 	else
-		FlushRequests();
-}
-
-void FileContent::FlushRequests()
-{
+		NetworkFlushRequests();
 }
 
 bool FileContent::WantsChunks()

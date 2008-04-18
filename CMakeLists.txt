@@ -66,6 +66,7 @@ IF(PF_NET)
 		peerfuse-net/application.cpp
 		peerfuse-net/environment.cpp
 		peerfuse-net/network.cpp
+		peerfuse-net/file_content.cpp
 		peerfuse-net/content_list.cpp
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp

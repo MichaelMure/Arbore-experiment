@@ -26,6 +26,7 @@
 #include <time.h>
 #include "mutex.h"
 #include "file_chunk.h"
+#include "pf_types.h"
 
 class FileContentBase : public Mutex, private std::list<FileChunk>
 {
@@ -47,8 +48,20 @@ private:
 	/* Network related */
 	std::set<FileChunk, CompFileChunk> net_requested;
 	std::set<FileChunk, CompFileChunk> net_unavailable;
+	struct sharedchunks
+	{
+		pf_id sharer;
+		FileChunk part;
+	};
+protected:
+	std::list<struct sharedchunks> sharers;
+
+	void NetworkFlushRequests();
+	bool waiting_for_sharers;
+	std::set<FileChunk, CompFileChunk> net_pending_request;
 	virtual void NetworkRequestChunk(FileChunk chunk) = 0;
 
+private:
 	/* Hdd related */
 	bool LoadFd();
 	bool OnDiskLoad(FileChunk chunk);
@@ -63,7 +76,7 @@ private:
 	bool OnDiskHaveChunk(FileChunk chunk, bool blockant_load = false);
 	enum chunk_availability NetworkHaveChunk(FileChunk chunk);
 
-	FileChunk& operator=(const FileChunk &other);
+	FileContentBase& operator=(const FileContentBase &other);
 
 protected:
 	std::string filename;
@@ -89,5 +102,6 @@ public:
 
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
+	void SetSharer(pf_id, off_t offset, size_t size);
 };
 #endif						  /* FILE_CONTENT_BASE_H */

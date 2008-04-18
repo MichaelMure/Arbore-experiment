@@ -372,3 +372,9 @@ time_t FileContentBase::GetAccessTime() const
 	BlockLockMutex lock(this);
 	return access_time;
 }
+
+void FileContentBase::NetworkFlushRequests()
+{
+	BlockLockMutex lock(this);
+	access_time = time(NULL);
+}
