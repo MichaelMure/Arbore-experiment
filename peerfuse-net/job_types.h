@@ -28,6 +28,8 @@ enum job_type
 	JOB_RMFILE,
 	/* SetAttr triggered by a peer */
 	JOB_FILE_SETATTR,
+	/* A peer for a reference to a file */
+	JOB_SEND_REF_FILE,
 	/* Notify the cache and the network about filesize modification */
 	JOB_CHANGE_FILESIZE,
 	/* Tries connecting to a peer */

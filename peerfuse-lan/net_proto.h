@@ -148,6 +148,7 @@ enum net_want_ref_file
 enum net_ref_file_path
 {
 	NET_REF_FILE_PATH,
+	NET_REF_FILE_REF,
 	NET_REF_FILE_OFFSET,
 	NET_REF_FILE_SIZE
 };

@@ -74,4 +74,35 @@ void ContentListBase::RemoveFile(std::string path)
 	iterator it = find(path);
 	if(it != end())
 		erase(it);
+	/* TODO: optimize-me */
+	std::map<uint32_t, std::string>::iterator ref_it;
+	for(ref_it = my_refs.begin(); ref_it != my_refs.end(); ++ref_it)
+	{
+		if(ref_it->second == path)
+		{
+			my_refs.erase(ref_it);
+			break;
+		}
+	}
 }
+
+uint32_t ContentListBase::GetRef(std::string filename)
+{
+	BlockLockMutex lock(this);
+	std::map<uint32_t, std::string>::iterator it;
+
+	/* TODO: optimize-me */
+	for(it = my_refs.begin(); it != my_refs.end(); ++it)
+	{
+		if(it->second == filename)
+			return it->first;
+	}
+
+	uint32_t ref = 0;
+	while(my_refs.find(ref) != my_refs.end())
+		ref++;
+	my_refs[ref] = filename;
+
+	return ref;
+}
+

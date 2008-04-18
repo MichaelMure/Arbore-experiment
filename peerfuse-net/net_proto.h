@@ -33,6 +33,8 @@ enum msg_type
 	NET_END_OF_MERGE_ACK,
 	NET_PEER_GOODBYE,
 	NET_I_HAVE_FILE,
+	NET_WANT_REF_FILE,
+	NET_REF_FILE,
 
 	NET_NB_MESSAGES
 };
@@ -80,6 +82,19 @@ enum net_rmfile
 enum net_i_have_file
 {
 	NET_I_HAVE_FILE_FILENAME
+};
+
+enum net_want_ref_file
+{
+	NET_WANT_REF_FILE_PATH
+};
+
+enum net_ref_file_path
+{
+	NET_REF_FILE_PATH,
+	NET_REF_FILE_REF,
+	NET_REF_FILE_OFFSET,
+	NET_REF_FILE_SIZE
 };
 
 extern const char* type2str[NET_NB_MESSAGES];

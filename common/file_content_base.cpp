@@ -357,6 +357,16 @@ void FileContentBase::SyncToHdd(bool force)
 	}
 }
 
+void FileContentBase::GetOnDiskContent(off_t& offset, size_t& size)
+{
+	BlockLockMutex lock(this);
+	access_time = time(NULL);
+
+	LoadFd();
+	offset = ondisk_offset;
+	size = ondisk_size;
+}
+
 time_t FileContentBase::GetAccessTime() const
 {
 	BlockLockMutex lock(this);

@@ -36,6 +36,8 @@ enum job_type
 	JOB_ADVERTISE_FILE,
 	/* A peer told us he has the content of a file */
 	JOB_SET_SHARER,
+	/* A peer for a reference to a file */
+	JOB_SEND_REF_FILE,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

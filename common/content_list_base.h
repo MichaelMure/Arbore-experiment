@@ -28,6 +28,9 @@
 
 class ContentListBase : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
+	// Map the ref i'll use to SEND file
+	std::map<uint32_t, std::string> my_refs;
+
 protected:
 	void Loop();
 	void OnStop();
@@ -45,5 +48,7 @@ public:
 	 * @param path path to the file
 	 */
 	void RemoveFile(std::string path);
+
+	uint32_t GetRef(std::string filename); 
 };
 #endif						  /* CONTENT_LIST_BASE_H */
