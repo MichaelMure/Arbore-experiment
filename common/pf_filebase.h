@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include "file_perms.h"
+#include "pf_types.h"
 #include "log.h"
 
 class DirEntry;
@@ -43,6 +44,7 @@ class FileEntryBase
 {
 	const std::string name;
 	DirEntry* parent;
+	IDList sharers;
 
 public:
 
@@ -56,6 +58,9 @@ public:
 	std::string GetFullName() const;
 
 	bool IsChildOf(const FileEntryBase* f) const;
+
+	std::vector<pf_id> GetSharers() const { return sharers; }
+	void SetSharers(std::vector<pf_id> l) { sharers = l; }
 };
 
 template<>

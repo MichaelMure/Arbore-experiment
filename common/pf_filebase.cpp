@@ -29,14 +29,14 @@ FileEntryBase::FileEntryBase(std::string _name, DirEntry* _parent)
 						  /* Protection */
 	time_t now = time(NULL);
 	stat.mode = S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO;
-	stat.uid = getuid();			  /* UID propri?taire */
-	stat.gid = getgid();			  /* GID propri?taire */
+	stat.uid = getuid();			  /* UID propriétaire */
+	stat.gid = getgid();			  /* GID propriétaire */
 	stat.size = 0;				  /* Taille totale en octets */
 	//	stat.blksize_t st_blksize;  /* Taille de bloc pour E/S */
-	//	stat.blkcnt_t  st_blocks;   /* Nombre de blocs allou?s */
-	stat.atime = now;			  /* Heure dernier acc?s */
-	stat.mtime = now;			  /* Heure derni?re modification */
-	stat.ctime = now;			  /* Heure dernier changement ?tat */
+	//	stat.blkcnt_t  st_blocks;   /* Nombre de blocs alloués */
+	stat.atime = now;			  /* Heure dernier acè?s */
+	stat.mtime = now;			  /* Heure dernière modification */
+	stat.ctime = now;			  /* Heure dernier changement êtat */
 	stat.meta_mtime = now;
 }
 

@@ -124,7 +124,9 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		else
 			file = new FileEntry(filename, dir);
 
-		/* Copy stat only if this isn't my who created this file! */
+		/* Copy stat only if this isn't me who created this file, because this
+		 * is unix stats, and constructof of FileEntry will set pfnet stats (uid etc)
+		 */
 		if(sender)
 			file->stat = stat;
 

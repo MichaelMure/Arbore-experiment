@@ -37,7 +37,6 @@ typedef std::set<FileEntry*, CompFiles> FileList;
 class FileEntry : public FileEntryBase
 {
 	unsigned int path_serial;
-	IDList sharers;
 
 public:
 
@@ -45,8 +44,5 @@ public:
 
 	/* TODO: calculate this */
 	unsigned int GetPathSerial() const { return path_serial; }
-
-	std::vector<pf_id> GetSharers() const { return sharers; }
-	void SetSharers(std::vector<pf_id> l) { sharers = l; }
 };
 #endif						  /* PFNET_FILE_H */

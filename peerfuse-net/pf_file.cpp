@@ -18,6 +18,7 @@
  */
 
 #include "pf_file.h"
+#include "environment.h"
 
 bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 {
@@ -33,6 +34,11 @@ FileEntry::FileEntry(std::string _name, DirEntry* parent)
 			: FileEntryBase(_name, parent),
 			path_serial(0u)
 {
+	/* Update file stat with pfnet specific values */
+	stat.uid = environment.my_id.Get();
+	stat.gid = environment.my_id.Get();
+
+	/* Calculate serial */
 	for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
 		path_serial += (path_serial << 3) + (unsigned char)*c;
 }
