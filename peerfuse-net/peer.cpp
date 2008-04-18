@@ -228,6 +228,16 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
 	scheduler_queue.Queue(new JobRmFile(filename, GetID()));
 }
 
+/** NET_I_HAVE_FILE
+ *
+ * Args:
+ *	NET_I_HAVE_FILE_FILENAME
+ */
+void Peer::Handle_net_i_have_file(struct Packet* msg)
+{
+	/* TODO: implement it. */
+}
+
 void Peer::Handle_net_file_setattr(struct Packet* msg)
 {
 	std::string filename;
@@ -265,6 +275,7 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_goodbye,     PERM_HIGHLINK  },
+		{ &Peer::Handle_net_i_have_file,      0              },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

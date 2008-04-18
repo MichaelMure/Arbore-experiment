@@ -87,6 +87,16 @@ Messages
 
 		sharers are peers which have file or part of files
 
+	I_HAVE_FILE
+	~~~~~~~~~~~
+
+		.------------.------------.------------.------------.
+		|   srcID    |   dstID    |    type    |    size    |
+		|------------+------------'------------'------------|
+		| path size  |  path ...                            |
+		|  (uint32)  |                (char[])              |
+		'------------'--------------------------------------'
+
 	RMFILE
 	~~~~~~
 

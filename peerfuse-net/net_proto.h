@@ -33,6 +33,7 @@ enum msg_type
 	NET_END_OF_MERGE,
 	NET_END_OF_MERGE_ACK,
 	NET_PEER_GOODBYE,
+	NET_I_HAVE_FILE,
 
 	NET_NB_MESSAGES
 };
@@ -74,6 +75,12 @@ enum net_rmfile
 {
 	NET_RMFILE_PATH
 	// ...
+};
+
+// NET_I_HAVE_FILE
+enum net_i_have_file
+{
+	NET_I_HAVE_FILE_FILENAME
 };
 
 // NET_FILE_SETATTR
