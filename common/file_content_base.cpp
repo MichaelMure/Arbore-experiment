@@ -378,3 +378,11 @@ void FileContentBase::NetworkFlushRequests()
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
 }
+
+void FileContentBase::SetSharer(pf_id sharer, off_t offset, size_t size)
+{
+	struct sharedchunks shared_part;
+	shared_part.sharer = sharer;
+	shared_part.part = FileChunk(NULL, offset, size);
+	sharers.push_back(shared_part);
+}

@@ -30,6 +30,8 @@ enum job_type
 	JOB_FILE_SETATTR,
 	/* A peer for a reference to a file */
 	JOB_SEND_REF_FILE,
+	/* A peer told us the part of the file he has */
+	JOB_SET_SHARED_PART,
 	/* Notify the cache and the network about filesize modification */
 	JOB_CHANGE_FILESIZE,
 	/* Tries connecting to a peer */

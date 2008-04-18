@@ -38,6 +38,8 @@ enum job_type
 	JOB_SET_SHARER,
 	/* A peer for a reference to a file */
 	JOB_SEND_REF_FILE,
+	/* A peer told us the part of the file he has */
+	JOB_SET_SHARED_PART,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

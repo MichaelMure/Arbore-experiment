@@ -37,6 +37,7 @@
 #include "job_file_setattr.h"
 #include "job_update_resp_files.h"
 #include "job_send_ref_file.h"
+#include "job_set_shared_part.h"
 #include "connection_ssl.h"
 #include "environment.h"
 
@@ -248,7 +249,12 @@ void Peer::Handle_net_want_ref_file(struct Packet* msg)
 
 void Peer::Handle_net_ref_file(struct Packet* msg)
 {
-	/* TODO: implement it. */
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_REF_FILE_PATH);
+	//uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
+	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REF_FILE_OFFSET);
+	off_t size = (off_t)msg->GetArg<uint32_t>(NET_REF_FILE_SIZE);
+	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
 }
 
 void Peer::HandleMsg(Packet* pckt)
