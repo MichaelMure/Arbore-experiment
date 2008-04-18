@@ -37,6 +37,7 @@
 #include "job_file_setattr.h"
 #include "job_send_changes.h"
 #include "job_advertise_file.h"
+#include "job_set_sharer.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -305,6 +306,17 @@ void Peer::Handle_net_who_has_file(struct Packet* msg)
 
 void Peer::Handle_net_i_have_file(struct Packet* msg)
 {
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_I_HAVE_FILE_PATH);
+	scheduler_queue.Queue(new JobSetSharer(filename, GetID()));
+}
+
+void Peer::Handle_net_want_ref_file(struct Packet* msg)
+{
+}
+
+void Peer::Handle_net_ref_file(struct Packet* msg)
+{
 }
 
 void Peer::HandleMsg(Packet* pckt)
@@ -329,6 +341,8 @@ void Peer::HandleMsg(Packet* pckt)
 		&Peer::Handle_net_end_of_merge_ack,
 		&Peer::Handle_net_who_has_file,
 		&Peer::Handle_net_i_have_file,
+		&Peer::Handle_net_want_ref_file,
+		&Peer::Handle_net_ref_file,
 	};
 
 	/* Note that we can safely cast pckt->type to unsigned after check pkct->type > 0 */

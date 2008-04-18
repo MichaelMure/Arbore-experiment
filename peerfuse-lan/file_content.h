@@ -43,5 +43,6 @@ public:
 
 	void NetworkRequestChunk(FileChunk chunk);
 	void SetSharer(pf_id, off_t offset, size_t size);
+	bool WantsChunks();
 };
 #endif						  /* FILE_CONTENT_H */

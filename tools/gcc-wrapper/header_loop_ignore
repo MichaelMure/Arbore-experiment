@@ -17,6 +17,7 @@ peer.cpp->job_file_setattr.h
 peer.cpp->job_other_connect.h
 peer.cpp->job_send_changes.h
 peer.cpp->job_advertise_file.h
+peer.cpp->job_set_sharer.h
 # pfnet only:
 peer.cpp->job_update_resp_files.h
 

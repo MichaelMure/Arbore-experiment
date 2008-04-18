@@ -42,3 +42,9 @@ void FileContent::NetworkRequestChunk(FileChunk chunk)
 void FileContent::FlushRequests()
 {
 }
+
+bool FileContent::WantsChunks()
+{
+	BlockLockMutex lock(this);
+	return net_pending_request.size() != 0;
+}

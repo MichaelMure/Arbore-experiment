@@ -34,6 +34,8 @@ enum job_type
 	JOB_SEND_CHANGES,
 	/* Tell a peer we have the content of a file */
 	JOB_ADVERTISE_FILE,
+	/* A peer told us he has the content of a file */
+	JOB_SET_SHARER,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

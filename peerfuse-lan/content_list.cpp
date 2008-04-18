@@ -18,11 +18,28 @@
  */
 
 #include "content_list.h"
+#include "pf_types.h"
+#include "packet.h"
+#include "peers_list.h"
 
 ContentList content_list;
 
 bool ContentList::HaveFile(std::string filename)
 {
+	/* No need to lock */
 	FileContent& f = GetFile(filename);
 	return f.HaveAnyChunk();
+}
+
+void ContentList::SetSharer(std::string filename, pf_id sharer)
+{
+	/* No need to lock */
+	FileContent& f = GetFile(filename);
+	if(f.WantsChunks())
+	{
+		/* Ask for a ref */
+		Packet p(NET_WANT_REF_FILE);
+		p.SetArg(NET_WANT_REF_FILE_PATH, filename);
+		peers_list.SendMsg(sharer, p);
+	}
 }
