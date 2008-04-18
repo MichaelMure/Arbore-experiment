@@ -99,7 +99,7 @@ FileList Cache::GetAllFiles()
 	return list;
 }
 
-void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
+void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 {
 	std::string filename;
 	FileEntry* file = 0;
@@ -169,6 +169,7 @@ void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
 		}
 
 		file->stat = stat;
+		file->SetSharers(sharers);
 
 		hdd.UpdateFile(file);
 	}

@@ -133,6 +133,7 @@ Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
 	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->stat.mtime);
 	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
 	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->stat.ctime);
+	pckt.SetArg(NET_MKFILE_SHARERS, f->GetSharers());
 
 	return pckt;
 }

@@ -33,7 +33,7 @@ public:
 	Cache();
 	~Cache();
 
-	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0);
+	virtual void MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender = 0);
 	virtual void RmFile(std::string path, pf_id sender = 0);
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 

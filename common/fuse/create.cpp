@@ -56,7 +56,7 @@ int pf_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 		pf_stat stat;
 		stat.mode = mode;
 
-		cache.MkFile(path, stat);
+		cache.MkFile(path, stat, IDList());
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

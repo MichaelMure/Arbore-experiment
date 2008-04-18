@@ -133,7 +133,7 @@ void Cache::SendChanges(pf_id peer, time_t last_view)
 	Unlock();
 }
 
-void Cache::MkFile(std::string path, pf_stat stat, pf_id sender)
+void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 {
 	BlockLockMutex lock(this);
 	std::string filename;

@@ -25,7 +25,7 @@ bool JobMkFile::Start()
 {
 	try
 	{
-		cache.MkFile(file, stat, sender);
+		cache.MkFile(file, stat, sharers, sender);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

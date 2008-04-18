@@ -84,7 +84,7 @@ public:
 	void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 #endif
 
-	virtual void MkFile(std::string path, pf_stat stat, pf_id sender = 0) = 0;
+	virtual void MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender = 0) = 0;
 	virtual void RmFile(std::string path, pf_id sender = 0) = 0;
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0) = 0;
 

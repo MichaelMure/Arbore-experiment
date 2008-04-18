@@ -75,6 +75,7 @@ void Network::OnRemovePeer(Peer* peer)
 	if(!peer->IsHighLink() || peer->IsAnonymous())
 		return;
 
+	BlockLockMutex lock(&peers_list);
 	/* A       C
 	 * '---B---'
 	 *     |       .--F
@@ -88,7 +89,10 @@ void Network::OnRemovePeer(Peer* peer)
 	 * and I try to connect to H and B as highlink.
 	 */
 
-	BlockLockMutex lock(&peers_list);
+	/* Tell to everybody that it is disconnected.
+	 * Only this peer is anounced in message, because receivers
+	 * will find themselves what peers are under it.
+	 */
 	Packet pckt(NET_PEER_GOODBYE, peer->GetID(), 0);
 	peers_list.Broadcast(pckt, peer);
 

@@ -58,6 +58,7 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_MKFILE_CREATE_TIME */     T_UINT32,
 		/* NET_MKFILE_MODIF_TIME */      T_UINT32,
 		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32,
+		/* NET_MKFILE_SHARERS */         T_IDLIST,
 		T_NONE
 	},
 

@@ -23,6 +23,7 @@
 #include <vector>
 #include "cache_base.h"
 #include "pf_dir.h"
+#include "pf_types.h"
 #include "pf_file.h"
 #include "packet.h"
 #include "filedist.h"
@@ -50,7 +51,7 @@ public:
 	Cache();
 	~Cache();
 
-	void MkFile(std::string path, pf_stat stat, pf_id sender = 0);
+	void MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender = 0);
 	void RmFile(std::string path, pf_id sender = 0);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 

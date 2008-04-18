@@ -28,8 +28,15 @@ class JobMkFile : public Job
 	std::string file;
 	pf_stat stat;
 	pf_id sender;
+	IDList sharers;
 public:
-	JobMkFile(std::string _file, pf_stat _stat, pf_id _sender): Job(0, REPEAT_NONE), file(_file), stat(_stat), sender(_sender) {}
+	JobMkFile(std::string _file, pf_stat _stat, IDList _sharers, pf_id _sender)
+		: Job(0, REPEAT_NONE),
+		file(_file),
+		stat(_stat),
+		sender(_sender),
+		sharers(_sharers)
+	{}
 	~JobMkFile() {}
 
 	bool Start();
