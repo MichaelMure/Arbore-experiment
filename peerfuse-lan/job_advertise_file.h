@@ -33,5 +33,4 @@ public:
 	job_type GetType() const { return JOB_ADVERTISE_FILE; }
 	std::string GetName() const { return "JobAdvertiseFile"; }
 };
-
-#endif /* JOB_ADVERTISE_FILE_H */
+#endif						  /* JOB_ADVERTISE_FILE_H */

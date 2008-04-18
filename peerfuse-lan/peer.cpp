@@ -300,7 +300,7 @@ void Peer::Handle_net_who_has_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_WHO_HAS_FILE_PATH);
-  	scheduler_queue.Queue(new JobAdvertiseFile(filename, GetID()));
+	scheduler_queue.Queue(new JobAdvertiseFile(filename, GetID()));
 }
 
 void Peer::Handle_net_i_have_file(struct Packet* msg)
