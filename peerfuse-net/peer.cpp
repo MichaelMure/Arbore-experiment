@@ -191,9 +191,15 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	downlinks.push_back(addr.id);
 }
 
+/** NET_PEER_GOODBYE
+ *
+ * Sender of this message has left network.
+ */
 void Peer::Handle_net_peer_goodbye(struct Packet* msg)
 {
-	/* */
+	peers_list.RemoveDownLinks(this);
+	peers_list.RemoveFromID(GetID());
+
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
