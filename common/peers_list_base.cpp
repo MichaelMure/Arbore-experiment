@@ -80,7 +80,7 @@ Peer* PeersListBase::Remove(Peer* p)
 {
 	BlockLockMutex lock(this);
 	iterator it;
-	for(it = begin(); it != end() && *it != p;)
+	for(it = begin(); it != end() && *it != p; ++it)
 		;
 
 	if(it == end())
