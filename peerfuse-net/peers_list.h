@@ -35,8 +35,11 @@ public:
 	void EraseFromID(pf_id id);
 	Peer* RemoveFromID(pf_id id);
 
-	/* Remove all downlinks from a peer */
-	void RemoveDownLinks(Peer* p);
+	/** Remove all downlinks from a peer
+	 * @param p remove all downlinks of this peer
+	 * @return a pf_addr of one downlink
+	 */
+	pf_addr RemoveDownLinks(Peer* p);
 
 	bool IsIDOnNetwork(pf_id id);
 	/** Return a list of connected high linkes */

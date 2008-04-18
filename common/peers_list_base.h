@@ -34,6 +34,8 @@ protected:
 	PeerMap fd2peer;
 
 	Peer* PeerFromFD(int fd);
+
+	virtual Peer* Remove(Peer* p);
 public:
 	PeersListBase();
 	virtual ~PeersListBase();

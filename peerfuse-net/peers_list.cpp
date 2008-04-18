@@ -69,20 +69,6 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 	}
 }
 
-void PeersList::RemoveDownLinks(Peer* p)
-{
-	BlockLockMutex lock(this);
-
-	/* Become highlink */
-	std::vector<Peer*> down_links = GetDownLinks(p);
-	for(std::vector<Peer*>::iterator it = down_links.begin();
-		it != down_links.end();
-		++it)
-	{
-		//AddDisconnected((*it)->GetAddr());
-	}
-}
-
 StaticPeersList PeersList::GetDirectHighLinks() const
 {
 	BlockLockMutex lock(&peers_list);
@@ -111,6 +97,32 @@ StaticPeersList PeersList::GetDownLinks(Peer* p) const
 	return list;
 }
 
+pf_addr PeersList::RemoveDownLinks(Peer* p)
+{
+	BlockLockMutex lock(this);
+	pf_addr addr;
+	addr.port = 0;
+
+	std::vector<Peer*> down_links = GetDownLinks(p);
+	if(down_links.empty() == false)
+		addr = down_links.front()->GetAddr();
+
+	/* Remove all downlinks, and recursively all downlinks
+	 * of every downlinks */
+	for(std::vector<Peer*>::iterator it = down_links.begin();
+		it != down_links.end();
+		++it)
+	{
+		RemoveDownLinks(*it);
+		Remove(*it);
+	}
+
+	/* This addr is used by Network::OnRemove() to trying to
+	 * connect to it.
+	 */
+	return addr;
+}
+
 Peer* PeersList::RemoveFromID(pf_id id)
 {
 	BlockLockMutex lock(this);
@@ -122,14 +134,7 @@ Peer* PeersList::RemoveFromID(pf_id id)
 		return NULL;
 
 	Peer* peer = *it;
-	erase(it);
-
-	if(peer->IsConnection())
-	{
-		PeerMap::iterator p = fd2peer.find(peer->GetFd());
-		if(p != fd2peer.end())
-			fd2peer.erase(p);
-	}
+	Remove(peer);
 
 	return peer;
 }

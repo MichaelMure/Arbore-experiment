@@ -94,7 +94,10 @@ void Network::OnRemovePeer(Peer* peer)
 
 	/* Added direct down_links of this peer in my scheduler queue
 	 * to connect to them like a highlink*/
-	peers_list.RemoveDownLinks(peer);
+	pf_addr addr = peers_list.RemoveDownLinks(peer);
+
+	if(addr.port > 0)
+		AddDisconnected(addr);
 }
 
 void Network::StartNetwork(MyConfig* conf)

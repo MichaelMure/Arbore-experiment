@@ -76,25 +76,41 @@ void PeersListBase::Add(Peer* p)
 	changed = true;
 }
 
+Peer* PeersListBase::Remove(Peer* p)
+{
+	BlockLockMutex lock(this);
+	iterator it;
+	for(it = begin(); it != end() && *it != p;)
+		;
+
+	if(it == end())
+		return NULL;
+
+	erase(it);
+	if(p->IsConnection())
+	{
+		PeerMap::iterator fd_it = fd2peer.find(p->GetFd());
+		if(fd_it != fd2peer.end())
+			fd2peer.erase(fd_it);
+	}
+
+	changed = true;
+
+	return p;
+}
+
 Peer* PeersListBase::Remove(int fd)
 {
 	BlockLockMutex lock(this);
+	PeerMap::iterator it = fd2peer.find(fd);
 	Peer* peer = NULL;
-	if(fd2peer.find(fd) != fd2peer.end())
+	if(it != fd2peer.end())
 	{
-		PeerMap::iterator p = fd2peer.find(fd);
-		log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << p->second->GetID() << ")";
-
-		for(iterator it = begin(); it != end();)
-			if(*it == p->second)
-				it = erase(it);
-		else
-			++it;
-
-		peer = p->second;
-		fd2peer.erase(p);
+		peer = it->second;
+		log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << peer->GetID() << ")";
+		Remove(peer);
 	}
-	changed = true;
+
 	return peer;
 }
 
