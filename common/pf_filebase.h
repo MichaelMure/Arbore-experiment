@@ -38,6 +38,16 @@ public:
 	time_t mtime;
 	time_t ctime;
 	time_t meta_mtime;		  /* last meta-data modification */
+
+	pf_stat()
+		: size(0)
+	{
+		time_t now = time(NULL);
+		atime = now;
+		mtime = now;
+		ctime = now;
+		meta_mtime = now;
+	}
 };
 
 class FileEntryBase
@@ -50,7 +60,7 @@ public:
 
 	pf_stat stat;
 
-	FileEntryBase(std::string name, DirEntry* _parent);
+	FileEntryBase(std::string name, pf_stat stat, DirEntry* _parent);
 	virtual ~FileEntryBase();
 
 	DirEntry* GetParent() const { return parent; }

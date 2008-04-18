@@ -44,7 +44,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-			
+
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	BlockLockMutex lock(this);
@@ -74,33 +74,35 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			if(!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, ".."))
 				continue;
 
-			// Add file
-			if(dir->d_type & DT_DIR)
-				f = new DirEntry(std::string(dir->d_name), cache_dir);
-			else
-				f = new FileEntry(std::string(dir->d_name), cache_dir);
-
 			std::string f_path = fullpath + "/" + std::string(dir->d_name);
 
 			struct stat stats;
 			if(lstat(f_path.c_str(), &stats))
 				throw HddAccessFailure(f_path);
 
-			f->stat.mode = stats.st_mode;
-			f->stat.uid = stats.st_uid;
-			f->stat.gid = stats.st_gid;
-			f->stat.atime = stats.st_atime;
-			f->stat.mtime = stats.st_mtime;
-			f->stat.ctime = stats.st_ctime;
+			pf_stat file_stats;
+			file_stats.mode = stats.st_mode;
+			file_stats.uid = stats.st_uid;
+			file_stats.gid = stats.st_gid;
+			file_stats.atime = stats.st_atime;
+			file_stats.mtime = stats.st_mtime;
+			file_stats.ctime = stats.st_ctime;
 			if(!tree_cfg.Get(f->GetFullName() + "#meta", f->stat.meta_mtime))
 			{
-				f->stat.meta_mtime = f->stat.mtime;
+				file_stats.meta_mtime = file_stats.mtime;
 				tree_cfg.Set(f->GetFullName() + "#meta", f->stat.meta_mtime);
 			}
 
 			uint32_t cfg_size = 0;
 			tree_cfg.Get(f->GetFullName() + "#size", cfg_size);
 			f->stat.size = (size_t)cfg_size;
+
+			// Add file
+			if(dir->d_type & DT_DIR)
+				f = new DirEntry(std::string(dir->d_name), file_stats, cache_dir);
+			else
+				f = new FileEntry(std::string(dir->d_name), file_stats, cache_dir);
+
 
 			log[W_INFO] << f->GetFullName() << " loaded.";
 

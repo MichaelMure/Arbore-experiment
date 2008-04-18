@@ -40,7 +40,7 @@ class FileEntry : public FileEntryBase
 
 public:
 
-	FileEntry(std::string _name, DirEntry* parent);
+	FileEntry(std::string _name, pf_stat _stat, DirEntry* parent);
 
 	/* TODO: calculate this */
 	unsigned int GetPathSerial() const { return path_serial; }

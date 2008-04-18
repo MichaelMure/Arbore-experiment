@@ -119,16 +119,18 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		if(filename.empty() || !dir)
 			throw FileAlreadyExists();
 
-		if(stat.mode & S_IFDIR)
-			file = new DirEntry(filename, dir);
-		else
-			file = new FileEntry(filename, dir);
+		/* If file was created locally, do not use the filesystem stat, because
+		 * it contains unix perms and we don't care about. */
+		if(sender == 0)
+		{
+			sharers.push_back(environment.my_id.Get());
+			stat = pf_stat();
+		}
 
-		/* Copy stat only if this isn't me who created this file, because this
-		 * is unix stats, and constructof of FileEntry will set pfnet stats (uid etc)
-		 */
-		if(sender)
-			file->stat = stat;
+		if(stat.mode & S_IFDIR)
+			file = new DirEntry(filename, stat, dir);
+		else
+			file = new FileEntry(filename, stat, dir);
 
 		dir->AddFile(file);
 

@@ -148,13 +148,9 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	FileEntry* file;
 
 	if(stat.mode & S_IFDIR)
-		file = new DirEntry(filename, dir);
+		file = new DirEntry(filename, stat, dir);
 	else
-		file = new FileEntry(filename, dir);
-
-	/* Copy stat only if it's me who created this file! */
-	if(sender != 0)
-		file->stat = stat;
+		file = new FileEntry(filename, stat, dir);
 
 	tree_cfg.Set(path + "#size", (uint32_t)file->stat.size);
 	dir->AddFile(file);

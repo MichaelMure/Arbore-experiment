@@ -23,21 +23,9 @@
 #include "pf_filebase.h"
 #include "pf_dir.h"
 
-FileEntryBase::FileEntryBase(std::string _name, DirEntry* _parent)
-			: name(_name), parent(_parent)
+FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
+			: name(_name), parent(_parent), stat(_stat)
 {
-						  /* Protection */
-	time_t now = time(NULL);
-	stat.mode = S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO;
-	stat.uid = getuid();			  /* UID propriétaire */
-	stat.gid = getgid();			  /* GID propriétaire */
-	stat.size = 0;				  /* Taille totale en octets */
-	//	stat.blksize_t st_blksize;  /* Taille de bloc pour E/S */
-	//	stat.blkcnt_t  st_blocks;   /* Nombre de blocs alloués */
-	stat.atime = now;			  /* Heure dernier acè?s */
-	stat.mtime = now;			  /* Heure dernière modification */
-	stat.ctime = now;			  /* Heure dernier changement êtat */
-	stat.meta_mtime = now;
 }
 
 FileEntryBase::~FileEntryBase()

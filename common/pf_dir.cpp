@@ -19,11 +19,12 @@
 
 #include "pf_dir.h"
 
-DirEntry::DirEntry(std::string name, DirEntry* _parent)
-			: FileEntry(name, _parent)
+DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
+			: FileEntry(name, _stat, _parent)
 {
-						  /* Protection */
-	stat.mode = S_IFDIR | S_IRWXU | S_IRWXG | S_IRWXO;
+	/* Set the specific directory flag, and remove file flag. */
+	stat.mode |= S_IFDIR;
+	stat.mode &= ~S_IFREG;
 }
 
 DirEntry::~DirEntry()

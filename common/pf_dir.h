@@ -31,7 +31,7 @@ class DirEntry : public FileEntry
 
 public:
 
-	DirEntry(std::string name, DirEntry* parent);
+	DirEntry(std::string name, pf_stat stat, DirEntry* parent);
 	~DirEntry();
 
 	const FileMap& GetFiles() { return files; }
