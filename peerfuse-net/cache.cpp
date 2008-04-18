@@ -103,10 +103,12 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 {
 	std::string filename;
 	FileEntry* file = 0;
-
 	BlockLockMutex lock(this);
 	BlockLockMutex peer_lock(&peers_list);
-	Peer* peer = peers_list.PeerFromID(sender);
+	Peer* peer = 0;
+
+	if(sender > 0)
+		peer = peers_list.PeerFromID(sender);
 
 	try
 	{
@@ -139,6 +141,10 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		/* Write file on cache */
 		hdd.MkFile(file);
+
+		/* Add file on FileDistribution */
+		filedist.AddFile(file, peer);
+
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
@@ -150,10 +156,38 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		log[W_DEBUG] << "File already exists... Update it.";
 
+		_set_attr(file, stat, peer, sharers);
+	}
+}
+
+void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
+{
+	Peer* peer = 0;
+
+	std::string filename;
+	FileEntry* file = Path2File(path, &filename);
+	DirEntry* dir = dynamic_cast<DirEntry*>(file);
+
+	if(!file || (filename.empty() == false && dir))
+		throw NoSuchFileOrDir();
+
+	if(sender > 0)
+		peer = peers_list.PeerFromID(sender);
+
+	_set_attr(file, stat, peer, IDList());
+}
+
+void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers)
+{
+	BlockLockMutex cache_lock(this);
+	BlockLockMutex peer_lock(&peers_list);
+
+	if(sender)
+	{
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		time_t dist_ts = peer->Timestamp(stat.mtime);
+		time_t dist_ts = sender->Timestamp(stat.mtime);
 
 		if(file->stat.mtime > dist_ts)
 		{
@@ -162,8 +196,8 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 			 */
 			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
 			Packet pckt = filedist.CreateMkFilePacket(file);
-			pckt.SetDstID(peer->GetID());
-			peer->SendMsg(pckt);
+			pckt.SetDstID(sender->GetID());
+			sender->SendMsg(pckt);
 			return;
 		}
 		else if(file->stat.mtime == dist_ts)
@@ -172,16 +206,17 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
-
-		file->stat = stat;
-		file->SetSharers(sharers);
-		tree_cfg.Set(path + "#size", (uint32_t)file->stat.size);
-
-		hdd.UpdateFile(file);
 	}
 
-	/* Add file on FileDistribution */
-	filedist.AddFile(file, peer);
+	file->stat = stat;
+	tree_cfg.Set(file->GetFullName() + "#size", (uint32_t)file->stat.size);
+	if(sharers.empty() == false)
+		file->SetSharers(sharers);
+
+	/* Update file */
+	hdd.UpdateFile(file);
+	filedist.AddFile(file, sender);
+
 }
 
 void Cache::RmFile(std::string path, pf_id sender)
@@ -227,17 +262,4 @@ void Cache::UpdateRespFiles()
 	Lock();
 	filedist.UpdateRespFiles();
 	Unlock();
-}
-
-void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
-{
-	BlockLockMutex lock(this);
-	FileEntry* file = Path2File(path);
-	if(file->stat.size != stat.size)
-		tree_cfg.Set(path + "#size", (uint32_t)stat.size);
-	if(file)
-		file->stat = stat;
-
-	if(sender == 0)
-		filedist.SetAttr(file, peers_list.PeerFromID(sender));
 }

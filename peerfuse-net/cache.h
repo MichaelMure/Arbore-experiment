@@ -46,6 +46,9 @@ protected:
 	 */
 	virtual FileList GetAllFiles();
 
+	/* SetAttr of file, use this method when you already have FileEntry* and Peer* objects */
+	void _set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers);
+
 public:
 
 	Cache();

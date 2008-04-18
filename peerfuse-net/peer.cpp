@@ -238,24 +238,6 @@ void Peer::Handle_net_i_have_file(struct Packet* msg)
 	/* TODO: implement it. */
 }
 
-void Peer::Handle_net_file_setattr(struct Packet* msg)
-{
-	std::string filename;
-	filename = msg->GetArg<std::string>(NET_FILE_SETATTR_PATH);
-
-	pf_stat stat;
-	stat.mode = msg->GetArg<uint32_t>(NET_FILE_SETATTR_MODE);
-	stat.uid = msg->GetArg<uint32_t>(NET_FILE_SETATTR_UID);
-	stat.gid = msg->GetArg<uint32_t>(NET_FILE_SETATTR_GID);
-	stat.size = msg->GetArg<uint64_t>(NET_FILE_SETATTR_SIZE);
-	stat.atime = Timestamp(msg->GetArg<uint32_t>(NET_FILE_SETATTR_ACCESS_TIME));
-	stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_FILE_SETATTR_MODIF_TIME));
-	stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_FILE_SETATTR_META_MODIF_TIME));
-	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_FILE_SETATTR_CREATE_TIME));
-
-	scheduler_queue.Queue(new JobFileSetAttr(filename, stat, GetID()));
-}
-
 void Peer::HandleMsg(Packet* pckt)
 {
 	struct
@@ -270,7 +252,6 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_hello,            PERM_ANONYMOUS },
 		{ &Peer::Handle_net_mkfile,           0              },
 		{ &Peer::Handle_net_rmfile,           0              },
-		{ &Peer::Handle_net_file_setattr,     0              },
 		{ &Peer::Handle_net_peer_connection,  PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },

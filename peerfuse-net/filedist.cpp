@@ -263,30 +263,6 @@ void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)
 	resp_files.erase(f);
 }
 
-void FileDistribution::SetAttr(FileEntry* f, Peer* sender)
-{
-	assert(f != NULL);			  /* exists */
-	assert(f->GetParent() != NULL);		  /* isn't the root dir */
-
-	std::set<Peer*> peers = GetRespPeers(f);
-	Packet pckt(NET_FILE_SETATTR);
-	pckt.SetArg(NET_FILE_SETATTR_PATH, f->GetFullName());
-	pckt.SetArg(NET_FILE_SETATTR_MODE, f->stat.mode);
-	pckt.SetArg(NET_FILE_SETATTR_UID, f->stat.uid);
-	pckt.SetArg(NET_FILE_SETATTR_GID, f->stat.gid);
-	pckt.SetArg(NET_FILE_SETATTR_SIZE, (uint64_t)f->stat.size);
-	pckt.SetArg(NET_FILE_SETATTR_ACCESS_TIME, (uint32_t)f->stat.atime);
-	pckt.SetArg(NET_FILE_SETATTR_CREATE_TIME, (uint32_t)f->stat.ctime);
-	pckt.SetArg(NET_FILE_SETATTR_MODIF_TIME, (uint32_t)f->stat.mtime);
-	pckt.SetArg(NET_FILE_SETATTR_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
-
-	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
-	{
-		pckt.SetDstID((*p)->GetID());
-		(*p)->SendMsg(pckt);
-	}
-}
-
 void FileDistribution::UpdateRespFiles()
 {
 	/* Store last id list */
