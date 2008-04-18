@@ -38,6 +38,7 @@
 #include "job_send_changes.h"
 #include "job_advertise_file.h"
 #include "job_set_sharer.h"
+#include "job_send_ref_file.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -313,6 +314,9 @@ void Peer::Handle_net_i_have_file(struct Packet* msg)
 
 void Peer::Handle_net_want_ref_file(struct Packet* msg)
 {
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_WANT_REF_FILE_PATH);
+	scheduler_queue.Queue(new JobSendRefFile(filename, GetID()));
 }
 
 void Peer::Handle_net_ref_file(struct Packet* msg)

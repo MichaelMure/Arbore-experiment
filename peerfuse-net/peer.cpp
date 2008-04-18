@@ -36,6 +36,7 @@
 #include "job_rmfile.h"
 #include "job_file_setattr.h"
 #include "job_update_resp_files.h"
+#include "job_send_ref_file.h"
 #include "connection_ssl.h"
 #include "environment.h"
 
@@ -238,6 +239,18 @@ void Peer::Handle_net_i_have_file(struct Packet* msg)
 	/* TODO: implement it. */
 }
 
+void Peer::Handle_net_want_ref_file(struct Packet* msg)
+{
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_WANT_REF_FILE_PATH);
+	scheduler_queue.Queue(new JobSendRefFile(filename, GetID()));
+}
+
+void Peer::Handle_net_ref_file(struct Packet* msg)
+{
+	/* TODO: implement it. */
+}
+
 void Peer::HandleMsg(Packet* pckt)
 {
 	struct
@@ -257,6 +270,8 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_goodbye,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_i_have_file,      0              },
+		{ &Peer::Handle_net_want_ref_file,    0              },
+		{ &Peer::Handle_net_ref_file,         0              },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */
