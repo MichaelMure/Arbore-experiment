@@ -40,6 +40,8 @@ enum job_type
 	JOB_SEND_REF_FILE,
 	/* A peer told us the part of the file he has */
 	JOB_SET_SHARED_PART,
+	/* Send a chunk to a peer */
+	JOB_SEND_CHUNK,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

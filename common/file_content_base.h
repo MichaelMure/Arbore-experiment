@@ -54,6 +54,7 @@ private:
 		FileChunk part;
 	};
 protected:
+	std::string filename;
 	std::list<struct sharedchunks> sharers;
 
 	void NetworkFlushRequests();
@@ -67,6 +68,13 @@ private:
 	bool OnDiskLoad(FileChunk chunk);
 	void OnDiskWrite(FileChunk& chunk);
 
+	FileContentBase& operator=(const FileContentBase &other);
+public:
+	FileContentBase(std::string _filename);
+	FileContentBase(const FileContentBase&);
+	virtual ~FileContentBase();
+
+	std::string GetFilename() const { return filename; }
 	/** Load a chunk from the hdd or ask it on the network
 	 * @param chunk the part to load
 	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
@@ -75,16 +83,6 @@ private:
 	bool FileContentHaveChunk(off_t offset, size_t size);
 	bool OnDiskHaveChunk(FileChunk chunk, bool blockant_load = false);
 	enum chunk_availability NetworkHaveChunk(FileChunk chunk);
-
-	FileContentBase& operator=(const FileContentBase &other);
-
-protected:
-	std::string filename;
-
-public:
-	FileContentBase(std::string _filename);
-	FileContentBase(const FileContentBase&);
-	virtual ~FileContentBase();
 
 	/* Returns a copy of the chunk */
 	FileChunk GetChunk(off_t offset, size_t size);

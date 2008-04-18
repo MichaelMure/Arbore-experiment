@@ -222,12 +222,34 @@ PacketBase& PacketBase::Write(IDList id_list)
 
 	char* ptr = new_datas + size;
 
+	// This is missing some endian tweakings ?
 	for(IDList::iterator it = id_list.begin(); it != id_list.end(); ++it)
 	{
 		pf_id id = *it;
 		memcpy(ptr, &id, sizeof(pf_id));
 	}
 	size += id_list.size() * sizeof(pf_id);
+	datas = new_datas;
+
+	return *this;
+}
+
+PacketBase& PacketBase::Write(FileChunk& chunk)
+{
+	Write((uint64_t)chunk.GetOffset());
+	Write((uint32_t)chunk.GetSize());
+
+	char* new_datas = new char [size + chunk.GetSize()];
+
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+
+	char* ptr = new_datas + size;
+	memcpy(ptr, chunk.GetData(), chunk.GetSize());
+
+	size += chunk.GetSize();
 	datas = new_datas;
 
 	return *this;

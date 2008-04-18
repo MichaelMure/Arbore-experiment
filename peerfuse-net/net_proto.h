@@ -36,6 +36,7 @@ enum msg_type
 	NET_WANT_REF_FILE,
 	NET_REF_FILE,
 	NET_WANT_CHUNK,
+	NET_CHUNK,
 
 	NET_NB_MESSAGES
 };
@@ -103,6 +104,12 @@ enum net_want_chunk
 	NET_WANT_CHUNK_REF,
 	NET_WANT_CHUNK_OFFSET,
 	NET_WANT_CHUNK_SIZE
+};
+
+enum net_chunk
+{
+	NET_CHUNK_REF,
+	NET_CHUNK_CHUNK,
 };
 
 extern const char* type2str[NET_NB_MESSAGES];

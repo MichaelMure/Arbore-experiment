@@ -180,5 +180,12 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_WANT_CHUNK_OFFSET */ T_UINT64,
 		/* NET_WANT_CHUNK_SIZE */ T_UINT32,
 		T_NONE
+	},
+
+	// NET_CHUNK
+	{
+		/* NET_CHUNK_REF */ T_UINT32,
+		/* NET_CHUNK_CHUNK */ T_CHUNK,
+		T_NONE
 	}
 };

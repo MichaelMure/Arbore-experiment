@@ -27,6 +27,7 @@
 #include "pf_types.h"
 #include "net_proto.h"
 #include "packet_arg.h"
+#include "file_chunk.h"
 
 class PacketBase
 {
@@ -44,6 +45,7 @@ class PacketBase
 	PacketBase& Write(std::string str);
 	PacketBase& Write(AddrList addr_list);
 	PacketBase& Write(IDList id_list);
+	PacketBase& Write(FileChunk& chunk);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();

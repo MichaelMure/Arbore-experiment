@@ -67,6 +67,18 @@ FileContent& ContentListBase::GetFile(std::string path)
 	return it->second;
 }
 
+FileContent& ContentListBase::GetFile(uint32_t ref)
+{
+	std::string filename;
+	std::map<uint32_t, std::string>::iterator it;
+
+//	TODO: handle this nicely
+	if((it = my_refs.find(ref)) == my_refs.end())
+		return GetFile("");
+
+	return GetFile(it->second);
+}
+
 void ContentListBase::RemoveFile(std::string path)
 {
 	BlockLockMutex lock(this);

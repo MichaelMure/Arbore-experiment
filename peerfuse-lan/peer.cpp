@@ -39,6 +39,7 @@
 #include "job_advertise_file.h"
 #include "job_set_sharer.h"
 #include "job_send_ref_file.h"
+#include "job_send_chunk.h"
 #include "job_set_shared_part.h"
 #include "session_config.h"
 #include "tools.h"
@@ -115,6 +116,18 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 	packet.SetArg(NET_WANT_CHUNK_OFFSET, offset);
 	packet.SetArg(NET_WANT_CHUNK_SIZE, size);
 	SendMsg(packet);
+}
+
+void Peer::SendChunk(std::string filename, FileChunk& chunk)
+{
+	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
+
+	while(it != file_refs.end() && it->second != filename)
+		++it;
+
+	if(it == file_refs.end())
+		return;
+
 }
 
 /*******************************
@@ -349,6 +362,13 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
 }
 
+void Peer::Handle_net_want_chunk(struct Packet* msg)
+{
+	uint32_t ref = msg->GetArg<uint32_t>(NET_WANT_CHUNK_REF);
+	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_WANT_CHUNK_OFFSET);
+	size_t size = (size_t)msg->GetArg<uint32_t>(NET_WANT_CHUNK_SIZE);
+	scheduler_queue.Queue(new JobSendChunk(ref, GetID(), offset, size));
+}
 
 void Peer::HandleMsg(Packet* pckt)
 {
@@ -374,6 +394,7 @@ void Peer::HandleMsg(Packet* pckt)
 		&Peer::Handle_net_i_have_file,
 		&Peer::Handle_net_want_ref_file,
 		&Peer::Handle_net_ref_file,
+		&Peer::Handle_net_want_chunk,
 	};
 
 	/* Note that we can safely cast pckt->type to unsigned after check pkct->type > 0 */

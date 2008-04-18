@@ -43,6 +43,7 @@ public:
 	 * @return the file content
 	 */
 	FileContent& GetFile(std::string path);
+	FileContent& GetFile(uint32_t ref);
 
 	/** Remove a file from the list. It's content is not flushed to the disk
 	 * @param path path to the file

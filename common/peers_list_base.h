@@ -25,6 +25,7 @@
 #include "peer.h"
 #include "mutex.h"
 #include "packet.h"
+#include "file_chunk.h"
 
 class PeersListBase: public std::vector<Peer*>, public Mutex
 {
@@ -66,5 +67,6 @@ public:
 	void SendMsg(pf_id id, const Packet &p) const;
 
 	void RequestChunk(std::string filename, pf_id id, off_t offset, size_t size);
+	void SendChunk(std::string filename, pf_id id, FileChunk& chunk);
 };
 #endif

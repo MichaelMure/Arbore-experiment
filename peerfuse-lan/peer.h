@@ -24,6 +24,7 @@
 #include "pf_types.h"
 #include "packet.h"
 #include "peer_base.h"
+#include "file_chunk.h"
 
 class Peer;
 
@@ -49,6 +50,7 @@ class Peer : public PeerBase
 	void Handle_net_i_have_file(struct Packet* pckt);
 	void Handle_net_want_ref_file(struct Packet* pckt);
 	void Handle_net_ref_file(struct Packet* pckt);
+	void Handle_net_want_chunk(struct Packet* pckt);
 public:
 	/* Exceptions */
 	class PeerCantConnect: public std::exception
@@ -72,5 +74,6 @@ public:
 	bool Receive();
 
 	void RequestChunk(std::string filename, off_t offset, size_t size);
+	void SendChunk(std::string filename, FileChunk& chunk);
 };
 #endif
