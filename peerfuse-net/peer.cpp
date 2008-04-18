@@ -99,6 +99,23 @@ void Peer::SendHello()
 	SendMsg(pckt);
 }
 
+void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
+{
+	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
+
+	while(it != file_refs.end() && it->second != filename)
+		++it;
+
+	if(it == file_refs.end())
+		return;
+
+	Packet packet(NET_WANT_CHUNK);
+	packet.SetArg(NET_WANT_CHUNK_REF, it->second);
+	packet.SetArg(NET_WANT_CHUNK_OFFSET, offset);
+	packet.SetArg(NET_WANT_CHUNK_SIZE, size);
+	SendMsg(packet);
+}
+
 /*******************************
  * Handers
  */
@@ -251,9 +268,11 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_REF_FILE_PATH);
-	//uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
+	uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
 	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REF_FILE_OFFSET);
 	off_t size = (off_t)msg->GetArg<uint32_t>(NET_REF_FILE_SIZE);
+
+	file_refs.insert(make_pair(ref, filename));
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
 }
 

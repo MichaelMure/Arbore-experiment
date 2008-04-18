@@ -377,6 +377,33 @@ void FileContentBase::NetworkFlushRequests()
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
+
+	/* Send a request for each chunk we have in our queue */
+	std::set<FileChunk>::iterator it = net_pending_request.begin();
+	while(it != net_pending_request.end())
+	{
+		/* Find a sharer that have this file */
+		std::list<struct sharedchunks>::iterator sh_it;
+		bool request_sent = false;
+		for(sh_it = sharers.begin(); sh_it != sharers.end(); ++sh_it)
+		{
+			if(it->GetOffset() >= sh_it->part.GetOffset() &&
+					it->GetOffset() + (off_t)it->GetSize() <= sh_it->part.GetOffset() + (off_t)sh_it->part.GetSize())
+			{
+				peers_list.RequestChunk(filename, sh_it->sharer, it->GetOffset(), it->GetSize());
+				request_sent = true;
+				break;
+			}
+		}
+		if(request_sent)
+		{
+			std::set<FileChunk>::iterator tmp_it = it;
+			++it;
+			net_pending_request.erase(tmp_it);
+		}
+		else
+			++it;
+	}
 }
 
 void FileContentBase::SetSharer(pf_id sharer, off_t offset, size_t size)
@@ -385,4 +412,5 @@ void FileContentBase::SetSharer(pf_id sharer, off_t offset, size_t size)
 	shared_part.sharer = sharer;
 	shared_part.part = FileChunk(NULL, offset, size);
 	sharers.push_back(shared_part);
+	NetworkFlushRequests();
 }

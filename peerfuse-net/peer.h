@@ -77,5 +77,7 @@ public:
 	void SendMsg(const Packet& pckt);
 	void SendHello();
 	virtual bool Receive();
+
+	void RequestChunk(std::string filename, off_t offset, size_t size);
 };
 #endif

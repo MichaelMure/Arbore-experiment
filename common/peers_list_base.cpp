@@ -183,3 +183,10 @@ void PeersListBase::SendMsg(pf_id id, const Packet &p) const
 	Peer* peer = PeerFromID(id);
 	peer->SendMsg(p);
 }
+
+void PeersListBase::RequestChunk(std::string filename, pf_id id, off_t offset, size_t size)
+{
+	BlockLockMutex lock(this);
+	Peer* peer = PeerFromID(id);
+	peer->RequestChunk(filename, offset, size);
+}

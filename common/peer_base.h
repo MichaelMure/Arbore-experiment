@@ -20,6 +20,7 @@
 #ifndef PEER_BASE_H
 #define PEER_BASE_H
 
+#include <map>
 #include <queue>
 #include "pf_types.h"
 #include "connection.h"
@@ -34,6 +35,8 @@ protected:
 	int ts_diff;			  // diff between our timestamp and its timestamp */
 	Packet* incoming;		  // packet we are receiving
 	std::queue<Packet> send_queue;	  // packets we are sending (with flush)
+
+	std::map<uint32_t, std::string> file_refs; // how this peer maps refs to files
 
 	unsigned int flags;
 

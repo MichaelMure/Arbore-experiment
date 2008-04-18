@@ -64,5 +64,7 @@ public:
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id) const;
 	void SendMsg(pf_id id, const Packet &p) const;
+
+	void RequestChunk(std::string filename, pf_id id, off_t offset, size_t size);
 };
 #endif
