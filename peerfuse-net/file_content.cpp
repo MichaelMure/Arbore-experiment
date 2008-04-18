@@ -38,5 +38,3 @@ void FileContent::NetworkRequestChunk(FileChunk chunk)
 	else
 		NetworkFlushRequests();
 }
-
-

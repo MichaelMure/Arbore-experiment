@@ -105,4 +105,3 @@ uint32_t ContentListBase::GetRef(std::string filename)
 
 	return ref;
 }
-

@@ -49,6 +49,6 @@ public:
 	 */
 	void RemoveFile(std::string path);
 
-	uint32_t GetRef(std::string filename); 
+	uint32_t GetRef(std::string filename);
 };
 #endif						  /* CONTENT_LIST_BASE_H */

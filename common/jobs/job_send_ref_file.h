@@ -35,5 +35,4 @@ public:
 	job_type GetType() const { return JOB_SEND_REF_FILE; }
 	std::string GetName() const { return "JobSendRefFile"; }
 };
-
-#endif /* JOB_SEND_REF_FILE_H */
+#endif						  /* JOB_SEND_REF_FILE_H */
