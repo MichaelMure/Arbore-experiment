@@ -124,13 +124,17 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		if(sender == 0)
 		{
 			sharers.push_back(environment.my_id.Get());
-			stat = pf_stat();
+			pf_stat tmp_stat = pf_stat();
+			tmp_stat.mode = stat.mode;
+			stat = tmp_stat;
 		}
 
 		if(stat.mode & S_IFDIR)
 			file = new DirEntry(filename, stat, dir);
 		else
 			file = new FileEntry(filename, stat, dir);
+
+		file->SetSharers(sharers);
 
 		dir->AddFile(file);
 
