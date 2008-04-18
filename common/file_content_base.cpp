@@ -201,10 +201,10 @@ bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 
 enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunk chunk)
 {
-#if 0
+	#if 0
 	/* If nobody's connected we won't receive anything */
 	if(peers_list.GetSize() == 0)
-#endif
+	#endif
 		return CHUNK_UNAVAILABLE;
 
 }

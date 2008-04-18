@@ -28,6 +28,4 @@ public:
 	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 };
-
-#endif /* FILE_CONTENT_H */
-
+#endif						  /* FILE_CONTENT_H */

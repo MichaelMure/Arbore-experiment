@@ -33,6 +33,6 @@ public:
 		: mode(S_IFREG | S_IRWXU | S_IRWXG | S_IRUSR | S_IXUSR),
 		uid(getuid()),
 		gid(getgid())
-	{}
+		{}
 };
 #endif						  /* FILE_PERMS_H */

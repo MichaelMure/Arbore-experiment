@@ -81,4 +81,4 @@ public:
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
 };
-#endif /* FILE_CONTENT_BASE_H */
+#endif						  /* FILE_CONTENT_BASE_H */

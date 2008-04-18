@@ -69,7 +69,7 @@ public:
 	CacheBase()
 		: Mutex(RECURSIVE_MUTEX),
 		tree("", pf_stat(), NULL)
-	{}
+		{}
 	virtual ~CacheBase() {}
 
 	/** Load all tree from an hard drive path.
