@@ -38,4 +38,3 @@ bool JobNewConnQueue::Start()
 	}
 	return false;
 }
-

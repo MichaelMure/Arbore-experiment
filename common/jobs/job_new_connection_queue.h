@@ -33,11 +33,10 @@ public:
 		: Job(time(NULL), REPEAT_LESS_AND_LESS, 1),
 		std::vector<pf_addr>(addr_list),
 		current(begin())
-	{}
+		{}
 
 	bool Start();
 	job_type GetType() const {return JOB_NEW_CONN_QUEUE; }
 	std::string GetName() const {return "JobNewConnQueue"; }
 };
-
 #endif
