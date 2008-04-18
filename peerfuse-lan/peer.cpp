@@ -36,6 +36,7 @@
 #include "job_rmfile.h"
 #include "job_file_setattr.h"
 #include "job_send_changes.h"
+#include "job_advertise_file.h"
 #include "session_config.h"
 #include "tools.h"
 #include "peers_list.h"
@@ -297,6 +298,9 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 
 void Peer::Handle_net_who_has_file(struct Packet* msg)
 {
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_WHO_HAS_FILE_PATH);
+  	scheduler_queue.Queue(new JobAdvertiseFile(filename, GetID()));
 }
 
 void Peer::Handle_net_i_have_file(struct Packet* msg)

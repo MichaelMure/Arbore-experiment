@@ -80,6 +80,8 @@ public:
 	/* Triggers loading the file from the cache or download from the network */
 	enum chunk_availability HaveChunk(off_t offset, size_t size);
 
+	bool HaveAnyChunk();
+
 	void SetChunk(FileChunk chunk);
 
 	void Truncate(off_t offset);

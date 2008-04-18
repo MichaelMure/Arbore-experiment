@@ -20,3 +20,9 @@
 #include "content_list.h"
 
 ContentList content_list;
+
+bool ContentList::HaveFile(std::string filename)
+{
+	FileContent& f = GetFile(filename);
+	return f.HaveAnyChunk();
+}

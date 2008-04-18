@@ -238,6 +238,13 @@ enum FileContentBase::chunk_availability FileContentBase::HaveChunk(off_t offset
 	return NetworkHaveChunk(FileChunk(NULL, offset, size));
 }
 
+bool FileContentBase::HaveAnyChunk()
+{
+	BlockLockMutex lock(this);
+	LoadFd();				  /* Needed to update the ondisk_size value */
+	return size() != 0 || ondisk_size != 0;
+}
+
 void FileContentBase::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);

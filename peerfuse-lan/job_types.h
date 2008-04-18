@@ -32,6 +32,8 @@ enum job_type
 	JOB_CHANGE_FILESIZE,
 	/* Send changes to the peer since his last connection */
 	JOB_SEND_CHANGES,
+	/* Tell a peer we have the content of a file */
+	JOB_ADVERTISE_FILE,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

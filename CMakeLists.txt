@@ -93,6 +93,7 @@ ELSE(PF_NET)
 		peerfuse-lan/packet.cpp
 		peerfuse-lan/peer.cpp
 		peerfuse-lan/peers_list.cpp
+		peerfuse-lan/job_advertise_file.cpp
 		peerfuse-lan/job_send_changes.cpp
 		peerfuse-lan/job_new_conn_req.cpp
 		peerfuse-lan/job_other_connect.cpp)

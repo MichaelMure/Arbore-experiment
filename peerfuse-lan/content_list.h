@@ -19,10 +19,13 @@
 
 #ifndef CONTENT_LIST_H
 #define CONTENT_LIST_H
+#include <string.h>
 #include "content_list_base.h"
 
 class ContentList : public ContentListBase
 {
+public:
+	bool HaveFile(std::string filename);
 };
 
 extern ContentList content_list;

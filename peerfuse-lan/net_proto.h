@@ -135,7 +135,7 @@ enum net_who_has_file
 
 enum net_i_have_file
 {
-	NET_I_HAVE_FILE_FILENAME
+	NET_I_HAVE_FILE_PATH
 };
 
 extern const char* type2str[NET_NB_MESSAGES];
