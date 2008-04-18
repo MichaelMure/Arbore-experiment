@@ -35,5 +35,4 @@ public:
 	job_type GetType() const { return JOB_SET_SHARER; }
 	std::string GetName() const { return "JobSetSharer"; }
 };
-
-#endif /* JOB_SET_SHARER_H */
+#endif						  /* JOB_SET_SHARER_H */
