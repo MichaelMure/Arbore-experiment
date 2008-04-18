@@ -26,5 +26,4 @@ class ContentList : public ContentListBase
 };
 
 extern ContentList content_list;
-
-#endif /* CONTENT_LIST_H */
+#endif						  /* CONTENT_LIST_H */

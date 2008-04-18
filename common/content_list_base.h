@@ -45,5 +45,4 @@ public:
 	 */
 	void RemoveFile(std::string path);
 };
-
-#endif /* CONTENT_LIST_BASE_H */
+#endif						  /* CONTENT_LIST_BASE_H */
