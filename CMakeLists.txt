@@ -5,7 +5,7 @@ SET(SRC
 	common/content_list.cpp
 	common/hdd.cpp
 	common/file_chunk.cpp
-	common/file_content.cpp
+	common/file_content_base.cpp
 	common/libconfig.cpp
 	common/log.cpp
 	common/mutex.cpp

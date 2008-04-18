@@ -17,8 +17,8 @@
  * $Id$
  */
 
-#ifndef FILE_CONTENT_H
-#define FILE_CONTENT_H
+#ifndef FILE_CONTENT_BASE_H
+#define FILE_CONTENT_BASE_H
 
 #include <string>
 #include <list>
@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "file_chunk.h"
 
-class FileContent : public Mutex, private std::list<FileChunk>
+class FileContentBase : public Mutex, private std::list<FileChunk>
 {
 public:
 	enum chunk_availability
@@ -63,9 +63,9 @@ private:
 
 	FileChunk& operator=(const FileChunk &other);
 public:
-	FileContent(std::string _filename);
-	FileContent(const FileContent&);
-	~FileContent();
+	FileContentBase(std::string _filename);
+	FileContentBase(const FileContentBase&);
+	virtual ~FileContentBase();
 
 	/* Returns a copy of the chunk */
 	FileChunk GetChunk(off_t offset, size_t size);
@@ -81,4 +81,4 @@ public:
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
 };
-#endif
+#endif /* FILE_CONTENT_BASE_H */

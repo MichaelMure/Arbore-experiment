@@ -21,7 +21,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include "file_content.h"
+#include "file_content_base.h"
 #include "file_chunk.h"
 #include "scheduler_queue.h"
 #include "job_change_filesize.h"
@@ -30,7 +30,7 @@
 
 const time_t write_to_hdd_timeout = 10;
 
-FileContent::FileContent(std::string _filename) :
+FileContentBase::FileContentBase(std::string _filename) :
 			Mutex(RECURSIVE_MUTEX),
 			filename(_filename),
 			ondisk_offset(0),
@@ -44,7 +44,7 @@ FileContent::FileContent(std::string _filename) :
 	access_time = time(NULL);
 }
 
-FileContent::FileContent(const FileContent& other) :
+FileContentBase::FileContentBase(const FileContentBase& other) :
 			Mutex(RECURSIVE_MUTEX),
 std::list<FileChunk>(),				  /* to avoid a warning */
 			filename(other.filename),
@@ -59,13 +59,13 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 	access_time = other.access_time;
 }
 
-FileContent::~FileContent()
+FileContentBase::~FileContentBase()
 {
 	if(ondisk_fd != -1)
 		close(ondisk_fd);
 }
 
-bool FileContent::LoadFd()
+bool FileContentBase::LoadFd()
 {
 	BlockLockMutex lock(this);
 	if(ondisk_fd == -1)
@@ -85,7 +85,7 @@ bool FileContent::LoadFd()
 	return (ondisk_fd != -1);
 }
 
-void FileContent::OnDiskWrite(FileChunk& chunk)
+void FileContentBase::OnDiskWrite(FileChunk& chunk)
 {
 	BlockLockMutex lock(this);
 	ondisk_offset = 0;
@@ -108,7 +108,7 @@ void FileContent::OnDiskWrite(FileChunk& chunk)
 	chunk.SetHddSynced(true);
 }
 
-bool FileContent::OnDiskLoad(FileChunk chunk)
+bool FileContentBase::OnDiskLoad(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
 	if(!LoadFd())
@@ -129,7 +129,7 @@ bool FileContent::OnDiskLoad(FileChunk chunk)
 	return true;
 }
 
-bool FileContent::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
+bool FileContentBase::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
 {
 	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
@@ -149,7 +149,7 @@ bool FileContent::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
 	return false;
 }
 
-FileChunk FileContent::GetChunk(off_t offset, size_t size)
+FileChunk FileContentBase::GetChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -175,7 +175,7 @@ FileChunk FileContent::GetChunk(off_t offset, size_t size)
 	return chunk;
 }
 
-bool FileContent::FileContentHaveChunk(off_t offset, size_t size)
+bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 {
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
@@ -199,7 +199,7 @@ bool FileContent::FileContentHaveChunk(off_t offset, size_t size)
 	return (it != end()) && next_off == it->GetOffset();
 }
 
-enum FileContent::chunk_availability FileContent::NetworkHaveChunk(FileChunk chunk)
+enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunk chunk)
 {
 #if 0
 	/* If nobody's connected we won't receive anything */
@@ -209,7 +209,7 @@ enum FileContent::chunk_availability FileContent::NetworkHaveChunk(FileChunk chu
 
 }
 
-enum FileContent::chunk_availability FileContent::HaveChunk(off_t offset, size_t size)
+enum FileContentBase::chunk_availability FileContentBase::HaveChunk(off_t offset, size_t size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -226,7 +226,7 @@ enum FileContent::chunk_availability FileContent::HaveChunk(off_t offset, size_t
 	return NetworkHaveChunk(FileChunk(NULL, offset, size));
 }
 
-void FileContent::SetChunk(FileChunk chunk)
+void FileContentBase::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
 	ondisk_synced = false;
@@ -270,7 +270,7 @@ void FileContent::SetChunk(FileChunk chunk)
 	insert(it, new_chunk);
 }
 
-void FileContent::Truncate(off_t offset)
+void FileContentBase::Truncate(off_t offset)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -308,7 +308,7 @@ void FileContent::Truncate(off_t offset)
 	}
 }
 
-void FileContent::SyncToHdd(bool force)
+void FileContentBase::SyncToHdd(bool force)
 {
 	BlockLockMutex lock(this);
 	if(ondisk_synced)
@@ -334,7 +334,7 @@ void FileContent::SyncToHdd(bool force)
 	}
 }
 
-time_t FileContent::GetAccessTime() const
+time_t FileContentBase::GetAccessTime() const
 {
 	BlockLockMutex lock(this);
 	return access_time;
