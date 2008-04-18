@@ -119,14 +119,11 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		if(filename.empty() || !dir)
 			throw FileAlreadyExists();
 
-		/* If file was created locally, do not use the filesystem stat, because
-		 * it contains unix perms and we don't care about. */
 		if(sender == 0)
 		{
 			sharers.push_back(environment.my_id.Get());
-			pf_stat tmp_stat = pf_stat();
-			tmp_stat.mode = stat.mode;
-			stat = tmp_stat;
+			stat.uid = environment.my_id.Get();
+			stat.gid = environment.my_id.Get();
 		}
 
 		if(stat.mode & S_IFDIR)
