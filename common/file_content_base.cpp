@@ -25,7 +25,6 @@
 #include "file_content_base.h"
 #include "file_chunk.h"
 #include "scheduler_queue.h"
-#include "job_change_filesize.h"
 #include "session_config.h"
 #include "hdd.h"
 #include "peers_list.h"

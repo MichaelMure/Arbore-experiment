@@ -36,8 +36,6 @@ enum job_type
  	JOB_SEND_CHUNK,
 	/* Receive a chunk from a peer */
 	JOB_SET_CHUNK,
-	/* Notify the cache and the network about filesize modification */
-	JOB_CHANGE_FILESIZE,
 	/* Tries connecting to a peer */
 	JOB_NEW_CONNECT,
 	/* Tries connecting to a peer because an other

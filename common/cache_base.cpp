@@ -174,7 +174,7 @@ void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 	if(off + (off_t)size > (off_t)stat.size)
 	{
 		stat.size = (size_t)off + size;
-		SetAttr(path, stat);
+		MkFile(path, stat, IDList());
 	}
 }
 
@@ -226,7 +226,7 @@ int CacheBase::Truncate(std::string path, off_t offset)
 	stat.size = (size_t)offset;
 	stat.ctime = time(NULL);
 	stat.mtime = stat.ctime;
-	SetAttr(path, stat);
+	MkFile(path, stat, IDList());
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);
 

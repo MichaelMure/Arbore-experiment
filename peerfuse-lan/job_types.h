@@ -29,8 +29,6 @@ enum job_type
 	/* SetAttr triggered by a peer */
 	JOB_FILE_SETATTR,
 	/* Notify the cache and the network about filesize modification */
-	JOB_CHANGE_FILESIZE,
-	/* Send changes to the peer since his last connection */
 	JOB_SEND_CHANGES,
 	/* Tell a peer we have the content of a file */
 	JOB_ADVERTISE_FILE,

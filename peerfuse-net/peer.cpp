@@ -33,7 +33,6 @@
 #include "scheduler_queue.h"
 #include "job_mkfile.h"
 #include "job_rmfile.h"
-#include "job_file_setattr.h"
 #include "job_update_resp_files.h"
 #include "job_send_ref_file.h"
 #include "job_send_chunk.h"

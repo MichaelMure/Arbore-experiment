@@ -82,7 +82,6 @@ public:
 	void ChOwn(std::string path, uid_t uid, gid_t gid);
 	void ChMod(std::string path, mode_t mode);
 	pf_stat GetAttr(std::string path);
-	virtual void SetAttr(std::string path, pf_stat _stat, pf_id sender = 0) = 0;
 #ifndef PF_SERVER_MODE
 	void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 #endif
