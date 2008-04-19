@@ -52,9 +52,11 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 			ondisk_offset(other.ondisk_offset),
 			ondisk_size(other.ondisk_size),
 			ondisk_fd(-1),
+			ondisk_synced(other.ondisk_synced),
 			filename(other.filename),
 			waiting_for_sharers(other.waiting_for_sharers)
 {
+	BlockLockMutex lock(&other);
 	if(other.ondisk_fd != -1)
 		ondisk_fd = dup(other.ondisk_fd);
 	for(const_iterator it = other.begin(); it != other.end(); ++it)
@@ -180,6 +182,7 @@ FileChunk FileContentBase::GetChunk(off_t offset, size_t size)
 
 bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 {
+	BlockLockMutex lock(this);
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
 		++it;
@@ -204,6 +207,7 @@ bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 
 enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunk chunk)
 {
+	BlockLockMutex lock(this);
 	/* If nobody's connected we won't receive anything */
 	if(peers_list.Size() == 0)
 		return CHUNK_UNAVAILABLE;
@@ -434,6 +438,7 @@ void FileContentBase::NetworkFlushRequests()
 
 void FileContentBase::SetSharer(pf_id sharer, off_t offset, size_t size)
 {
+	BlockLockMutex lock(this);
 	struct sharedchunks shared_part;
 	shared_part.sharer = sharer;
 	shared_part.part = FileChunk(NULL, offset, size);

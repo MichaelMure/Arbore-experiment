@@ -33,6 +33,11 @@ bool JobSendChunk::Start()
 	{
 		log[W_DEBUG] << "Sending chunk";
 		FileChunk chunk = f.GetChunk(offset, size);
+		if(chunk.GetData() == NULL)
+		{
+			log[W_ERR] << "Trying to send an empty chunk..";
+			return false;
+		}
 		peers_list.SendChunk(ref, sendto, chunk);
 		return false;
 	}
