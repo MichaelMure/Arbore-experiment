@@ -106,6 +106,7 @@ do
 		gdb)
 			sleep 2
 			#echo "set follow-fork-mode child" > stdin$i
+			echo "handle SIGPIPE nostop print pass" > stdin$i
 			echo "r" > stdin$i
 			;;
 		valgrind) sleep 10 ;;
