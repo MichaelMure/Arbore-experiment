@@ -430,9 +430,22 @@ FileChunk PacketBase::ReadChunk()
 	size_t c_size = ReadInt32();
 
 	FileChunk chunk(datas, c_offset, c_size);
+
+	char* new_datas;
+	size -= c_size;
+	if(size > 0)
+	{
+		new_datas = new char [size];
+		memcpy(new_datas, datas + c_size, size);
+	}
+
 	delete []datas;
-	size = 0;
-	datas = NULL;
+
+	if(size > 0)
+		datas = new_datas;
+	else
+		datas = NULL;
+
 	return chunk;
 }
 
