@@ -31,43 +31,53 @@ ConnectionSsl::~ConnectionSsl()
 
 void ConnectionSsl::SocketWrite() throw(WriteError)
 {
-	if(write_buf_size == 0)
-		return;
+	if(write_buf_size != 0)
+	{
+		buf_t new_buf;
+		new_buf.buf = write_buf;
+		new_buf.size = write_buf_size;
+		write_buf = NULL;
+		write_buf_size = 0;
+		buf_queue.push(new_buf);
+	}
 
 	log[W_DEBUG] << "Send...";
-	int written = SSL_write(ssl, write_buf, write_buf_size);
-	if(written < 0)
+	while(!buf_queue.empty())
 	{
-		// No error, we are just waiting for datas
-		// A WANT_READ can be returnd see man SSL_read()
-		if(SSL_get_error(ssl, written) == SSL_ERROR_WANT_READ
-			|| SSL_get_error(ssl, written) == SSL_ERROR_WANT_WRITE)
-			return;
-		log[W_DEBUG] << "Write failed";
-		std::string err = ERR_error_string(ERR_get_error(), NULL);
-		throw WriteError(err);
-	}
-	else
-	if(written == 0)
-	{
-		throw WriteError("Peer disconnected");
-	}
-	if(written == (int)write_buf_size)
-	{
-		// All the buffer has been sent
-		write_buf_size = 0;
-		free(write_buf);
-		write_buf = NULL;
-	}
-	else
-	{
-		// Partial send
-		write_buf_size -= written;
-		char* new_buf = (char*)malloc(write_buf_size);
-		memcpy(new_buf, write_buf + written, write_buf_size);
-		free(write_buf);
-		write_buf = new_buf;
-		log[W_DEBUG] << "Partial send";
+		int written = SSL_write(ssl, buf_queue.front().buf, buf_queue.front().size);
+		if(written < 0)
+		{
+			// No error, we are just waiting for datas
+			// A WANT_READ can be returnd see man SSL_read()
+			if(SSL_get_error(ssl, written) == SSL_ERROR_WANT_READ
+				|| SSL_get_error(ssl, written) == SSL_ERROR_WANT_WRITE)
+				return;
+			log[W_DEBUG] << "Write failed";
+			std::string err = ERR_error_string(ERR_get_error(), NULL);
+			throw WriteError(err);
+		}
+		else
+		if(written == 0)
+		{
+			throw WriteError("Peer disconnected");
+		}
+		if(written == (int)buf_queue.front().size)
+		{
+			// All the buffer has been sent
+			free(buf_queue.front().buf);
+			buf_queue.pop();
+		}
+		else
+		{
+			// Partial send
+			buf_queue.front().size -= written;
+			char* new_buf = (char*)malloc(buf_queue.front().size);
+			memcpy(new_buf, buf_queue.front().buf + written, buf_queue.front().size);
+			free(buf_queue.front().buf);
+			buf_queue.front().buf = new_buf;
+			log[W_DEBUG] << "Partial send";
+			break;
+		}
 	}
 }
 

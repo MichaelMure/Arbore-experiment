@@ -21,12 +21,20 @@
 #define PF_CONNECTION_SSL_H
 
 #include <exception>
+#include <queue>
 #include "connection.h"
 #include "certificate.h"
 
 class ConnectionSsl : public Connection
 {
 	SSL* ssl;
+	struct buf_t
+	{
+		char* buf;
+		size_t size;
+	};
+	std::queue<struct buf_t> buf_queue;
+
 public:
 	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
 	~ConnectionSsl();
