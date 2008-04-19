@@ -38,6 +38,7 @@
 #include "job_update_resp_files.h"
 #include "job_send_ref_file.h"
 #include "job_send_chunk.h"
+#include "job_set_chunk.h"
 #include "job_set_shared_part.h"
 #include "connection_ssl.h"
 #include "environment.h"
@@ -295,6 +296,18 @@ void Peer::Handle_net_want_chunk(struct Packet* msg)
 	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_WANT_CHUNK_OFFSET);
 	size_t size = (size_t)msg->GetArg<uint32_t>(NET_WANT_CHUNK_SIZE);
 	scheduler_queue.Queue(new JobSendChunk(ref, GetID(), offset, size));
+}
+
+void Peer::Handle_net_chunk(struct Packet* msg)
+{
+	uint32_t ref = msg->GetArg<uint32_t>(NET_CHUNK_REF);
+
+	std::map<uint32_t, std::string>::iterator it;
+	if((it = file_refs.find(ref)) == file_refs.end())
+		return;
+
+	FileChunk& chunk = msg->GetArg<FileChunk&>(NET_CHUNK_CHUNK);
+	scheduler_queue.Queue(new JobSetChunk(it->second, chunk));
 }
 
 void Peer::HandleMsg(Packet* pckt)

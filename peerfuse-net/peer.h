@@ -60,6 +60,7 @@ class Peer : public PeerBase
 	void Handle_net_want_ref_file(struct Packet* pckt);
 	void Handle_net_ref_file(struct Packet* pckt);
 	void Handle_net_want_chunk(struct Packet* pckt);
+	void Handle_net_chunk(struct Packet* pckt);
 public:
 	/* Constructors */
 	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, pf_id parent = 0);

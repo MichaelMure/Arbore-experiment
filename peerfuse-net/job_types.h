@@ -34,6 +34,8 @@ enum job_type
 	JOB_SET_SHARED_PART,
  	/* Send a chunk to a peer */
  	JOB_SEND_CHUNK,
+	/* Receive a chunk from a peer */
+	JOB_SET_CHUNK,
 	/* Notify the cache and the network about filesize modification */
 	JOB_CHANGE_FILESIZE,
 	/* Tries connecting to a peer */
