@@ -54,6 +54,7 @@ void ContentListBase::OnStop()
 	/* Force saving chunk to disk */
 	for(iterator it = begin(); it != end(); ++it)
 		it->second.SyncToHdd(true);
+	sync();
 }
 
 FileContent& ContentListBase::GetFile(std::string path)

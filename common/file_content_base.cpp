@@ -106,7 +106,6 @@ void FileContentBase::OnDiskWrite(FileChunk& chunk)
 		log[W_ERR] << "Unable to save \"" << filename <<"\" in cache: " <<strerror(errno);
 		return;
 	}
-	fsync(ondisk_fd);
 
 	log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	ondisk_size = (size_t)MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), (off_t)ondisk_size);
