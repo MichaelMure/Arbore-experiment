@@ -54,9 +54,9 @@ public:
 	Cache();
 	~Cache();
 
-	void MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender = 0);
+	void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0);
 	void RmFile(std::string path, pf_id sender = 0);
-	void SetAttr(std::string path, pf_stat stat, pf_id sender);
+	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 
 	/* FileDistributino functions... */

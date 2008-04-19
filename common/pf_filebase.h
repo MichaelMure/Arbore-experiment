@@ -56,9 +56,9 @@ class FileEntryBase
 	DirEntry* parent;
 	IDList sharers;
 
+	pf_stat stat;
 public:
 
-	pf_stat stat;
 
 	FileEntryBase(std::string name, pf_stat stat, DirEntry* _parent);
 	virtual ~FileEntryBase();
@@ -71,6 +71,9 @@ public:
 
 	std::vector<pf_id> GetSharers() const { return sharers; }
 	void SetSharers(std::vector<pf_id> l) { sharers = l; }
+
+	pf_stat GetAttr() const { return stat; };
+	void SetAttr(pf_stat stat);
 };
 
 template<>

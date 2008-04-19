@@ -353,10 +353,20 @@ void FileContentBase::SyncToHdd(bool force)
 	iterator it = begin();
 	while(it != end() && it->GetOffset() <= ondisk_offset + (off_t)ondisk_size)
 	{
+		/* This chunk has not been accessed during the last 10 secs */
 		if(it->GetAccessTime() + write_to_hdd_timeout < time(NULL) || force)
 		{
+			/* Write it to disk, if it's not already done */
 			if(!it->GetHddSynced())
+			{
 				OnDiskWrite(*it);
+				if(!force)
+				{
+					/* Came back later, let fuse continue to acces this file */
+					ondisk_synced = false;
+					return;
+				}
+			}
 			it = erase(it);
 		}
 		else

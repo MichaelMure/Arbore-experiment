@@ -77,22 +77,19 @@ void CacheBase::Load(std::string hd_path)
 
 void CacheBase::ChOwn(std::string path, uid_t uid, gid_t gid)
 {
-	Lock();
+	BlockLockMutex lock(this);
 
 	FileEntry* file = Path2File(path);
 	if(!file)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
-	file->stat.uid = uid;
-	file->stat.gid = gid;
-	file->stat.meta_mtime = time(NULL);
+	pf_stat stat = file->GetAttr();
+	stat.uid = uid;
+	stat.gid = gid;
+	stat.meta_mtime = time(NULL);
+	SetAttr(path, stat);
 
 	/* TODO propagate it */
-
-	Unlock();
 }
 
 void CacheBase::ChMod(std::string path, mode_t mode)
@@ -101,36 +98,25 @@ void CacheBase::ChMod(std::string path, mode_t mode)
 
 	FileEntry* file = Path2File(path);
 	if(!file)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
-	file->stat.mode = mode;
-	file->stat.meta_mtime = time(NULL);
+	pf_stat stat = file->GetAttr();
+	stat.mode = mode;
+	stat.meta_mtime = time(NULL);
+	SetAttr(path, stat);
 
 	/* TODO propagate it */
-
-	Unlock();
 }
 
 pf_stat CacheBase::GetAttr(std::string path)
 {
-	pf_stat stat;
-
-	Lock();
+	BlockLockMutex lock(this);
 
 	FileEntry* file = Path2File(path);
 	if(!file)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
-	stat = file->stat;
-	Unlock();
-
-	return stat;
+	return file->GetAttr();
 }
 
 #ifndef PF_SERVER_MODE
@@ -174,15 +160,15 @@ void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 	if(off + (off_t)size > (off_t)stat.size)
 	{
 		stat.size = (size_t)off + size;
-		MkFile(path, stat, IDList());
+		SetAttr(path, stat);
 	}
 }
 
 int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 {
-	size_t file_size = (size_t)GetAttr(path).size;
+	off_t file_size = GetAttr(path).size;
 
-	if(off >= (off_t)file_size)
+	if(off >= file_size)
 	{
 		log[W_WARNING] << "Fuse trying to read out of file";
 		return 0;
@@ -226,7 +212,7 @@ int CacheBase::Truncate(std::string path, off_t offset)
 	stat.size = (size_t)offset;
 	stat.ctime = time(NULL);
 	stat.mtime = stat.ctime;
-	MkFile(path, stat, IDList());
+	MkFile(path, stat);
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);
 

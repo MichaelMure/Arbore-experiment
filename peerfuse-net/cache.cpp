@@ -160,7 +160,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	}
 }
 
-void Cache::SetAttr(std::string path, pf_stat stat, pf_id sender)
+void Cache::SetAttr(std::string path, pf_stat stat, IDList sharer, pf_id sender, bool keep_newest)
 {
 	Peer* peer = 0;
 
@@ -189,7 +189,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 		 */
 		time_t dist_ts = sender->Timestamp(stat.mtime);
 
-		if(file->stat.mtime > dist_ts)
+		if(file->GetAttr().mtime > dist_ts)
 		{
 			/* My file is more recent than peer's, so I send it a mkfile
 			 * to correct this.
@@ -200,7 +200,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			sender->SendMsg(pckt);
 			return;
 		}
-		else if(file->stat.mtime == dist_ts)
+		else if(file->GetAttr().mtime == dist_ts)
 		{
 			log[W_DEBUG] << "Same timestamp... What can we do ??";
 			/* TODO Same timestamp, what can we do?... */
@@ -208,8 +208,8 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 		}
 	}
 
-	file->stat = stat;
-	tree_cfg.Set(file->GetFullName() + "#size", (uint32_t)file->stat.size);
+	file->SetAttr(stat);
+
 	if(sharers.empty() == false)
 		file->SetSharers(sharers);
 
@@ -228,7 +228,7 @@ void Cache::RmFile(std::string path, pf_id sender)
 		throw NoSuchFileOrDir();
 
 	// If it's a dir that isn't empty -> return error
-	if (f->stat.mode & S_IFDIR)
+	if (f->GetAttr().mode & S_IFDIR)
 	{
 		DirEntry* d = static_cast<DirEntry*>(f);
 		if(d->GetSize() != 0)

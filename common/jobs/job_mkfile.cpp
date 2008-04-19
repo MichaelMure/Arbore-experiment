@@ -25,12 +25,11 @@ bool JobMkFile::Start()
 {
 	try
 	{
-		cache.MkFile(file, stat, sharers, sender);
+		cache.SetAttr(file, stat, sharers, sender, keep_newest);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
-		log[W_DESYNCH] << "Unable to create " << file << ": No such file or directory";
-		/* XXX: Desync DO SOMETHING */
+		cache.MkFile(file, stat, sharers, sender);
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{

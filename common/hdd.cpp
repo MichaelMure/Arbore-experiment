@@ -94,14 +94,12 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			else
 				f = new FileEntry(std::string(dir->d_name), file_stats, cache_dir);
 
-			if(!tree_cfg.Get(f->GetFullName() + "#meta", f->stat.meta_mtime))
-			{
-				file_stats.meta_mtime = file_stats.mtime;
-				tree_cfg.Set(f->GetFullName() + "#meta", f->stat.meta_mtime);
-			}
-			uint32_t cfg_size = 0;
-			tree_cfg.Get(f->GetFullName() + "#size", cfg_size);
-			f->stat.size = (size_t)cfg_size;
+			uint32_t cfg_val = 0;
+			if(tree_cfg.Get(f->GetFullName() + "#meta", cfg_val))
+				file_stats.meta_mtime = (time_t)cfg_val;
+			if(tree_cfg.Get(f->GetFullName() + "#size", cfg_val))
+				file_stats.size = (size_t)cfg_val;
+			f->SetAttr(file_stats);
 
 			log[W_INFO] << f->GetFullName() << " loaded.";
 
@@ -153,16 +151,16 @@ void Hdd::MkFile(FileEntry* f)
 {
 	BlockLockMutex lock(this);
 	std::string path = root + f->GetFullName();
-	if(f->stat.mode & S_IFDIR)
+	if(f->GetAttr().mode & S_IFDIR)
 	{
-		int r = mkdir(path.c_str(), f->stat.mode);
+		int r = mkdir(path.c_str(), f->GetAttr().mode);
 		if(r)
 			throw HddWriteFailure(path);
 		log[W_INFO] << "mkdir on " << path;
 	}
 	else
 	{
-		int fd = creat(path.c_str(), f->stat.mode);
+		int fd = creat(path.c_str(), f->GetAttr().mode);
 		if(fd == -1)
 			throw HddWriteFailure(path);
 		close(fd);
@@ -170,19 +168,17 @@ void Hdd::MkFile(FileEntry* f)
 	}
 
 	#ifndef PF_NET
-	/* TODO: store somewhere owner and group of file. */
-	if(lchown(path.c_str(), f->stat.uid, f->stat.gid) != 0)
+	/* TODO: store somewhere owner and group of file. -> from pf_file.cpp */
+	if(lchown(path.c_str(), f->GetAttr().uid, f->GetAttr().gid) != 0)
 		throw HddWriteFailure(path);
 	#endif
-
-	tree_cfg.Set(f->GetFullName() + "#meta", f->stat.meta_mtime);
 }
 
 void Hdd::RmFile(FileEntry* f)
 {
 	BlockLockMutex lock(this);
 	std::string path = root + f->GetFullName();
-	if(f->stat.mode & S_IFDIR)
+	if(f->GetAttr().mode & S_IFDIR)
 	{
 		int r = rmdir(path.c_str());
 		if(r)

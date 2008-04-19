@@ -150,7 +150,13 @@ function start_test
 				cat "${!LOG}"
 				echo
 				echo "Files in MNT$i:"
-				ls "${!MNT}"
+				ls -l "${!MNT}"
+				stat "${!MNT}"/*
+				echo
+				echo "session.cfg:"
+				cat "${WORKDIR}/confdir${i}/session.cfg"
+				echo "tree.cfg:"
+				cat "${WORKDIR}/confdir${i}/tree.cfg"
 				if [ "$TOOL" == "valgrind" ] || [ "$TOOL" == "helgrind" ]
 				then
 					echo "Valgrind logs:"

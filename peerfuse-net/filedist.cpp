@@ -125,14 +125,14 @@ Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
 {
 	Packet pckt(NET_MKFILE, environment.my_id.Get());
 	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
-	pckt.SetArg(NET_MKFILE_MODE, f->stat.mode);
-	pckt.SetArg(NET_MKFILE_UID, f->stat.uid);
-	pckt.SetArg(NET_MKFILE_GID, f->stat.gid);
-	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->stat.size);
-	pckt.SetArg(NET_MKFILE_ACCESS_TIME, (uint32_t)f->stat.atime);
-	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->stat.mtime);
-	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->stat.meta_mtime);
-	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->stat.ctime);
+	pckt.SetArg(NET_MKFILE_MODE, f->GetAttr().mode);
+	pckt.SetArg(NET_MKFILE_UID, f->GetAttr().uid);
+	pckt.SetArg(NET_MKFILE_GID, f->GetAttr().gid);
+	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->GetAttr().size);
+	pckt.SetArg(NET_MKFILE_ACCESS_TIME, (uint32_t)f->GetAttr().atime);
+	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->GetAttr().mtime);
+	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->GetAttr().meta_mtime);
+	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->GetAttr().ctime);
 	pckt.SetArg(NET_MKFILE_SHARERS, f->GetSharers());
 
 	return pckt;

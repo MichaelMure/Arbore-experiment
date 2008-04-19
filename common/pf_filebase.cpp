@@ -22,10 +22,12 @@
 #include <sys/types.h>
 #include "pf_filebase.h"
 #include "pf_dir.h"
+#include "session_config.h"
 
 FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
-			: name(_name), parent(_parent), stat(_stat)
+			: name(_name), parent(_parent)
 {
+	SetAttr(stat);
 }
 
 FileEntryBase::~FileEntryBase()
@@ -55,4 +57,14 @@ bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
 	while(p && p != f) p = p->parent;
 
 	return (p);
+}
+
+void FileEntryBase::SetAttr(pf_stat new_stat)
+{
+	// Update attribute
+	if(stat.size != new_stat.size)
+		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
+	if(stat.meta_mtime != new_stat.meta_mtime)
+		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
+	stat = new_stat;
 }

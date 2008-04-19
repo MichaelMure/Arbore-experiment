@@ -33,8 +33,9 @@ public:
 	Cache();
 	~Cache();
 
-	virtual void MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender = 0);
+	virtual void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0);
 	virtual void RmFile(std::string path, pf_id sender = 0);
+	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 
 	void SendChanges(pf_id peer, time_t last_view);

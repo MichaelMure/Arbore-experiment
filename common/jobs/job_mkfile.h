@@ -29,13 +29,15 @@ class JobMkFile : public Job
 	pf_stat stat;
 	pf_id sender;
 	IDList sharers;
+	bool keep_newest;
 public:
-	JobMkFile(std::string _file, pf_stat _stat, IDList _sharers, pf_id _sender)
+	JobMkFile(std::string _file, pf_stat _stat, IDList _sharers, pf_id _sender, bool _keep_newest)
 		: Job(0, REPEAT_NONE),
 		file(_file),
 		stat(_stat),
 		sender(_sender),
-		sharers(_sharers)
+		sharers(_sharers),
+		keep_newest(_keep_newest)
 		{}
 	~JobMkFile() {}
 
