@@ -54,16 +54,16 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	/* NET_HELLO */
 	{
-		/* NET_HELLO_NOW */     T_UINT32,
-		/* NET_HELLO_PORT */    T_UINT32,
-		/* NET_HELLO_VERSION */ T_STR,
-		/* NET_HELLO_MY_ID */   T_UINT32,
+		/* NET_HELLO_NOW */     T_UINT32, /* Local time */
+		/* NET_HELLO_PORT */    T_UINT32, /* Port where i'm listening on */
+		/* NET_HELLO_VERSION */ T_STR, /* My version */
+		/* NET_HELLO_MY_ID */   T_UINT32, /* My Id */
 		T_NONE
 	},
 
 	/* NET_YOUR_ID */
 	{
-		/* NET_YOUR_ID_ID */    T_UINT32,
+		/* NET_YOUR_ID_ID */    T_UINT32, /* Id randomly chosen for the peer */
 		T_NONE
 	},
 
@@ -74,65 +74,65 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	/* NET_GET_STRUCT_DIFF */
 	{
-		/* NET_GET_STRUCT_DIFF_LAST_CONNECTION */ T_UINT32,
+		/* NET_GET_STRUCT_DIFF_LAST_CONNECTION */ T_UINT32, /* Last time we was connetced to the network */
 		T_NONE
 	},
 
 	/* NET_MKFILE */
 	{
-		/* NET_MKFILE_PATH */            T_STR,
-		/* NET_MKFILE_MODE */            T_UINT32,
-		/* NET_MKFILE_UID */             T_UINT32,
-		/* NET_MKFILE_GID */             T_UINT32,
-		/* NET_MKFILE_SIZE */            T_UINT64,
-		/* NET_MKFILE_ACCESS_TIME */     T_UINT32,
-		/* NET_MKFILE_CREATE_TIME */     T_UINT32,
-		/* NET_MKFILE_MODIF_TIME */      T_UINT32,
-		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32,
+		/* NET_MKFILE_PATH */            T_STR, /* Path to the file */
+		/* NET_MKFILE_MODE */            T_UINT32, /* File mode (dir, file, symlink...) */
+		/* NET_MKFILE_UID */             T_UINT32, /* UID of the file */
+		/* NET_MKFILE_GID */             T_UINT32, /* GID of the file */
+		/* NET_MKFILE_SIZE */            T_UINT64, /* Size of the file */
+		/* NET_MKFILE_ACCESS_TIME */     T_UINT32, /* Access time (subject to change) */
+		/* NET_MKFILE_CREATE_TIME */     T_UINT32, /* Creation time (subject to change) */
+		/* NET_MKFILE_MODIF_TIME */      T_UINT32, /* Modification time (subject to change) */
+		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32, /* Meta data modification time (subject to change) */
 		T_NONE
 	},
 
 	/* NET_RMFILE */
 	{
-		/* NET_RMFILE_PATH */ T_STR,
+		/* NET_RMFILE_PATH */ T_STR, /* Path to file */
 		T_NONE
 	},
 
 	/* NET_FILE_SETATTR */
 	{
-		/* NET_MKFILE_PATH */            T_STR,
-		/* NET_MKFILE_MODE */            T_UINT32,
-		/* NET_MKFILE_UID */             T_UINT32,
-		/* NET_MKFILE_GID */             T_UINT32,
-		/* NET_MKFILE_SIZE */            T_UINT64,
-		/* NET_MKFILE_ACCESS_TIME */     T_UINT32,
-		/* NET_MKFILE_CREATE_TIME */     T_UINT32,
-		/* NET_MKFILE_MODIF_TIME */      T_UINT32,
-		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32,
+		/* NET_FILE_SETATR_PATH */            T_STR,
+		/* NET_FILE_SETATR_MODE */            T_UINT32,
+		/* NET_FILE_SETATR_UID */             T_UINT32,
+		/* NET_FILE_SETATR_GID */             T_UINT32,
+		/* NET_FILE_SETATR_SIZE */            T_UINT64,
+		/* NET_FILE_SETATR_ACCESS_TIME */     T_UINT32,
+		/* NET_FILE_SETATR_CREATE_TIME */     T_UINT32,
+		/* NET_FILE_SETATR_MODIF_TIME */      T_UINT32,
+		/* NET_FILE_SETATR_META_MODIF_TIME */ T_UINT32,
 		T_NONE
 	},
 
 	// NET_PEER_CONNECTION
 	{
-		/* NET_PEER_CONNECTION_ADDRESS */ T_ADDR,
+		/* NET_PEER_CONNECTION_ADDRESS */ T_ADDR, /* Connect to this address */
 		T_NONE
 	},
 
 	// NET_PEER_CONNECTION_ACK
 	{
-		/* NET_PEER_CONNECTION_ACK_ADDRESS */ T_ADDR,
+		/* NET_PEER_CONNECTION_ACK_ADDRESS */ T_ADDR, /* Connection to this address was successful */
 		T_NONE
 	},
 
 	// NET_PEER_CONNECTION_RST
 	{
-		/* NET_PEER_CONNECTION_RST_ADDRESS */ T_ADDR,
+		/* NET_PEER_CONNECTION_RST_ADDRESS */ T_ADDR, /* Connection to this address wasn't successful */
 		T_NONE
 	},
 
 	// NET_PEER_CONNECTION_REJECTED
 	{
-		/* NET_PEER_CONNECTION_REJECTED_ADDRESS */ T_ADDR,
+		/* NET_PEER_CONNECTION_REJECTED_ADDRESS */ T_ADDR, /* Address of the peer that couldn't contact us */
 		T_NONE
 	},
 
@@ -150,43 +150,43 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	// NET_WHO_HAS_FILE
 	{
-		/* NET_WHO_HAS_FILE_PATH */ T_STR,
+		/* NET_WHO_HAS_FILE_PATH */ T_STR, /* Path to file */
 		T_NONE
 	},
 
 	// NET_I_HAVE_FILE
 	{
-		/* NET_I_HAVE_FILE_PATH */ T_STR,
+		/* NET_I_HAVE_FILE_PATH */ T_STR, /* Path to file */
 		T_NONE
 	},
 
 	// NET_WANT_REF_FILE
 	{
-		/* NET_WANT_REF_FILE_PATH */ T_STR,
+		/* NET_WANT_REF_FILE_PATH */ T_STR, /* Path to file */
 		T_NONE
 	},
 
 	// NET_REF_FILE
 	{
-		/* NET_REF_FILE_PATH */ T_STR,
-		/* NET_REF_FILE_REF */ T_UINT32,
-		/* NET_REF_FILE_OFFSET */ T_UINT64,
-		/* NET_REF_FILE_SIZE */ T_UINT64,
+		/* NET_REF_FILE_PATH */ T_STR, /* Path to file */
+		/* NET_REF_FILE_REF */ T_UINT32, /* Reference of the file */
+		/* NET_REF_FILE_OFFSET */ T_UINT64, /* Offset of the content we own */
+		/* NET_REF_FILE_SIZE */ T_UINT64, /* Size of the content we own */
 		T_NONE
 	},
 
 	// NET_WANT_CHUNK
 	{
-		/* NET_WANT_CHUNK_REF */ T_UINT32,
-		/* NET_WANT_CHUNK_OFFSET */ T_UINT64,
-		/* NET_WANT_CHUNK_SIZE */ T_UINT32,
+		/* NET_WANT_CHUNK_REF */ T_UINT32, /* Reference of the file */
+		/* NET_WANT_CHUNK_OFFSET */ T_UINT64, /* Offset of the wanted content */
+		/* NET_WANT_CHUNK_SIZE */ T_UINT32, /* Size of the wanted content */
 		T_NONE
 	},
 
 	// NET_CHUNK
 	{
-		/* NET_CHUNK_REF */ T_UINT32,
-		/* NET_CHUNK_CHUNK */ T_CHUNK,
+		/* NET_CHUNK_REF */ T_UINT32, /* Reference of the file */
+		/* NET_CHUNK_CHUNK */ T_CHUNK, /* Content */
 		T_NONE
 	}
 };
