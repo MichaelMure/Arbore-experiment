@@ -55,7 +55,5 @@ enum job_type
 	/* We asked other peers to connect to a new peer
 	   this job checks wether they all answered */
 	JOB_OTHER_CONNECT,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
 };
 #endif

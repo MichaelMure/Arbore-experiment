@@ -45,8 +45,6 @@ enum job_type
 	JOB_NEW_CONN_REQ,
 	/* Tries connecting to a list of peers */
 	JOB_NEW_CONN_QUEUE,
-	/* Make the peer send all packet he has in its sending queue */
-	JOB_FLUSH_PEER,
 	/* Update responsibles files */
 	JOB_UPDATE_RESP_FILES,
 };

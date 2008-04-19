@@ -41,7 +41,10 @@ function start_fs
 		export CACHE_ROOT="$PWD/pf$i/cache"
 		export WORKDIR="$PWD/pf$i/work"
 		export CONFDIR=WORKDIR
-		build_conf "$PWD/pf$i/pfconf.conf"
+		if [ ! -f "$PWD/pf$i/pfconf.conf" ]
+		then
+			build_conf "$PWD/pf$i/pfconf.conf"
+		fi
 	fi
 
 	case $TOOL in
