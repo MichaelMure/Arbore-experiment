@@ -44,6 +44,7 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_WANT_REF_FILE */          "WANT_REF_FILE",
 	/* NET_REF_FILE */               "REF_FILE",
 	/* NET_WANT_CHUNK */             "WANT_CHUNK",
+	/* NET_CHUNK */                  "CHUNK",
 };
 
 const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
@@ -170,7 +171,7 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_REF_FILE_PATH */ T_STR,
 		/* NET_REF_FILE_REF */ T_UINT32,
 		/* NET_REF_FILE_OFFSET */ T_UINT64,
-		/* NET_REF_FILE_SIZE */ T_UINT64,
+		/* NET_REF_FILE_SIZE */ T_UINT32,
 		T_NONE
 	},
 

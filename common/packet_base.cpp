@@ -234,7 +234,7 @@ PacketBase& PacketBase::Write(IDList id_list)
 	return *this;
 }
 
-PacketBase& PacketBase::Write(FileChunk& chunk)
+PacketBase& PacketBase::Write(FileChunk chunk)
 {
 	Write((uint64_t)chunk.GetOffset());
 	Write((uint32_t)chunk.GetSize());
@@ -463,7 +463,7 @@ void PacketBase::BuildDataFromArgs()
 			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
 			case T_IDLIST: Write(GetArg<IDList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
-			case T_CHUNK: Write(GetArg<FileChunk&>(arg_no)); break;
+			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
 			default: throw Malformated();
 		}
 }
@@ -512,8 +512,8 @@ std::string PacketBase::GetPacketInfo() const
 				break;
 			}
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
-			case T_CHUNK: s += "ch off:" + TypToStr(GetArg<FileChunk&>(arg_no).GetOffset())
-						      + " off:" +  TypToStr(GetArg<FileChunk&>(arg_no).GetSize());
+			case T_CHUNK: s += "ch off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
+						      + " off:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize());
 				break;
 			default: throw Malformated();
 		}

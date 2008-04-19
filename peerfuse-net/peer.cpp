@@ -112,22 +112,29 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 		return;
 
 	Packet packet(NET_WANT_CHUNK);
-	packet.SetArg(NET_WANT_CHUNK_REF, it->second);
-	packet.SetArg(NET_WANT_CHUNK_OFFSET, offset);
-	packet.SetArg(NET_WANT_CHUNK_SIZE, size);
+	packet.SetArg(NET_WANT_CHUNK_REF, it->first);
+	packet.SetArg(NET_WANT_CHUNK_OFFSET, (uint64_t)offset);
+	packet.SetArg(NET_WANT_CHUNK_SIZE, (uint32_t)size);
 	SendMsg(packet);
 }
 
-void Peer::SendChunk(std::string filename, FileChunk& chunk)
+void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 {
+#if 0
 	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
 
 	while(it != file_refs.end() && it->second != filename)
 		++it;
 
 	if(it == file_refs.end())
+	{
 		return;
-
+	}
+#endif
+	Packet pckt(NET_CHUNK);
+	pckt.SetArg(NET_CHUNK_REF, ref);
+	pckt.SetArg(NET_CHUNK_CHUNK, chunk);
+	SendMsg(pckt);
 }
 
 /*******************************
@@ -306,7 +313,7 @@ void Peer::Handle_net_chunk(struct Packet* msg)
 	if((it = file_refs.find(ref)) == file_refs.end())
 		return;
 
-	FileChunk& chunk = msg->GetArg<FileChunk&>(NET_CHUNK_CHUNK);
+	FileChunk chunk = msg->GetArg<FileChunk>(NET_CHUNK_CHUNK);
 	scheduler_queue.Queue(new JobSetChunk(it->second, chunk));
 }
 
@@ -332,6 +339,7 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_want_ref_file,    0              },
 		{ &Peer::Handle_net_ref_file,         0              },
 		{ &Peer::Handle_net_want_chunk,       0              },
+		{ &Peer::Handle_net_chunk,            0              },
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

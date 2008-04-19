@@ -82,6 +82,6 @@ public:
 	virtual bool Receive();
 
 	void RequestChunk(std::string filename, off_t offset, size_t size);
-	void SendChunk(std::string filename, FileChunk& chunk);
+	void SendChunk(uint32_t ref, FileChunk& chunk);
 };
 #endif

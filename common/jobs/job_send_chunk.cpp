@@ -21,6 +21,7 @@
 #include "content_list.h"
 #include "file_content.h"
 #include "peers_list.h"
+#include "log.h"
 
 bool JobSendChunk::Start()
 {
@@ -30,10 +31,13 @@ bool JobSendChunk::Start()
 	if(f.FileContentHaveChunk(offset, size)
 	|| f.OnDiskHaveChunk(requested_chunk)) /* TODO: make OnDiskHaveChunk non-blockant and repeat the job */
 	{
+		log[W_DEBUG] << "Sending chunk";
 		FileChunk chunk = f.GetChunk(offset, size);
-		peers_list.SendChunk(f.GetFilename(), sendto, chunk);
+		peers_list.SendChunk(ref, sendto, chunk);
 		return false;
 	}
+	else
+		log[W_DEBUG] << "I don't have this chunk ??";
 
 	return false;
 }

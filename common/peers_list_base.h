@@ -67,6 +67,6 @@ public:
 	void SendMsg(pf_id id, const Packet &p) const;
 
 	void RequestChunk(std::string filename, pf_id id, off_t offset, size_t size);
-	void SendChunk(std::string filename, pf_id id, FileChunk& chunk);
+	void SendChunk(uint32_t ref, pf_id id, FileChunk& chunk);
 };
 #endif

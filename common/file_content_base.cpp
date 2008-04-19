@@ -216,6 +216,7 @@ enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileC
 	if(net_requested.find(chunk) != net_requested.end())
 		return CHUNK_NOT_READY;
 
+	log[W_DEBUG] << "Sending request no " << net_requested.size();
 	net_requested.insert(chunk);
 	NetworkRequestChunk(chunk);
 	return CHUNK_NOT_READY;
@@ -357,7 +358,7 @@ void FileContentBase::SyncToHdd(bool force)
 	}
 }
 
-void FileContentBase::GetOnDiskContent(off_t& offset, size_t& size)
+void FileContentBase::GetSharedContent(off_t& offset, size_t& size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -365,6 +366,29 @@ void FileContentBase::GetOnDiskContent(off_t& offset, size_t& size)
 	LoadFd();
 	offset = ondisk_offset;
 	size = ondisk_size;
+
+
+	if(begin() != end())
+	{
+		// TODO: we don't handle nicely chunks in ram
+		if(front().GetOffset() <= offset
+		&& front().GetOffset() + (off_t) front().GetSize() >= offset
+		&& front().GetOffset() + (off_t) front().GetSize() <= offset + (off_t)size)
+			offset = front().GetOffset();
+
+		/* Find the last contiguous entry */
+		iterator it = begin();
+		off_t next_off = it->GetOffset();
+		while(it != end()
+			&& next_off == it->GetOffset())
+		{
+			next_off = it->GetOffset() + (off_t)it->GetSize();
+			++it;
+		}
+		--it;
+
+		size = (size_t) MAX(it->GetOffset() + (off_t) it->GetSize(), offset + (off_t)size) - offset;
+	}
 }
 
 time_t FileContentBase::GetAccessTime() const

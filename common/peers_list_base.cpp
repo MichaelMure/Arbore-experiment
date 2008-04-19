@@ -191,9 +191,9 @@ void PeersListBase::RequestChunk(std::string filename, pf_id id, off_t offset, s
 	peer->RequestChunk(filename, offset, size);
 }
 
-void PeersListBase::SendChunk(std::string filename, pf_id id, FileChunk& chunk)
+void PeersListBase::SendChunk(uint32_t ref, pf_id id, FileChunk& chunk)
 {
 	BlockLockMutex lock(this);
 	Peer* peer = PeerFromID(id);
-	peer->SendChunk(filename, chunk);
+	peer->SendChunk(ref, chunk);
 }

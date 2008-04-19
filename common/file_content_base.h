@@ -92,7 +92,7 @@ public:
 	enum chunk_availability HaveChunk(off_t offset, size_t size);
 
 	bool HaveAnyChunk();
-	void GetOnDiskContent(off_t& offset, size_t& size);
+	void GetSharedContent(off_t& offset, size_t& size);
 
 	void SetChunk(FileChunk chunk);
 

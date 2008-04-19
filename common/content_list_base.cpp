@@ -114,6 +114,7 @@ uint32_t ContentListBase::GetRef(std::string filename)
 	while(my_refs.find(ref) != my_refs.end())
 		ref++;
 	my_refs[ref] = filename;
+	log[W_DEBUG] << "Giving ref " << ref << " to \"" << filename << "\"";
 
 	return ref;
 }

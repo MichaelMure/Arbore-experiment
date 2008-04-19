@@ -45,7 +45,7 @@ class PacketBase
 	PacketBase& Write(std::string str);
 	PacketBase& Write(AddrList addr_list);
 	PacketBase& Write(IDList id_list);
-	PacketBase& Write(FileChunk& chunk);
+	PacketBase& Write(FileChunk chunk);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();
