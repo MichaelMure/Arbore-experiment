@@ -177,7 +177,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 	FileContent& file = content_list.GetFile(path);
 
 	/* Limit the read to the size of the file */
-	size_t to_read = (size_t) ((off + size > file_size) ? file_size - off : size);
+	size_t to_read = (size_t) ((off + (off_t)size > file_size) ? file_size - off : size);
 
 	if(!to_read)
 	{
