@@ -426,10 +426,10 @@ IDList PacketBase::ReadIDList()
 
 FileChunk PacketBase::ReadChunk()
 {
-	off_t offset = ReadInt64();
-	size_t size = ReadInt32();
+	off_t c_offset = ReadInt64();
+	size_t c_size = ReadInt32();
 
-	FileChunk chunk(datas, offset, size);
+	FileChunk chunk(datas, c_offset, c_size);
 	delete []datas;
 	size = 0;
 	datas = NULL;

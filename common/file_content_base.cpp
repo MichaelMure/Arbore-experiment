@@ -37,7 +37,8 @@ FileContentBase::FileContentBase(std::string _filename) :
 			ondisk_size(0),
 			ondisk_fd(-1),
 			ondisk_synced(true),
-			filename(_filename)
+			filename(_filename),
+			waiting_for_sharers(false)
 {
 	uint32_t nbr = 0;
 	tree_cfg.Get(filename + "#ondisk_off", nbr);
@@ -51,7 +52,8 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 			ondisk_offset(other.ondisk_offset),
 			ondisk_size(other.ondisk_size),
 			ondisk_fd(-1),
-			filename(other.filename)
+			filename(other.filename),
+			waiting_for_sharers(other.waiting_for_sharers)
 {
 	if(other.ondisk_fd != -1)
 		ondisk_fd = dup(other.ondisk_fd);
