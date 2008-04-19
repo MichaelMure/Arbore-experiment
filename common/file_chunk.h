@@ -38,6 +38,16 @@ public:
 	FileChunk& operator=(const FileChunk &other);
 	~FileChunk();
 
+	bool operator==(const FileChunk &other)
+	{
+		return GetOffset() == other.GetOffset() && GetSize() == other.GetSize();
+	}
+
+	bool operator<(const FileChunk &other)
+	{
+		return GetOffset() < other.GetOffset() || (GetOffset() == other.GetOffset() && GetSize() < other.GetSize());
+	}
+
 	time_t GetAccessTime() const { return access_time; }
 	off_t GetOffset() const { return offset; }
 	size_t GetSize() const { return size; }

@@ -212,18 +212,19 @@ enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileC
 	if(peers_list.Size() == 0)
 		return CHUNK_UNAVAILABLE;
 
-	std::set<FileChunk>::iterator net_it;
-	if((net_it = net_unavailable.find(chunk)) != net_unavailable.end())
+	std::list<FileChunk>::iterator net_it;
+	if((net_it = find(net_unavailable.begin(), net_unavailable.end(), chunk)) != net_unavailable.end())
 	{
-		net_unavailable.erase(*net_it);
+		net_unavailable.erase(net_it);
 		return CHUNK_UNAVAILABLE;
 	}
 
-	if(net_requested.find(chunk) != net_requested.end())
+	if(find(net_requested.begin(), net_requested.end(), chunk) != net_requested.end())
 		return CHUNK_NOT_READY;
 
 	log[W_DEBUG] << "Sending request no " << net_requested.size();
-	net_requested.insert(chunk);
+	net_requested.push_back(chunk);
+	net_pending_request.push_back(chunk);
 	NetworkRequestChunk(chunk);
 	return CHUNK_NOT_READY;
 }
@@ -258,11 +259,14 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	ondisk_synced = false;
 	access_time = time(NULL);
 
-	std::set<FileChunk>::iterator net_it;
-	if((net_it = net_requested.find(chunk)) != net_requested.end())
-		net_requested.erase(*net_it);
+	std::list<FileChunk>::iterator net_it;
+	if((net_it = find(net_requested.begin(), net_requested.end(), chunk)) != net_requested.end())
+	{
+		log[W_DEBUG] << "Erasing matching request";
+		net_requested.erase(net_it);
+	}
 
-	/* Merge into the chunk set */
+	/* Merge into the chunk list */
 	iterator it = begin();
 	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= chunk.GetOffset())
 		++it;
@@ -408,8 +412,9 @@ void FileContentBase::NetworkFlushRequests()
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
 
+	log[W_DEBUG] << "Needs to send " << net_pending_request.size() << " chunk requests to " << sharers.size() << "sharers.";
 	/* Send a request for each chunk we have in our queue */
-	std::set<FileChunk>::iterator it = net_pending_request.begin();
+	std::list<FileChunk>::iterator it = net_pending_request.begin();
 	while(it != net_pending_request.end())
 	{
 		/* Find a sharer that have this file */
@@ -426,13 +431,12 @@ void FileContentBase::NetworkFlushRequests()
 			}
 		}
 		if(request_sent)
-		{
-			std::set<FileChunk>::iterator tmp_it = it;
-			++it;
-			net_pending_request.erase(tmp_it);
-		}
+			it = net_pending_request.erase(it);
 		else
+		{
+			log[W_DEBUG] << "No peer found for this request.";
 			++it;
+		}
 	}
 }
 

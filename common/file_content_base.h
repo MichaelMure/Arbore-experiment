@@ -46,8 +46,8 @@ private:
 	time_t access_time;
 
 	/* Network related */
-	std::set<FileChunk, CompFileChunk> net_requested;
-	std::set<FileChunk, CompFileChunk> net_unavailable;
+	std::list<FileChunk> net_requested;
+	std::list<FileChunk> net_unavailable;
 	struct sharedchunks
 	{
 		pf_id sharer;
@@ -59,7 +59,7 @@ protected:
 
 	void NetworkFlushRequests();
 	bool waiting_for_sharers;
-	std::set<FileChunk, CompFileChunk> net_pending_request;
+	std::list<FileChunk> net_pending_request;
 	virtual void NetworkRequestChunk(FileChunk chunk) = 0;
 
 private:

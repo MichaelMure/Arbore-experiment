@@ -110,7 +110,10 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 		++it;
 
 	if(it == file_refs.end())
+	{
+		log[W_ERR] << "This peer has no ref to this file ??";
 		return;
+	}
 
 	Packet packet(NET_WANT_CHUNK);
 	packet.SetArg(NET_WANT_CHUNK_REF, it->first);

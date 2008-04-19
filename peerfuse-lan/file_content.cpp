@@ -20,13 +20,15 @@
 #include "file_content.h"
 #include "peers_list.h"
 #include "packet.h"
+#include "log.h"
 
 void FileContent::NetworkRequestChunk(FileChunk chunk)
 {
+	BlockLockMutex lock(this);
 	if(sharers.size() == 0)
 	{
+		log[W_DEBUG] << "Waiting for sharers to advertise their files";
 		// We don't know who have this file, so ask it first
-		net_pending_request.insert(chunk);
 		if(!waiting_for_sharers)
 		{
 			Packet packet(NET_WHO_HAS_FILE);

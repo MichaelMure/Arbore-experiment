@@ -31,6 +31,10 @@ ConnectionSsl::~ConnectionSsl()
 
 void ConnectionSsl::SocketWrite() throw(WriteError)
 {
+	if(write_buf_size == 0)
+		return;
+
+	log[W_DEBUG] << "Send...";
 	int written = SSL_write(ssl, write_buf, write_buf_size);
 	if(written < 0)
 	{
@@ -63,6 +67,7 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 		memcpy(new_buf, write_buf + written, write_buf_size);
 		free(write_buf);
 		write_buf = new_buf;
+		log[W_DEBUG] << "Partial send";
 	}
 }
 

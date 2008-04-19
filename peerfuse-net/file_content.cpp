@@ -25,7 +25,6 @@ void FileContent::NetworkRequestChunk(FileChunk chunk)
 {
 	if(sharers.size() == 0)
 	{
-		net_pending_request.insert(chunk);
 		// We don't know who have which part of the file
 		if(!waiting_for_sharers)
 		{

@@ -526,7 +526,7 @@ std::string PacketBase::GetPacketInfo() const
 			}
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
 			case T_CHUNK: s += "ch off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
-						      + " off:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize());
+						      + " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize());
 				break;
 			default: throw Malformated();
 		}

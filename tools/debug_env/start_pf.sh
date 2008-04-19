@@ -47,7 +47,7 @@ function start_fs
 	case $TOOL in
 		gdb)
 			rm -f log_stdout$i 
-			tail -f stdin$i | gdb --args "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>&1| while read line
+			tail -f stdin$i | gdb --args "../../build.$PF/$PF" pf$i/pfconf.conf -d pf$i/mount 2>&1 | tee -a log${i}| while read line
 			do
 				echo "$i $line" >> stdout$i
 			done
