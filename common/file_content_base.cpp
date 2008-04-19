@@ -21,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include <algorithm>
 #include "file_content_base.h"
 #include "file_chunk.h"
 #include "scheduler_queue.h"
@@ -213,13 +214,13 @@ enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileC
 		return CHUNK_UNAVAILABLE;
 
 	std::list<FileChunk>::iterator net_it;
-	if((net_it = find(net_unavailable.begin(), net_unavailable.end(), chunk)) != net_unavailable.end())
+	if((net_it = std::find(net_unavailable.begin(), net_unavailable.end(), chunk)) != net_unavailable.end())
 	{
 		net_unavailable.erase(net_it);
 		return CHUNK_UNAVAILABLE;
 	}
 
-	if(find(net_requested.begin(), net_requested.end(), chunk) != net_requested.end())
+	if(std::find(net_requested.begin(), net_requested.end(), chunk) != net_requested.end())
 		return CHUNK_NOT_READY;
 
 	log[W_DEBUG] << "Sending request no " << net_requested.size();
