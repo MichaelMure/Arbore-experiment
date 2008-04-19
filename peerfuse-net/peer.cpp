@@ -278,6 +278,13 @@ void Peer::Handle_net_i_have_file(struct Packet* msg)
 	/* TODO: implement it. */
 }
 
+/** NET_WANT_REF_FILE
+ *
+ * Peer wants a reference number for a file (he probably wants to download it)
+ *
+ * Args:
+ *	NET_WANT_REF_FILE_PATH
+ */
 void Peer::Handle_net_want_ref_file(struct Packet* msg)
 {
 	std::string filename;
@@ -285,6 +292,16 @@ void Peer::Handle_net_want_ref_file(struct Packet* msg)
 	scheduler_queue.Queue(new JobSendRefFile(filename, GetID()));
 }
 
+/** NET_REF_FILE
+ *
+ * Answer of NET_WANT_REF_FILE
+ *
+ * Args:
+ *	NET_REF_FILE_PATH
+ *	NET_REF_FILE_REF
+ *	NET_REF_FILE_OFFSET
+ *	NET_REF_FILE_SIZE
+ */
 void Peer::Handle_net_ref_file(struct Packet* msg)
 {
 	std::string filename;
@@ -297,6 +314,15 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
 }
 
+/** NET_WANT_CHUNK
+ *
+ * Want a part of file.
+ *
+ * Args:
+ *	NET_WANT_CHUNK_REF
+ *	NET_WANT_CHUNK_OFFSET
+ *	NET_WANT_CHUNK_SIZE
+ */
 void Peer::Handle_net_want_chunk(struct Packet* msg)
 {
 	uint32_t ref = msg->GetArg<uint32_t>(NET_WANT_CHUNK_REF);
@@ -305,6 +331,14 @@ void Peer::Handle_net_want_chunk(struct Packet* msg)
 	scheduler_queue.Queue(new JobSendChunk(ref, GetID(), offset, size));
 }
 
+/** NET_CHUNK
+ *
+ * Receive a part of a file.
+ *
+ * Args:
+ *	NET_CHUNK_REF
+ *	NET_CHUNK_CHUNK
+ */
 void Peer::Handle_net_chunk(struct Packet* msg)
 {
 	uint32_t ref = msg->GetArg<uint32_t>(NET_CHUNK_REF);

@@ -389,7 +389,7 @@ void FileContentBase::GetSharedContent(off_t& offset, size_t& size)
 		}
 		--it;
 
-		size = (size_t) MAX(it->GetOffset() + (off_t) it->GetSize(), offset + (off_t)size) - offset;
+		size = (size_t) (MAX(it->GetOffset() + (off_t) it->GetSize(), offset + (off_t)size) - offset);
 	}
 }
 
