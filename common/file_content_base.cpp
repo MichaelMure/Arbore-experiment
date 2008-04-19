@@ -338,7 +338,7 @@ void FileContentBase::Truncate(off_t offset)
 			ondisk_size = 0;
 		}
 		else
-			ondisk_size = (size_t) (offset - ondisk_offset);
+			ondisk_size = offset - ondisk_offset;
 		tree_cfg.Set(filename + "#ondisk_off", (uint32_t)ondisk_offset);
 	}
 }
@@ -369,7 +369,7 @@ void FileContentBase::SyncToHdd(bool force)
 	}
 }
 
-void FileContentBase::GetSharedContent(off_t& offset, size_t& size)
+void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -423,8 +423,8 @@ void FileContentBase::NetworkFlushRequests()
 		bool request_sent = false;
 		for(sh_it = sharers.begin(); sh_it != sharers.end(); ++sh_it)
 		{
-			if(it->GetOffset() >= sh_it->part.GetOffset() &&
-					it->GetOffset() + (off_t)it->GetSize() <= sh_it->part.GetOffset() + (off_t)sh_it->part.GetSize())
+			if(it->GetOffset() >= sh_it->offset &&
+					it->GetOffset() + (off_t)it->GetSize() <= sh_it->offset + sh_it->size)
 			{
 				peers_list.RequestChunk(filename, sh_it->sharer, it->GetOffset(), it->GetSize());
 				request_sent = true;
@@ -441,12 +441,13 @@ void FileContentBase::NetworkFlushRequests()
 	}
 }
 
-void FileContentBase::SetSharer(pf_id sharer, off_t offset, size_t size)
+void FileContentBase::SetSharer(pf_id sharer, off_t offset, off_t size)
 {
 	BlockLockMutex lock(this);
 	struct sharedchunks shared_part;
 	shared_part.sharer = sharer;
-	shared_part.part = FileChunk(NULL, offset, size);
+	shared_part.offset = offset;
+	shared_part.size = size;
 	sharers.push_back(shared_part);
 	NetworkFlushRequests();
 }

@@ -27,14 +27,14 @@ bool JobSendRefFile::Start()
 	uint32_t ref = content_list.GetRef(filename);
 	FileContent& f = content_list.GetFile(filename);
 	off_t offset;
-	size_t size;
+	off_t size;
 	f.GetSharedContent(offset, size);
 
 	Packet packet(NET_REF_FILE);
 	packet.SetArg(NET_REF_FILE_PATH, filename);
 	packet.SetArg(NET_REF_FILE_REF, ref);
 	packet.SetArg(NET_REF_FILE_OFFSET, (uint64_t)offset);
-	packet.SetArg(NET_REF_FILE_SIZE, (uint32_t)size);
+	packet.SetArg(NET_REF_FILE_SIZE, (uint64_t)size);
 	peers_list.SendMsg(sendto, packet);
 	return false;
 }

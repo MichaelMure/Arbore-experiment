@@ -28,9 +28,9 @@ class JobSetSharedPart : public Job
 	std::string filename;
 	pf_id sharer;
 	off_t offset;
-	size_t size;
+	off_t size;
 public:
-	JobSetSharedPart(std::string _filename, pf_id _sharer, off_t _offset, size_t _size) :
+	JobSetSharedPart(std::string _filename, pf_id _sharer, off_t _offset, off_t _size) :
 		Job(0, REPEAT_NONE), filename(_filename), sharer(_sharer), offset(_offset), size(_size) {}
 
 	bool Start();

@@ -184,7 +184,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(off >= (off_t)file_size)
 	{
-		log[W_DEBUG] << "Fuse trying to read out of file";
+		log[W_WARNING] << "Fuse trying to read out of file";
 		return 0;
 	}
 
@@ -195,7 +195,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(!to_read)
 	{
-		log[W_DEBUG] << "Fuse trying to read out of file";
+		log[W_WARNING] << "Fuse trying to read out of file";
 		return 0;
 	}
 
@@ -211,7 +211,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(!chunk.GetData())			  /* shouldn't happen */
 	{
-		log[W_DEBUG] << "FileContent returned an empty chunk ??";
+		log[W_WARNING] << "FileContent returned an empty chunk??";
 		return 0;
 	}
 

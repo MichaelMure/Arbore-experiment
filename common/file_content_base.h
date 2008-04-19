@@ -40,7 +40,7 @@ public:
 private:
 	/* Information about what's currently stored on hardrive */
 	off_t ondisk_offset;
-	size_t ondisk_size;
+	off_t ondisk_size;
 	int ondisk_fd;
 	bool ondisk_synced;
 	time_t access_time;
@@ -51,7 +51,8 @@ private:
 	struct sharedchunks
 	{
 		pf_id sharer;
-		FileChunk part;
+		off_t offset;
+		off_t size;
 	};
 protected:
 	std::string filename;
@@ -92,7 +93,7 @@ public:
 	enum chunk_availability HaveChunk(off_t offset, size_t size);
 
 	bool HaveAnyChunk();
-	void GetSharedContent(off_t& offset, size_t& size);
+	void GetSharedContent(off_t& offset, off_t& size);
 
 	void SetChunk(FileChunk chunk);
 
@@ -100,6 +101,6 @@ public:
 
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
-	void SetSharer(pf_id, off_t offset, size_t size);
+	void SetSharer(pf_id, off_t offset, off_t size);
 };
 #endif						  /* FILE_CONTENT_BASE_H */
