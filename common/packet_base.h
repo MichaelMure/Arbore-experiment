@@ -54,6 +54,7 @@ class PacketBase
 	std::string ReadStr();
 	AddrList ReadAddrList();
 	IDList ReadIDList();
+	FileChunk ReadChunk();
 
 protected:
 	msg_type type;

@@ -136,7 +136,7 @@ bool FileContentBase::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
 	LoadFd();				  /* Needed to update the ondisk_size value */
 
 	/* TODO: load only the missing part of the chunk */
-	log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+	//log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	if(chunk.GetOffset() >= ondisk_offset
 		&& (chunk.GetOffset() + (off_t)chunk.GetSize() <= ondisk_offset + (off_t)ondisk_size))
 	{

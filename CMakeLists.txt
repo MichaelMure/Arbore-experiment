@@ -29,6 +29,7 @@ SET(SRC
 	common/jobs/job_new_connection_queue.cpp
 	common/jobs/job_send_ref_file.cpp
 	common/jobs/job_send_chunk.cpp
+	common/jobs/job_set_chunk.cpp
 	common/jobs/job_set_shared_part.cpp
 	common/jobs/job_mkfile.cpp
 	common/jobs/job_rmfile.cpp

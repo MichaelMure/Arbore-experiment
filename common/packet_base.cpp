@@ -398,6 +398,7 @@ IDList PacketBase::ReadIDList()
 	uint32_t list_size = ReadInt32();
 	ASSERT((size * sizeof(pf_id)) >= list_size);
 
+	// This is missing some endian tweakings ?
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
 		pf_id id;
@@ -423,6 +424,18 @@ IDList PacketBase::ReadIDList()
 	return id_list;
 }
 
+FileChunk PacketBase::ReadChunk()
+{
+	off_t offset = ReadInt64();
+	size_t size = ReadInt32();
+
+	FileChunk chunk(datas, offset, size);
+	delete []datas;
+	size = 0;
+	datas = NULL;
+	return chunk;
+}
+
 void PacketBase::BuildArgsFromData()
 {
 	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
@@ -434,6 +447,7 @@ void PacketBase::BuildArgsFromData()
 			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
 			case T_IDLIST: SetArg(arg_no, ReadIDList()); break;
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
+			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
 			default: throw Malformated();
 		}
 }
@@ -449,6 +463,7 @@ void PacketBase::BuildDataFromArgs()
 			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
 			case T_IDLIST: Write(GetArg<IDList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
+			case T_CHUNK: Write(GetArg<FileChunk&>(arg_no)); break;
 			default: throw Malformated();
 		}
 }
@@ -497,6 +512,9 @@ std::string PacketBase::GetPacketInfo() const
 				break;
 			}
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
+			case T_CHUNK: s += "ch off:" + TypToStr(GetArg<FileChunk&>(arg_no).GetOffset())
+						      + " off:" +  TypToStr(GetArg<FileChunk&>(arg_no).GetSize());
+				break;
 			default: throw Malformated();
 		}
 	}
