@@ -284,7 +284,7 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	filename = msg->GetArg<std::string>(NET_REF_FILE_PATH);
 	uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
 	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REF_FILE_OFFSET);
-	off_t size = (off_t)msg->GetArg<uint32_t>(NET_REF_FILE_SIZE);
+	size_t size = (size_t)msg->GetArg<uint32_t>(NET_REF_FILE_SIZE);
 
 	file_refs.insert(make_pair(ref, filename));
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));

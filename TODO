@@ -32,5 +32,7 @@
 
 	* Store owner and group of file somewhere else of cache's file properties
 
+	* Implement Peer::Handle_net_i_have_file()
+
 == Peerfuse LAN ==
 
