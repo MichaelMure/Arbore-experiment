@@ -1,1 +1,8 @@
-[PFLAN] If a peer connects asks for a merge to a peer that is currently merging, there we'll be a desync
+
+
++-------+--------+----------+----------+
+| Bug no| Status | Category | Severity | Comments
++-------+--------+----------+----------+
+| 00002 |  Open  | PFL-Merge|     5    | There are some desynchronisation risk if a peer start a merge with a peer currently merging.
+| 00001 |  Open  |  PF-PKI  |     1    | The sign-req script emits an error (no such file or dir on the key), that is normal.
++-------+--------+----------+----------+
