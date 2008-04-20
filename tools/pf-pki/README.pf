@@ -1,6 +1,16 @@
 ./clean.sh
 source ./vars
 ./build-dh
+
+Build CA:
 ./build-ca
-./build-key-server nom_du_serveur
+
+Build a key:
+./build-key peer_name
+
+Build a csr:
+./build-req peer_name
+
+Sign csr:
+./sign-req peer_name
 
