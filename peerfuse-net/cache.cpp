@@ -242,8 +242,9 @@ void Cache::RmFile(std::string path, pf_id sender)
 
 	hdd.RmFile(f);
 
-	BlockLockMutex net_lock(&peers_list);
+	peers_list.Lock();
 	filedist.RemoveFile(f, peers_list.PeerFromID(sender));
+	peers_list.Unlock(); /* Unlock as we'll lock the content list */
 
 	content_list.RemoveFile(f->GetFullName());
 
