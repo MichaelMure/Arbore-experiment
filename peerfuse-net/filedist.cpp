@@ -263,6 +263,43 @@ void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)
 	resp_files.erase(f);
 }
 
+void FileDistribution::AddSharer(FileEntry* file, pf_id sender)
+{
+	assert(file != NULL);
+	assert(sender > 0);
+	std::set<Peer*> relayed_peers;
+
+	file->AddSharer(sender);
+
+	if(!IsResponsible(sender, file))
+	{
+		std::set<Peer*> peers = GetRespPeers(file);
+		if(IsResponsible(environment.my_id.Get(), file))
+		{
+			/* Send to other responsibles. */
+			relayed_peers.insert(peers.begin(), peers.end());
+		}
+		else if(peers.empty() == false)
+		{
+			/* Send to a responsible. */
+			relayed_peers.insert(*peers.begin());
+		}
+		else
+			log[W_WARNING] << "FileDistribution::AddSharer: there isn't any responsible of " << file->GetFullName() << " ??";
+	}
+
+	if(relayed_peers.empty() == false)
+	{
+		Packet pckt = CreateMkFilePacket(file);
+
+		for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+		{
+			pckt.SetDstID((*p)->GetID());
+			(*p)->SendMsg(pckt);
+		}
+	}
+}
+
 void FileDistribution::UpdateRespFiles()
 {
 	/* Store last id list */

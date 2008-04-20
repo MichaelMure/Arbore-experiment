@@ -22,6 +22,7 @@ peer.cpp->job_advertise_file.h
 peer.cpp->job_set_sharer.h
 # pfnet only:
 peer.cpp->job_update_resp_files.h
+peer.cpp->job_add_sharer.h
 
 pf_dir.h->pf_file.h
 

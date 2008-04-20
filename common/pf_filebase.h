@@ -71,6 +71,7 @@ public:
 
 	std::vector<pf_id> GetSharers() const { return sharers; }
 	void SetSharers(std::vector<pf_id> l) { sharers = l; }
+	void AddSharer(pf_id id) { sharers.push_back(id); }
 
 	pf_stat GetAttr() const { return stat; };
 	void SetAttr(pf_stat stat);

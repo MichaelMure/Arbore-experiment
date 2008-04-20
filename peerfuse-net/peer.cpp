@@ -38,6 +38,7 @@
 #include "job_send_chunk.h"
 #include "job_set_chunk.h"
 #include "job_set_shared_part.h"
+#include "job_add_sharer.h"
 #include "connection_ssl.h"
 #include "environment.h"
 
@@ -272,7 +273,9 @@ void Peer::Handle_net_rmfile(struct Packet* msg)
  */
 void Peer::Handle_net_i_have_file(struct Packet* msg)
 {
-	/* TODO: implement it. */
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_I_HAVE_FILE_FILENAME);
+	scheduler_queue.Queue(new JobAddSharer(filename, GetID()));
 }
 
 /** NET_WANT_REF_FILE

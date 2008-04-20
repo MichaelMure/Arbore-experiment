@@ -58,6 +58,7 @@ public:
 	void RmFile(std::string path, pf_id sender = 0);
 	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
+	void AddSharer(std::string path, pf_id sender);
 
 	/* FileDistributino functions... */
 	void UpdateRespFiles();

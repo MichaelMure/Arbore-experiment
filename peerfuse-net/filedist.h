@@ -85,6 +85,8 @@ public:
 	void AddFile(FileEntry* f, Peer* sender);
 	void RemoveFile(FileEntry* f, Peer* sender);
 
+	void AddSharer(FileEntry* f, pf_id);
+
 	/** Create a packet that create a file.
 	 * @param file file to send
 	 * @return packet created

@@ -45,5 +45,7 @@ enum job_type
 	JOB_NEW_CONN_QUEUE,
 	/* Update responsibles files */
 	JOB_UPDATE_RESP_FILES,
+	/* Add a sharer to a file. */
+	JOB_ADD_SHARER,
 };
 #endif

@@ -241,25 +241,36 @@ void Cache::RmFile(std::string path, pf_id sender)
 	log[W_DEBUG] << "Removed " << path;
 
 	hdd.RmFile(f);
+
+	BlockLockMutex net_lock(&peers_list);
 	filedist.RemoveFile(f, peers_list.PeerFromID(sender));
+
 	content_list.RemoveFile(f->GetFullName());
 
 	f->GetParent()->RemFile(f);
 	delete f;
 }
 
+void Cache::AddSharer(std::string path, pf_id sender)
+{
+	BlockLockMutex lock(this);
+	FileEntry* f = Path2File(path);
+
+	if(!f)
+		throw NoSuchFileOrDir();
+
+	filedist.AddSharer(f, sender);
+}
+
 void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 {
-	Lock();
+	BlockLockMutex lock(this);
 
 	/* TODO implement this */
-
-	Unlock();
 }
 
 void Cache::UpdateRespFiles()
 {
-	Lock();
+	BlockLockMutex lock(this);
 	filedist.UpdateRespFiles();
-	Unlock();
 }
