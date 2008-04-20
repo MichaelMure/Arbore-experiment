@@ -41,6 +41,7 @@
 #include "peers_list.h"
 #include "pf_thread.h"
 #include "environment.h"
+#include "content_list.h"
 
 NetworkBase::NetworkBase()
 			: Mutex(RECURSIVE_MUTEX),
@@ -92,6 +93,7 @@ Peer* NetworkBase::AddPeer(Peer* p)
 void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
 	Peer* p = peers_list.Remove(fd);
+	content_list.RemovePeerRefs(p->GetID());
 
 	OnRemovePeer(p);
 

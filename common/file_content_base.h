@@ -22,7 +22,7 @@
 
 #include <string>
 #include <list>
-#include <set>
+#include <map>
 #include <time.h>
 #include "mutex.h"
 #include "file_chunk.h"
@@ -50,13 +50,12 @@ private:
 	std::list<FileChunk> net_unavailable;
 	struct sharedchunks
 	{
-		pf_id sharer;
 		off_t offset;
 		off_t size;
 	};
 protected:
 	std::string filename;
-	std::list<struct sharedchunks> sharers;
+	std::map<pf_id, struct sharedchunks> sharers;
 
 	void NetworkFlushRequests();
 	bool waiting_for_sharers;
@@ -102,5 +101,6 @@ public:
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
 	void SetSharer(pf_id, off_t offset, off_t size);
+	void RemoveSharer(pf_id);
 };
 #endif						  /* FILE_CONTENT_BASE_H */

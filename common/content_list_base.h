@@ -50,6 +50,12 @@ public:
 	 */
 	void RemoveFile(std::string path);
 
+	/** When a peer disconnect acknowledge the file-contents that the peer
+	 *  stop sharing the file
+	 * @param path path to the file
+	 */
+	void RemovePeerRefs(pf_id);
+
 	uint32_t GetRef(std::string filename);
 };
 #endif						  /* CONTENT_LIST_BASE_H */

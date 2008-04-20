@@ -99,6 +99,13 @@ void ContentListBase::RemoveFile(std::string path)
 	}
 }
 
+void ContentListBase::RemovePeerRefs(pf_id peer)
+{
+	BlockLockMutex lock(this);
+	for(iterator it = begin(); it != end(); ++it)
+		it->second.RemoveSharer(peer);
+}
+
 uint32_t ContentListBase::GetRef(std::string filename)
 {
 	BlockLockMutex lock(this);

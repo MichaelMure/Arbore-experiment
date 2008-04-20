@@ -427,14 +427,14 @@ void FileContentBase::NetworkFlushRequests()
 	while(it != net_pending_request.end())
 	{
 		/* Find a sharer that have this file */
-		std::list<struct sharedchunks>::iterator sh_it;
+		std::map<pf_id, struct sharedchunks>::iterator sh_it;
 		bool request_sent = false;
 		for(sh_it = sharers.begin(); sh_it != sharers.end(); ++sh_it)
 		{
-			if(it->GetOffset() >= sh_it->offset &&
-					it->GetOffset() + (off_t)it->GetSize() <= sh_it->offset + sh_it->size)
+			if(it->GetOffset() >= sh_it->second.offset &&
+					it->GetOffset() + (off_t)it->GetSize() <= sh_it->second.offset + sh_it->second.size)
 			{
-				peers_list.RequestChunk(filename, sh_it->sharer, it->GetOffset(), it->GetSize());
+				peers_list.RequestChunk(filename, sh_it->first, it->GetOffset(), it->GetSize());
 				request_sent = true;
 				break;
 			}
@@ -453,9 +453,16 @@ void FileContentBase::SetSharer(pf_id sharer, off_t offset, off_t size)
 {
 	BlockLockMutex lock(this);
 	struct sharedchunks shared_part;
-	shared_part.sharer = sharer;
 	shared_part.offset = offset;
 	shared_part.size = size;
-	sharers.push_back(shared_part);
+	sharers[sharer] = shared_part;
 	NetworkFlushRequests();
+}
+
+void FileContentBase::RemoveSharer(pf_id peer)
+{
+	BlockLockMutex lock(this);
+	std::map<pf_id, struct sharedchunks>::iterator it;
+	if((it = sharers.find(peer)) != sharers.end())
+		sharers.erase(it);
 }
