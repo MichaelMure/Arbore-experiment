@@ -1,0 +1,11 @@
+
+
++-------+--------+
+|Task no| Status | Comments
++-------+--------+
+| 00004 |  Open  |
+| 00003 |  Open  | Catch SIGTERM to call Application::Exit()
+| 00002 |  Open  | Simplify logging system (we only need DEBUG/WARNING/ERRORS)
+| 00001 |  Open  | Support file deletion (mark file as deleted in tree_cfg, truncate
+|       |        | them in the cache)
++-------+--------+
