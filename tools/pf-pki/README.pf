@@ -1,0 +1,6 @@
+./clean.sh
+source ./vars
+./build-dh
+./build-ca
+./build-key-server nom_du_serveur
+
