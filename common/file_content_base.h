@@ -33,9 +33,9 @@ class FileContentBase : public Mutex, private std::list<FileChunk>
 public:
 	enum chunk_availability
 	{
-		CHUNK_READY,		  /** it's ready to be read */
-		CHUNK_NOT_READY,	  /** it's not yet loaded from hdd/not yet received */
-		CHUNK_UNAVAILABLE	  /** we don't have it on hdd and nobody has it on network */
+		CHUNK_READY,		  /**< it's ready to be read */
+		CHUNK_NOT_READY,	  /**< it's not yet loaded from hdd/not yet received */
+		CHUNK_UNAVAILABLE	  /**< we don't have it on hdd and nobody has it on network */
 	};
 private:
 	/* Information about what's currently stored on hardrive */
