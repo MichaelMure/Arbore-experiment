@@ -21,6 +21,7 @@
 #define CACHE_H
 
 #include <vector>
+#include <map>
 #include "cache_base.h"
 #include "pf_dir.h"
 #include "pf_types.h"
@@ -30,9 +31,17 @@
 
 class Cache : public CacheBase
 {
-protected:
-	FileDistribution filedist;
-	std::vector<FileEntry*> files;
+
+#ifndef PF_SERVER_MODE
+	enum incoming_states_t
+	{
+		GETTING,
+		FINISHED,
+	};
+	std::map<std::string, incoming_states_t> dir_incoming;
+
+	bool IsReadyForList(std::string path);
+#endif /* PF_SERVER_MODE */
 
 	/* Because there are functions which return protected data,
 	 * but that FileDistribution object is an own attribute, these
@@ -40,6 +49,7 @@ protected:
 	 * It's so my friend.
 	 */
 	friend class FileDistribution;
+	FileDistribution filedist;
 
 	/* This method will explore all arborescence. It can be
 	 * slow, so do NOT call this function too frequently.
@@ -55,10 +65,18 @@ public:
 	~Cache();
 
 	void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0);
-	void RmFile(std::string path, pf_id sender = 0);
+	void RmFile(std::string path);
 	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 	void AddSharer(std::string path, pf_id sender);
+
+	/* Send files dir to a peer */
+	void SendDirFiles(std::string path, pf_id to);
+
+#ifndef PF_SERVER_MODE
+	void SetReadyForList(std::string path);
+	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
+#endif
 
 	/* FileDistributino functions... */
 	void UpdateRespFiles();

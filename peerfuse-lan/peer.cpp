@@ -32,7 +32,6 @@
 #include "job_other_connect.h"
 #include "job_new_conn_req.h"
 #include "job_mkfile.h"
-#include "job_rmfile.h"
 #include "job_send_changes.h"
 #include "job_advertise_file.h"
 #include "job_set_sharer.h"
@@ -297,12 +296,6 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID()/*, IsMerging()*/, true));
 }
 
-void Peer::Handle_net_rmfile(struct Packet* msg)
-{
-	std::string filename = msg->GetArg<std::string>(NET_RMFILE_PATH);
-	scheduler_queue.Queue(new JobRmFile(filename, GetID()));
-}
-
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
 {
 	environment.merging.Set(false);
@@ -395,7 +388,6 @@ void Peer::HandleMsg(Packet* pckt)
 		&Peer::Handle_net_start_merge,
 		&Peer::Handle_net_get_struct_diff,
 		&Peer::Handle_net_mkfile,
-		&Peer::Handle_net_rmfile,
 		&Peer::Handle_net_peer_connection,
 		&Peer::Handle_net_peer_connection_ack,
 		&Peer::Handle_net_peer_connection_rst,

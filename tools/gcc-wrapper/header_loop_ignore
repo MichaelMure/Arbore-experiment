@@ -10,7 +10,6 @@ network.cpp->job_new_connection_queue.h
 peer.cpp->job_new_conn_req.h
 peer.cpp->job_flush_peer.h
 peer.cpp->job_mkfile.h
-peer.cpp->job_rmfile.h
 peer.cpp->job_send_ref_file.h
 peer.cpp->job_send_chunk.h
 peer.cpp->job_set_chunk.h
@@ -23,6 +22,8 @@ peer.cpp->job_set_sharer.h
 # pfnet only:
 peer.cpp->job_update_resp_files.h
 peer.cpp->job_add_sharer.h
+peer.cpp->job_ls_dir.h
+peer.cpp->job_end_of_ls.h
 
 pf_dir.h->pf_file.h
 

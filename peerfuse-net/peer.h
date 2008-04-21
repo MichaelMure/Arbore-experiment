@@ -51,7 +51,6 @@ class Peer : public PeerBase
 	// Receiving functions
 	void Handle_net_hello(struct Packet* pckt);
 	void Handle_net_mkfile(struct Packet* pckt);
-	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
 	void Handle_net_peer_goodbye(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
@@ -62,6 +61,8 @@ class Peer : public PeerBase
 	void Handle_net_refresh_ref_file(struct Packet* pckt);
 	void Handle_net_want_chunk(struct Packet* pckt);
 	void Handle_net_chunk(struct Packet* pckt);
+	void Handle_net_ls_dir(struct Packet* pckt);
+	void Handle_net_end_of_ls(struct Packet* pckt);
 public:
 	/* Constructors */
 	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, pf_id parent = 0);

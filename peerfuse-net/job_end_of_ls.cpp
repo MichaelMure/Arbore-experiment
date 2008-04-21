@@ -17,32 +17,12 @@
  * $Id$
  */
 
-#ifndef CACHE_H
-#define CACHE_H
+#include "job_end_of_ls.h"
+#include "cache.h"
 
-#include <vector>
-#include "cache_base.h"
-#include "pf_dir.h"
-#include "pf_file.h"
-#include "packet.h"
-
-class Cache : public CacheBase
+bool JobEndOfLs::Start()
 {
-public:
+	cache.SetReadyForList(path);
+	return false;
+}
 
-	Cache();
-	~Cache();
-
-	virtual void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0);
-	virtual void RmFile(std::string path);
-	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
-	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
-
-	void SendChanges(pf_id peer, time_t last_view);
-
-	virtual Packet CreateMkFilePacket(FileEntry* file);
-
-};
-
-extern Cache cache;
-#endif

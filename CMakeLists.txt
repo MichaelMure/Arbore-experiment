@@ -30,7 +30,6 @@ SET(SRC
 	common/jobs/job_set_chunk.cpp
 	common/jobs/job_set_shared_part.cpp
 	common/jobs/job_mkfile.cpp
-	common/jobs/job_rmfile.cpp
 
 	common/ssl/certificate.cpp
 	common/ssl/connection.cpp
@@ -76,6 +75,8 @@ IF(PF_NET)
 		peerfuse-net/job_new_conn_req.cpp
 		peerfuse-net/job_update_resp_files.cpp
 		peerfuse-net/job_add_sharer.cpp
+		peerfuse-net/job_ls_dir.cpp
+		peerfuse-net/job_end_of_ls.cpp
 		peerfuse-net/packet.cpp
 		peerfuse-net/peers_list.cpp
 		peerfuse-net/net_proto.cpp

@@ -17,23 +17,26 @@
  * $Id$
  */
 
-#ifndef JOB_RMFILE_H
-#define JOB_RMFILE_H
+#ifndef JOB_END_OF_LS_H
+#define JOB_END_OF_LS_H
+
+#include <string.h>
 #include "job.h"
-#include "pf_file.h"
 #include "pf_types.h"
 
-class JobRmFile : public Job
+class JobEndOfLs : public Job
 {
-	std::string file;
-	pf_id sender;
+        std::string path;
 public:
-	JobRmFile(std::string _file, pf_id _sender): Job(0, REPEAT_NONE), file(_file), sender(_sender) {}
-	~JobRmFile() {}
+        JobEndOfLs(std::string _path)
+		: Job(0, REPEAT_NONE),
+		path(_path)
+	{}
 
-	bool Start();
+        bool Start();
 
-	job_type GetType() const { return JOB_RMFILE; }
-	std::string GetName() const { return "JobRmFile"; }
+        job_type GetType() const { return JOB_END_OF_LS; }
+        std::string GetName() const { return "JobEndOfLs"; }
 };
-#endif						  /* JOB_RMFILE_H */
+#endif                                            /* JOB_END_OF_LS_H */
+

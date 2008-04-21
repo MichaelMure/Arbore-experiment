@@ -25,12 +25,19 @@
 class FilePermissions
 {
 public:
-	mode_t mode;
+	/* Special peerfuse flags. */
+	enum {
+		S_PF_REMOVED = 1 << 0
+	};
+
+	uint32_t pf_mode;
+	mode_t  mode;
 	uid_t uid;
 	gid_t gid;
 
 	FilePermissions()
-		: mode(S_IFREG | S_IRWXU | S_IRWXG | S_IRUSR | S_IXUSR),
+		: pf_mode(0),
+		mode(S_IFREG | S_IRWXU | S_IRWXG | S_IRUSR | S_IXUSR),
 		uid(getuid()),
 		gid(getgid())
 		{}

@@ -71,10 +71,10 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 	assert(f != NULL);
 
 	std::set<Peer*> list;
+	BlockLockMutex lock(&peers_list);
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
-		BlockLockMutex lock(&peers_list);
 		Peer* peer = peers_list.PeerFromID(idl[(f->GetPathSerial()+i) % idl.size()]);
 
 		/* It is possible that there isn't any Peer object for this
@@ -125,7 +125,7 @@ Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
 {
 	Packet pckt(NET_MKFILE, environment.my_id.Get());
 	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
-	pckt.SetArg(NET_MKFILE_MODE, f->GetAttr().mode);
+	pckt.SetArg(NET_MKFILE_MODE, (uint32_t)f->GetAttr().mode);
 	pckt.SetArg(NET_MKFILE_UID, f->GetAttr().uid);
 	pckt.SetArg(NET_MKFILE_GID, f->GetAttr().gid);
 	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->GetAttr().size);
@@ -134,14 +134,34 @@ Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
 	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->GetAttr().meta_mtime);
 	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->GetAttr().ctime);
 	pckt.SetArg(NET_MKFILE_SHARERS, f->GetSharers());
+	pckt.SetArg(NET_MKFILE_PF_MODE, (uint32_t)f->GetAttr().pf_mode);
 
 	return pckt;
+}
+
+void FileDistribution::SendDirFiles(DirEntry* dir, Peer* to)
+{
+	assert(dir != NULL);
+	assert(to != NULL);
+
+	const FileMap& files = dir->GetFiles();
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+	{
+		Packet pckt = CreateMkFilePacket(it->second);
+		pckt.SetDstID(to->GetID());
+		to->SendMsg(pckt);
+	}
+
+	Packet pckt = Packet(NET_END_OF_LS, environment.my_id.Get(), to->GetID());
+	pckt.SetArg(NET_END_OF_LS_PATH, dir->GetFullName());
+	to->SendMsg(pckt);
 }
 
 void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 {
 	assert(f != NULL);			  /* exists */
 
+	BlockLockMutex net_lock(&peers_list);
 	std::set<Peer*> relayed_peers;
 
 	/* I'm responsible of this file. */
@@ -238,35 +258,11 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 
 }
 
-Packet FileDistribution::CreateRmFilePacket(FileEntry* f)
-{
-	Packet pckt(NET_RMFILE, environment.my_id.Get());
-	pckt.SetArg(NET_RMFILE_PATH, f->GetFullName());
-
-	return pckt;
-}
-
-void FileDistribution::RemoveFile(FileEntry* f, Peer* sender)
-{
-	assert(f != NULL);			  /* exists */
-	assert(f->GetParent() != NULL);		  /* isn't the root dir */
-
-	std::set<Peer*> peers = GetRespPeers(f);
-	Packet pckt = CreateRmFilePacket(f);
-
-	for(std::set<Peer*>::iterator p = peers.begin(); p != peers.end(); ++p)
-	{
-		pckt.SetDstID((*p)->GetID());
-		(*p)->SendMsg(pckt);
-	}
-
-	resp_files.erase(f);
-}
-
 void FileDistribution::AddSharer(FileEntry* file, pf_id sender)
 {
 	assert(file != NULL);
 	assert(sender > 0);
+	BlockLockMutex net_lock(&peers_list);
 	std::set<Peer*> relayed_peers;
 
 	file->AddSharer(sender);

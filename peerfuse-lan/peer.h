@@ -35,7 +35,6 @@ class Peer : public PeerBase
 	void Handle_net_your_id(struct Packet* pckt);
 	void Handle_net_get_struct_diff(struct Packet* pckt);
 	void Handle_net_mkfile(struct Packet* pckt);
-	void Handle_net_rmfile(struct Packet* pckt);
 	void Handle_net_peer_connection(struct Packet* pckt);
 	void Handle_net_peer_connection_ack(struct Packet* pckt);
 	void Handle_net_peer_connection_rst(struct Packet* pckt);

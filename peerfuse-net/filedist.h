@@ -28,7 +28,7 @@
 
 class Peer;
 
-const size_t NB_PEERS_PER_FILE = 5;
+const size_t NB_PEERS_PER_FILE = 2;
 
 class FileDistribution
 {
@@ -83,21 +83,15 @@ public:
 
 	/* Flags are defined in cache.h */
 	void AddFile(FileEntry* f, Peer* sender);
-	void RemoveFile(FileEntry* f, Peer* sender);
 
 	void AddSharer(FileEntry* f, pf_id);
+
+	void SendDirFiles(DirEntry* dir, Peer* to);
 
 	/** Create a packet that create a file.
 	 * @param file file to send
 	 * @return packet created
 	 */
 	Packet CreateMkFilePacket(FileEntry* file);
-
-	/** Create a packet that remove a file.
-	 * @param file file to remove
-	 * @return packet created
-	 */
-	Packet CreateRmFilePacket(FileEntry* file);
-
 };
 #endif						  /* FILEDIST_H */

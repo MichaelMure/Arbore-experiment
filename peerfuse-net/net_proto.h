@@ -27,7 +27,6 @@ enum msg_type
 	NET_NONE = 0,
 	NET_HELLO,
 	NET_MKFILE,
-	NET_RMFILE,
 	NET_PEER_CONNECTION,
 	NET_END_OF_MERGE,
 	NET_END_OF_MERGE_ACK,
@@ -38,6 +37,8 @@ enum msg_type
 	NET_REFRESH_REF_FILE,
 	NET_WANT_CHUNK,
 	NET_CHUNK,
+	NET_LS_DIR,
+	NET_END_OF_LS,
 
 	NET_NB_MESSAGES
 };
@@ -71,13 +72,7 @@ enum net_mkfile_args
 	NET_MKFILE_MODIF_TIME,
 	NET_MKFILE_META_MODIF_TIME,
 	NET_MKFILE_SHARERS,
-	// ...
-};
-
-// NET_RMFILE
-enum net_rmfile
-{
-	NET_RMFILE_PATH
+	NET_MKFILE_PF_MODE,
 	// ...
 };
 
@@ -118,6 +113,16 @@ enum net_chunk
 {
 	NET_CHUNK_REF,
 	NET_CHUNK_CHUNK,
+};
+
+enum net_ls_dir
+{
+	NET_LS_DIR_PATH,
+};
+
+enum net_end_of_ls
+{
+	NET_END_OF_LS_PATH,
 };
 
 extern const char* type2str[NET_NB_MESSAGES];

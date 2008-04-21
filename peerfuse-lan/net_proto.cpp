@@ -29,7 +29,6 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_START_MERGE */            "START_MERGE",
 	/* NET_GET_STRUCT_DIFF */        "GET_STRUCT_DIFF",
 	/* NET_MKFILE */                 "MKFILE",
-	/* NET_RMFILE */                 "RMFILE",
 	/* NET_PEER_CONNECTION */        "PEER_CONNECTION",
 	/* NET_PEER_CONNECTION_ACK */    "PEER_CONNECTION_ACK",
 	/* NET_PEER_CONNECTION_RST */    "PEER_CONNECTION_RST",
@@ -89,12 +88,7 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_MKFILE_CREATE_TIME */     T_UINT32, /* Creation time (subject to change) */
 		/* NET_MKFILE_MODIF_TIME */      T_UINT32, /* Modification time (subject to change) */
 		/* NET_MKFILE_META_MODIF_TIME */ T_UINT32, /* Meta data modification time (subject to change) */
-		T_NONE
-	},
-
-	/* NET_RMFILE */
-	{
-		/* NET_RMFILE_PATH */ T_STR, /* Path to file */
+		/* NET_MKFILE_PF_MODE */         T_UINT32, /* Peerfuse file mode */
 		T_NONE
 	},
 

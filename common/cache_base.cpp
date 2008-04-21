@@ -24,7 +24,7 @@
 #include "hdd.h"
 #include "session_config.h"
 
-FileEntry* CacheBase::Path2File(std::string path, std::string* filename)
+FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::string* filename)
 {
 	BlockLockMutex lock(this);
 	DirEntry* current_dir = &tree;
@@ -34,15 +34,45 @@ FileEntry* CacheBase::Path2File(std::string path, std::string* filename)
 	while((name = stringtok(path, "/")).empty() == false)
 	{
 		FileEntry* tmp = current_dir->GetFile(name);
-		if(!tmp)
+		if(!tmp || tmp->IsRemoved())
 		{
-			if(path.find('/') == std::string::npos && filename)
-			{			  /* we are in last dir, but this file doesn't exist */
-				*filename = name;
-				return current_dir;
+			if(path.empty())
+			{
+				/* we are in last dir, but this file doesn't exist */
+				if(tmp && flags & RESTORE_REMOVED_FILE)
+				{
+					tmp->ClearRemoved();
+					return tmp;
+				}
+				else if(filename)
+				{
+					*filename = name;
+					return current_dir;
+				}
+				else
+					return NULL;
 			}
+
 			/* we aren't in last dir, so the path isn't found. */
-			return NULL;
+			if(flags & CREATE_UNKNOWN_DIRS)
+			{
+				if(!tmp)
+				{
+					pf_stat stat;
+					stat.mtime = 0;
+					stat.ctime = 0;
+					stat.meta_mtime = 0;
+					stat.atime = 0;
+					stat.uid = 0;
+					stat.gid = 0;
+					tmp = new DirEntry(name, pf_stat(), current_dir);
+					current_dir->AddFile(tmp);
+				}
+				else
+					tmp->ClearRemoved();
+			}
+			else
+				return NULL;
 		}
 
 		if(!(current_dir = dynamic_cast<DirEntry*>(tmp)))
@@ -123,18 +153,18 @@ pf_stat CacheBase::GetAttr(std::string path)
 void CacheBase::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 			off_t offset, struct fuse_file_info *fi)
 {
-	Lock();
+	BlockLockMutex lock(this);
 	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path));
 
 	if(!dir)
-	{
-		Unlock();
 		throw NoSuchFileOrDir();
-	}
 
 	FileMap files = dir->GetFiles();
 	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
 	{
+		if(it->second->IsRemoved())
+			continue;
+
 		struct stat st;
 		memset(&st, 0, sizeof st);
 		/*st.st_ino = de->d_ino;
@@ -143,9 +173,6 @@ void CacheBase::FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler,
 		if(filler(buf, it->second->GetName().c_str(), &st, 0))
 			break;
 	}
-
-	Unlock();
-
 }
 #endif						  /* PF_SERVER_MODE */
 

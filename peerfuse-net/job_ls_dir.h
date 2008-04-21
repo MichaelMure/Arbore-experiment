@@ -17,25 +17,28 @@
  * $Id$
  */
 
-#include "job_rmfile.h"
-#include "cache.h"
-#include "log.h"
+#ifndef JOB_LS_DIR_H
+#define JOB_LS_DIR_H
 
-bool JobRmFile::Start()
+#include <string.h>
+#include "job.h"
+#include "pf_types.h"
+
+class JobLsDir : public Job
 {
-	try
-	{
-		cache.RmFile(file, sender);
-	}
-	catch(Cache::NoSuchFileOrDir &e)
-	{
-		log[W_DESYNCH] << "Unable to remove " << file << ": No such file or directory";
-		/* TODO: Desynch, DO SOMETHING */
-	}
-	catch(Cache::DirNotEmpty &e)
-	{
-		log[W_DESYNCH] << "Unable to remove " << file << ": Dir not empty";
-		/* TODO: Desynch, DO SOMETHING */
-	}
-	return false;
-}
+        std::string path;
+        pf_id id;
+public:
+        JobLsDir(std::string _path, pf_id _id)
+		: Job(0, REPEAT_NONE),
+		path(_path),
+		id(_id)
+	{}
+
+        bool Start();
+
+        job_type GetType() const { return JOB_LS_DIR; }
+        std::string GetName() const { return "JobLsDir"; }
+};
+#endif                                            /* JOB_LS_DIR_H */
+

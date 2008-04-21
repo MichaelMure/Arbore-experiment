@@ -24,8 +24,6 @@ enum job_type
 {
 	/* MKfile triggered by a peer */
 	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
 	/* SetAttr triggered by a peer */
 	JOB_FILE_SETATTR,
 	/* A peer for a reference to a file */
@@ -47,5 +45,9 @@ enum job_type
 	JOB_UPDATE_RESP_FILES,
 	/* Add a sharer to a file. */
 	JOB_ADD_SHARER,
+	/* Send list of files in a directory to a peer */
+	JOB_LS_DIR,
+	/* Tell cache we receive all of the directory files */
+	JOB_END_OF_LS,
 };
 #endif

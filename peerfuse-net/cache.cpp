@@ -112,7 +112,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 	try
 	{
-		file = Path2File(path, &filename);
+		file = Path2File(path, CREATE_UNKNOWN_DIRS|RESTORE_REMOVED_FILE, &filename);
 		DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 		if(!file)
@@ -160,12 +160,42 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	}
 }
 
-void Cache::SetAttr(std::string path, pf_stat stat, IDList sharer, pf_id sender, bool keep_newest)
+void Cache::RmFile(std::string path)
+{
+	BlockLockMutex lock(this);
+	FileEntry* f = Path2File(path);
+
+	if(!f)
+		throw NoSuchFileOrDir();
+
+	// If it's a dir that isn't empty -> return error
+	if (f->GetAttr().mode & S_IFDIR)
+	{
+		DirEntry* d = static_cast<DirEntry*>(f);
+		if(d->GetSize() != 0)
+			throw DirNotEmpty();
+	}
+
+	if(!f->GetParent())
+		throw NoPermission();
+
+	log[W_DEBUG] << "Removed " << path;
+
+	pf_stat stat = f->GetAttr();
+	stat.pf_mode |= FilePermissions::S_PF_REMOVED;
+
+	_set_attr(f, stat, NULL, IDList());
+
+	content_list.RemoveFile(f->GetFullName());
+
+}
+
+void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest)
 {
 	Peer* peer = 0;
 
 	std::string filename;
-	FileEntry* file = Path2File(path, &filename);
+	FileEntry* file = Path2File(path, 0, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 	if(!file || (filename.empty() == false && dir))
@@ -174,7 +204,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharer, pf_id sender,
 	if(sender > 0)
 		peer = peers_list.PeerFromID(sender);
 
-	_set_attr(file, stat, peer, IDList());
+	_set_attr(file, stat, peer, sharers);
 }
 
 void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers)
@@ -216,41 +246,8 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	/* Update file */
 	hdd.UpdateFile(file);
 	filedist.AddFile(file, sender);
-
 }
 
-void Cache::RmFile(std::string path, pf_id sender)
-{
-	BlockLockMutex lock(this);
-	FileEntry* f = Path2File(path);
-
-	if(!f)
-		throw NoSuchFileOrDir();
-
-	// If it's a dir that isn't empty -> return error
-	if (f->GetAttr().mode & S_IFDIR)
-	{
-		DirEntry* d = static_cast<DirEntry*>(f);
-		if(d->GetSize() != 0)
-			throw DirNotEmpty();
-	}
-
-	if(!f->GetParent())
-		throw NoPermission();
-
-	log[W_DEBUG] << "Removed " << path;
-
-	hdd.RmFile(f);
-
-	peers_list.Lock();
-	filedist.RemoveFile(f, peers_list.PeerFromID(sender));
-	peers_list.Unlock(); /* Unlock as we'll lock the content list */
-
-	content_list.RemoveFile(f->GetFullName());
-
-	f->GetParent()->RemFile(f);
-	delete f;
-}
 
 void Cache::AddSharer(std::string path, pf_id sender)
 {
@@ -269,6 +266,101 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 
 	/* TODO implement this */
 }
+
+void Cache::SendDirFiles(std::string path, pf_id to)
+{
+	BlockLockMutex lock(this);
+	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path));
+
+	if(!dir)
+		throw NoSuchFileOrDir();
+
+	BlockLockMutex net_lock(&peers_list);
+	Peer* peer = peers_list.PeerFromID(to);
+
+	filedist.SendDirFiles(dir, peer);
+}
+
+#ifndef PF_SERVER_MODE
+void Cache::SetReadyForList(std::string path)
+{
+	BlockLockMutex lock(this);
+	dir_incoming[path] = FINISHED;
+}
+
+bool Cache::IsReadyForList(std::string path)
+{
+	BlockLockMutex lock(this);
+
+	std::map<std::string, incoming_states_t>::iterator incoming = dir_incoming.find(path);
+	if(incoming == dir_incoming.end() || incoming->second == FINISHED)
+		return true;
+	else
+		return false;
+}
+
+void Cache::FillReadDir(const char* _path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
+{
+	std::string path = _path;
+	bool wait_for_content = false;
+
+	/* Open a block only to use BlockLockMutex. */
+	do
+	{
+		/* Do NOT lock mutex outside of this block! It might freeze Cache because
+		 * of the loop
+		 */
+		BlockLockMutex lock(this);
+
+		DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path));
+
+		if(!dir)
+			throw NoSuchFileOrDir();
+
+		path = dir->GetFullName();
+
+		/* If I'm not responsible of this directory, send a request to a responsible
+		 * to get content.
+		 */
+		if(!filedist.IsResponsible(environment.my_id.Get(), dir))
+		{
+			BlockLockMutex lock(&peers_list);
+			std::set<Peer*> peers = filedist.GetRespPeers(dir);
+
+			if(peers.empty())
+				log[W_WARNING] << "Cache::FillReadDir: there isn't any responsible of " << dir->GetFullName() << " ??";
+			else
+			{
+				std::map<std::string, incoming_states_t>::iterator incoming = dir_incoming.find(path);
+				if(incoming == dir_incoming.end() || incoming->second != GETTING)
+				{
+					Peer* resp = *peers.begin();
+
+					Packet pckt = Packet(NET_LS_DIR, environment.my_id.Get(), resp->GetID());
+					pckt.SetArg(NET_LS_DIR_PATH, path);
+					resp->SendMsg(pckt);
+
+					dir_incoming[path] = GETTING;
+				}
+
+				wait_for_content = true;
+			}
+
+		}
+
+	}
+	while(0);
+
+	if(wait_for_content)
+	{
+		while(!IsReadyForList(path))
+			usleep(10000);         /* 0.01 sec */
+
+	}
+
+	CacheBase::FillReadDir(_path, buf, filler, offset, fi);
+}
+#endif /* PF_SERVER_MODE */
 
 void Cache::UpdateRespFiles()
 {

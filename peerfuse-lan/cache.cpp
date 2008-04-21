@@ -42,7 +42,7 @@ Packet Cache::CreateMkFilePacket(FileEntry* f)
 {
 	Packet pckt(NET_MKFILE);
 	pckt.SetArg(NET_MKFILE_PATH, f->GetFullName());
-	pckt.SetArg(NET_MKFILE_MODE, f->GetAttr().mode);
+	pckt.SetArg(NET_MKFILE_MODE, (uint32_t)f->GetAttr().mode);
 	pckt.SetArg(NET_MKFILE_UID, f->GetAttr().uid);
 	pckt.SetArg(NET_MKFILE_GID, f->GetAttr().gid);
 	pckt.SetArg(NET_MKFILE_SIZE, (uint64_t)f->GetAttr().size);
@@ -50,14 +50,7 @@ Packet Cache::CreateMkFilePacket(FileEntry* f)
 	pckt.SetArg(NET_MKFILE_MODIF_TIME, (uint32_t)f->GetAttr().mtime);
 	pckt.SetArg(NET_MKFILE_META_MODIF_TIME, (uint32_t)f->GetAttr().meta_mtime);
 	pckt.SetArg(NET_MKFILE_CREATE_TIME, (uint32_t)f->GetAttr().ctime);
-
-	return pckt;
-}
-
-Packet Cache::CreateRmFilePacket(FileEntry* f)
-{
-	Packet pckt(NET_RMFILE);
-	pckt.SetArg(NET_RMFILE_PATH, f->GetFullName());
+	pckt.SetArg(NET_MKFILE_PF_MODE, (uint32_t)f->GetAttr().pf_mode);
 
 	return pckt;
 }
@@ -140,7 +133,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	FileEntry* f = Path2File(path);
 	// The file doesn't exist -> create it
 	std::string filename;
-	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path, &filename));
+	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path, 0, &filename));
 
 	if(!dir)
 		throw NoSuchFileOrDir();
@@ -183,7 +176,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	/* hdd.SetAttr(stat); */
 }
 
-void Cache::RmFile(std::string path, pf_id sender)
+void Cache::RmFile(std::string path)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
@@ -204,16 +197,12 @@ void Cache::RmFile(std::string path, pf_id sender)
 
 	log[W_DEBUG] << "Removed " << path;
 
-	hdd.RmFile(f);
+	f->SetRemoved();
+
 	content_list.RemoveFile(f->GetFullName());
 
-	/* Send before removing file */
-	if(sender == 0)
-		peers_list.Broadcast(CreateRmFilePacket(f));
+	peers_list.Broadcast(CreateMkFilePacket(f));
 
-	f->GetParent()->RemFile(f);
-
-	delete f;
 }
 
 void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)

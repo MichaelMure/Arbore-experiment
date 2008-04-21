@@ -32,13 +32,14 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 #include "job_mkfile.h"
-#include "job_rmfile.h"
 #include "job_update_resp_files.h"
 #include "job_send_ref_file.h"
 #include "job_send_chunk.h"
 #include "job_set_chunk.h"
 #include "job_set_shared_part.h"
 #include "job_add_sharer.h"
+#include "job_ls_dir.h"
+#include "job_end_of_ls.h"
 #include "connection_ssl.h"
 #include "environment.h"
 
@@ -248,6 +249,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 
 	pf_stat stat;
 	stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
+	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
 	stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
 	stat.gid = msg->GetArg<uint32_t>(NET_MKFILE_GID);
 	stat.size = msg->GetArg<uint64_t>(NET_MKFILE_SIZE);
@@ -260,11 +262,32 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	scheduler_queue.Queue(new JobMkFile(filename, stat, sharers, GetID(), /* keep_newest */ true));
 }
 
-void Peer::Handle_net_rmfile(struct Packet* msg)
+/** NET_LS_DIR
+ *
+ * Args:
+ *	NET_LS_DIR_PATH
+ */
+void Peer::Handle_net_ls_dir(struct Packet* msg)
 {
-	std::string filename = msg->GetArg<std::string>(NET_RMFILE_PATH);
-	scheduler_queue.Queue(new JobRmFile(filename, GetID()));
+	std::string path;
+	path = msg->GetArg<std::string>(NET_LS_DIR_PATH);
+	scheduler_queue.Queue(new JobLsDir(path, GetID()));
 }
+
+/** NET_END_OF_LS
+ *
+ * Args:
+ *	NET_END_OF_LS_PATH
+ */
+void Peer::Handle_net_end_of_ls(struct Packet* msg)
+{
+	/* In server mode, we don't care about listing a directory. */
+#ifndef PF_SERVER_MODE
+	std::string path = msg->GetArg<std::string>(NET_END_OF_LS_PATH);
+	scheduler_queue.Queue(new JobEndOfLs(path));
+#endif
+}
+
 
 /** NET_I_HAVE_FILE
  *
@@ -377,7 +400,6 @@ void Peer::HandleMsg(Packet* pckt)
 		{ NULL,                               0              },
 		{ &Peer::Handle_net_hello,            PERM_ANONYMOUS },
 		{ &Peer::Handle_net_mkfile,           0              },
-		{ &Peer::Handle_net_rmfile,           0              },
 		{ &Peer::Handle_net_peer_connection,  PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
@@ -388,6 +410,8 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_refresh_ref_file, 0              },
 		{ &Peer::Handle_net_want_chunk,       0              },
 		{ &Peer::Handle_net_chunk,            0              },
+		{ &Peer::Handle_net_ls_dir,           0              },
+		{ &Peer::Handle_net_end_of_ls,        0              }
 	};
 
 	/* Note tha we can safely cast pckt->type to unsigned after check pkct->type > 0 */

@@ -24,8 +24,6 @@ enum job_type
 {
 	/* MKfile triggered by a peer */
 	JOB_MKFILE,
-	/* Rmfile triggered by a peer */
-	JOB_RMFILE,
 	/* SetAttr triggered by a peer */
 	JOB_FILE_SETATTR,
 	/* Send changes to the peer since his last connection */
