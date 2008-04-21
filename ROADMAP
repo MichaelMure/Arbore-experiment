@@ -1,6 +1,25 @@
 Roadmap for the 0.1 release
 ***************************
 
+Piggledy:
+- NET_REFRESH_FILE_REF handling(almost done)
+- NET_FILE_UNREF handling
+- Download from multiple peers (trivial)
+- Fix file truncating (pflan only?)
+- Tests: local truncate, distant truncate, file transfer
+- Split FileChunk into FileChunk + FileChunkDescription
+- Security: limit packet size, limit the number of opened fd, script to test random read/write size and offset
+- Valgrind / helgrind check
+- Documentation
+- Website: FAQ, Warning, doc
+
+- Handle file modifications (0.2 ?)
+- Add a non-debug compilation target that disables stdout/err logging and disables the log Mutex. (0.2 ?)
+- make install (0.2 ?)
+- Handle anticipated download (0.2 ?)
+- Security: stress tests scripts (0.2 ?)
+- Security: limit ram usage (0.2 ?)
+
 Mon 21 April
 ------------
 

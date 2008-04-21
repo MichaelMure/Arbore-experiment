@@ -3,6 +3,7 @@
 +-------+--------+----------+------------+
 |Task no| Status | Category | Assign. to | Comments
 +-------+--------+----------+------------+
+| 00008 |  Open  |  Global  |            | Add a chroot option
 | 00007 |  Open  |  PFnet   |   romain   | PF_LS_DIR
 | 00006 |  Open  |  PFnet   |            | Store owner and group of file somewhere else than cache's
 |       |        |          |            |   files properties.
