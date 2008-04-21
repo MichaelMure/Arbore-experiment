@@ -51,7 +51,12 @@ int pf_mkdir(const char *path, mode_t mode)
 		 */
 		pf_stat stat;
 		stat.mode = mode|S_IFDIR;
-		cache.MkFile(path, stat, IDList());
+		stat.ctime = time(NULL);
+		stat.atime = stat.ctime;
+		stat.mtime = stat.ctime;
+		stat.meta_mtime = stat.ctime;
+
+	cache.MkFile(path, stat, IDList());
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
