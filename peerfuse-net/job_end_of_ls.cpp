@@ -17,6 +17,8 @@
  * $Id$
  */
 
+#ifndef PF_SERVER_MODE
+
 #include "job_end_of_ls.h"
 #include "cache.h"
 
@@ -26,3 +28,4 @@ bool JobEndOfLs::Start()
 	return false;
 }
 
+#endif /* PF_SERVER_MODE */

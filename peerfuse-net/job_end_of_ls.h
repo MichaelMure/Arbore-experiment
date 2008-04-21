@@ -20,6 +20,8 @@
 #ifndef JOB_END_OF_LS_H
 #define JOB_END_OF_LS_H
 
+#ifndef PF_SERVER_MODE
+
 #include <string.h>
 #include "job.h"
 #include "pf_types.h"
@@ -38,5 +40,8 @@ public:
         job_type GetType() const { return JOB_END_OF_LS; }
         std::string GetName() const { return "JobEndOfLs"; }
 };
+
+#endif                                            /* PF_SERVER_MODE */
+
 #endif                                            /* JOB_END_OF_LS_H */
 
