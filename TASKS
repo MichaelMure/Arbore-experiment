@@ -1,11 +1,17 @@
 
 
-+-------+--------+----------+
-|Task no| Status | Category | Comments
-+-------+--------+----------+
-| 00004 |  Open  |  Global  | Catch SIGHUP to reload the configuration file
-| 00003 |  Open  |  Global  | Catch SIGTERM to call Application::Exit()
-| 00002 |  Open  |  Global  | Simplify logging system (we only need DEBUG/WARNING/ERRORS)
-| 00001 |  Open  | FileSys. | Support file deletion (mark file as deleted in tree_cfg, truncate
-|       |        |          | them in the cache)
-+-------+--------+----------+
++-------+--------+----------+------------+
+|Task no| Status | Category | Assign. to | Comments
++-------+--------+----------+------------+
+| 00007 |  Open  |  PFnet   |   romain   | PF_LS_DIR
+| 00006 |  Open  |  PFnet   |            | Store owner and group of file somewhere else than cache's
+|       |        |          |            |   files properties.
+| 00005 |  Open  |  PFnet   |   romain   | When a low link is established from an ID which is already
+|       |        |          |            |   present in the peers_list, do not remove the first Peer,
+|       |        |          |            |   but do it only when we receive the HELLO message.
+| 00004 |  Open  |  Global  |            | Catch SIGHUP to reload the configuration file
+| 00003 |  Open  |  Global  |            | Catch SIGTERM to call Application::Exit()
+| 00002 |  Open  |  Global  |            | Simplify logging system (we only need DEBUG/WARNING/ERRORS)
+| 00001 |  Open  | FileSys. |            | Support file deletion (mark file as deleted in tree_cfg, truncate
+|       |        |          |            |   them in the cache)
++-------+--------+----------+------------+

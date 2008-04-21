@@ -1,0 +1,29 @@
+Roadmap for the 0.1 release
+***************************
+
+Mon 21 April
+------------
+
+- Finish the NET_LS_DIR on pfnet
+
+Tue 22 April - Thu 24 April
+---------------------------
+
+- Implement files transferts on pfnet
+- Connection to multiple peer on pfnet
+
+Fri 25 April - Sun 27 April
+----------------------------
+
+?
+
+
+Mon 28 April - Wed 30 April
+---------------------------
+
+- Test all filesystem, write tests scripts
+
+Thu 31 April
+------------
+
+- Packaging
