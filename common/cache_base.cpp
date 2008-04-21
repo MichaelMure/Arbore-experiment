@@ -157,11 +157,17 @@ void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 
 	/* No need to lock cache, we don't touch its members */
 	pf_stat stat = GetAttr(path);
+	time_t now = time(NULL);
+	stat.meta_mtime = now;
+	stat.mtime = now;
+	stat.ctime = now;
 	if(off + (off_t)size > (off_t)stat.size)
 	{
 		stat.size = (size_t)off + size;
 		SetAttr(path, stat);
 	}
+
+	content_list.RefreshPeersRef(path);
 }
 
 int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
@@ -212,6 +218,7 @@ int CacheBase::Truncate(std::string path, off_t offset)
 	stat.size = (size_t)offset;
 	stat.ctime = time(NULL);
 	stat.mtime = stat.ctime;
+	stat.meta_mtime = stat.ctime;
 	MkFile(path, stat);
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);

@@ -331,6 +331,19 @@ void Peer::Handle_net_want_chunk(struct Packet* msg)
 	scheduler_queue.Queue(new JobSendChunk(ref, GetID(), offset, size));
 }
 
+void Peer::Handle_net_refresh_ref_file(struct Packet* msg)
+{
+	uint32_t ref = msg->GetArg<uint32_t>(NET_REFRESH_REF_FILE_REF);
+	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REFRESH_REF_FILE_OFFSET);
+	off_t size = (size_t)msg->GetArg<uint64_t>(NET_REFRESH_REF_FILE_SIZE);
+
+	std::map<uint32_t, std::string>::iterator it;
+	if((it = file_refs.find(ref)) == file_refs.end())
+		return;
+
+	scheduler_queue.Queue(new JobSetSharedPart(it->second, GetID(), offset, size));
+}
+
 /** NET_CHUNK
  *
  * Receive a part of a file.
@@ -372,6 +385,7 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_i_have_file,      0              },
 		{ &Peer::Handle_net_want_ref_file,    0              },
 		{ &Peer::Handle_net_ref_file,         0              },
+		{ &Peer::Handle_net_refresh_ref_file, 0              },
 		{ &Peer::Handle_net_want_chunk,       0              },
 		{ &Peer::Handle_net_chunk,            0              },
 	};

@@ -44,6 +44,7 @@ enum msg_type
 	NET_I_HAVE_FILE,
 	NET_WANT_REF_FILE,
 	NET_REF_FILE,
+	NET_REFRESH_REF_FILE,
 	NET_WANT_CHUNK,
 	NET_CHUNK,
 
@@ -138,6 +139,13 @@ enum net_ref_file_path
 	NET_REF_FILE_REF,
 	NET_REF_FILE_OFFSET,
 	NET_REF_FILE_SIZE
+};
+
+enum net_refresh_ref_file_path
+{
+	NET_REFRESH_REF_FILE_REF,
+	NET_REFRESH_REF_FILE_OFFSET,
+	NET_REFRESH_REF_FILE_SIZE
 };
 
 enum net_want_chunk

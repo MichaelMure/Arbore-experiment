@@ -94,6 +94,7 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
 	Peer* p = peers_list.Remove(fd);
 	content_list.RemovePeerRefs(p->GetID());
+	content_list.DelReferer(p->GetID());
 
 	OnRemovePeer(p);
 

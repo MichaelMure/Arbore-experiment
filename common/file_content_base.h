@@ -100,7 +100,13 @@ public:
 
 	void SyncToHdd(bool force = false);
 	time_t GetAccessTime() const;
+
+	/* Set which part of the file a peer has */
 	void SetSharer(pf_id, off_t offset, off_t size);
+
+	/* Remove the part a peer has */
 	void RemoveSharer(pf_id);
+
+	IDList GetSharers();
 };
 #endif						  /* FILE_CONTENT_BASE_H */

@@ -55,6 +55,10 @@ int pf_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 	{
 		pf_stat stat;
 		stat.mode = mode;
+		stat.ctime = time(NULL);
+		stat.atime = stat.ctime;
+		stat.mtime = stat.ctime;
+		stat.meta_mtime = stat.meta_mtime;
 
 		cache.MkFile(path, stat, IDList());
 	}

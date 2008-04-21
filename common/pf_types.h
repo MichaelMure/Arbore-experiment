@@ -20,6 +20,7 @@
 #ifndef PF_TYPES_H
 #define PF_TYPES_H
 
+#include <list>
 #include <vector>
 #include <stdint.h>
 
@@ -48,7 +49,7 @@ public:
 };
 
 typedef std::vector<pf_addr> AddrList;
-typedef std::vector<pf_id> IDList;
+typedef std::list<pf_id> IDList;
 
 template<typename T>
 class Deleter

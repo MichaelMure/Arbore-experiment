@@ -30,12 +30,14 @@ class ContentListBase : public Thread, private Mutex, private std::map<std::stri
 {
 	// Map the ref i'll use to SEND file
 	std::map<uint32_t, std::string> my_refs;
+	std::map<std::string, IDList> refered_by;
 
 protected:
 	void Loop();
 	void OnStop();
 
 public:
+	ContentListBase() : Mutex(RECURSIVE_MUTEX) {}
 	virtual ~ContentListBase();
 
 	/** Returns the content of the file we already have in memory
@@ -51,11 +53,23 @@ public:
 	void RemoveFile(std::string path);
 
 	/** When a peer disconnect acknowledge the file-contents that the peer
-	 *  stop sharing the file
+	 *  stopped sharing the file
 	 * @param path path to the file
 	 */
-	void RemovePeerRefs(pf_id);
+	void RemovePeerRefs(pf_id peer);
+
+	/** Resend to peers the part of the file we are sharing
+	 * @param path path to the file
+	 */
+	void RefreshPeersRef(std::string path);
 
 	uint32_t GetRef(std::string filename);
+
+	/* Track that this peer is using this ref */
+	void AddReferer(std::string path, pf_id referer);
+	/* Stop tracking that this peer was using this ref */
+	void DelReferer(std::string path, pf_id referer);
+	/* Stop tracking all the ref a peer has */
+	void DelReferer(pf_id);
 };
 #endif						  /* CONTENT_LIST_BASE_H */

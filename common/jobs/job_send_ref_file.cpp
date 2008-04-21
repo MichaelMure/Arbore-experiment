@@ -26,6 +26,7 @@ bool JobSendRefFile::Start()
 {
 	uint32_t ref = content_list.GetRef(filename);
 	FileContent& f = content_list.GetFile(filename);
+	content_list.AddReferer(filename, sendto);
 	off_t offset;
 	off_t size;
 	f.GetSharedContent(offset, size);

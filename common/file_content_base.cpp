@@ -459,6 +459,16 @@ void FileContentBase::SetSharer(pf_id sharer, off_t offset, off_t size)
 	NetworkFlushRequests();
 }
 
+IDList FileContentBase::GetSharers()
+{
+	BlockLockMutex lock(this);
+	IDList lst;
+	std::map<pf_id, struct sharedchunks>::iterator it;
+	for(it = sharers.begin(); it != sharers.end(); ++it)
+		lst.push_back(it->first);
+	return lst;
+}
+
 void FileContentBase::RemoveSharer(pf_id peer)
 {
 	BlockLockMutex lock(this);

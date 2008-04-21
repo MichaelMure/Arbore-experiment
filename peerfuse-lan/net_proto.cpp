@@ -42,6 +42,7 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_I_HAVE_FILE */            "I_HAVE_FILE",
 	/* NET_WANT_REF_FILE */          "WANT_REF_FILE",
 	/* NET_REF_FILE */               "REF_FILE",
+	/* NET_REFRESH_REF_FILE */       "REFRESH_REF_FILE",
 	/* NET_WANT_CHUNK */             "WANT_CHUNK",
 	/* NET_CHUNK */                  "CHUNK",
 };
@@ -157,6 +158,14 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_REF_FILE_REF */ T_UINT32, /* Reference of the file */
 		/* NET_REF_FILE_OFFSET */ T_UINT64, /* Offset of the content we own */
 		/* NET_REF_FILE_SIZE */ T_UINT64, /* Size of the content we own */
+		T_NONE
+	},
+
+	// NET_REFRESH_REF_FILE
+	{
+		/* NET_REFRESH_REF_FILE_REF */ T_UINT32, /* Reference of the file */
+		/* NET_REFRESH_REF_FILE_OFFSET */ T_UINT64, /* Offset of the content we own */
+		/* NET_REFRESH_REF_FILE_SIZE */ T_UINT64, /* Size of the content we own */
 		T_NONE
 	},
 

@@ -164,16 +164,21 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		peers_list.Broadcast(CreateMkFilePacket(f));
 }
 
-void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newer)
+void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
 	if(!f)
 		throw NoSuchFileOrDir();
 
-	if(stat.mtime >= f->GetAttr().mtime)
+	if(stat.meta_mtime >= f->GetAttr().meta_mtime)
 		f->SetAttr(stat);
+	else
+		log[W_DEBUG] << "Won't update stats";
 
+	/* if it's me who created/modified file */
+	if(sender == 0)
+		peers_list.Broadcast(CreateMkFilePacket(f));
 	/* TODO: Set attribute on hdd */
 	/* hdd.SetAttr(stat); */
 }

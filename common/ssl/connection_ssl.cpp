@@ -41,7 +41,6 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 		buf_queue.push(new_buf);
 	}
 
-	log[W_DEBUG] << "Send...";
 	while(!buf_queue.empty())
 	{
 		int written = SSL_write(ssl, buf_queue.front().buf, buf_queue.front().size);

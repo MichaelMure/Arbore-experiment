@@ -59,6 +59,7 @@ class Peer : public PeerBase
 	void Handle_net_i_have_file(struct Packet* pckt);
 	void Handle_net_want_ref_file(struct Packet* pckt);
 	void Handle_net_ref_file(struct Packet* pckt);
+	void Handle_net_refresh_ref_file(struct Packet* pckt);
 	void Handle_net_want_chunk(struct Packet* pckt);
 	void Handle_net_chunk(struct Packet* pckt);
 public:

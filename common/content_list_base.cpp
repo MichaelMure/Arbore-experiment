@@ -18,9 +18,12 @@
  */
 
 #include <string>
+#include <algorithm>
 #include <time.h>
 #include "content_list_base.h"
 #include "log.h"
+#include "peers_list.h"
+#include "pf_types.h"
 
 const time_t remove_from_list_timeout = 15;
 
@@ -70,6 +73,7 @@ FileContent& ContentListBase::GetFile(std::string path)
 
 FileContent& ContentListBase::GetFile(uint32_t ref)
 {
+	BlockLockMutex lock(this);
 	std::string filename;
 	std::map<uint32_t, std::string>::iterator it;
 
@@ -83,6 +87,11 @@ FileContent& ContentListBase::GetFile(uint32_t ref)
 void ContentListBase::RemoveFile(std::string path)
 {
 	BlockLockMutex lock(this);
+
+	/* Remove referer */
+	std::map<std::string, IDList>::iterator referer_it;
+	if((referer_it = refered_by.find(path)) != refered_by.end())
+		refered_by.erase(referer_it);
 
 	iterator it = find(path);
 	if(it != end())
@@ -106,6 +115,27 @@ void ContentListBase::RemovePeerRefs(pf_id peer)
 		it->second.RemoveSharer(peer);
 }
 
+void ContentListBase::RefreshPeersRef(std::string path)
+{
+	BlockLockMutex lock(this);
+	std::map<std::string, IDList>::iterator referers_list;
+
+	if((referers_list = refered_by.find(path)) == refered_by.end())
+		return;
+
+	uint32_t ref = GetRef(path);
+	FileContent& f = GetFile(path);
+	off_t offset;
+	off_t size;
+	f.GetSharedContent(offset, size);
+
+	Packet packet(NET_REFRESH_REF_FILE);
+	packet.SetArg(NET_REFRESH_REF_FILE_REF, ref);
+	packet.SetArg(NET_REFRESH_REF_FILE_OFFSET, (uint64_t)offset);
+	packet.SetArg(NET_REFRESH_REF_FILE_SIZE, (uint64_t)size);
+	peers_list.SendMsg(referers_list->second, packet);
+}
+
 uint32_t ContentListBase::GetRef(std::string filename)
 {
 	BlockLockMutex lock(this);
@@ -125,4 +155,36 @@ uint32_t ContentListBase::GetRef(std::string filename)
 	log[W_DEBUG] << "Giving ref " << ref << " to \"" << filename << "\"";
 
 	return ref;
+}
+
+void ContentListBase::AddReferer(std::string path, pf_id referer)
+{
+	BlockLockMutex lock(this);
+	if(refered_by.find(path) == refered_by.end())
+		refered_by.insert(make_pair(path, IDList()));
+
+	refered_by[path].push_back(referer);
+}
+
+void ContentListBase::DelReferer(std::string path, pf_id referer)
+{
+	BlockLockMutex lock(this);
+	std::map<std::string, IDList>::iterator ref_it;
+	if((ref_it = refered_by.find(path)) == refered_by.end())
+		return;
+
+	IDList::iterator referer_it;
+	if((referer_it = std::find(ref_it->second.begin(), ref_it->second.end(), referer)) != ref_it->second.end())
+		ref_it->second.erase(referer_it);
+}
+
+void ContentListBase::DelReferer(pf_id referer)
+{
+	std::map<std::string, IDList>::iterator ref;
+	for(ref = refered_by.begin(); ref != refered_by.end(); ++ref)
+	{
+		IDList::iterator it;
+		if((it = std::find(ref->second.begin(), ref->second.end(), referer)) != ref->second.end())
+			ref->second.erase(it);
+	}
 }

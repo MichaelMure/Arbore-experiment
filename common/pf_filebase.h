@@ -40,14 +40,11 @@ public:
 	time_t meta_mtime;		  /* last meta-data modification */
 
 	pf_stat()
-		: size(0)
-	{
-		time_t now = time(NULL);
-		atime = now;
-		mtime = now;
-		ctime = now;
-		meta_mtime = now;
-	}
+		: size(0),
+		atime(0),
+		mtime(0),
+		ctime(0),
+		meta_mtime(0) {}
 };
 
 class FileEntryBase
@@ -69,8 +66,8 @@ public:
 
 	bool IsChildOf(const FileEntryBase* f) const;
 
-	std::vector<pf_id> GetSharers() const { return sharers; }
-	void SetSharers(std::vector<pf_id> l) { sharers = l; }
+	IDList GetSharers() const { return sharers; }
+	void SetSharers(IDList l) { sharers = l; }
 	void AddSharer(pf_id id) { sharers.push_back(id); }
 
 	pf_stat GetAttr() const { return stat; };
