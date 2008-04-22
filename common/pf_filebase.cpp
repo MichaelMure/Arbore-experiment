@@ -66,5 +66,7 @@ void FileEntryBase::SetAttr(pf_stat new_stat)
 		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
 	if(stat.meta_mtime != new_stat.meta_mtime)
 		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
+	if(stat.pf_mode != new_stat.pf_mode)
+		tree_cfg.Set(GetFullName() + "#pfmode", (uint32_t)new_stat.pf_mode);
 	stat = new_stat;
 }

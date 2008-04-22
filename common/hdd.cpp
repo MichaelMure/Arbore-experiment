@@ -44,7 +44,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-			
+
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	BlockLockMutex lock(this);
@@ -99,6 +99,8 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 				file_stats.meta_mtime = (time_t)cfg_val;
 			if(tree_cfg.Get(f->GetFullName() + "#size", cfg_val))
 				file_stats.size = (size_t)cfg_val;
+			if(tree_cfg.Get(f->GetFullName() + "#pfmode", cfg_val))
+				file_stats.pf_mode = (uint32_t)cfg_val;
 			f->SetAttr(file_stats);
 
 			log[W_INFO] << f->GetFullName() << " loaded.";
