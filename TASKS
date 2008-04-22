@@ -3,6 +3,9 @@
 +-------+--------+----------+------------+
 |Task no| Status | Category | Assign. to | Comments
 +-------+--------+----------+------------+
+| 00010 |  Open  |  Global  |            | Merge options workdir/ and cache/, pf should create the config arborescence by itself
+| 00009 |  Open  |  Global  |            | Assign a number to a newly created network to avoid a cache if someone tries to connect
+|       |        |          |            |   with a cache from a different network
 | 00008 |  Open  |  Global  |            | Add a chroot option
 | 00007 | Closed |  PFnet   |   romain   | NET_LS_DIR
 | 00006 |  Open  |  PFnet   |            | Store owner and group of file somewhere else than cache's
