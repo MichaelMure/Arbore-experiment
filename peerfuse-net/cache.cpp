@@ -128,6 +128,9 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 			stat.gid = environment.my_id.Get();
 		}
 
+		if(stat.pf_mode & FilePermissions::S_PF_REMOVED)
+			log[W_DEBUG] << "File removed";
+
 		if(stat.mode & S_IFDIR)
 			file = new DirEntry(filename, stat, dir);
 		else
@@ -152,7 +155,12 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		 * to let fuse returns an error.
 		 */
 		if(sender == 0)
-			throw;
+		{
+			if(file->IsRemoved())
+				file->ClearRemoved();
+			else
+				throw;
+		}
 
 		log[W_DEBUG] << "File already exists... Update it.";
 
@@ -203,6 +211,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	if(!file || (filename.empty() == false && dir))
 		throw NoSuchFileOrDir();
 
+	BlockLockMutex peer_lock(&peers_list);
 	if(sender > 0)
 		peer = peers_list.PeerFromID(sender);
 
@@ -241,6 +250,8 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	}
 	else
 		stat.meta_mtime = time(NULL);
+
+	log[W_DEBUG] << "Updating file.";
 
 	file->SetAttr(stat);
 
