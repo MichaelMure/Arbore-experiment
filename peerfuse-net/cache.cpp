@@ -183,6 +183,8 @@ void Cache::RmFile(std::string path)
 
 	pf_stat stat = f->GetAttr();
 	stat.pf_mode |= FilePermissions::S_PF_REMOVED;
+	stat.meta_mtime = time(NULL);
+	stat.mtime = time(NULL);
 
 	_set_attr(f, stat, NULL, IDList());
 
@@ -217,9 +219,9 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		time_t dist_ts = sender->Timestamp(stat.mtime);
+		time_t dist_ts = sender->Timestamp(stat.meta_mtime);
 
-		if(file->GetAttr().mtime > dist_ts)
+		if(file->GetAttr().meta_mtime > dist_ts)
 		{
 			/* My file is more recent than peer's, so I send it a mkfile
 			 * to correct this.
@@ -230,13 +232,15 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			sender->SendMsg(pckt);
 			return;
 		}
-		else if(file->GetAttr().mtime == dist_ts)
+		else if(file->GetAttr().meta_mtime == dist_ts)
 		{
 			log[W_DEBUG] << "Same timestamp... What can we do ??";
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
 	}
+	else
+		stat.meta_mtime = time(NULL);
 
 	file->SetAttr(stat);
 
