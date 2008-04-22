@@ -80,8 +80,9 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
-		Peer* peer = peers_list.PeerFromID(idl[(f->GetPathSerial()+i) % idl.size()]);
-		log[W_DEBUG] << "     peer: " << idl[(f->GetPathSerial()+i) % idl.size()];
+		unsigned int num = (f->GetPathSerial() > i ? (f->GetPathSerial() - i) : (f->GetPathSerial() + idl.size() - i)) % idl.size();
+		Peer* peer = peers_list.PeerFromID(idl[num]);
+		log[W_DEBUG] << "     peer: " << idl[num];
 
 		/* It is possible that there isn't any Peer object for this
 		 * ID. For example, for me.
