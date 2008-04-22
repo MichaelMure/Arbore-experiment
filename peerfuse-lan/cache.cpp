@@ -150,7 +150,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	dir->AddFile(f);
 	hdd.MkFile(f);
 
-	SetAttr(path, stat);
+	SetAttr(path, stat, IDList(), sender);
 
 	/* if it's me who created/modified file */
 	if(sender == 0)
@@ -202,7 +202,6 @@ void Cache::RmFile(std::string path)
 	content_list.RemoveFile(f->GetFullName());
 
 	peers_list.Broadcast(CreateMkFilePacket(f));
-
 }
 
 void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)

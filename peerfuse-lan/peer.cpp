@@ -292,6 +292,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_MODIF_TIME));
 	stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_META_MODIF_TIME));
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
+	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
 
 	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID()/*, IsMerging()*/, true));
 }

@@ -48,14 +48,19 @@ size_t DirEntry::CountExistantFiles() const
 
 void DirEntry::AddFile(FileEntry* file)
 {
-	if(files.find(file->GetName()) != files.end())
-		return;				  // TODO: no happy, raise an exception?
+	FileMap::iterator it;
+	if((it = files.find(file->GetName())) != files.end())
+	{
+		log[W_DEBUG] << "File already exists, replacing it";
+		delete it->second;
+	}
+
 	files[file->GetName()] = file;
 }
 
 void DirEntry::RemFile(FileEntry* file)
 {
-	files.erase(file->GetName());
+	/* TODO: Remove-me ? */
 }
 
 FileEntry* DirEntry::GetFile(std::string name) const
