@@ -155,13 +155,33 @@ void Hdd::MkFile(FileEntry* f)
 	std::string path = root + f->GetFullName();
 	if(f->GetAttr().mode & S_IFDIR)
 	{
+		/* Try to open it to know if it exists */
+		DIR* d = opendir(path.c_str());
+		if(d)
+		{
+			//TODO: We may need to change perms
+			closedir(d);
+			return;
+		}
+		
 		int r = mkdir(path.c_str(), f->GetAttr().mode);
 		if(r)
+		{
+			log[W_ERR] << "mkdir failed: " << strerror(errno);
 			throw HddWriteFailure(path);
+		}
 		log[W_INFO] << "mkdir on " << path;
 	}
 	else
 	{
+		int hdd_fd = open(path.c_str(), O_RDONLY);
+		if(hdd_fd != -1)
+		{
+			// TODO: change perms
+			close(hdd_fd);
+			return;
+		}
+
 		int fd = creat(path.c_str(), f->GetAttr().mode);
 		if(fd == -1)
 			throw HddWriteFailure(path);
