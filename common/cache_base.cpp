@@ -59,13 +59,9 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 				if(!tmp)
 				{
 					pf_stat stat;
-					stat.mtime = 0;
-					stat.ctime = 0;
-					stat.meta_mtime = 0;
-					stat.atime = 0;
 					stat.uid = 0;
 					stat.gid = 0;
-					tmp = new DirEntry(name, pf_stat(), current_dir);
+					tmp = new DirEntry(name, stat, current_dir);
 					current_dir->AddFile(tmp);
 				}
 				else
@@ -118,13 +114,11 @@ void CacheBase::ChOwn(std::string path, uid_t uid, gid_t gid)
 	stat.gid = gid;
 	stat.meta_mtime = time(NULL);
 	SetAttr(path, stat);
-
-	/* TODO propagate it */
 }
 
 void CacheBase::ChMod(std::string path, mode_t mode)
 {
-	Lock();
+	BlockLockMutex lock(this);
 
 	FileEntry* file = Path2File(path);
 	if(!file)
@@ -134,8 +128,6 @@ void CacheBase::ChMod(std::string path, mode_t mode)
 	stat.mode = mode;
 	stat.meta_mtime = time(NULL);
 	SetAttr(path, stat);
-
-	/* TODO propagate it */
 }
 
 pf_stat CacheBase::GetAttr(std::string path)
