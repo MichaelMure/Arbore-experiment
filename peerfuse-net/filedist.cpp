@@ -31,17 +31,19 @@ FileDistribution::FileDistribution()
 
 }
 
-bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* file, const std::vector<pf_id>& id_list) const
+bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* file, const std::vector<pf_id>& id_l) const
 {
 	assert(peer_id > 0);
 	assert(file != NULL);
 
+	log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ")";
+
 	std::vector<pf_id>::const_iterator it;
-	std::vector<pf_id>::const_iterator begin = id_list.begin();
-	for(it = begin; it != id_list.end() && *it != peer_id; ++it)
+	std::vector<pf_id>::const_iterator begin = id_l.begin();
+	for(it = begin; it != id_l.end() && *it != peer_id; ++it)
 		;
 
-	if(it == id_list.end())
+	if(it == id_l.end())
 	{
 		log[W_WARNING] << "FileDistribution::_is_responsible(): " << peer_id << " isn't in list";
 		return false;
@@ -50,9 +52,10 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 	size_t id_n = it - begin;
 	size_t i = 0;
 
-	for(; i < NB_PEERS_PER_FILE && file->GetPathSerial() % id_list.size() != id_n % id_list.size(); ++i)
+	for(; i < NB_PEERS_PER_FILE && (file->GetPathSerial() % id_l.size() != (id_n + i) % id_l.size()); ++i)
 		;
 
+	log[W_DEBUG] << "            result: " << (i < NB_PEERS_PER_FILE ? "true" : "false");
 	return (i < NB_PEERS_PER_FILE);
 }
 
@@ -73,9 +76,12 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 	std::set<Peer*> list;
 	BlockLockMutex lock(&peers_list);
 
+	log[W_DEBUG] << "FileDist::_get_resp_peers(" << f->GetFullName() << ", " << f->GetPathSerial() << ")";
+
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
 		Peer* peer = peers_list.PeerFromID(idl[(f->GetPathSerial()+i) % idl.size()]);
+		log[W_DEBUG] << "     peer: " << idl[(f->GetPathSerial()+i) % idl.size()];
 
 		/* It is possible that there isn't any Peer object for this
 		 * ID. For example, for me.
@@ -110,7 +116,7 @@ FileList FileDistribution::GetFiles(pf_id id) const
 	{
 		size_t i = 0;
 		for(; i < NB_PEERS_PER_FILE &&
-			((*it)->GetPathSerial() % id_list.size() != id_number % id_list.size());
+			((*it)->GetPathSerial() % id_list.size() != (id_number + i) % id_list.size());
 			++i)
 		;
 
@@ -314,6 +320,9 @@ void FileDistribution::UpdateRespFiles()
 	/* Sort it */
 	std::sort(id_list.begin(), id_list.end());
 
+	for(std::vector<pf_id>::const_iterator it = id_list.begin(); it != id_list.end(); ++it)
+		log[W_DEBUG] << "     LISTpeer: " << *it;
+
 	/* Get all new files I have responsible */
 	FileList last_resp = resp_files;
 	resp_files.clear();
@@ -322,11 +331,11 @@ void FileDistribution::UpdateRespFiles()
 
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
+		log[W_DEBUG] << "- file " << (*it)->GetFullName();
+
 		Packet pckt = CreateMkFilePacket(*it);
 		/* get actual peer list */
 		std::set<Peer*> peers = GetRespPeers(*it);
-
-		log[W_DEBUG] << "- file " << (*it)->GetFullName();
 
 		/* TODO do not send message to peers we know they have already this file version */
 		for(std::set<Peer*>::iterator peer = peers.begin(); peer != peers.end(); ++peer)
