@@ -36,6 +36,7 @@ public:
 
 	const FileMap& GetFiles() { return files; }
 	size_t GetSize() const { return files.size(); }
+	size_t CountExistantFiles() const;
 
 	void AddFile(FileEntry* file);
 	void RemFile(FileEntry* file);	  /**< will *not* destroy object */

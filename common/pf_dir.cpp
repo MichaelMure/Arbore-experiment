@@ -36,6 +36,16 @@ DirEntry::~DirEntry()
 		delete it->second;
 }
 
+size_t DirEntry::CountExistantFiles() const
+{
+	size_t i = 0;
+	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+		if(it->second->IsRemoved() == false)
+			++i;
+
+	return i;
+}
+
 void DirEntry::AddFile(FileEntry* file)
 {
 	if(files.find(file->GetName()) != files.end())

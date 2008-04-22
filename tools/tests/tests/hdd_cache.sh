@@ -22,13 +22,16 @@ source "$TESTS/bash/tests.sh"
 
 start_p2pfs
 
+# Do not remove files or dir to test if cache is same than filesystem,
+# because a removed file isn't removed from cache.
+
 mkdir -p "$MNT1/blah/sdf"
 mkdir -p "$MNT1/blh/sf"
 mkdir -p "$MNT1/blh/sf2"
-rmdir "$MNT1/blh/sf"
+#rmdir "$MNT1/blh/sf"
 touch "$MNT1/blh/s"
 touch "$MNT1/blh/d"
-rm "$MNT1/blh/s"
+#rm "$MNT1/blh/s"
 
 find "$MNT1" | sort | colrm 1 ${#MNT1} > /tmp/p2pfs_tests_find1
 find "$CACHE1" | sort | colrm 1 ${#CACHE1} > /tmp/p2pfs_tests_find2

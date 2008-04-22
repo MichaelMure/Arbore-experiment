@@ -172,7 +172,7 @@ void Cache::RmFile(std::string path)
 	if (f->GetAttr().mode & S_IFDIR)
 	{
 		DirEntry* d = static_cast<DirEntry*>(f);
-		if(d->GetSize() != 0)
+		if(d->CountExistantFiles() != 0)
 			throw DirNotEmpty();
 	}
 
