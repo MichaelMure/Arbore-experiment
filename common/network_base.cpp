@@ -92,6 +92,8 @@ Peer* NetworkBase::AddPeer(Peer* p)
 
 void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
+	BlockLockMutex lock(this);
+
 	Peer* p = peers_list.Remove(fd);
 	content_list.RemovePeerRefs(p->GetID());
 	content_list.DelReferer(p->GetID());
@@ -102,22 +104,15 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 		AddDisconnected(p->GetAddr());
 
 	delete p;
-	Lock();
+
 	if(FD_ISSET(fd, &global_read_set)) FD_CLR(fd, &global_read_set);
-	Unlock();
 }
 
 void NetworkBase::Loop()
 {
-	/* We wait only 1000ms because when an other thread wants to send a
-	 * message to someone, we change global_write_set, and it needs to call
-	 * an other time select().
-	 * If timeout was something like one minute, we may wait one minute before
-	 * message was sent...
-	 */
 	struct timeval timeout;
 	timeout.tv_sec = 0;
-	timeout.tv_usec = 1000;
+	timeout.tv_usec = 0;
 
 	usleep(1000);				  // sleep 0.001 sec -> give the other thread a chance to lock
 	BlockLockMutex lock(this);
@@ -233,9 +228,9 @@ void NetworkBase::OnStop()
 
 void NetworkBase::CloseAll()
 {
+	BlockLockMutex lock(this);
 	peers_list.CloseAll();
 
-	Lock();
 	if(serv_sock >= 0)
 	{
 		close(serv_sock);
@@ -246,7 +241,6 @@ void NetworkBase::CloseAll()
 
 	delete ssl;
 	ssl = 0;
-	Unlock();
 }
 
 pf_addr NetworkBase::MakeAddr(const std::string& hostname, uint16_t port)
@@ -278,6 +272,7 @@ pf_addr NetworkBase::MakeAddr(const std::string& hostname, uint16_t port)
 
 Peer* NetworkBase::Connect(pf_addr addr)
 {
+	BlockLockMutex lock(this);
 	assert(ssl);
 
 	/* Socket creation
