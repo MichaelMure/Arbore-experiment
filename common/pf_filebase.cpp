@@ -27,7 +27,7 @@
 FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
 			: name(_name), parent(_parent)
 {
-	SetAttr(stat);
+	SetAttr(_stat);
 }
 
 FileEntryBase::~FileEntryBase()
