@@ -45,7 +45,7 @@ FileList Cache::GetAllFiles()
 	std::stack<std::pair<FileMap::const_iterator, FileMap::const_iterator> > stack;
 	FileList list;
 
-	Lock();
+	BlockLockMutex lock(this);
 	DirEntry* current_dir = GetTree();
 
 	/* GetFiles() returns a reference, so we can use it directly */
@@ -94,8 +94,6 @@ FileList Cache::GetAllFiles()
 
 	}
 
-	Unlock();
-
 	return list;
 }
 
@@ -127,9 +125,6 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 			stat.uid = environment.my_id.Get();
 			stat.gid = environment.my_id.Get();
 		}
-
-		if(stat.pf_mode & FilePermissions::S_PF_REMOVED)
-			log[W_DEBUG] << "File removed";
 
 		if(stat.mode & S_IFDIR)
 			file = new DirEntry(filename, stat, dir);
@@ -192,7 +187,7 @@ void Cache::RmFile(std::string path)
 	pf_stat stat = f->GetAttr();
 	stat.pf_mode |= FilePermissions::S_PF_REMOVED;
 	stat.meta_mtime = time(NULL);
-	stat.mtime = time(NULL);
+	stat.mtime = stat.meta_mtime;
 
 	_set_attr(f, stat, NULL, IDList());
 
@@ -202,8 +197,8 @@ void Cache::RmFile(std::string path)
 
 void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest)
 {
+	BlockLockMutex lock(this);
 	Peer* peer = 0;
-
 	std::string filename;
 	FileEntry* file = Path2File(path, 0, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(file);

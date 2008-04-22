@@ -130,27 +130,35 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 {
 	BlockLockMutex lock(this);
 
-	FileEntry* f = Path2File(path);
-	// The file doesn't exist -> create it
 	std::string filename;
-	DirEntry* dir = dynamic_cast<DirEntry*>(Path2File(path, 0, &filename));
+	FileEntry* f = Path2File(path, 0, &filename);
+	DirEntry* dir = dynamic_cast<DirEntry*>(f);
 
-	if(!dir)
+	if(!f)
 		throw NoSuchFileOrDir();
 
-	if(filename.empty())
-		throw FileAlreadyExists();
-
-	if(stat.mode & S_IFDIR)
-		f = new DirEntry(filename, stat, dir);
+	if(filename.empty() || !dir)
+	{
+		if(f->IsRemoved())
+		{
+			f->ClearRemoved();
+			f->SetAttr(stat);
+			hdd.UpdateFile(f);
+		}
+		else
+			throw FileAlreadyExists();
+	}
 	else
-		f = new FileEntry(filename, stat, dir);
+	{
+		if(stat.mode & S_IFDIR)
+			f = new DirEntry(filename, stat, dir);
+		else
+			f = new FileEntry(filename, stat, dir);
 
-	log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
-	dir->AddFile(f);
-	hdd.MkFile(f);
-
-	SetAttr(path, stat, IDList(), sender);
+		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
+		dir->AddFile(f);
+		hdd.MkFile(f);
+	}
 
 	/* if it's me who created/modified file */
 	if(sender == 0)
@@ -168,6 +176,8 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 		f->SetAttr(stat);
 	else
 		log[W_DEBUG] << "Won't update stats";
+
+	hdd.UpdateFile(f);
 
 	/* if it's me who created/modified file */
 	if(sender == 0)
