@@ -67,8 +67,8 @@ public:
 	bool IsChildOf(const FileEntryBase* f) const;
 
 	IDList GetSharers() const { return sharers; }
-	void SetSharers(IDList l) { sharers = l; }
-	void AddSharer(pf_id id) { sharers.push_back(id); }
+	void SetSharers(IDList l);
+	void AddSharer(pf_id id) { sharers.push_back(id); SetSharers(sharers); }
 
 	pf_stat GetAttr() const { return stat; };
 	void SetAttr(pf_stat stat);

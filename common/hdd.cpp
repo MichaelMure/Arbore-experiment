@@ -101,6 +101,18 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 				file_stats.size = (size_t)cfg_val;
 			if(tree_cfg.Get(f->GetFullName() + "#pfmode", cfg_val))
 				file_stats.pf_mode = (uint32_t)cfg_val;
+			#ifdef PF_NET
+			std::string cfg_val_s;
+			if(tree_cfg.Get(f->GetFullName() + "#sharers", cfg_val_s))
+			{
+				IDList idlist;
+				std::string id;
+				while((id = stringtok(cfg_val_s, ",")).empty() == false)
+					idlist.push_back(StrToTyp<uint32_t>(id));
+				f->SetSharers(idlist);
+			}
+			#endif
+
 			f->SetAttr(file_stats);
 
 			log[W_INFO] << f->GetFullName() << " loaded.";
@@ -163,7 +175,7 @@ void Hdd::MkFile(FileEntry* f)
 			closedir(d);
 			return;
 		}
-		
+
 		int r = mkdir(path.c_str(), f->GetAttr().mode);
 		if(r)
 		{
