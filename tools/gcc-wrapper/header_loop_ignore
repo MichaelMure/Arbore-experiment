@@ -24,6 +24,7 @@ peer.cpp->job_update_resp_files.h
 peer.cpp->job_add_sharer.h
 peer.cpp->job_ls_dir.h
 peer.cpp->job_end_of_ls.h
+file_content.cpp->cache.h
 
 pf_dir.h->pf_file.h
 

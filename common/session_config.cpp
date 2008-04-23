@@ -24,12 +24,6 @@
 #include "session_config.h"
 #include "log.h"
 
-template<>
-std::string SessionConfigValue<std::string>::GetAsString() const
-{
-	return value;
-};
-
 SessionConfig session_cfg;
 SessionConfig tree_cfg;
 
@@ -40,13 +34,6 @@ SessionConfig::SessionConfig() : Mutex(RECURSIVE_MUTEX), filename("")
 SessionConfig::~SessionConfig()
 {
 	Save();
-
-	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
-		it != list.end();
-		++it)
-	{
-		delete it->second;
-	}
 }
 
 static ssize_t getline(std::string& line, std::fstream& file)
@@ -78,6 +65,7 @@ void SessionConfig::Load(const std::string& _filename)
 		if(line.size() == 0 || line.at(0) == '#' )
 			continue;
 
+		/* TODO: Problem if key has a = in name */
 		std::string::size_type equ_pos = line.find('=',0);
 		if(equ_pos == std::string::npos)
 		{
@@ -105,11 +93,11 @@ void SessionConfig::Save()
 		return;
 	}
 
-	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
+	for(std::map<std::string, std::string>::iterator it = list.begin();
 		it != list.end();
 		++it)
 	{
-		fout << it->first << "=" << it->second->GetAsString() << std::endl;
+		fout << it->first << "=" << it->second << std::endl;
 	}
 	fout.close();
 	//log[W_INFO] << "SessionConfig: Config saved in " << filename;
@@ -125,23 +113,14 @@ void SessionConfig::Parse(const std::string& line)
 	std::string opt = line.substr(0, equ_pos);
 	std::string val = line.substr(equ_pos+1);
 
-	// val is considered to be an int if it doesn't contain
-	// a '.' (ip address have to be handled as string...
-	if(val.find('.',0) == std::string::npos
-		&& ((val.at(0) >= '0' && val.at(0) <= '9')))
-	{
-		uint32_t nbr = strtoul(val.c_str(), NULL, 10);
-		Set(opt, nbr);
-	}
-	else
-		Set(opt, val);
+	Set(opt, val);
 }
 
 void SessionConfig::Display()
 {
 	BlockLockMutex lock(this);
-	for(std::map<std::string, SessionConfigValueBase*>::iterator it = list.begin();
+	for(std::map<std::string, std::string>::iterator it = list.begin();
 		it != list.end();
 		++it)
-	log[W_INFO] << it->first << ":" << it->second->GetAsString();
+	log[W_INFO] << it->first << ":" << it->second;
 }

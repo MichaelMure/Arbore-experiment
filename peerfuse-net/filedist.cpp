@@ -36,7 +36,6 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 	assert(peer_id > 0);
 	assert(file != NULL);
 
-	log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ")";
 
 	std::vector<pf_id>::const_iterator it;
 	std::vector<pf_id>::const_iterator begin = id_l.begin();
@@ -55,7 +54,8 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 	for(; i < NB_PEERS_PER_FILE && (file->GetPathSerial() % id_l.size() != (id_n + i) % id_l.size()); ++i)
 		;
 
-	log[W_DEBUG] << "            result: " << (i < NB_PEERS_PER_FILE ? "true" : "false");
+	log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ") = "
+	             << (i < NB_PEERS_PER_FILE ? "true" : "false");
 	return (i < NB_PEERS_PER_FILE);
 }
 
@@ -76,13 +76,13 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 	std::set<Peer*> list;
 	BlockLockMutex lock(&peers_list);
 
-	log[W_DEBUG] << "FileDist::_get_resp_peers(" << f->GetFullName() << ", " << f->GetPathSerial() << ")";
+	std::string debug;
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
 		unsigned int num = (f->GetPathSerial() > i ? (f->GetPathSerial() - i) : (f->GetPathSerial() + idl.size() - i)) % idl.size();
 		Peer* peer = peers_list.PeerFromID(idl[num]);
-		log[W_DEBUG] << "     peer: " << idl[num];
+		debug += TypToStr(idl[num]) + ", ";
 
 		/* It is possible that there isn't any Peer object for this
 		 * ID. For example, for me.
@@ -90,6 +90,8 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 		if(peer)
 			list.insert(peer);
 	}
+
+	log[W_DEBUG] << "FileDist::_get_resp_peers(" << f->GetFullName() << ", " << f->GetPathSerial() << ") = " << debug;
 
 	return list;
 }
@@ -299,6 +301,24 @@ void FileDistribution::AddSharer(FileEntry* file, pf_id sender)
 		{
 			pckt.SetDstID((*p)->GetID());
 			(*p)->SendMsg(pckt);
+		}
+	}
+}
+
+void FileDistribution::RequestFileRefs(const FileEntry* f)
+{
+	IDList idlist = f->GetSharers();
+
+	BlockLockMutex net_lock(&peers_list);
+	Packet packet(NET_WANT_REF_FILE, environment.my_id.Get());
+	packet.SetArg(NET_WANT_REF_FILE_PATH, f->GetFullName());
+	for(IDList::iterator id = idlist.begin(); id != idlist.end(); ++id)
+	{
+		Peer* peer = peers_list.PeerFromID(*id);
+		if(peer)
+		{
+			packet.SetDstID(*id);
+			peer->SendMsg(packet);
 		}
 	}
 }

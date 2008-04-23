@@ -27,6 +27,8 @@ class ContentList : public ContentListBase
 public:
 	bool HaveFile(std::string filename);
 	void SetSharer(std::string filename, pf_id sharer);
+
+	virtual void SendRefFile(pf_id to, std::string filename);
 };
 
 extern ContentList content_list;

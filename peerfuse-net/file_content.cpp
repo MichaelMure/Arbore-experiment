@@ -20,17 +20,17 @@
 #include "file_content.h"
 #include "peers_list.h"
 #include "packet.h"
+#include "cache.h"
 
 void FileContent::NetworkRequestChunk(FileChunk chunk)
 {
 	if(sharers.size() == 0)
 	{
+		log[W_DEBUG] << "Request for file refs";
 		// We don't know who have which part of the file
 		if(!waiting_for_sharers)
 		{
-			Packet packet(NET_WANT_REF_FILE);
-			packet.SetArg(NET_WANT_REF_FILE_PATH, filename);
-			/* TODO: send packet to owners of this file */
+			cache.RequestFileRefs(filename);
 			waiting_for_sharers = true;
 		}
 	}

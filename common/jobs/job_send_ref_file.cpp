@@ -24,18 +24,7 @@
 
 bool JobSendRefFile::Start()
 {
-	uint32_t ref = content_list.GetRef(filename);
-	FileContent& f = content_list.GetFile(filename);
 	content_list.AddReferer(filename, sendto);
-	off_t offset;
-	off_t size;
-	f.GetSharedContent(offset, size);
-
-	Packet packet(NET_REF_FILE);
-	packet.SetArg(NET_REF_FILE_PATH, filename);
-	packet.SetArg(NET_REF_FILE_REF, ref);
-	packet.SetArg(NET_REF_FILE_OFFSET, (uint64_t)offset);
-	packet.SetArg(NET_REF_FILE_SIZE, (uint64_t)size);
-	peers_list.SendMsg(sendto, packet);
+	content_list.SendRefFile(sendto, filename);
 	return false;
 }

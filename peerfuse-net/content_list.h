@@ -23,6 +23,8 @@
 
 class ContentList : public ContentListBase
 {
+public:
+	virtual void SendRefFile(pf_id to, std::string filename);
 };
 
 extern ContentList content_list;

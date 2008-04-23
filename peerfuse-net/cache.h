@@ -80,6 +80,8 @@ public:
 
 	/* FileDistributino functions... */
 	void UpdateRespFiles();
+
+	void RequestFileRefs(std::string filename);
 };
 
 extern Cache cache;

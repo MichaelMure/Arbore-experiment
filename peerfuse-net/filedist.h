@@ -81,6 +81,9 @@ public:
 	/** When there are new peers on network, call this method. */
 	void UpdateRespFiles();
 
+	/** Send a NET_WANT_FILE_REF to all sharers of a file. */
+	void RequestFileRefs(const FileEntry*);
+
 	/* Flags are defined in cache.h */
 	void AddFile(FileEntry* f, Peer* sender);
 

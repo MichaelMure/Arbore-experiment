@@ -110,7 +110,7 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 	if(it == file_refs.end())
 		return;
 
-	Packet packet(NET_WANT_CHUNK);
+	Packet packet(NET_WANT_CHUNK, environment.my_id.Get(), addr.id);
 	packet.SetArg(NET_WANT_CHUNK_REF, it->first);
 	packet.SetArg(NET_WANT_CHUNK_OFFSET, (uint64_t)offset);
 	packet.SetArg(NET_WANT_CHUNK_SIZE, (uint32_t)size);
@@ -130,7 +130,7 @@ void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 		return;
 	}
 #endif
-	Packet pckt(NET_CHUNK);
+	Packet pckt(NET_CHUNK, environment.my_id.Get(), addr.id);
 	pckt.SetArg(NET_CHUNK_REF, ref);
 	pckt.SetArg(NET_CHUNK_CHUNK, chunk);
 	SendMsg(pckt);

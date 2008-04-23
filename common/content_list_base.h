@@ -71,5 +71,8 @@ public:
 	void DelReferer(std::string path, pf_id referer);
 	/* Stop tracking all the ref a peer has */
 	void DelReferer(pf_id);
+
+	/* Send a NET_REF_FILE message to a peer */
+	virtual void SendRefFile(pf_id to, std::string filename) = 0;
 };
 #endif						  /* CONTENT_LIST_BASE_H */

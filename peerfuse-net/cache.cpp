@@ -377,3 +377,14 @@ void Cache::UpdateRespFiles()
 	BlockLockMutex lock(this);
 	filedist.UpdateRespFiles();
 }
+
+void Cache::RequestFileRefs(std::string filename)
+{
+	BlockLockMutex lock(this);
+	FileEntry* f = Path2File(filename);
+
+	if(!f)
+		throw NoSuchFileOrDir();
+
+	filedist.RequestFileRefs(f);
+}
