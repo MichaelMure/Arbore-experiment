@@ -101,6 +101,7 @@ fi
 
 for((i=1;i<=$1;i++))
 do
+	sleep 1
 	start_fs $i &
 	case $TOOL in
 		gdb)

@@ -238,7 +238,7 @@ int CacheBase::Truncate(std::string path, off_t offset)
 	stat.ctime = time(NULL);
 	stat.mtime = stat.ctime;
 	stat.meta_mtime = stat.ctime;
-	MkFile(path, stat);
+	SetAttr(path, stat);
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);
 
