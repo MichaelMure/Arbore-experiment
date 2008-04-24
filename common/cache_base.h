@@ -71,10 +71,7 @@ public:
 	class NoPermission : public std::exception {};
 	class FileUnavailable : public std::exception {};
 
-	CacheBase()
-		: Mutex(RECURSIVE_MUTEX),
-		tree("", pf_stat(), NULL)
-		{}
+	CacheBase();
 	virtual ~CacheBase() {}
 
 	/** Load all tree from an hard drive path.
