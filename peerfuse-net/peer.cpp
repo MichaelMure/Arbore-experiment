@@ -183,7 +183,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		/* Tell to all of my other links that this peer is connected. */
 		Packet pckt(NET_PEER_CONNECTION, environment.my_id.Get(), 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
-		pckt.SetArg(NET_PEER_CONNECTION_NOW, (uint32_t)Timestamp(time(NULL)));
+		pckt.SetArg(NET_PEER_CONNECTION_NOW, (uint32_t)(time(NULL) - GetTimestampDiff()));
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
 		peers_list.Broadcast(pckt, this);  /* Don't send to this peer a creation message about him! */

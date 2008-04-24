@@ -67,6 +67,7 @@ public:
 
 	time_t Timestamp(time_t ts) const;
 	void SetTimestampDiff(uint32_t now);
+	int GetTimestampDiff() const { return ts_diff; }
 
 	pf_id GetID() const { return addr.id; }
 
