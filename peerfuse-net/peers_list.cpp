@@ -61,7 +61,7 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
-		pckt.SetArg(NET_PEER_CONNECTION_NOW, (*it)->Timestamp(now));
+		pckt.SetArg(NET_PEER_CONNECTION_NOW, (uint32_t)(*it)->Timestamp(now));
 		/* TODO: put certificate here! */
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 
