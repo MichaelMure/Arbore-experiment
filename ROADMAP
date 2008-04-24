@@ -25,12 +25,12 @@ Tue 22 April - Thu 24 April
 ---------------------------
 
 - Implement files transferts on pfnet [DONE]
-- Connection to multiple peer on pfnet
 
 Fri 25 April - Sun 27 April
 ----------------------------
 
-- Fix file truncating
+- Fix file truncating [DONE]
+- Connection to multiple peer on pfnet
 - Download from multiple peers (trivial)
 - NET_REFRESH_FILE_REF handling(almost done)
 - NET_FILE_UNREF handling
