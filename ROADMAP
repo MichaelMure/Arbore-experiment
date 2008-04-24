@@ -2,11 +2,6 @@ Roadmap for the 0.1 release
 ***************************
 
 Piggledy:
-- NET_REFRESH_FILE_REF handling(almost done)
-- NET_FILE_UNREF handling
-- Download from multiple peers (trivial)
-- Fix file truncating (pflan only?)
-- Tests: local truncate, distant truncate, file transfer
 - Split FileChunk into FileChunk + FileChunkDescription
 - Security: limit packet size, limit the number of opened fd, pf_assert() that exits, script to test random read/write size and offset
 - Valgrind / helgrind check
@@ -24,24 +19,28 @@ Piggledy:
 Mon 21 April
 ------------
 
-- Finish the NET_LS_DIR on pfnet
+- Finish the NET_LS_DIR on pfnet [DONE]
 
 Tue 22 April - Thu 24 April
 ---------------------------
 
-- Implement files transferts on pfnet
+- Implement files transferts on pfnet [DONE]
 - Connection to multiple peer on pfnet
 
 Fri 25 April - Sun 27 April
 ----------------------------
 
-?
-
+- Fix file truncating
+- Download from multiple peers (trivial)
+- NET_REFRESH_FILE_REF handling(almost done)
+- NET_FILE_UNREF handling
 
 Mon 28 April - Wed 30 April
 ---------------------------
 
-- Test all filesystem, write tests scripts
+- Test all filesystem
+- write tests scripts
+- Tests: local truncate, distant truncate, file transfer
 
 Thu 1 May
 ---------
