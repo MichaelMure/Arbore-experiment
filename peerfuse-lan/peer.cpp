@@ -149,7 +149,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		throw MustDisconnect();
 	}
 
-	ts_diff = time(NULL) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
+	SetTimestampDiff(pckt->GetArg<uint32_t>(NET_HELLO_NOW));
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
 	if(IsClient())

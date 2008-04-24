@@ -49,6 +49,7 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 {
 	BlockLockMutex lock(&peers_list);
 	StaticPeersList peers = from ? GetDownLinks(from) : GetDirectHighLinks();
+	uint32_t now = time(NULL);
 	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
 	{
 		/* Do not send information about himself! */
@@ -60,6 +61,7 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 		/* It broadcasts. */
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
+		pckt.SetArg(NET_PEER_CONNECTION_NOW, (*it)->Timestamp(now));
 		/* TODO: put certificate here! */
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
 

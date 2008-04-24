@@ -65,7 +65,8 @@ public:
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 
-	time_t Timestamp(time_t ts) { return ts_diff + ts; }
+	time_t Timestamp(time_t ts) const;
+	void SetTimestampDiff(uint32_t now);
 
 	pf_id GetID() const { return addr.id; }
 

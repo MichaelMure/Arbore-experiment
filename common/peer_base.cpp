@@ -37,6 +37,21 @@ PeerBase::~PeerBase()
 		delete conn;
 }
 
+void PeerBase::SetTimestampDiff(uint32_t now)
+{
+	uint32_t local = (uint32_t)time(NULL);
+
+	if(local > now)
+		ts_diff = local - now;
+	else
+		ts_diff = - (int)(now - local);
+}
+
+void PeerBase::Timestamp(time_t ts) const
+{
+	return ts + ts_diff;
+}
+
 void PeerBase::Flush()
 {
 	while(!send_queue.empty())

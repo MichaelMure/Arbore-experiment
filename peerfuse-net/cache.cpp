@@ -223,7 +223,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 		/* This file already exists, but do not panic! We take modifications only if
 		 * this file is more recent than mine.
 		 */
-		time_t dist_ts = sender->Timestamp(stat.meta_mtime);
+		time_t dist_ts = stat.meta_mtime;
 
 		if(file->GetAttr().meta_mtime > dist_ts)
 		{

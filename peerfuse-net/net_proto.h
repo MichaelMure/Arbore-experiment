@@ -56,6 +56,7 @@ enum net_hello_args
 enum net_peer_connection
 {
 	NET_PEER_CONNECTION_ADDRESS,		  /* T_ADDR */
+	NET_PEER_CONNECTION_NOW,                  /* T_UINT32 */
 	NET_PEER_CONNECTION_CERTIFICATE,	  /* T_STR */
 };
 

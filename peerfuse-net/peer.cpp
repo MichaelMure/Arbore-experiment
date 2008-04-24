@@ -164,9 +164,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
 	SetHighLink(flags & NET_HELLO_FLAGS_HIGHLINK);
 
-	ts_diff = static_cast<uint32_t>(time(NULL)) - pckt->GetArg<uint32_t>(NET_HELLO_NOW);
+	SetTimestampDiff(pckt->GetArg<uint32_t>(NET_HELLO_NOW));
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
-
 	DelFlag(ANONYMOUS);
 
 	/* If this is a client, we answer an HELLO message. */
@@ -221,11 +220,13 @@ void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
+	uint32_t now = msg->GetArg<uint32_t>(NET_PEER_CONNECTION_NOW);
 
 	if(peers_list.IsIDOnNetwork(addr.id))
 		return;				  /* I'm already connected to him. */
 
 	Peer* p = new Peer(addr, NULL, 0, GetID());
+	p->SetTimestampDiff(now);
 	peers_list.Add(p);
 
 	downlinks.push_back(addr.id);
