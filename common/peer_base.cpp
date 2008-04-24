@@ -51,6 +51,9 @@ void PeerBase::SetTimestampDiff(uint32_t now)
 
 time_t PeerBase::Timestamp(time_t ts) const
 {
+	if(ts_diff < 0 && ts < (int)(-ts_diff))
+		return 0;
+
 	return ts + ts_diff;
 }
 

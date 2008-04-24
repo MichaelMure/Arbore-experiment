@@ -28,12 +28,6 @@ CacheBase::CacheBase()
 	: Mutex(RECURSIVE_MUTEX),
 	tree("", pf_stat(), NULL)
 {
-	pf_stat stat = tree.GetAttr();
-	stat.ctime = time(NULL);
-	stat.atime = stat.ctime;
-	stat.mtime = stat.ctime;
-	stat.meta_mtime = stat.ctime;
-	tree.SetAttr(stat);
 }
 
 FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::string* filename)
