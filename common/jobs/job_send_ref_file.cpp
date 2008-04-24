@@ -21,9 +21,15 @@
 #include "content_list.h"
 #include "packet.h"
 #include "peers_list.h"
+#include "cache.h"
 
 bool JobSendRefFile::Start()
 {
+	/* Removing this is a security issue,
+	 * as we could be asked for file outside the filesystem */
+	if(!cache.FileExists(filename))
+		return false;
+
 	content_list.AddReferer(filename, sendto);
 	content_list.SendRefFile(sendto, filename);
 	return false;

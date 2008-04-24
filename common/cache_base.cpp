@@ -244,3 +244,10 @@ int CacheBase::Truncate(std::string path, off_t offset)
 
 	return 0;
 }
+
+bool CacheBase::FileExists(std::string path)
+{
+	BlockLockMutex lock(this);
+	return Path2File(path) != NULL;
+}
+
