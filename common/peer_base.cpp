@@ -47,7 +47,7 @@ void PeerBase::SetTimestampDiff(uint32_t now)
 		ts_diff = - (int)(now - local);
 }
 
-void PeerBase::Timestamp(time_t ts) const
+time_t PeerBase::Timestamp(time_t ts) const
 {
 	return ts + ts_diff;
 }
