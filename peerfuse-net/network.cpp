@@ -34,6 +34,7 @@
 #include "tools.h"
 #include "scheduler_queue.h"
 #include "job_new_connection_queue.h"
+#include "job_update_resp_files.h"
 #include "pf_ssl_ssl.h"
 #include "peers_list.h"
 #include "mutex.h"
@@ -103,6 +104,8 @@ void Network::OnRemovePeer(Peer* peer)
 	/* Connect to them. */
 	if(addr_list.empty() == false)
 		scheduler_queue.Queue(new JobNewConnQueue(addr_list));
+
+	scheduler_queue.Queue(new JobUpdateRespFiles());
 }
 
 void Network::StartNetwork(MyConfig* conf)

@@ -240,6 +240,8 @@ void Peer::Handle_net_peer_goodbye(struct Packet* msg)
 	peers_list.RemoveDownLinks(this);
 	peers_list.RemoveFromID(GetID());
 
+	scheduler_queue.Queue(new JobUpdateRespFiles());
+
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
