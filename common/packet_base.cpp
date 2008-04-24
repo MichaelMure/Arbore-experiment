@@ -222,10 +222,9 @@ PacketBase& PacketBase::Write(IDList id_list)
 
 	char* ptr = new_datas + size;
 
-	// This is missing some endian tweakings ?
 	for(IDList::iterator it = id_list.begin(); it != id_list.end(); ++it)
 	{
-		pf_id id = *it;
+		pf_id id = htonl(*it);
 		memcpy(ptr, &id, sizeof(pf_id));
 	}
 	size += id_list.size() * sizeof(pf_id);
@@ -403,7 +402,7 @@ IDList PacketBase::ReadIDList()
 	{
 		pf_id id;
 		memcpy(&id, datas, sizeof(pf_id));
-		id_list.push_back(id);
+		id_list.push_back(ntohl(id));
 	}
 
 	char* new_datas;
