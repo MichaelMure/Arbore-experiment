@@ -56,6 +56,7 @@ private:
 protected:
 	std::string filename;
 	std::map<pf_id, struct sharedchunks> sharers;
+	pf_id last_peer_requested;
 
 	void NetworkFlushRequests();
 	bool waiting_for_sharers;

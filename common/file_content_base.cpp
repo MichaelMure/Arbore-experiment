@@ -38,6 +38,7 @@ FileContentBase::FileContentBase(std::string _filename) :
 			ondisk_fd(-1),
 			ondisk_synced(true),
 			filename(_filename),
+			last_peer_requested(0),
 			waiting_for_sharers(false)
 {
 	uint32_t nbr = 0;
@@ -54,6 +55,7 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 			ondisk_fd(-1),
 			ondisk_synced(other.ondisk_synced),
 			filename(other.filename),
+			last_peer_requested(other.last_peer_requested),
 			waiting_for_sharers(other.waiting_for_sharers)
 {
 	BlockLockMutex lock(&other);
@@ -427,17 +429,41 @@ void FileContentBase::NetworkFlushRequests()
 	while(it != net_pending_request.end())
 	{
 		/* Find a sharer that have this file */
-		std::map<pf_id, struct sharedchunks>::iterator sh_it;
+		std::map<pf_id, struct sharedchunks>::iterator sh_it = sharers.begin();
+		std::map<pf_id, struct sharedchunks>::iterator first_it = sharers.begin();
 		bool request_sent = false;
-		for(sh_it = sharers.begin(); sh_it != sharers.end(); ++sh_it)
+
+		/* Find the last peer we asked a chunk to */
+		while(sh_it != sharers.end() && last_peer_requested != sh_it->first && last_peer_requested != 0)
+			++sh_it;
+
+		if(sh_it == sharers.end())
+			sh_it = sharers.begin();
+		else
+			++sh_it;
+
+		first_it = sh_it;
+
+		/* We'll ask to the next peer first */
+		if(sh_it != sharers.end())
+			++sh_it;
+
+		while(sh_it != sharers.end())
 		{
+			/* Check if this peer have this pat */
 			if(it->GetOffset() >= sh_it->second.offset &&
 					it->GetOffset() + (off_t)it->GetSize() <= sh_it->second.offset + sh_it->second.size)
 			{
 				peers_list.RequestChunk(filename, sh_it->first, it->GetOffset(), it->GetSize());
 				request_sent = true;
+				last_peer_requested = sh_it->first;
 				break;
 			}
+			if(sh_it == first_it)
+				break;
+			++sh_it;
+			if(sh_it == sharers.end())
+				sh_it = sharers.begin();
 		}
 		if(request_sent)
 			it = net_pending_request.erase(it);
