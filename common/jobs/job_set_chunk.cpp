@@ -25,5 +25,6 @@ bool JobSetChunk::Start()
 {
 	FileContent& f = content_list.GetFile(filename);
 	f.SetChunk(chunk);
+	content_list.RefreshPeersRef(filename);
 	return false;
 }
