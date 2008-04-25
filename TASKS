@@ -3,6 +3,7 @@
 +-------+--------+----------+------------+
 |Task no| Status | Category | Assign. to | Comments
 +-------+--------+----------+------------+
+| 00013 |  Open  |  Global  |            | Do not show files which are not available on network
 | 00012 |  Open  |  Global  |            | Change cmake files to port peerfuse to Mac OS X (use pkg-config for fuse and openssl)
 | 00011 | Closed |  PFnet   |   romain   | Update FileDistribution when a peer is disconnected from network
 | 00010 |  Open  |  Global  |            | Merge options workdir/ and cache/, pf should creates the config arborescence by itself
