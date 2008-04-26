@@ -3,6 +3,10 @@
 +-------+--------+----------+------------+
 |Task no| Status | Category | Assign. to | Comments
 +-------+--------+----------+------------+
+| 00015 |  Open  |  PFnet   |            | To prevent flood, when I receive a NET_MKFILE for a file older than mine, if I send a
+|       |        |          |            |   NET_MKFILE to correct him, store it somewhere to do that one time. If I receive the
+|       |        |          |            |   same message from the same peer, do not correct him.
+| 00014 |  Open  |  PFnet   |            | Set an expiration time for LS_DIR
 | 00013 |  Open  |  Global  |            | Do not show files which are not available on network
 | 00012 |  Open  |  Global  |            | Change cmake files to port peerfuse to Mac OS X (use pkg-config for fuse and openssl)
 | 00011 | Closed |  PFnet   |   romain   | Update FileDistribution when a peer is disconnected from network
