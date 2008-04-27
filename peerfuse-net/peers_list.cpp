@@ -62,8 +62,7 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 		Packet pckt(NET_PEER_CONNECTION, id, 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, (*it)->GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_NOW, (uint32_t)(now - (*it)->GetTimestampDiff()));
-		/* TODO: put certificate here! */
-		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, (*it)->GetCertificate());
 
 		to->SendMsg(pckt);
 
@@ -92,7 +91,10 @@ void PeersList::GetMapOfNetwork(std::vector<std::string>& list, Peer* from, std:
 		}
 
 		pf_addr addr = (*it)->GetAddr();
+		s += (*it)->GetCertificate().GetCommonName();
+		s += " (";
 		s += pf_addr2string(addr);
+		s += ")";
 
 		list.push_back(s);
 

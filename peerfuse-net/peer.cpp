@@ -51,7 +51,10 @@ Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
 	/* If there isn't any connection with this peer, it must have an ID in addr */
 	assert(conn != NULL || addr.id > 0);
 	if(conn)
-		addr.id = static_cast<ConnectionSsl*>(conn)->GetCertificateID();
+	{
+		certificate = dynamic_cast<ConnectionSsl*>(conn)->GetCertificate();
+		addr.id = certificate.GetIDFromCertificate();
+	}
 	if(GetID() == environment.my_id.Get() && IsServer())
 		throw SelfConnect();
 }
@@ -184,7 +187,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		Packet pckt(NET_PEER_CONNECTION, environment.my_id.Get(), 0);
 		pckt.SetArg(NET_PEER_CONNECTION_ADDRESS, GetAddr());
 		pckt.SetArg(NET_PEER_CONNECTION_NOW, (uint32_t)(time(NULL) - GetTimestampDiff()));
-		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, std::string("TODO: put certificate here"));
+		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, certificate);
 
 		peers_list.Broadcast(pckt, this);  /* Don't send to this peer a creation message about him! */
 	}
@@ -203,18 +206,17 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	 * responsibles of files I am not responsible anymore.
 	 */
 	scheduler_queue.Queue(new JobUpdateRespFiles());
-}
-
-void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
-{
-	DelFlag(MERGING_ACK);
 
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 	log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
 		log[W_INFO] << *it;
+}
 
+void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
+{
+	DelFlag(MERGING_ACK);
 }
 
 /** NET_PEER_CONNECTION
@@ -229,12 +231,14 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 {
 	pf_addr addr = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_ADDRESS);
 	uint32_t now = msg->GetArg<uint32_t>(NET_PEER_CONNECTION_NOW);
+	Certificate cert = msg->GetArg<Certificate>(NET_PEER_CONNECTION_CERTIFICATE);
 
 	if(peers_list.IsIDOnNetwork(addr.id))
 		return;				  /* I'm already connected to him. */
 
 	Peer* p = new Peer(addr, NULL, 0, GetID());
 	p->SetTimestampDiff(now);
+	p->certificate = cert;
 	peers_list.Add(p);
 
 	downlinks.push_back(addr.id);

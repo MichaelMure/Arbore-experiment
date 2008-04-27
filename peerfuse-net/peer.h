@@ -21,6 +21,7 @@
 #define PEER_H
 
 #include "connection_ssl.h"
+#include "certificate.h"
 #include "pf_types.h"
 #include "packet.h"
 #include "peer_base.h"
@@ -47,6 +48,7 @@ class Peer : public PeerBase
 	 */
 	pf_id uplink;				  /**< Peer where this peer is connected */
 	std::vector<pf_id> downlinks;		  /**< Peer connected to this one */
+	Certificate certificate;
 
 	// Receiving functions
 	void Handle_net_hello(struct Packet* pckt);
@@ -67,6 +69,8 @@ public:
 	/* Constructors */
 	Peer(pf_addr addr, Connection* _conn, unsigned int _flags = 0, pf_id parent = 0);
 	~Peer();
+
+	Certificate GetCertificate() const { return certificate; }
 
 	bool IsHighLink() const { return flags & HIGHLINK; }
 	bool IsLowLink() const { return !(flags & HIGHLINK); }

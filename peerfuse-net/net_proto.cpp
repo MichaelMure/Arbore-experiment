@@ -74,7 +74,7 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 	{
 		/* NET_PEER_LIST_ADDRESSES */     T_ADDR,
 		/* NET_PEER_LIST_NOW */           T_UINT32,
-		/* NET_PEER_LIST_CERTIFICATE */   T_STR,
+		/* NET_PEER_LIST_CERTIFICATE */   T_CERTIFICATE,
 		T_NONE
 	},
 
