@@ -98,7 +98,7 @@ void PeersList::GetMapOfNetwork(std::vector<std::string>& list, Peer* from, std:
 
 		GetMapOfNetwork(list, *it, prefix);
 
-		prefix = prefix.substr(prefix.size() - 2);
+		prefix = prefix.substr(0, prefix.size() - 2);
 	}
 }
 
