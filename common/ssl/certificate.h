@@ -53,6 +53,7 @@ public:
 
 	std::string GetCertificateInfos() const;
 	pf_id GetIDFromCertificate() throw(BadCertificate);
+	std::string GetCommonName() const throw(BadCertificate);
 
 	X509* GetSSL() const { return ssl_cert; }
 
@@ -62,6 +63,6 @@ public:
 	 */
 	void SetSSL(X509* _ssl_cert);
 
-	void GetRaw(unsigned char** buf, size_t* len);
+	void GetRaw(unsigned char** buf, size_t* len) const;
 };
 #endif						  // PF_CERTIFICATE_H

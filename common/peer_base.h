@@ -49,9 +49,11 @@ public:
 		SERVER      = 1 << 0,	  /**< This peer is a server */
 		MERGING     = 1 << 1,	  /**< We are merging with this peer (between HELLO and END_OF_MERGE) */
 		/* pfnet only flags */
+		#ifdef PF_NET
 		MERGING_ACK = 1 << 2,	  /**< We are waiting for an ACK */
 		HIGHLINK    = 1 << 3,	  /**< This peer is a highlink */
 		ANONYMOUS   = 1 << 4,	  /**< We don't know this peer (between connection and HELLO) */
+		#endif
 	};
 
 	/* Exceptions */

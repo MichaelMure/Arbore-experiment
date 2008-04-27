@@ -22,6 +22,7 @@
 #include <openssl/pem.h>
 #include <cstring>
 #include "certificate.h"
+#include "tools.h"
 
 Certificate::Certificate() : ssl_cert(NULL)
 {
@@ -110,7 +111,7 @@ void Certificate::LoadRaw(const unsigned char* buf, size_t len) throw(BadCertifi
 	}
 }
 
-void Certificate::GetRaw(unsigned char** buf, size_t* len)
+void Certificate::GetRaw(unsigned char** buf, size_t* len) const
 {
 	// Returns a certificate in binary format
 	// Non-tested
@@ -141,4 +142,37 @@ pf_id Certificate::GetIDFromCertificate() throw(BadCertificate)
 		throw BadCertificate("Can't read certificate's serial number");
 
 	return id;
+}
+
+std::string Certificate::GetCommonName() const throw(BadCertificate)
+{
+	if(!ssl_cert)
+		return "";
+
+	X509_NAME *subject;
+	int pos;
+	X509_NAME_ENTRY *entry;
+	ASN1_STRING *entry_str;
+	int len;
+	unsigned char *utf;
+
+	subject = X509_get_subject_name(ssl_cert);
+	pos = X509_NAME_get_index_by_NID(subject, NID_commonName, -1);
+
+	if (pos < 0)
+		return "";
+
+	if (X509_NAME_get_index_by_NID(subject, NID_commonName, pos) >= 0)
+		return "";
+
+	if ((entry = X509_NAME_get_entry(subject, pos)) == 0)
+		throw BadCertificate("Unable to get common name");
+
+	if ((entry_str = X509_NAME_ENTRY_get_data(entry)) == 0)
+		throw BadCertificate("Unable to get common name");
+
+	/* Canonicalize to UTF-8 and validate */
+	len = ASN1_STRING_to_UTF8(&utf, entry_str);
+
+	return TypToStr(utf);
 }
