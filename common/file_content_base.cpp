@@ -430,24 +430,30 @@ void FileContentBase::NetworkFlushRequests()
 	{
 		/* Find a sharer that have this file */
 		std::map<pf_id, struct sharedchunks>::iterator sh_it = sharers.begin();
-		std::map<pf_id, struct sharedchunks>::iterator first_it = sharers.begin();
+		std::map<pf_id, struct sharedchunks>::iterator next_it;
 		bool request_sent = false;
 
 		/* Find the last peer we asked a chunk to */
-		while(sh_it != sharers.end() && last_peer_requested != sh_it->first && last_peer_requested != 0)
-			++sh_it;
+		if(last_peer_requested != 0)
+		{
+			while(sh_it != sharers.end() && last_peer_requested != sh_it->first)
+				++sh_it;
 
-		if(sh_it == sharers.end())
-			sh_it = sharers.begin();
+			if(sh_it == sharers.end())
+				sh_it = sharers.begin();
+			else
+			{
+				++sh_it;
+				if(sh_it == sharers.end())
+					sh_it = sharers.begin();
+			}
+			next_it = sh_it;
+		}
 		else
-			++sh_it;
-
-		first_it = sh_it;
-
-		/* We'll ask to the next peer first */
-		if(sh_it != sharers.end())
-			++sh_it;
-
+		{
+			next_it = sharers.begin();
+		}
+	
 		while(sh_it != sharers.end())
 		{
 			/* Check if this peer have this pat */
@@ -459,11 +465,11 @@ void FileContentBase::NetworkFlushRequests()
 				last_peer_requested = sh_it->first;
 				break;
 			}
-			if(sh_it == first_it)
-				break;
 			++sh_it;
 			if(sh_it == sharers.end())
 				sh_it = sharers.begin();
+			if(sh_it == next_it)
+				break;
 		}
 		if(request_sent)
 			it = net_pending_request.erase(it);
