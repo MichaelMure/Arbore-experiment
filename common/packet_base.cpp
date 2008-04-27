@@ -257,10 +257,10 @@ PacketBase& PacketBase::Write(FileChunk chunk)
 PacketBase& PacketBase::Write(const Certificate& cert)
 {
 	unsigned char *buf;
-	uint32_t str_len;
+	size_t str_len;
 	cert.GetRaw(&buf, &str_len);
 
-	Write(str_len);
+	Write((uint32_t)str_len);
 	char* new_datas = new char [size + str_len];
 	if(datas)
 		memcpy(new_datas, datas, size);
