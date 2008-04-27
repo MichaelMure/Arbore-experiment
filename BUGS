@@ -4,6 +4,7 @@ Severity is a level from 1 to 5
 +-------+--------+----------+----------+
 | Bug no| Status | Category | Severity | Comments
 +-------+--------+----------+----------+
+| 00006 |  Open  | Compile  |     2    | If architecture of compilation wants to give gcc parameters which aren't supported by gcc-wrapper
 | 00005 | Closed |  Cache   |     3    | When a file is received from network and is created, it doesn't store pf_mode
 | 00004 | Closed | PFN-Dist |     3    | It seems to have a desynchronization between peers to know who is responsible of what file
 | 00003 |  Open  | PFN-Quit |     5    | Assertion failed in PeersList::GetDownLinks() when someone exits network, because a precedent

@@ -51,11 +51,17 @@ public:
 
 	PublicKey GetPublicKey();
 
-	const std::string GetCertificateInfos();
+	std::string GetCertificateInfos() const;
 	pf_id GetIDFromCertificate() throw(BadCertificate);
 
 	X509* GetSSL() const { return ssl_cert; }
+
+	/** Attribute an X509 certificate object to this object.
+	 *
+	 * Note that it doesn't copy X509, so you MUSTN'T free memory.
+	 */
 	void SetSSL(X509* _ssl_cert);
+
 	void GetRaw(unsigned char** buf, size_t* len);
 };
 #endif						  // PF_CERTIFICATE_H
