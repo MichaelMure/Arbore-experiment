@@ -78,6 +78,7 @@ public:
 
 	pf_id GetUpLink() const { return uplink; }
 	std::vector<pf_id> GetDownLinks() const { return downlinks; }
+	void RemoveDownLink(pf_id id);
 
 	bool IsAnonymous() const { return (flags & ANONYMOUS); }
 

@@ -151,12 +151,29 @@ std::vector<pf_addr> PeersList::RemoveDownLinks(Peer* p)
 		addr_list.push_back((*it)->GetAddr());
 		addr_list.insert(addr_list.begin(), local_addr_lst.begin(), local_addr_lst.end());
 
-		Remove(*it);
+		PeersList::RemovePeer(*it);
 	}
 
 	/* This addr is used by Network::OnRemove() to trying to
 	 * connect to it. */
 	return addr_list;
+}
+
+Peer* PeersList::RemovePeer(Peer* p)
+{
+	BlockLockMutex lock(this);
+
+	if(!p->IsAnonymous())
+	{
+		pf_id id;
+		if((id = p->GetUpLink()))
+		{
+			Peer* p = PeerFromID(id);
+			p->RemoveDownLink(p->GetID());
+		}
+	}
+
+	return PeersListBase::RemovePeer(p);
 }
 
 Peer* PeersList::RemoveFromID(pf_id id)
@@ -170,7 +187,7 @@ Peer* PeersList::RemoveFromID(pf_id id)
 		return NULL;
 
 	Peer* peer = *it;
-	Remove(peer);
+	RemovePeer(peer);
 
 	return peer;
 }

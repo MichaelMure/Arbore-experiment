@@ -53,22 +53,13 @@ Network::~Network()
 Peer* Network::AddPeer(Peer* peer)
 {
 	Peer* p;
-	/* If this peer is already on my list, this is because I
-	 * get a NET_PEER_CONNECTION from my highlink, in other
-	 * case, this is a highlink.
-	 */
-	if((p = peers_list.RemoveFromID(peer->GetID())))
-		delete p;
-	else
+
+	if(!peers_list.IsIDOnNetwork(peer->GetID()))
 		peer->SetHighLink(peer);
 
 
-	if(peers_list.Size() == 0 && peer->HasFlag(Peer::SERVER))
-	{
-		// This is the first peer to which we connected
-		peer->SetHighLink();
+	if(peer->HasFlag(Peer::SERVER))
 		peer->SendHello();
-	}
 
 	p = NetworkBase::AddPeer(peer);
 

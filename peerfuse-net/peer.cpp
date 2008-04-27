@@ -103,6 +103,16 @@ void Peer::SendHello()
 	SendMsg(pckt);
 }
 
+void Peer::RemoveDownLink(pf_id id)
+{
+	std::vector<pf_id>::iterator it = downlinks.begin();
+	for(; it != downlinks.end() && *it != id; ++it)
+		;
+
+	if(it != downlinks.end())
+		downlinks.erase(it);
+}
+
 void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 {
 	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
@@ -169,7 +179,26 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 	SetTimestampDiff(pckt->GetArg<uint32_t>(NET_HELLO_NOW));
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
+
 	DelFlag(ANONYMOUS);
+
+	if(IsLowLink())
+	{
+		BlockLockMutex net_lock(&peers_list);
+		Peer* p = peers_list.PeerFromID(addr.id);
+		if(p)
+		{
+			/* Already a connection from this peer, disallow
+			 * a second connection */
+			if(p->IsConnection())
+				throw MustDisconnect();
+
+			/* We want to switch connection to the other Peer object. */
+			SetFlag(ANONYMOUS);
+			p->SetConnection(conn);
+		}
+	}
+
 
 	/* If this is a client, we answer an HELLO message. */
 	if(IsClient())
@@ -190,6 +219,16 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		pckt.SetArg(NET_PEER_CONNECTION_CERTIFICATE, certificate);
 
 		peers_list.Broadcast(pckt, this);  /* Don't send to this peer a creation message about him! */
+	}
+
+	/* if we reset flags to anonymous above, we switch the Connection object to an other
+	 * Peer object. So we ask Network to remove this object.
+	 */
+	if(IsAnonymous())
+	{
+		conn = NULL;
+
+		throw MustDisconnect();
 	}
 }
 

@@ -119,6 +119,7 @@ void NetworkBase::Loop()
 	fd_set tmp_read_set = global_read_set;
 	int events;
 
+	/* TODO: this is useless to use select() here, because now there is only one fd (server sock) */
 	if((events = select(serv_sock + 1, &tmp_read_set, NULL, NULL, &timeout)) < 0)
 	{
 		if(errno != EINTR)

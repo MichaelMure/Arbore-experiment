@@ -36,7 +36,8 @@ protected:
 
 	Peer* PeerFromFD(int fd);
 
-	virtual Peer* Remove(Peer* p);
+	virtual Peer* RemovePeer(Peer* p);
+
 public:
 	PeersListBase();
 	virtual ~PeersListBase();

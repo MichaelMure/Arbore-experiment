@@ -61,7 +61,13 @@ Peer* PeersListBase::PeerFromID(pf_id id) const
 
 	BlockLockMutex lock(this);
 	const_iterator it;
-	for(it = begin(); it != end() && (*it)->GetID() != id; ++it)
+	for(it = begin();
+	    it != end() &&
+	    (*it)->GetID() != id
+#ifdef PF_NET
+	    && !(*it)->IsAnonymous()
+#endif
+	    ; ++it)
 		;
 
 	return (it != end() ? *it : NULL);
@@ -76,7 +82,7 @@ void PeersListBase::Add(Peer* p)
 	changed = true;
 }
 
-Peer* PeersListBase::Remove(Peer* p)
+Peer* PeersListBase::RemovePeer(Peer* p)
 {
 	BlockLockMutex lock(this);
 	iterator it;
@@ -108,7 +114,7 @@ Peer* PeersListBase::Remove(int fd)
 	{
 		peer = it->second;
 		log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << peer->GetID() << ")";
-		Remove(peer);
+		RemovePeer(peer);
 	}
 
 	return peer;

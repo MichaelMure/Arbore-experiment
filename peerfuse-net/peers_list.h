@@ -28,6 +28,8 @@ class PeersList: public PeersListBase
 
 	void _send_peer_list(Peer* to, Peer* from) const;
 
+	virtual Peer* RemovePeer(Peer* p);
+
 public:
 	PeersList() {}
 	~PeersList() {}
