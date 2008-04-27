@@ -31,6 +31,7 @@ enum PacketArgType
 	T_ADDRLIST,
 	T_IDLIST,
 	T_CHUNK,
+	T_CERTIFICATE,
 	T_NONE
 };
 

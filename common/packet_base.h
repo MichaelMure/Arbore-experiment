@@ -24,6 +24,7 @@
 #include <cassert>
 #include <string>
 #include "connection.h"
+#include "certificate.h"
 #include "pf_types.h"
 #include "net_proto.h"
 #include "packet_arg.h"
@@ -42,10 +43,11 @@ class PacketBase
 	PacketBase& Write(uint32_t nbr);
 	PacketBase& Write(uint64_t nbr);
 	PacketBase& Write(pf_addr addr);
-	PacketBase& Write(std::string str);
-	PacketBase& Write(AddrList addr_list);
-	PacketBase& Write(IDList id_list);
+	PacketBase& Write(const std::string& str);
+	PacketBase& Write(const AddrList& addr_list);
+	PacketBase& Write(const IDList& id_list);
 	PacketBase& Write(FileChunk chunk);
+	PacketBase& Write(const Certificate& certif);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();
@@ -55,6 +57,7 @@ class PacketBase
 	AddrList ReadAddrList();
 	IDList ReadIDList();
 	FileChunk ReadChunk();
+	Certificate ReadCertificate();
 
 protected:
 	msg_type type;

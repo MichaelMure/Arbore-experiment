@@ -168,7 +168,7 @@ PacketBase& PacketBase::Write(pf_addr addr)
 	return *this;
 }
 
-PacketBase& PacketBase::Write(std::string str)
+PacketBase& PacketBase::Write(const std::string& str)
 {
 	uint32_t str_len = str.size();
 	Write(str_len);
@@ -185,7 +185,7 @@ PacketBase& PacketBase::Write(std::string str)
 	return *this;
 }
 
-PacketBase& PacketBase::Write(AddrList addr_list)
+PacketBase& PacketBase::Write(const AddrList& addr_list)
 {
 	Write((uint32_t)addr_list.size());
 
@@ -198,7 +198,7 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 
 	char* ptr = new_datas + size;
 
-	for(AddrList::iterator it = addr_list.begin(); it != addr_list.end(); ++it)
+	for(AddrList::const_iterator it = addr_list.begin(); it != addr_list.end(); ++it)
 	{
 		pf_addr addr = pf_addr_ton(*it);
 		memcpy(ptr, &addr, sizeof(pf_addr));
@@ -209,7 +209,7 @@ PacketBase& PacketBase::Write(AddrList addr_list)
 	return *this;
 }
 
-PacketBase& PacketBase::Write(IDList id_list)
+PacketBase& PacketBase::Write(const IDList& id_list)
 {
 	Write((uint32_t)id_list.size());
 
@@ -222,7 +222,7 @@ PacketBase& PacketBase::Write(IDList id_list)
 
 	char* ptr = new_datas + size;
 
-	for(IDList::iterator it = id_list.begin(); it != id_list.end(); ++it)
+	for(IDList::const_iterator it = id_list.begin(); it != id_list.end(); ++it)
 	{
 		pf_id id = htonl(*it);
 		memcpy(ptr, &id, sizeof(pf_id));
@@ -249,6 +249,26 @@ PacketBase& PacketBase::Write(FileChunk chunk)
 	memcpy(ptr, chunk.GetData(), chunk.GetSize());
 
 	size += chunk.GetSize();
+	datas = new_datas;
+
+	return *this;
+}
+
+PacketBase& PacketBase::Write(const Certificate& cert)
+{
+	unsigned char *buf;
+	uint32_t str_len;
+	cert.GetRaw(&buf, &str_len);
+
+	Write(str_len);
+	char* new_datas = new char [size + str_len];
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+
+	memcpy(new_datas + size, buf, str_len);
+	size += str_len;
 	datas = new_datas;
 
 	return *this;
@@ -448,6 +468,44 @@ FileChunk PacketBase::ReadChunk()
 	return chunk;
 }
 
+Certificate PacketBase::ReadCertificate()
+{
+	uint32_t str_size = ReadInt32();
+	ASSERT(size >= str_size);
+	unsigned char* str = new unsigned char [str_size+1];
+
+	memcpy(str, datas, str_size);
+
+	Certificate cert;
+
+	try
+	{
+		cert.LoadRaw(str, str_size);
+	}
+	catch(Certificate::BadCertificate &e)
+	{
+		throw Malformated();
+	}
+
+	char* new_datas;
+	size -= str_size;
+	if(size > 0)
+	{
+		new_datas = new char [size];
+		memcpy(new_datas, datas + str_size, size);
+	}
+
+	delete []datas;
+	delete []str;
+
+	if(size > 0)
+		datas = new_datas;
+	else
+		datas = NULL;
+
+	return cert;
+}
+
 void PacketBase::BuildArgsFromData()
 {
 	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
@@ -460,6 +518,7 @@ void PacketBase::BuildArgsFromData()
 			case T_IDLIST: SetArg(arg_no, ReadIDList()); break;
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
 			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
+			case T_CERTIFICATE: SetArg(arg_no, ReadCertificate()); break;
 			default: throw Malformated();
 		}
 }
@@ -476,6 +535,7 @@ void PacketBase::BuildDataFromArgs()
 			case T_IDLIST: Write(GetArg<IDList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
 			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
+			case T_CERTIFICATE: Write(GetArg<Certificate>(arg_no)); break;
 			default: throw Malformated();
 		}
 }
@@ -524,8 +584,12 @@ std::string PacketBase::GetPacketInfo() const
 				break;
 			}
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
-			case T_CHUNK: s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
-			                + " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
+			case T_CHUNK:
+				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
+				    + " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
+				break;
+			case T_CERTIFICATE:
+				s += "cert(" + GetArg<Certificate>(arg_no).GetCommonName() + ")";
 				break;
 			default: throw Malformated();
 		}
