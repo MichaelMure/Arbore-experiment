@@ -208,6 +208,13 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
 {
 	DelFlag(MERGING_ACK);
+
+	std::vector<std::string> list;
+	peers_list.GetMapOfNetwork(list);
+	log[W_INFO] << "Network map:";
+	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
+		log[W_INFO] << *it;
+
 }
 
 /** NET_PEER_CONNECTION

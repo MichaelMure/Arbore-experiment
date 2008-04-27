@@ -71,6 +71,37 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 	}
 }
 
+void PeersList::GetMapOfNetwork(std::vector<std::string>& list, Peer* from, std::string prefix) const
+{
+	BlockLockMutex lock(this);
+	StaticPeersList peers = from ? GetDownLinks(from) : GetDirectHighLinks();
+	if(from == NULL)
+		list.push_back(std::string("127.0.0.1/") + TypToStr(environment.my_id.Get()));
+	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
+	{
+		std::string s = prefix;
+		if(it+1 == peers.end())
+		{
+			s += "`-";
+			prefix += "  ";
+		}
+		else
+		{
+			s += "|-";
+			prefix += "| ";
+		}
+
+		pf_addr addr = (*it)->GetAddr();
+		s += pf_addr2string(addr);
+
+		list.push_back(s);
+
+		GetMapOfNetwork(list, *it, prefix);
+
+		prefix = prefix.substr(prefix.size() - 2);
+	}
+}
+
 StaticPeersList PeersList::GetDirectHighLinks() const
 {
 	BlockLockMutex lock(&peers_list);

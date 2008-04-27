@@ -49,6 +49,8 @@ public:
 
 	virtual void Broadcast(Packet pckt, const Peer* but_one = NULL) const;
 	void SendPeerList(Peer* to) const;
+
+	void GetMapOfNetwork(std::vector<std::string> &list, Peer* from = 0, std::string prefix = "") const;
 };
 
 extern PeersList peers_list;

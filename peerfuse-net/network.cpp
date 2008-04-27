@@ -62,13 +62,25 @@ Peer* Network::AddPeer(Peer* peer)
 	else
 		peer->SetHighLink(peer);
 
+
 	if(peers_list.Size() == 0 && peer->HasFlag(Peer::SERVER))
 	{
 		// This is the first peer to which we connected
 		peer->SetHighLink();
 		peer->SendHello();
 	}
-	return NetworkBase::AddPeer(peer);
+
+	p = NetworkBase::AddPeer(peer);
+
+	std::vector<std::string> list;
+	peers_list.GetMapOfNetwork(list);
+
+	log[W_INFO] << "Network map:";
+	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
+		log[W_INFO] << *it;
+
+	return p;
+
 }
 
 void Network::OnRemovePeer(Peer* peer)
