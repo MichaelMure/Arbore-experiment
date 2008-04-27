@@ -480,7 +480,7 @@ Certificate PacketBase::ReadCertificate()
 
 	try
 	{
-		cert.LoadRaw(str, str_size);
+		cert.LoadRaw(str, (size_t)str_size);
 	}
 	catch(Certificate::BadCertificate &e)
 	{
