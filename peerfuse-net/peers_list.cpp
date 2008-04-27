@@ -151,7 +151,9 @@ std::vector<pf_addr> PeersList::RemoveDownLinks(Peer* p)
 		addr_list.push_back((*it)->GetAddr());
 		addr_list.insert(addr_list.begin(), local_addr_lst.begin(), local_addr_lst.end());
 
-		PeersList::RemovePeer(*it);
+		/* Do not call our RemovePeer() because it would call
+		 * RemoveDownLinks() and it can crash. */
+		PeersListBase::RemovePeer(*it);
 	}
 
 	/* This addr is used by Network::OnRemove() to trying to
@@ -168,8 +170,8 @@ Peer* PeersList::RemovePeer(Peer* p)
 		pf_id id;
 		if((id = p->GetUpLink()))
 		{
-			Peer* p = PeerFromID(id);
-			p->RemoveDownLink(p->GetID());
+			Peer* uplink = PeerFromID(id);
+			uplink->RemoveDownLink(p->GetID());
 		}
 	}
 
