@@ -65,7 +65,7 @@ public:
 			return FileChunkDesc();
 		off_t begin_off = MAX(GetOffset(), other.GetOffset());
 		off_t end_off = MIN(GetEndOffset(), other.GetEndOffset());
-		assert(begin_off > end_off);
+		assert(begin_off < end_off);
 
 		return FileChunkDesc(begin_off, end_off - begin_off);
 	}

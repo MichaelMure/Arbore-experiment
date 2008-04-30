@@ -195,7 +195,9 @@ bool FileContentBase::FileContentHaveChunk(FileChunkDesc chunk_desc)
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
 	off_t next_off = it->GetOffset();
-	while(it != end() && chunk_desc.Overlaps(*it) && next_off == it->GetOffset())
+	while(it != end()
+			&& it->GetEndOffset() < chunk_desc.GetEndOffset()
+			&& next_off == it->GetOffset())
 	{
 		/* Blocks must follow themself */
 		next_off = it->GetOffset() + (off_t)it->GetSize();

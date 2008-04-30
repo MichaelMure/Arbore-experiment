@@ -29,7 +29,7 @@ bool JobSendChunk::Start()
 	FileChunkDesc requested_chunk(offset, size);
 
 	if(f.FileContentHaveChunk(requested_chunk)
-						  /* TODO: make OnDiskHaveChunk non-blockant and repeat the job */
+	/* TODO: make OnDiskHaveChunk non-blockant and repeat the job */
 		|| f.OnDiskHaveChunk(requested_chunk))
 	{
 		log[W_DEBUG] << "Sending chunk";
