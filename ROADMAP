@@ -11,6 +11,7 @@ Piggledy:
 - CRL handling
 - comply with OpenSSL license
 - change default port
+- implement rename()
 
 - Handle file modifications (0.2 ?)
 - Add a non-debug compilation target that disables stdout/err logging and disables the log Mutex. (0.2 ?)
