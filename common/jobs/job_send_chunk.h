@@ -37,5 +37,4 @@ public:
 	job_type GetType() const { return JOB_SEND_CHUNK; }
 	std::string GetName() const { return "JobSendChunk"; }
 };
-
-#endif /* JOB_SEND_CHUNK_H */
+#endif						  /* JOB_SEND_CHUNK_H */

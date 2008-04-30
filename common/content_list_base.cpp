@@ -77,7 +77,7 @@ FileContent& ContentListBase::GetFile(uint32_t ref)
 	std::string filename;
 	std::map<uint32_t, std::string>::iterator it;
 
-//	TODO: handle this nicely
+	//	TODO: handle this nicely
 	if((it = my_refs.find(ref)) == my_refs.end())
 		return GetFile("");
 

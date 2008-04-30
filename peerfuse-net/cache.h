@@ -32,7 +32,7 @@
 class Cache : public CacheBase
 {
 
-#ifndef PF_SERVER_MODE
+	#ifndef PF_SERVER_MODE
 	enum incoming_states_t
 	{
 		GETTING,
@@ -41,7 +41,7 @@ class Cache : public CacheBase
 	std::map<std::string, incoming_states_t> dir_incoming;
 
 	bool IsReadyForList(std::string path);
-#endif /* PF_SERVER_MODE */
+	#endif					  /* PF_SERVER_MODE */
 
 	/* Because there are functions which return protected data,
 	 * but that FileDistribution object is an own attribute, these

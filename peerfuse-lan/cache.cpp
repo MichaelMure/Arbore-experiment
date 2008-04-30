@@ -222,4 +222,3 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 
 	Unlock();
 }
-

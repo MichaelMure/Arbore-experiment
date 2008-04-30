@@ -57,7 +57,6 @@ Peer* Network::AddPeer(Peer* peer)
 	if(!peers_list.IsIDOnNetwork(peer->GetID()))
 		peer->SetHighLink(peer);
 
-
 	if(peer->HasFlag(Peer::SERVER))
 		peer->SendHello();
 

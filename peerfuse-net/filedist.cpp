@@ -36,7 +36,6 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 	assert(peer_id > 0);
 	assert(file != NULL);
 
-
 	std::vector<pf_id>::const_iterator it;
 	std::vector<pf_id>::const_iterator begin = id_l.begin();
 	for(it = begin; it != id_l.end() && *it != peer_id; ++it)
@@ -55,7 +54,7 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 		;
 
 	log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ") = "
-	             << (i < NB_PEERS_PER_FILE ? "true" : "false");
+		<< (i < NB_PEERS_PER_FILE ? "true" : "false");
 	return (i < NB_PEERS_PER_FILE);
 }
 

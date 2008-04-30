@@ -258,7 +258,6 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	filedist.AddFile(file, sender);
 }
 
-
 void Cache::AddSharer(std::string path, pf_id sender)
 {
 	BlockLockMutex lock(this);
@@ -364,13 +363,13 @@ void Cache::FillReadDir(const char* _path, void *buf, fuse_fill_dir_t filler, of
 	if(wait_for_content)
 	{
 		while(!IsReadyForList(path))
-			usleep(10000);         /* 0.01 sec */
+			usleep(10000);		  /* 0.01 sec */
 
 	}
 
 	CacheBase::FillReadDir(_path, buf, filler, offset, fi);
 }
-#endif /* PF_SERVER_MODE */
+#endif						  /* PF_SERVER_MODE */
 
 void Cache::UpdateRespFiles()
 {

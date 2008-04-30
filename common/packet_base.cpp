@@ -520,7 +520,7 @@ void PacketBase::BuildArgsFromData()
 			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
 			case T_CERTIFICATE: SetArg(arg_no, ReadCertificate()); break;
 			default: throw Malformated();
-		}
+	}
 }
 
 void PacketBase::BuildDataFromArgs()
@@ -537,7 +537,7 @@ void PacketBase::BuildDataFromArgs()
 			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
 			case T_CERTIFICATE: Write(GetArg<Certificate>(arg_no)); break;
 			default: throw Malformated();
-		}
+	}
 }
 
 std::string PacketBase::GetPacketInfo() const
@@ -586,7 +586,7 @@ std::string PacketBase::GetPacketInfo() const
 			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
 			case T_CHUNK:
 				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
-				    + " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
+					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
 				break;
 			case T_CERTIFICATE:
 				s += "cert(" + GetArg<Certificate>(arg_no).GetCommonName() + ")";

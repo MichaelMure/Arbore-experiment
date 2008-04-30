@@ -35,5 +35,4 @@ public:
 	job_type GetType() const { return JOB_SET_CHUNK; }
 	std::string GetName() const { return "JobSetChunk"; }
 };
-
-#endif /* JOB_SET_CHUNK_H */
+#endif						  /* JOB_SET_CHUNK_H */

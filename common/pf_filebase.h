@@ -56,7 +56,6 @@ class FileEntryBase
 	pf_stat stat;
 public:
 
-
 	FileEntryBase(std::string name, pf_stat stat, DirEntry* _parent);
 	virtual ~FileEntryBase();
 

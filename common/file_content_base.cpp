@@ -388,13 +388,12 @@ void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
 	offset = ondisk_offset;
 	size = ondisk_size;
 
-
 	if(begin() != end())
 	{
 		// TODO: we don't handle nicely chunks in ram
 		if(front().GetOffset() <= offset
-		&& front().GetOffset() + (off_t) front().GetSize() >= offset
-		&& front().GetOffset() + (off_t) front().GetSize() <= offset + (off_t)size)
+			&& front().GetOffset() + (off_t) front().GetSize() >= offset
+			&& front().GetOffset() + (off_t) front().GetSize() <= offset + (off_t)size)
 			offset = front().GetOffset();
 
 		/* Find the last contiguous entry */
@@ -453,12 +452,12 @@ void FileContentBase::NetworkFlushRequests()
 		{
 			next_it = sharers.begin();
 		}
-	
+
 		while(sh_it != sharers.end())
 		{
 			/* Check if this peer have this pat */
 			if(it->GetOffset() >= sh_it->second.offset &&
-					it->GetOffset() + (off_t)it->GetSize() <= sh_it->second.offset + sh_it->second.size)
+				it->GetOffset() + (off_t)it->GetSize() <= sh_it->second.offset + sh_it->second.size)
 			{
 				peers_list.RequestChunk(filename, sh_it->first, it->GetOffset(), it->GetSize());
 				request_sent = true;

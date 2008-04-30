@@ -60,4 +60,3 @@ void ContentList::SendRefFile(pf_id to, std::string filename)
 	packet.SetArg(NET_REF_FILE_SIZE, (uint64_t)size);
 	peers_list.SendMsg(to, packet);
 }
-

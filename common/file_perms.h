@@ -26,7 +26,8 @@ class FilePermissions
 {
 public:
 	/* Special peerfuse flags. */
-	enum {
+	enum
+	{
 		S_PF_REMOVED = 1 << 0
 	};
 

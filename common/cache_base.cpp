@@ -25,8 +25,8 @@
 #include "session_config.h"
 
 CacheBase::CacheBase()
-	: Mutex(RECURSIVE_MUTEX),
-	tree("", pf_stat(), NULL)
+			: Mutex(RECURSIVE_MUTEX),
+			tree("", pf_stat(), NULL)
 {
 }
 
@@ -256,4 +256,3 @@ bool CacheBase::FileExists(std::string path)
 	BlockLockMutex lock(this);
 	return Path2File(path) != NULL;
 }
-

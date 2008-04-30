@@ -26,19 +26,18 @@
 
 class JobLsDir : public Job
 {
-        std::string path;
-        pf_id id;
+	std::string path;
+	pf_id id;
 public:
-        JobLsDir(std::string _path, pf_id _id)
+	JobLsDir(std::string _path, pf_id _id)
 		: Job(0, REPEAT_NONE),
 		path(_path),
 		id(_id)
-	{}
+		{}
 
-        bool Start();
+	bool Start();
 
-        job_type GetType() const { return JOB_LS_DIR; }
-        std::string GetName() const { return "JobLsDir"; }
+	job_type GetType() const { return JOB_LS_DIR; }
+	std::string GetName() const { return "JobLsDir"; }
 };
-#endif                                            /* JOB_LS_DIR_H */
-
+#endif						  /* JOB_LS_DIR_H */

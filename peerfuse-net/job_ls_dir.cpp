@@ -25,4 +25,3 @@ bool JobLsDir::Start()
 	cache.SendDirFiles(path, id);
 	return false;
 }
-

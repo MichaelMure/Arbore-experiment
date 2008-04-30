@@ -26,15 +26,14 @@
 
 class JobAddSharer : public Job
 {
-        std::string filename;
-        pf_id id;
+	std::string filename;
+	pf_id id;
 public:
-        JobAddSharer(std::string _filename, pf_id _id) : Job(0, REPEAT_NONE), filename(_filename), id(_id) {}
+	JobAddSharer(std::string _filename, pf_id _id) : Job(0, REPEAT_NONE), filename(_filename), id(_id) {}
 
-        bool Start();
+	bool Start();
 
-        job_type GetType() const { return JOB_ADD_SHARER; }
-        std::string GetName() const { return "JobAddSharer"; }
+	job_type GetType() const { return JOB_ADD_SHARER; }
+	std::string GetName() const { return "JobAddSharer"; }
 };
-#endif                                            /* JOB_ADD_SHARER_H */
-
+#endif						  /* JOB_ADD_SHARER_H */

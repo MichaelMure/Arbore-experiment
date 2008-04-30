@@ -28,20 +28,17 @@
 
 class JobEndOfLs : public Job
 {
-        std::string path;
+	std::string path;
 public:
-        JobEndOfLs(std::string _path)
+	JobEndOfLs(std::string _path)
 		: Job(0, REPEAT_NONE),
 		path(_path)
-	{}
+		{}
 
-        bool Start();
+	bool Start();
 
-        job_type GetType() const { return JOB_END_OF_LS; }
-        std::string GetName() const { return "JobEndOfLs"; }
+	job_type GetType() const { return JOB_END_OF_LS; }
+	std::string GetName() const { return "JobEndOfLs"; }
 };
-
-#endif                                            /* PF_SERVER_MODE */
-
-#endif                                            /* JOB_END_OF_LS_H */
-
+#endif						  /* PF_SERVER_MODE */
+#endif						  /* JOB_END_OF_LS_H */

@@ -120,7 +120,7 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 
 void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 {
-#if 0
+	#if 0
 	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
 
 	while(it != file_refs.end() && it->second != filename)
@@ -130,7 +130,7 @@ void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 	{
 		return;
 	}
-#endif
+	#endif
 	Packet pckt(NET_CHUNK);
 	pckt.SetArg(NET_CHUNK_REF, ref);
 	pckt.SetArg(NET_CHUNK_CHUNK, chunk);

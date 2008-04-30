@@ -132,7 +132,7 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 
 void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 {
-#if 0
+	#if 0
 	std::map<uint32_t, std::string>::iterator it = file_refs.begin();
 
 	while(it != file_refs.end() && it->second != filename)
@@ -142,7 +142,7 @@ void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
 	{
 		return;
 	}
-#endif
+	#endif
 	Packet pckt(NET_CHUNK, environment.my_id.Get(), addr.id);
 	pckt.SetArg(NET_CHUNK_REF, ref);
 	pckt.SetArg(NET_CHUNK_CHUNK, chunk);
@@ -198,7 +198,6 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 			p->SetConnection(conn);
 		}
 	}
-
 
 	/* If this is a client, we answer an HELLO message. */
 	if(IsClient())
@@ -336,12 +335,11 @@ void Peer::Handle_net_ls_dir(struct Packet* msg)
 void Peer::Handle_net_end_of_ls(struct Packet* msg)
 {
 	/* In server mode, we don't care about listing a directory. */
-#ifndef PF_SERVER_MODE
+	#ifndef PF_SERVER_MODE
 	std::string path = msg->GetArg<std::string>(NET_END_OF_LS_PATH);
 	scheduler_queue.Queue(new JobEndOfLs(path));
-#endif
+	#endif
 }
-
 
 /** NET_I_HAVE_FILE
  *

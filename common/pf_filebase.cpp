@@ -74,7 +74,7 @@ void FileEntryBase::SetAttr(pf_stat new_stat)
 void FileEntryBase::SetSharers(IDList idl)
 {
 	sharers = idl;
-#ifdef PF_NET
+	#ifdef PF_NET
 	std::string list;
 	for(IDList::iterator it = sharers.begin(); it != sharers.end(); ++it)
 	{
@@ -82,5 +82,5 @@ void FileEntryBase::SetSharers(IDList idl)
 		list += TypToStr(*it);
 	}
 	tree_cfg.Set(GetFullName() + "#sharers", list);
-#endif
+	#endif
 }

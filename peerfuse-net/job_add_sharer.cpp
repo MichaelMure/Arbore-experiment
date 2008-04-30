@@ -25,4 +25,3 @@ bool JobAddSharer::Start()
 	cache.AddSharer(filename, id);
 	return false;
 }
-

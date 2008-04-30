@@ -64,7 +64,7 @@ void PeerBase::Flush()
 		send_queue.front().Send(conn);
 		send_queue.pop();
 	}
-	conn->SocketWrite(); /* Flush any pending data */
+	conn->SocketWrite();			  /* Flush any pending data */
 }
 
 // true when there is still data available, false elsewise

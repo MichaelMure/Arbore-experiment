@@ -27,5 +27,4 @@ bool JobEndOfLs::Start()
 	cache.SetReadyForList(path);
 	return false;
 }
-
-#endif /* PF_SERVER_MODE */
+#endif						  /* PF_SERVER_MODE */
