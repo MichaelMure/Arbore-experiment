@@ -46,5 +46,4 @@ public:
 	void Concatenate(FileChunk chunk);
 	FileChunk GetPart(FileChunkDesc chunk_desc);
 };
-
 #endif						  /* FILE_CHUNK_H */

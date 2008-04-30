@@ -55,7 +55,7 @@ public:
 
 	bool Overlaps(const FileChunkDesc& other) const
 	{
-		return	(GetOffset() <= other.GetOffset() && GetEndOffset() > other.GetOffset())
+		return  (GetOffset() <= other.GetOffset() && GetEndOffset() > other.GetOffset())
 			|| (other.GetOffset() <= GetOffset() && other.GetEndOffset() > GetOffset());
 	}
 
