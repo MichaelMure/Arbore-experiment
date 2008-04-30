@@ -36,7 +36,7 @@ protected:
 	Packet* incoming;		  // packet we are receiving
 	std::queue<Packet> send_queue;	  // packets we are sending (with flush)
 
-					  // how this peer maps refs to files
+	// how this peer maps refs to files
 	std::map<uint32_t, std::string> file_refs;
 
 	unsigned int flags;
