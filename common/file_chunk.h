@@ -22,46 +22,29 @@
 
 #include <time.h>
 #include <unistd.h>
+#include "file_chunk_desc.h"
 
-class FileChunk
+class FileChunk : public FileChunkDesc
 {
 	time_t access_time;
 	char* data;
-	off_t offset;
-	size_t size;
 	bool hdd_synced;
 
 public:
-	FileChunk() : access_time(0), data(NULL), offset(0), size(0), hdd_synced(false) {}
+	FileChunk() : access_time(0), data(NULL), hdd_synced(false) {}
 	FileChunk(const char* _data, off_t _offset, size_t _size);
 	FileChunk(const FileChunk &other);
 	FileChunk& operator=(const FileChunk &other);
 	~FileChunk();
 
-	bool operator==(const FileChunk &other)
-	{
-		return GetOffset() == other.GetOffset() && GetSize() == other.GetSize();
-	}
-
-	bool operator<(const FileChunk &other)
-	{
-		return GetOffset() < other.GetOffset() || (GetOffset() == other.GetOffset() && GetSize() < other.GetSize());
-	}
-
 	time_t GetAccessTime() const { return access_time; }
-	off_t GetOffset() const { return offset; }
-	size_t GetSize() const { return size; }
 	bool GetHddSynced() const { return hdd_synced; }
 	void SetHddSynced(bool _hdd_synced) { hdd_synced = _hdd_synced; }
 	const char* GetData();
 
 	void Merge(FileChunk chunk);
 	void Concatenate(FileChunk chunk);
-	FileChunk GetPart(off_t _offset, size_t _size);
+	FileChunk GetPart(FileChunkDesc chunk_desc);
 };
 
-struct CompFileChunk
-{
-	bool operator() (const FileChunk c1, const FileChunk c2);
-};
 #endif						  /* FILE_CHUNK_H */

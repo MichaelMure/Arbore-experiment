@@ -22,26 +22,19 @@
 #include "file_chunk.h"
 #include "log.h"
 
-bool CompFileChunk::operator() (const FileChunk c1, const FileChunk c2)
-{
-	return c1.GetOffset() < c2.GetOffset();
-}
-
-FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : offset(_offset), size(_size), hdd_synced(false)
+FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : FileChunkDesc(_offset, _size), hdd_synced(false)
 {
 	access_time = time(NULL);
 	if(_data)
 	{
-		data = new char[size];
-		memcpy(data, _data, size);
+		data = new char[GetSize()];
+		memcpy(data, _data, GetSize());
 	}
 	else
 		data = NULL;
 }
 
-FileChunk::FileChunk(const FileChunk& other) : access_time(other.access_time),
-			offset(other.offset),
-			size(other.size),
+FileChunk::FileChunk(const FileChunk& other) : FileChunkDesc(other), access_time(other.access_time),
 			hdd_synced(other.hdd_synced)
 {
 	if(other.data)
@@ -88,24 +81,19 @@ const char* FileChunk::GetData()
 void FileChunk::Merge(FileChunk chunk)
 {
 	/* Check we are overlapping */
-	if(offset + (off_t)size <= chunk.GetOffset())
-		return;
-
-	if(offset >= chunk.GetOffset() + (off_t)chunk.GetSize())
+	if(!Overlaps(chunk))
 		return;
 
 	access_time = time(NULL);
 	hdd_synced = false;
 
 	/* Merge */
-	off_t begin_off = chunk.offset - offset > 0 ? chunk.offset - offset : 0;
-	off_t chunk_off = offset - chunk.offset > 0 ? offset - chunk.offset: 0;
-	off_t merge_end = MIN(offset + (off_t)size, chunk.GetOffset() + (off_t)chunk.GetSize());
-	size_t merge_size = (size_t) (merge_end - begin_off - offset);
+	FileChunkDesc common_part = GetCommonPartDesc(chunk);
 
-	assert(begin_off + merge_size <= size);
-	assert(chunk_off + merge_size <= chunk.GetSize());
-	memcpy(data + begin_off, chunk.GetData() + chunk_off, size);
+	off_t buf_start = common_part.GetOffset() - GetOffset();
+	off_t chu_start = common_part.GetOffset() - chunk.GetOffset();
+
+	memcpy(data + buf_start, chunk.GetData() + chu_start, common_part.GetSize());
 
 	log[W_DEBUG] << "Chunk merged: off:" << chunk.GetOffset() << ", size:" << chunk.GetSize() << " inside off:" << offset << ", size:" << size;
 }
@@ -126,7 +114,7 @@ void FileChunk::Concatenate(FileChunk other)
 
 	access_time = time(NULL);
 	hdd_synced = false;
-	size_t new_size = (size_t) (other.GetOffset() + other.GetSize() - offset);
+	size_t new_size = (size_t) (GetSize() + other.GetSize());
 	char* new_data = new char[new_size];
 	memset(new_data, 0, new_size);
 
@@ -137,26 +125,24 @@ void FileChunk::Concatenate(FileChunk other)
 	}
 
 	if(other.GetData())
-		memcpy(new_data + other.GetOffset() - offset, other.GetData(), other.GetSize());
+		memcpy(new_data + other.GetOffset() - GetOffset(), other.GetData(), other.GetSize());
 
 	size = new_size;
 	data = new_data;
 	log[W_DEBUG] << "Chunk concatenated: off:" << other.GetOffset() << ", size:" << other.GetSize() << " to off:" << offset << ", size:" << size;
 }
 
-FileChunk FileChunk::GetPart(off_t _offset, size_t _size)
+FileChunk FileChunk::GetPart(FileChunkDesc chunk_desc)
 {
-	if(_offset >= offset + (off_t)size)
-		return FileChunk();
-	if(_offset + (off_t)_size <= offset)
+	if(!Overlaps(chunk_desc))
 		return FileChunk();
 
 	access_time = time(NULL);
-	off_t data_offset = _offset > offset ? _offset - offset : 0;
-	off_t data_end = MIN(_offset + (off_t)_size, offset + (off_t)size);
-	size_t data_size = (size_t) (data_end - offset - data_offset);
+	FileChunkDesc common_part = GetCommonPartDesc(chunk_desc);
 
-	FileChunk chunk(data + data_offset, offset + data_offset, data_size);
+	off_t buf_start = common_part.GetOffset() - GetOffset();
+
+	FileChunk chunk(GetData() + buf_start, common_part.GetOffset(), common_part.GetSize());
 	if(hdd_synced)
 		chunk.SetHddSynced(true);
 	return chunk;

@@ -22,7 +22,7 @@
 #include "packet.h"
 #include "log.h"
 
-void FileContent::NetworkRequestChunk(FileChunk chunk)
+void FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {
 	BlockLockMutex lock(this);
 	if(sharers.size() == 0)
@@ -41,7 +41,7 @@ void FileContent::NetworkRequestChunk(FileChunk chunk)
 		NetworkFlushRequests();
 }
 
-bool FileContent::WantsChunks()
+bool FileContent::WaitsForNetChunks()
 {
 	BlockLockMutex lock(this);
 	return net_pending_request.size() != 0;

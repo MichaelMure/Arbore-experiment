@@ -26,6 +26,7 @@
 #include <time.h>
 #include "mutex.h"
 #include "file_chunk.h"
+#include "file_chunk_desc.h"
 #include "pf_types.h"
 
 class FileContentBase : public Mutex, private std::list<FileChunk>
@@ -46,8 +47,8 @@ private:
 	time_t access_time;
 
 	/* Network related */
-	std::list<FileChunk> net_requested;
-	std::list<FileChunk> net_unavailable;
+	std::list<FileChunkDesc> net_requested;
+	std::list<FileChunkDesc> net_unavailable;
 	struct sharedchunks
 	{
 		off_t offset;
@@ -60,13 +61,13 @@ protected:
 
 	void NetworkFlushRequests();
 	bool waiting_for_sharers;
-	std::list<FileChunk> net_pending_request;
-	virtual void NetworkRequestChunk(FileChunk chunk) = 0;
+	std::list<FileChunkDesc> net_pending_request;
+	virtual void NetworkRequestChunk(FileChunkDesc chunk) = 0;
 
 private:
 	/* Hdd related */
 	bool LoadFd();
-	bool OnDiskLoad(FileChunk chunk);
+	bool OnDiskLoad(FileChunkDesc chunk_desc);
 	void OnDiskWrite(FileChunk& chunk);
 
 	FileContentBase& operator=(const FileContentBase &other);
@@ -81,16 +82,16 @@ public:
 	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
 	 * @return returns true if the chunk is available after returning from this method
 	 */
-	bool FileContentHaveChunk(off_t offset, size_t size);
-	bool OnDiskHaveChunk(FileChunk chunk, bool blockant_load = false);
-	enum chunk_availability NetworkHaveChunk(FileChunk chunk);
+	bool FileContentHaveChunk(FileChunkDesc chunk_desc);
+	bool OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load = false);
+	enum chunk_availability NetworkHaveChunk(FileChunkDesc chunk_desc);
 
 	/* Returns a copy of the chunk */
-	FileChunk GetChunk(off_t offset, size_t size);
+	FileChunk GetChunk(FileChunkDesc chunk_desc);
 
 	/* Return true or false if we have it */
 	/* Triggers loading the file from the cache or download from the network */
-	enum chunk_availability HaveChunk(off_t offset, size_t size);
+	enum chunk_availability HaveChunk(FileChunkDesc chunk_desc);
 
 	bool HaveAnyChunk();
 	void GetSharedContent(off_t& offset, off_t& size);

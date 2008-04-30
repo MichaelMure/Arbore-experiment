@@ -24,6 +24,7 @@
 #include <algorithm>
 #include "file_content_base.h"
 #include "file_chunk.h"
+#include "file_chunk_desc.h"
 #include "scheduler_queue.h"
 #include "session_config.h"
 #include "hdd.h"
@@ -114,20 +115,20 @@ void FileContentBase::OnDiskWrite(FileChunk& chunk)
 	chunk.SetHddSynced(true);
 }
 
-bool FileContentBase::OnDiskLoad(FileChunk chunk)
+bool FileContentBase::OnDiskLoad(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	if(!LoadFd())
 		return false;
 
-	if(lseek(ondisk_fd, chunk.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1)
+	if(lseek(ondisk_fd, chunk_desc.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1)
 		return false;
 
-	log[W_DEBUG] << "Loading from cache \"" << filename << "\" off:" << chunk.GetOffset() << ", size:" << chunk.GetSize();
-	char* buf = new char[chunk.GetSize()];
-	if(read(ondisk_fd, buf, chunk.GetSize()) == -1)
+	log[W_DEBUG] << "Loading from cache \"" << filename << "\" off:" << chunk_desc.GetOffset() << ", size:" << chunk_desc.GetSize();
+	char* buf = new char[chunk_desc.GetSize()];
+	if(read(ondisk_fd, buf, chunk_desc.GetSize()) == -1)
 		log[W_ERR] << "Error while loading \"" << filename << "\": "<< strerror(errno);
-	FileChunk new_chunk(buf, chunk.GetOffset(), chunk.GetSize());
+	FileChunk new_chunk(buf, chunk_desc.GetOffset(), chunk_desc.GetSize());
 	new_chunk.SetHddSynced(true);
 	delete []buf;
 	SetChunk(new_chunk);
@@ -135,17 +136,17 @@ bool FileContentBase::OnDiskLoad(FileChunk chunk)
 	return true;
 }
 
-bool FileContentBase::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
+bool FileContentBase::OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load)
 {
 	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
 
 	/* TODO: load only the missing part of the chunk */
 	//log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
-	if(chunk.GetOffset() >= ondisk_offset
-		&& (chunk.GetOffset() + (off_t)chunk.GetSize() <= ondisk_offset + (off_t)ondisk_size))
+	if(chunk_desc.GetOffset() >= ondisk_offset
+		&& (chunk_desc.GetOffset() + (off_t)chunk_desc.GetSize() <= ondisk_offset + (off_t)ondisk_size))
 	{
-		if(!OnDiskLoad(chunk))
+		if(!OnDiskLoad(chunk_desc))
 		{
 			log[W_ERR] << "Unable to read file from cache !";
 			return false;
@@ -155,12 +156,12 @@ bool FileContentBase::OnDiskHaveChunk(FileChunk chunk, bool blockant_load)
 	return false;
 }
 
-FileChunk FileContentBase::GetChunk(off_t offset, size_t size)
+FileChunk FileContentBase::GetChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
 	iterator it = begin();
-	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
+	while(it != end() && !it->Overlaps(chunk_desc))
 		++it;
 
 	if(it == end())
@@ -172,31 +173,29 @@ FileChunk FileContentBase::GetChunk(off_t offset, size_t size)
 
 	/* Build the requested chunk */
 	FileChunk chunk;
-	while(it != end() && it->GetOffset() < offset + (off_t)size)
+	while(it != end() && it->Overlaps(chunk_desc))
 	{
-		chunk.Concatenate(it->GetPart(offset, size));
+		chunk.Concatenate(it->GetPart(chunk_desc));
 		++it;
 	}
 
 	return chunk;
 }
 
-bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
+bool FileContentBase::FileContentHaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	iterator it = begin();
-	while(it != end() && it->GetOffset() + (off_t)it->GetSize() <= offset)
+	while(it != end() && !chunk_desc.Overlaps(*it))
 		++it;
 
-	if(it == end() || it->GetOffset() > offset)
+	if(it == end() || it->GetOffset() > chunk_desc.GetOffset())
 		return false;
 
 	/* We have the begining of the chunk
 	 * Check we have it until the end */
 	off_t next_off = it->GetOffset();
-	while(it != end()
-		&& it->GetOffset() + (off_t)it->GetSize() < offset + (off_t)size
-		&& next_off == it->GetOffset())
+	while(it != end() && chunk_desc.Overlaps(*it) && next_off == it->GetOffset())
 	{
 		/* Blocks must follow themself */
 		next_off = it->GetOffset() + (off_t)it->GetSize();
@@ -206,45 +205,45 @@ bool FileContentBase::FileContentHaveChunk(off_t offset, size_t size)
 	return (it != end()) && next_off == it->GetOffset();
 }
 
-enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunk chunk)
+enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	/* If nobody's connected we won't receive anything */
 	if(peers_list.Size() == 0)
 		return CHUNK_UNAVAILABLE;
 
-	std::list<FileChunk>::iterator net_it;
-	if((net_it = std::find(net_unavailable.begin(), net_unavailable.end(), chunk)) != net_unavailable.end())
+	std::list<FileChunkDesc>::iterator net_it;
+	if((net_it = std::find(net_unavailable.begin(), net_unavailable.end(), chunk_desc)) != net_unavailable.end())
 	{
 		net_unavailable.erase(net_it);
 		return CHUNK_UNAVAILABLE;
 	}
 
-	if(std::find(net_requested.begin(), net_requested.end(), chunk) != net_requested.end())
+	if(std::find(net_requested.begin(), net_requested.end(), chunk_desc) != net_requested.end())
 		return CHUNK_NOT_READY;
 
 	log[W_DEBUG] << "Sending request no " << net_requested.size();
-	net_requested.push_back(chunk);
-	net_pending_request.push_back(chunk);
-	NetworkRequestChunk(chunk);
+	net_requested.push_back(chunk_desc);
+	net_pending_request.push_back(chunk_desc);
+	NetworkRequestChunk(chunk_desc);
 	return CHUNK_NOT_READY;
 }
 
-enum FileContentBase::chunk_availability FileContentBase::HaveChunk(off_t offset, size_t size)
+enum FileContentBase::chunk_availability FileContentBase::HaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
 
 	/* Check if the chunk is already loaded */
-	if(FileContentHaveChunk(offset, size))
+	if(FileContentHaveChunk(chunk_desc))
 		return CHUNK_READY;
 
 	/* Check if we have it on Hdd */
-	if(OnDiskHaveChunk(FileChunk(NULL, offset, size), true))
+	if(OnDiskHaveChunk(chunk_desc, true))
 		return CHUNK_READY;
 
 	/* Ask it on the network */
-	return NetworkHaveChunk(FileChunk(NULL, offset, size));
+	return NetworkHaveChunk(chunk_desc);
 }
 
 bool FileContentBase::HaveAnyChunk()
@@ -260,7 +259,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	ondisk_synced = false;
 	access_time = time(NULL);
 
-	std::list<FileChunk>::iterator net_it;
+	std::list<FileChunkDesc>::iterator net_it;
 	if((net_it = find(net_requested.begin(), net_requested.end(), chunk)) != net_requested.end())
 	{
 		log[W_DEBUG] << "Erasing matching request";
@@ -301,7 +300,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	}
 	size_t size = (size_t) (chunk.GetOffset() + chunk.GetSize() - offset);
 	log[W_DEBUG] << "Inserting chunk in the middle of \"" << filename << "\" off:" << offset << " size:" << size;
-	FileChunk new_chunk = chunk.GetPart(offset, size);
+	FileChunk new_chunk = chunk.GetPart(FileChunkDesc(offset, size));
 	insert(it, new_chunk);
 }
 
@@ -424,7 +423,7 @@ void FileContentBase::NetworkFlushRequests()
 
 	log[W_DEBUG] << "Needs to send " << net_pending_request.size() << " chunk requests to " << sharers.size() << "sharers.";
 	/* Send a request for each chunk we have in our queue */
-	std::list<FileChunk>::iterator it = net_pending_request.begin();
+	std::list<FileChunkDesc>::iterator it = net_pending_request.begin();
 	while(it != net_pending_request.end())
 	{
 		/* Find a sharer that have this file */

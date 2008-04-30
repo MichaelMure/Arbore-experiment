@@ -26,14 +26,14 @@
 bool JobSendChunk::Start()
 {
 	FileContent& f = content_list.GetFile(ref);
-	FileChunk requested_chunk(NULL, offset, size);
+	FileChunkDesc requested_chunk(offset, size);
 
-	if(f.FileContentHaveChunk(offset, size)
+	if(f.FileContentHaveChunk(requested_chunk)
 						  /* TODO: make OnDiskHaveChunk non-blockant and repeat the job */
 		|| f.OnDiskHaveChunk(requested_chunk))
 	{
 		log[W_DEBUG] << "Sending chunk";
-		FileChunk chunk = f.GetChunk(offset, size);
+		FileChunk chunk = f.GetChunk(requested_chunk);
 		if(chunk.GetData() == NULL)
 		{
 			log[W_ERR] << "Trying to send an empty chunk..";

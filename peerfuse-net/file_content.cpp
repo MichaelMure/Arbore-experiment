@@ -22,7 +22,7 @@
 #include "packet.h"
 #include "cache.h"
 
-void FileContent::NetworkRequestChunk(FileChunk chunk)
+void FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {
 	if(sharers.size() == 0)
 	{

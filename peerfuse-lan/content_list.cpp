@@ -36,7 +36,7 @@ void ContentList::SetSharer(std::string filename, pf_id sharer)
 	// Don't move-me to job_set_sharer.cpp -> we'll be needed to handle redondancy
 	/* No need to lock */
 	FileContent& f = GetFile(filename);
-	if(f.WantsChunks())
+	if(f.WaitsForNetChunks())
 	{
 		/* Ask for a ref */
 		Packet p(NET_WANT_REF_FILE);

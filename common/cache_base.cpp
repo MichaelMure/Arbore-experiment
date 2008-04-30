@@ -216,15 +216,15 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 		return 0;
 	}
 
+	FileChunkDesc chunk_to_read(off, to_read);
 	enum FileContent::chunk_availability chunk_state;
-	while((chunk_state = file.HaveChunk(off, to_read)) == FileContent::CHUNK_NOT_READY)
+	while((chunk_state = file.HaveChunk(chunk_to_read)) == FileContent::CHUNK_NOT_READY)
 		usleep(10000);			  /* 0.01 sec */
 
 	if(chunk_state == FileContent::CHUNK_UNAVAILABLE)
 		throw FileUnavailable();
 
-	FileChunk chunk;
-	chunk = file.GetChunk(off, to_read);
+	FileChunk chunk = file.GetChunk(chunk_to_read);
 
 	if(!chunk.GetData())			  /* shouldn't happen */
 	{
