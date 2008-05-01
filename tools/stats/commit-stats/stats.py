@@ -524,7 +524,8 @@ def main():
 		<li><a href="/download.html">Download</a></li><li class="separator"></li>
 		<li><a href="/documentation.html">Documentation</a></li><li class="separator" />
 		<li><a class="current" href="http://peerfuse.org/stats/stats.html">SVN stats</a></li><li class="separator" />
-		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li>
+		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li><li class="separator" />
+		<li><a href="http://peerfuse.org/mailman/listinfo/peerfuse">Mailing list</a></li>
 	</ul>
 </div>
 <div class='content'>
