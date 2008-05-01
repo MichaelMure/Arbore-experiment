@@ -28,6 +28,6 @@ public:
 	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 
-	void NetworkRequestChunk(FileChunkDesc chunk);
+	chunk_availability NetworkRequestChunk(FileChunkDesc chunk);
 };
 #endif						  /* FILE_CONTENT_H */

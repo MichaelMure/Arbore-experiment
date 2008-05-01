@@ -17,28 +17,52 @@
  * $Id$
  */
 
+#include <time.h>
 #include "file_content.h"
 #include "peers_list.h"
 #include "packet.h"
 #include "log.h"
 
-void FileContent::NetworkRequestChunk(FileChunkDesc chunk)
+const time_t ref_request_timeout = 5;
+
+FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {
 	BlockLockMutex lock(this);
-	if(sharers.size() == 0)
+	if(sharers.size() == 0 && !waiting_for_sharers)
 	{
-		log[W_DEBUG] << "Waiting for sharers to advertise their files";
 		// We don't know who have this file, so ask it first
-		if(!waiting_for_sharers)
-		{
-			Packet packet(NET_WHO_HAS_FILE);
-			packet.SetArg(NET_WHO_HAS_FILE_PATH, filename);
-			peers_list.Broadcast(packet);
-			waiting_for_sharers = true;
-		}
+		Packet packet(NET_WHO_HAS_FILE);
+		packet.SetArg(NET_WHO_HAS_FILE_PATH, filename);
+		peers_list.Broadcast(packet);
+		waiting_for_sharers = true;
+		ref_request_time = time(NULL);
+		log[W_DEBUG] << "Now waiting for sharers to advertise their files";
 	}
 	else
+	{
+		// Check the chunk presence on the network
+		if(time(NULL) > ref_request_time + ref_request_timeout)
+		{
+			std::map<pf_id, struct sharedchunks>::iterator it;
+			bool found = false;
+			for(it = sharers.begin(); it != sharers.end(); ++it)
+			{
+				if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
+				{
+					found = true;
+					break;
+				}
+			}
+			if(!found)
+			{
+				log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+				return CHUNK_UNAVAILABLE;
+			}
+		}
+
 		NetworkFlushRequests();
+	}
+	return CHUNK_NOT_READY;
 }
 
 bool FileContent::WaitsForNetChunks()

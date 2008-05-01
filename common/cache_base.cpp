@@ -217,7 +217,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 	}
 
 	FileChunkDesc chunk_to_read(off, to_read);
-	enum FileContent::chunk_availability chunk_state;
+	FileContent::chunk_availability chunk_state;
 	while((chunk_state = file.HaveChunk(chunk_to_read)) == FileContent::CHUNK_NOT_READY)
 		usleep(10000);			  /* 0.01 sec */
 

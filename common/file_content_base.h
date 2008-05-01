@@ -32,12 +32,12 @@
 class FileContentBase : public Mutex, private std::list<FileChunk>
 {
 public:
-	enum chunk_availability
+	typedef enum _chunk_availability
 	{
 		CHUNK_READY,		  /**< it's ready to be read */
 		CHUNK_NOT_READY,	  /**< it's not yet loaded from hdd/not yet received */
 		CHUNK_UNAVAILABLE	  /**< we don't have it on hdd and nobody has it on network */
-	};
+	} chunk_availability;
 private:
 	/* Information about what's currently stored on hardrive */
 	off_t ondisk_offset;
@@ -48,7 +48,6 @@ private:
 
 	/* Network related */
 	std::list<FileChunkDesc> net_requested;
-	std::list<FileChunkDesc> net_unavailable;
 	struct sharedchunks
 	{
 		off_t offset;
@@ -62,7 +61,7 @@ protected:
 	void NetworkFlushRequests();
 	bool waiting_for_sharers;
 	std::list<FileChunkDesc> net_pending_request;
-	virtual void NetworkRequestChunk(FileChunkDesc chunk) = 0;
+	virtual chunk_availability NetworkRequestChunk(FileChunkDesc chunk) = 0;
 
 private:
 	/* Hdd related */
@@ -84,14 +83,14 @@ public:
 	 */
 	bool FileContentHaveChunk(FileChunkDesc chunk_desc);
 	bool OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load = false);
-	enum chunk_availability NetworkHaveChunk(FileChunkDesc chunk_desc);
+	chunk_availability NetworkHaveChunk(FileChunkDesc chunk_desc);
 
 	/* Returns a copy of the chunk */
 	FileChunk GetChunk(FileChunkDesc chunk_desc);
 
 	/* Return true or false if we have it */
 	/* Triggers loading the file from the cache or download from the network */
-	enum chunk_availability HaveChunk(FileChunkDesc chunk_desc);
+	chunk_availability HaveChunk(FileChunkDesc chunk_desc);
 
 	bool HaveAnyChunk();
 	void GetSharedContent(off_t& offset, off_t& size);

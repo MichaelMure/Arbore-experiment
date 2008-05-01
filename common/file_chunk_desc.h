@@ -69,6 +69,11 @@ public:
 
 		return FileChunkDesc(begin_off, end_off - begin_off);
 	}
+
+	bool Contains(const FileChunkDesc& other) const
+	{
+		return GetOffset() <= other.GetOffset() && GetEndOffset() >= other.GetEndOffset();
+	}
 };
 
 struct CompFileChunk

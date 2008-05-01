@@ -19,16 +19,18 @@
 
 #ifndef FILE_CONTENT_H
 #define FILE_CONTENT_H
+#include<time.h>
 #include "file_content_base.h"
 #include "file_chunk_desc.h"
 
 class FileContent : public FileContentBase
 {
+	time_t ref_request_time;
 public:
-	FileContent(std::string path) : FileContentBase(path) {}
+	FileContent(std::string path) : FileContentBase(path), ref_request_time(0) {}
 	~FileContent() {}
 
-	void NetworkRequestChunk(FileChunkDesc chunk);
+	chunk_availability NetworkRequestChunk(FileChunkDesc chunk);
 	bool WaitsForNetChunks();
 };
 #endif						  /* FILE_CONTENT_H */

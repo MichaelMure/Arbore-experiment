@@ -207,31 +207,23 @@ bool FileContentBase::FileContentHaveChunk(FileChunkDesc chunk_desc)
 	return (it != end()) && next_off == it->GetOffset();
 }
 
-enum FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkDesc chunk_desc)
+FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	/* If nobody's connected we won't receive anything */
 	if(peers_list.Size() == 0)
 		return CHUNK_UNAVAILABLE;
 
-	std::list<FileChunkDesc>::iterator net_it;
-	if((net_it = std::find(net_unavailable.begin(), net_unavailable.end(), chunk_desc)) != net_unavailable.end())
+	if(std::find(net_requested.begin(), net_requested.end(), chunk_desc) == net_requested.end())
 	{
-		net_unavailable.erase(net_it);
-		return CHUNK_UNAVAILABLE;
+		log[W_DEBUG] << "Sending request no " << net_requested.size();
+		net_requested.push_back(chunk_desc);
+		net_pending_request.push_back(chunk_desc);
 	}
-
-	if(std::find(net_requested.begin(), net_requested.end(), chunk_desc) != net_requested.end())
-		return CHUNK_NOT_READY;
-
-	log[W_DEBUG] << "Sending request no " << net_requested.size();
-	net_requested.push_back(chunk_desc);
-	net_pending_request.push_back(chunk_desc);
-	NetworkRequestChunk(chunk_desc);
-	return CHUNK_NOT_READY;
+	return NetworkRequestChunk(chunk_desc);
 }
 
-enum FileContentBase::chunk_availability FileContentBase::HaveChunk(FileChunkDesc chunk_desc)
+FileContentBase::chunk_availability FileContentBase::HaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -423,7 +415,9 @@ void FileContentBase::NetworkFlushRequests()
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
 
-	log[W_DEBUG] << "Needs to send " << net_pending_request.size() << " chunk requests to " << sharers.size() << "sharers.";
+	if(sharers.size() == 0)
+		return;
+
 	/* Send a request for each chunk we have in our queue */
 	std::list<FileChunkDesc>::iterator it = net_pending_request.begin();
 	while(it != net_pending_request.end())
@@ -474,10 +468,7 @@ void FileContentBase::NetworkFlushRequests()
 		if(request_sent)
 			it = net_pending_request.erase(it);
 		else
-		{
-			log[W_DEBUG] << "No peer found for this request.";
 			++it;
-		}
 	}
 }
 
