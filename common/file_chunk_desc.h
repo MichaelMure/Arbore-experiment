@@ -67,7 +67,7 @@ public:
 		off_t end_off = MIN(GetEndOffset(), other.GetEndOffset());
 		assert(begin_off < end_off);
 
-		return FileChunkDesc(begin_off, end_off - begin_off);
+		return FileChunkDesc(begin_off, (size_t)(end_off - begin_off));
 	}
 
 	bool Contains(const FileChunkDesc& other) const
