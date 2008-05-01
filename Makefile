@@ -22,6 +22,14 @@ build.peerfuse-lan/Makefile:
 	[ -d build.peerfuse-lan ] || mkdir build.peerfuse-lan; \
 	cd build.peerfuse-lan && cmake $(PF_LAN_OPT) ..
 
+install-pfnet:
+	make -C build.peerfuse-net install
+
+install-pflan:
+	make -C build.peerfuse-lan install
+
+install: install-pfnet install-pflan
+
 clean:
 	rm -rf build.peerfuse-net
 	rm -rf build.peerfuse-lan

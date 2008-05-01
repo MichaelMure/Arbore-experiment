@@ -83,6 +83,7 @@ IF(PF_NET)
 		peerfuse-net/peer.cpp)
 	SET(BIN_NAME peerfuse-net)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_NET")
+	SET(CONF_NAME pfnet.conf)
 ELSE(PF_NET)
 	SET(SRC ${SRC}
 		peerfuse-lan/application.cpp
@@ -104,6 +105,7 @@ ELSE(PF_NET)
 		peerfuse-lan/job_other_connect.cpp)
 	SET(BIN_NAME peerfuse-lan)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_LAN")
+	SET(CONF_NAME pflan.conf)
 ENDIF(PF_NET)
 
 
@@ -145,3 +147,12 @@ ENDIF(DEBUG_BUILD)
 MESSAGE(STATUS "Using compiler ${CMAKE_CXX_COMPILER}")
 MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+INSTALL(TARGETS ${BIN_NAME}
+        DESTINATION bin)
+INSTALL(FILES ${CONF_NAME}
+        DESTINATION etc)
+INSTALL(FILES BUGS COPYING HACKING README ROADMAP TASKS
+        DESTINATION doc/peerfuse)
+INSTALL(DIRECTORY doc/
+        DESTINATION doc/peerfuse
+        PATTERN ".svn" EXCLUDE)
