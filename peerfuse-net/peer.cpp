@@ -480,11 +480,13 @@ void Peer::HandleMsg(Packet* pckt)
 		throw Peer::MustDisconnect();
 	}
 
+#if 0a /* TODO: check only if this is the sender */
 	if(!IsHighLink() && (handler[pckt->GetType()].perm & PERM_HIGHLINK))
 	{
 		log[W_WARNING] << "Received an HIGHLINK command from a non highlink peer";
 		throw Peer::MustDisconnect();
 	}
+#endif
 
 	(this->*handler[pckt->GetType()].func)(pckt);
 }
