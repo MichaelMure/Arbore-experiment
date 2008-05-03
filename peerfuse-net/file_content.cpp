@@ -34,7 +34,7 @@ FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDe
 	else
 	{
 		// Check the chunk presence on the network
-		if(/* TODO: enter this only if all FILE_REF have been received */ true)
+		if(/* TODO: enter this only if all FILE_REF have been received */ false)
 		{
 			std::map<pf_id, struct sharedchunks>::iterator it;
 			bool found = false;
