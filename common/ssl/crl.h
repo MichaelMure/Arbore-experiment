@@ -34,8 +34,8 @@ public:
 
 	class BadCRL : public StrException
 	{
-	public:
-		BadCRL(std::string err) : StrException(err) {}
+		public:
+			BadCRL(std::string err) : StrException(err) {}
 	};
 
 	void Load(std::string _path);
@@ -46,5 +46,4 @@ public:
 };
 
 extern Crl crl;
-
-#endif /* CRL_H */
+#endif						  /* CRL_H */

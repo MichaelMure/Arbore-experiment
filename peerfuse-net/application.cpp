@@ -68,7 +68,7 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
 	section->AddItem(new ConfigItem_string("ca", "CA certificate"));
- 	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
+	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
@@ -129,10 +129,10 @@ int Application::main(int argc, char *argv[])
 
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
- 		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
- 			crl.Load("../tests/conf/certs/crl.pem");
- 		else
- 			crl.Disable();
+		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
+			crl.Load("../tests/conf/certs/crl.pem");
+		else
+			crl.Disable();
 		net.StartNetwork(&conf);
 
 		cache.UpdateRespFiles();

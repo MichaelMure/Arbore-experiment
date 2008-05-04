@@ -76,4 +76,3 @@ void Crl::Load(std::string _filename)
 	log[W_INFO] << "CRL issued by: " << str;
 	filename = _filename;
 }
-
