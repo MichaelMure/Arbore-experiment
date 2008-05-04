@@ -1,27 +1,13 @@
 #
 # Set global variable FUSE to TRUE if both fuse lib and include files are found
 #
+INCLUDE(UsePkgConfig)
+PKGCONFIG("fuse" FUSE_INCLUDE_DIR FUSE_LINK_DIR
+	        FUSE_LDFLAGS FUSE_CFLAGS)
 
-
-# Look for FUSE library
-FIND_LIBRARY(FUSE_LIBRARY_PATH
-             NAMES fuse
-             PATHS /lib
-                   /usr/lib
-                   /usr/local/lib)
-
-
-
-# Look for FUSE include files
-FIND_PATH(FUSE_INCLUDE_PATH
-          NAMES fuse.h
-          PATHS /usr/include
-                /usr/local/include)
-
-IF(FUSE_LIBRARY_PATH AND FUSE_INCLUDE_PATH)
+IF(FUSE_INCLUDE_DIR OR FUSE_LINK_DIR OR FUSE_LDFLAGS OR FUSE_CFLAGS)
   SET(FUSE_FOUND TRUE)
-  SET(FUSE_LIBRARY "-lfuse")
-ELSE(FUSE_LIBRARY_PATH AND FUSE_INCLUDE_PATH)
+ELSE(FUSE_INCLUDE_DIR OR FUSE_LINK_DIR OR FUSE_LDFLAGS OR FUSE_CFLAGS)
   SET(FUSE_FOUND FALSE)
-ENDIF(FUSE_LIBRARY_PATH AND FUSE_INCLUDE_PATH)
+ENDIF(FUSE_INCLUDE_DIR OR FUSE_LINK_DIR OR FUSE_LDFLAGS OR FUSE_CFLAGS)
 
