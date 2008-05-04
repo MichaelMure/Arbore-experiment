@@ -73,35 +73,36 @@ def check_loop(file, top = False):
 			return True
 	return False
 
-enable_check = False
 # Parse options, nicely ignore gcc flags
 include_dirs = []
 header_checked = []
-opt, arg = getopt.gnu_getopt(sys.argv[2:], "I:o:D:W:f:r:l:L:cg")
 
 # Build the path to search for files
-for option in opt:
-	if option[0] == "-I":
-		include_dirs.append(option[1])
-	elif option[0] == "-c":
-		enable_check = True
+arg_no = 0
+filename = ""
+for option in sys.argv[2:]:
+	if option == "-I":
+		include_dirs.append(sys.argv[arg_no + 3])
+	elif option == "-c":
+		filename = sys.argv[arg_no + 3]
+	arg_no += 1
 
-if not enable_check:
+if len(filename) < 4:
 	sys.exit(0)
 
-if arg[0][len(arg[0])-4:] != ".cpp":
-	print "Don't know how to handle", arg[0]
+if filename[len(filename)-4:] != ".cpp":
+	print "Don't know how to handle", filename
 	sys.exit(0)
 
 # We'll emit an error if someone include this file:
-forbidden_header = os.path.basename(arg[0])
+forbidden_header = os.path.basename(filename)
 forbidden_header = forbidden_header[:len(forbidden_header)-4] + ".h"
 
 ignore_list = load_ignore_list("../tools/gcc-wrapper/header_loop_ignore")
 
 # Add to the search path the parent folder of the file
-include_dirs.append(os.path.dirname(arg[0]))
+include_dirs.append(os.path.dirname(filename))
 
-if check_loop(os.path.basename(arg[0]), True):
+if check_loop(os.path.basename(filename), True):
 	sys.exit(1)
 
