@@ -44,7 +44,7 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 
-const int merge_post_lastview_dt = 15 * 60; /* When merging, ask a diff of what's happened since last_view - 15m */
+const int merge_post_lastview_dt = 15 * 60;	  /* When merging, ask a diff of what's happened since last_view - 15m */
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags) :
 			PeerBase(_addr, _conn, _flags)
