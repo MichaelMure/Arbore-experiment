@@ -69,7 +69,7 @@ std::string stringtok(std::string &in, const char * const delimiters)
 
 std::string pf_addr2string(const pf_addr addr)
 {
-	std::string ret;
+	std::string ret = "";
 	if(addr.ip[0] == 0 &&
 		addr.ip[1] == 0 &&
 		addr.ip[2] == 0)

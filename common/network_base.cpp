@@ -138,9 +138,7 @@ void NetworkBase::Loop()
 
 			if(newfd != -1)
 			{
-				/* none_addr is initialized to NULL */
-				static pf_addr none_addr;
-				pf_addr addr = none_addr;
+				pf_addr addr;
 				addr.ip[3] = newcon.sin_addr.s_addr;
 
 				Connection *peer_conn;

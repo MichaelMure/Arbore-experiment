@@ -37,6 +37,14 @@ public:
 	uint16_t port;
 	pf_id id;
 
+	pf_addr() : port(0), id(0)
+	{
+		ip[0] = 0;
+		ip[1] = 0;
+		ip[2] = 0;
+		ip[3] = 0;
+	}
+
 	bool operator ==(const pf_addr &other)
 	{
 		return ip[0] == other.ip[0]

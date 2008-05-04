@@ -44,6 +44,8 @@
 #include "peers_list.h"
 #include "scheduler_queue.h"
 
+const int merge_post_lastview_dt = 15 * 60; /* When merging, ask a diff of what's happened since last_view - 15m */
+
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags) :
 			PeerBase(_addr, _conn, _flags)
 {
@@ -93,7 +95,7 @@ void Peer::SendGetStructDiff()
 {
 	Packet pckt(NET_GET_STRUCT_DIFF);
 	uint32_t last_v = 0;
-	session_cfg.Get("last_view", last_v);
+	session_cfg.Get("last_view_" + TypToStr(GetID()), last_v);
 	pckt.SetArg(NET_GET_STRUCT_DIFF_LAST_CONNECTION, last_v);
 	SendMsg(pckt);
 }
@@ -269,7 +271,7 @@ void Peer::Handle_net_get_struct_diff(struct Packet* pckt)
 {
 	time_t last_view = Timestamp(pckt->GetArg<uint32_t>(NET_GET_STRUCT_DIFF_LAST_CONNECTION));
 
-	scheduler_queue.Queue(new JobSendChanges(GetID(), last_view));
+	scheduler_queue.Queue(new JobSendChanges(GetID(), last_view - merge_post_lastview_dt ));
 }
 
 void Peer::Handle_net_end_of_diff(struct Packet* pckt)
@@ -294,7 +296,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
 
-	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID()/*, IsMerging()*/, true));
+	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID(), HasFlag(MERGING)));
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
@@ -304,7 +306,7 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 	if(IsClient())
 	{
 		SendMsg(Packet(NET_END_OF_MERGE_ACK));
-		session_cfg.Set("last_view", time(NULL));
+		session_cfg.Set("last_view_" + TypToStr(GetID()), time(NULL));
 	}
 }
 
@@ -431,5 +433,7 @@ bool Peer::Receive()
 
 	HandleMsg(*packet);
 
+	if(!HasFlag(MERGING))
+		session_cfg.Set("last_view_" + TypToStr(GetID()), time(NULL));
 	return false;
 }

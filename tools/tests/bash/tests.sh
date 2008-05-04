@@ -24,6 +24,15 @@ alias valgrind="valgrind --tool=memcheck \
 				--trace-children=yes"
 source "$TESTS/bash/$BINNAME-conf.sh"
 
+function pf_file_stat
+{
+	# Display filename, filetype and filesize
+	stat --print "%n %F %s\n" $*
+
+	# Display permissions as well
+	#stat --print "%n %A %F %g %u %s\n" $*
+}
+
 function start_p2pfs
 {
 	# Arguments:
