@@ -35,6 +35,7 @@ SET(SRC
 	common/ssl/connection.cpp
 	common/ssl/connection_ssl.cpp
 	common/ssl/connection_nossl.cpp
+	common/ssl/crl.cpp
 	common/ssl/pf_ssl_ssl.cpp
 	common/ssl/pf_ssl_nossl.cpp
 	common/ssl/private_key.cpp

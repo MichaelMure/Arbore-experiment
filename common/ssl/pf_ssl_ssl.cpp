@@ -22,10 +22,12 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/err.h>
+#include <openssl/store.h>
 #include "log.h"
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
+#include "crl.h"
 
 SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_file) throw (Certificate::BadCertificate)
 {
@@ -73,7 +75,17 @@ void SslSsl::SetCertificates(SSL_CTX* ctx)
 	// Set trust certificates
 	X509_STORE* st = SSL_CTX_get_cert_store(ctx);
 	X509_STORE_add_cert(st, cacert.GetSSL());
-	// TODO: set the crl
+
+	// Set the crl
+	if(!crl.GetDisabled())
+	{
+		if((ret = X509_STORE_add_crl(st, crl.GetSSL())) <= 0)
+		{
+			std::string str = "CRL:" + std::string(ERR_error_string( ERR_get_error(), NULL));
+			throw Crl::BadCRL(str);
+		}
+		X509_STORE_set_flags(st, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
+	}
 }
 
 SslSsl::~SslSsl()
@@ -82,9 +94,14 @@ SslSsl::~SslSsl()
 
 void SslSsl::ForceDisconnect(SSL* ssl, int fd)
 {
-	SSL_shutdown(ssl);
-	SSL_free(ssl);
-	close(fd);
+	if(ssl)
+	{
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+		ssl = NULL;
+	}
+	if(fd != -1)
+		close(fd);
 }
 
 void SslSsl::CheckPeerCertificate(SSL* ssl)
@@ -98,6 +115,9 @@ void SslSsl::CheckPeerCertificate(SSL* ssl)
 		std::string err = std::string(X509_verify_cert_error_string(ret));
 		throw SslHandshakeFailed(err);
 	}
+
+	// TODO: check wether expiration date checking is needed
+
 	X509* client_cert = SSL_get_peer_certificate (ssl);
 	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
 	log[W_INFO] << "SSL connection established with: " << str;

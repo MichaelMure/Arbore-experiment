@@ -1,3 +1,4 @@
 V	180325051817Z		01	unknown	/C=US/ST=CA/L=SanFrancisco/O=Fort-Funston/CN=key1/emailAddress=me@myhost.mydomain
 V	180325051827Z		02	unknown	/C=US/ST=CA/L=SanFrancisco/O=Fort-Funston/CN=key2/emailAddress=me@myhost.mydomain
 V	180325051843Z		03	unknown	/C=US/ST=CA/L=SanFrancisco/O=Fort-Funston/CN=key3/emailAddress=me@myhost.mydomain
+R	180502102544Z	080504102555Z	04	unknown	/C=US/ST=CA/L=SanFrancisco/O=Fort-Funston/CN=key-revoked/emailAddress=me@myhost.mydomain

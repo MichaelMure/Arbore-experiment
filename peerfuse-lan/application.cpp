@@ -29,6 +29,7 @@
 #include "network.h"
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
+#include "crl.h"
 #include "cache.h"
 #include "log.h"
 #include "pf_file.h"
@@ -70,6 +71,7 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
 	section->AddItem(new ConfigItem_string("ca", "CA certificate path"));
+	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
@@ -138,13 +140,17 @@ int Application::main(int argc, char *argv[])
 		else
 			log[W_INFO] << "I have no ID yet.";
 
+		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
+			crl.Load("../tests/conf/certs/crl.pem");
+		else
+			crl.Disable();
 		net.StartNetwork(&conf);
 
 		umask(0);
 		#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);
 		#else
-		StartThreads();			  /* this function may be called by fuse_main, so without fuse we call it ourselves. */
+		StartThreads();			  /* this function is called by fuse_main, so without fuse we call it ourselves. */
 		while(1) sleep(1);
 
 		// TODO: Catch SIGTERM
@@ -191,6 +197,10 @@ int Application::main(int argc, char *argv[])
 	catch(PrivateKey::BadFile &e)
 	{
 		log[W_ERR] << "Unable to read private key file";
+	}
+	catch(Crl::BadCRL &e)
+	{
+		log[W_ERR] << "Unable to CRL file: " << e.GetString();
 	}
 	catch(Hdd::HddAccessFailure &e)
 	{
