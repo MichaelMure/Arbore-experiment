@@ -458,6 +458,7 @@ def main():
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel='stylesheet' href='http://peerfuse.org/style.css' type='text/css' />
     <link rel="shortcut icon" type="image/png" href="http://peerfuse.org/favicon.png" />
+	<link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http://peerfuse.org/feed.xml" />
     <script type="text/javascript">
 
     function getElementsByClass(searchClass,node,tag) {
