@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# revoke a certificate, regenerate CRL,
+# and verify revocation
+
+CRL="crl.pem"
+
+if [ "$KEY_DIR" ]; then
+    cd "$KEY_DIR"
+
+    # set defaults
+    export KEY_CN=""
+    export KEY_OU=""
+
+    # generate a new CRL -- try to be compatible with
+    # intermediate PKIs
+    openssl ca -gencrl -out "$CRL" -config "$KEY_CONFIG"
+else
+    echo 'Please source the vars script first (i.e. "source ./vars")'
+    echo 'Make sure you have edited it to reflect your configuration.'
+fi
