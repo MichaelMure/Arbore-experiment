@@ -22,10 +22,12 @@
 #include <string>
 #include <openssl/x509.h>
 #include "pf_exception.h"
+#include "pf_thread.h"
 
-class Crl
+class Crl /* : public Thread */
 {
-	std::string filename;
+	std::string path;
+	std::string url;
 	X509_CRL* crl;
 	bool disabled;
 public:
@@ -37,12 +39,16 @@ public:
 		public:
 			BadCRL(std::string err) : StrException(err) {}
 	};
+	class DownloadFailed : public std::exception {};
 
-	void Load(std::string _path);
+	void Set(std::string _path, std::string _url) { path = _path; url = _url; }
+	void Load();
 
 	X509_CRL* GetSSL() { return crl; }
 	void Disable() { disabled = true; }
 	bool GetDisabled() const { return disabled; }
+
+	void Loop();
 };
 
 extern Crl crl;

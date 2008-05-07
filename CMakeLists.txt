@@ -3,6 +3,7 @@ PROJECT(peerfuse)
 SET(SRC
 	common/cache_base.cpp
 	common/content_list_base.cpp
+	common/download.cpp
 	common/hdd.cpp
 	common/file_chunk.cpp
 	common/file_content_base.cpp
@@ -112,23 +113,33 @@ ENDIF(PF_NET)
 
 ADD_EXECUTABLE(${BIN_NAME} ${SRC})
 
+## OpenSSL
+SET(OpenSSL_FIND_REQUIRED TRUE)
 FIND_PACKAGE(OpenSSL)
 
-## Server mode disables fuse export
+## Fuse package, when server mode is disabled
 IF(NOT PF_SERVER_MODE)
 	INCLUDE(FindFuse.cmake)
 	IF(NOT FUSE_FOUND)
 		MESSAGE(FATAL_ERROR "Unable to find Fuse library")
 		MESSAGE(FATAL_ERROR "")
 	ELSE(NOT FUSE_FOUND)
-		MESSAGE(STATUS "Found Fuse library")
+		MESSAGE(STATUS "Found Fuse: ${FUSE_LINK_DIR} ${FUSE_LDFLAGS}")
 	ENDIF(NOT FUSE_FOUND)
 ENDIF(NOT PF_SERVER_MODE)
 
-INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR}
+## LibCurl
+SET(CURL_FIND_REQUIRED TRUE)
+FIND_PACKAGE(CURL)
+IF(CURL_FOUND)
+	MESSAGE(STATUS "Found Curl: ${CURL_LIBRARIES}")
+ENDIF(CURL_FOUND)
+
+
+INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS}
 	"${BIN_NAME}/" "common/" "common/fuse" "common/jobs" "common/ssl")
 LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LINK_DIR})
-TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES})
+TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES})
 
 
 SET(CMAKE_BUILD_TYPE ${BUILD})

@@ -72,6 +72,7 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
 	section->AddItem(new ConfigItem_string("ca", "CA certificate path"));
 	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
+	section->AddItem(new ConfigItem_string("crl_url", "URL of the crl"));
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
@@ -141,7 +142,18 @@ int Application::main(int argc, char *argv[])
 			log[W_INFO] << "I have no ID yet.";
 
 		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
-			crl.Load("../tests/conf/certs/crl.pem");
+		{
+			crl.Set(conf.GetSection("hdd")->GetItem("workdir")->String() + "/crl.pem",
+				conf.GetSection("ssl")->GetItem("crl_url")->String());
+			try
+			{
+				crl.Load();
+			}
+			catch(...)
+			{
+				log[W_ERR] << "Failed to download the crl.";
+			}
+		}
 		else
 			crl.Disable();
 		net.StartNetwork(&conf);

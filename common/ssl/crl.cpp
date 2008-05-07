@@ -22,10 +22,11 @@
 #include <openssl/safestack.h>
 #include "crl.h"
 #include "log.h"
+#include "download.h"
 
 Crl crl;
 
-Crl::Crl() : filename(""), crl(NULL), disabled(false)
+Crl::Crl() : path(""), crl(NULL), disabled(false)
 {
 }
 
@@ -34,9 +35,14 @@ Crl::~Crl()
 
 }
 
-void Crl::Load(std::string _filename)
+void Crl::Load()
 {
-	log[W_INFO] << "Loading CRL file : \"" << _filename << "\".";
+	if(!download.Get(url.c_str(), path.c_str()))
+	{
+		log[W_INFO] << "CRL download failed";
+		throw DownloadFailed();
+	}
+	log[W_INFO] << "Loading CRL file : \"" << path << "\".";
 
 	if(crl)
 	{
@@ -45,7 +51,7 @@ void Crl::Load(std::string _filename)
 	}
 
 	// TODO: simplify-me with openssl's BIO
-	FILE* f = fopen(_filename.c_str(), "r");
+	FILE* f = fopen(path.c_str(), "r");
 	if(!f)
 		throw BadCRL(std::string(strerror(errno)));
 
@@ -74,5 +80,9 @@ void Crl::Load(std::string _filename)
 
 	char* str = X509_NAME_oneline (X509_CRL_get_issuer (crl), 0, 0);
 	log[W_INFO] << "CRL issued by: " << str;
-	filename = _filename;
+}
+
+void Crl::Loop()
+{
+
 }
