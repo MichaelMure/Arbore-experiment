@@ -94,7 +94,8 @@ void NetworkBase::RemovePeer(int fd, bool try_reconnect)
 {
 	BlockLockMutex lock(this);
 
-	Peer* p = peers_list.Remove(fd);
+	Peer* p;
+	peers_list.Pop(fd, &p);
 	content_list.RemovePeerRefs(p->GetID());
 	content_list.DelReferer(p->GetID());
 
@@ -269,10 +270,18 @@ pf_addr NetworkBase::MakeAddr(const std::string& hostname, uint16_t port)
 	return addr;
 }
 
-Peer* NetworkBase::Connect(pf_addr addr)
+void NetworkBase::Connect(pf_addr addr)
 {
 	BlockLockMutex lock(this);
 	assert(ssl);
+
+#if 0
+	if(addr.id)
+	{
+		BlockLock net_lock(&peers_list);
+		Peer* p =
+	}
+#endif
 
 	/* Socket creation
 	 * Note: during initialisation, as = {0} isn't compatible everywhere, we set it to
@@ -315,10 +324,9 @@ Peer* NetworkBase::Connect(pf_addr addr)
 		throw CantConnectTo(errno, addr);
 	}
 
-	Peer* p = AddPeer(new Peer(addr, conn, Peer::SERVER));
+	AddPeer(new Peer(addr, conn, Peer::SERVER));
 
 	DelDisconnected(addr);
-	return p;
 }
 
 void NetworkBase::Listen(uint16_t port, const char* bindaddr) throw(CantOpenSock, CantListen)

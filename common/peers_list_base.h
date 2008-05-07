@@ -36,6 +36,9 @@ protected:
 
 	Peer* PeerFromFD(int fd);
 
+	/** Remove a peer from list.
+	 * It will *NOT* delete peer!
+	 */
 	virtual Peer* RemovePeer(Peer* p);
 
 public:
@@ -43,32 +46,54 @@ public:
 	virtual ~PeersListBase();
 
 	unsigned int Size() const { return size(); }
+
+	/** Add a peer to list */
 	void Add(Peer* p);
-	void Erase(int fd);		  /* Remove the peer from the list and erase it */
-	Peer* Remove(int fd);		  /* Remove the peer from the list */
+
+	/** Remove a peer from the list and delete it. */
+	void Erase(int fd);
+
+	/** Remove a peer from the list and get it. */
+	void Pop(int fd, Peer** pop);
+
+	/** Flush messages to a peer. */
 	void PeerFlush(int fd);
+
+	/** Receive messages from a peer. */
 	bool PeerReceive(int fd);
 
+	/** Close all connections. */
 	void CloseAll();
 
-	/* This status variable can be used to know if list has changed. */
+	/** This status variable can be used to know if list has changed. */
 	bool IsChanged() const;
 	void ClearChanged();
 
-	/* Broadcast a packet to everybody.
+	/** Broadcast a packet to everybody.
 	 * If but_one != NULL, do not send a packet to him.
 	 */
 	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) const = 0;
 
-	/* Create an ID not used by any other peer in network */
+	/** Create an ID not used by any other peer in network */
 	pf_id CreateID();
 
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id) const;
+
+	/** Send a message to a peer */
 	void SendMsg(pf_id id, const Packet &p) const;
+
+	/** Send a message to a list of peers. */
 	void SendMsg(IDList ids, const Packet &p) const;
 
+	/** Request a file chunk to a peer. */
 	void RequestChunk(std::string filename, pf_id id, off_t offset, size_t size);
+
+	/** Send a file chunk to a peer.
+	 * @param ref reference of this file request.
+	 * @param id ID of peer
+	 * @param chunk file chunk
+	 */
 	void SendChunk(uint32_t ref, pf_id id, FileChunk& chunk);
 };
 #endif

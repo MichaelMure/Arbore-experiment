@@ -64,12 +64,15 @@ private:
 protected:
 	Ssl *ssl;
 
-	void RemovePeer(int fd, bool try_reconnect = true);
 
 	void Listen(uint16_t port, const char* bind) throw (CantOpenSock, CantListen);
 	void CloseAll();
 	void Loop();
 	void OnStop();
+
+	/** Add a peer on network */
+	virtual Peer* AddPeer(Peer* peer);
+	void RemovePeer(int fd, bool try_reconnect = true);
 
 	void AddDisconnected(const pf_addr& addr);
 	void DelDisconnected(const pf_addr& addr);
@@ -79,7 +82,7 @@ public:
 	NetworkBase();
 	virtual ~NetworkBase();
 
-	virtual Peer* AddPeer(Peer* peer);
+	/** Virtual method called when a peer is removed. */
 	virtual void OnRemovePeer(Peer* peer) {}
 
 	/* Read configuration and start listener, and connect to other servers */
@@ -91,6 +94,6 @@ public:
 
 	/* Connect to a pf_addr.
 	 */
-	virtual Peer* Connect(pf_addr addr);
+	virtual void Connect(pf_addr addr);
 };
 #endif

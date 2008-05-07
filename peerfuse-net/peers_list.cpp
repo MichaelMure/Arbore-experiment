@@ -154,6 +154,8 @@ std::vector<pf_addr> PeersList::RemoveDownLinks(Peer* p)
 		/* Do not call our RemovePeer() because it would call
 		 * RemoveDownLinks() and it can crash. */
 		PeersListBase::RemovePeer(*it);
+
+		delete *it;
 	}
 
 	/* This addr is used by Network::OnRemove() to trying to
@@ -215,5 +217,9 @@ void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 
 bool PeersList::IsIDOnNetwork(pf_id id)
 {
-	return PeerFromID(id);
+	Peer* p = PeerFromID(id);
+
+	log[W_DEBUG] << "PeersList::IsIDOnNetwork(" << id << ") = " << (p ? "true" : "false");
+
+	return !!p;
 }

@@ -68,9 +68,15 @@ Peer* PeersListBase::PeerFromID(pf_id id) const
 		&& !(*it)->IsAnonymous()
 		#endif
 		; ++it)
-	;
+	{
+	}
 
-	return (it != end() ? *it : NULL);
+	Peer* p = NULL;
+
+	if(it != end())
+		p = *it;
+
+	return p;
 }
 
 // Public methods
@@ -92,6 +98,8 @@ Peer* PeersListBase::RemovePeer(Peer* p)
 	if(it == end())
 		return NULL;
 
+	log[W_DEBUG] << "Removing peer from list: " << p->GetID();
+
 	erase(it);
 	if(p->IsConnection())
 	{
@@ -105,25 +113,25 @@ Peer* PeersListBase::RemovePeer(Peer* p)
 	return p;
 }
 
-Peer* PeersListBase::Remove(int fd)
+void PeersListBase::Pop(int fd, Peer** p)
 {
 	BlockLockMutex lock(this);
 	PeerMap::iterator it = fd2peer.find(fd);
 	Peer* peer = NULL;
 	if(it != fd2peer.end())
 	{
-		peer = it->second;
+		peer = RemovePeer(it->second);
 		log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << peer->GetID() << ")";
-		RemovePeer(peer);
 	}
 
-	return peer;
+	*p = peer;
 }
 
 void PeersListBase::Erase(int fd)
 {
 	BlockLockMutex lock(this);
-	Peer* p = Remove(fd);
+	Peer* p;
+	Pop(fd, &p);
 	delete p;
 }
 
