@@ -60,16 +60,13 @@ Peer* PeersListBase::PeerFromID(pf_id id) const
 	if(!id) return NULL;
 
 	BlockLockMutex lock(this);
-	const_iterator it;
-	for(it = begin();
-		it != end() &&
-		(*it)->GetID() != id
-		#ifdef PF_NET
+	const_iterator it = begin();
+	while(it != end() && (*it)->GetID() != id
+#ifdef PF_NET
 		&& !(*it)->IsAnonymous()
-		#endif
-		; ++it)
-	{
-	}
+#endif
+	     )
+		++it;
 
 	Peer* p = NULL;
 
