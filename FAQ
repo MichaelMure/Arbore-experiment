@@ -1,0 +1,22 @@
+Q: What are the differences between Peerfuse-net and Peerfuse-lan ?
+A: Peerfuse implements two different distributed filesystems: Peerfuse-net and Peerfuse-lan. The two of them share many code, but have key differences.
+Peerfuse-net is intended to be used in a community of users that wants to share some files, where the user handles administration tasks by itself, chooses which other user can read his files, modify them... Peerfuse-net also implements message routing over peers to let people behind NAT routers access the filesystem's network transparently.
+Peerfuse-lan is more oriented towards LAN usage, but can still be used safely on Internet. Peerfuse-lan manages file permissions differently than Peerfuse-net; it uses a more traditional way like other network filesystems, where Unix accounts tell who can read/modify what files. The network part is simplified, each peer must be able to contact other peers (that is subject to change).
+
+Q: What are the differences with other distributed filesystems, and with other P2P softwares ?
+A: Peerfuse is a peer to peer filesystem totally decentralized, that means that unlike most other distributed filesystem all computer runs the same software, it's much less subject to service outage, and storage space on usual clients is not wasted.
+Peerfuse uses the now standard libfuse to implement its filesystem, which means no module compilation is needed to make it work. An other advantage of Peerfuse is to be really simple to setup.
+Compared to classical P2P software, Peerfuse mainly brings instantaneous file reading. There is no need to wait for hours before the file is downloaded, as soon as someone copies a file to the filesystem, it's available to everybody on the network. Peerfuse will also make new files automatically copied to other peers to increase their availability.
+
+Q: What is the current state of the project ?
+A: Peerfuse is quite new of focuses on implementing basic features. It doesn't handle file permissions, file replication is not yet ready, the local cache has no size limitation... But the current code base is clean and those feature won't take long to be added. We also try to make our code damn stable and ensure it is by using common free software tools like buildbot (http://bb.peerfuse.org/) to perform automated tests. We also have some tests at compilation time and automated performance tests are planned when to project becomes a bit more mature.
+More importantly, the project is really active. Drop by #peerfuse on irc.freenode.net if you want to be convinced. :)
+
+Q: Is it safe ?
+A: Peerfuse is written with security in mind and should be fairly safe. Public key encryption is used for every message transmitted, authentication is performed using standards X509 certficates. As of version 0.1, we know Peerfuse is subject to some DOS attacks, which we'll be resolved for the next version. Since the version 0.1 is only meant as a demo release and doesn't present enough feature to be used in a production environment, we don't consider it as harmful.
+
+Q: How are files stored ?
+A: File storing is not really advanced yet. Currently, when someone writes a file, it is stored locally. As soon as someone wants to read this file, it is retrieved from the peers that have this file.
+
+If you have some question let unanswered by this FAQ, feel free to ask them peerfuse@peerfuse.org .
+
