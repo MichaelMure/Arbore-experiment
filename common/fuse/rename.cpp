@@ -43,6 +43,10 @@
 
 int pf_rename(const char *path, const char* new_path)
 {
+	/* TODO: support file renames. */
+	return -ENOSYS;
+
+	#if 0
 	try
 	{
 		cache.RenameFile(path, new_path);
@@ -57,4 +61,5 @@ int pf_rename(const char *path, const char* new_path)
 	}
 
 	return 0;
+	#endif
 }
