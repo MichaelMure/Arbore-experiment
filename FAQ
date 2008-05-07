@@ -29,7 +29,7 @@ to increase their availability.
 
 Q: What is the current state of the project?
 
-A: Peerfuse is quite new of focuses on implementing basic features. It doesn't
+A: Peerfuse is quite new and currently focuses on implementing basic features. It doesn't
 handle file permissions, file replication is not yet ready, the local cache
 has no size limitation... But the current code base is clean and those feature
 won't take long to be added. We also try to make our code damn stable and ensure
