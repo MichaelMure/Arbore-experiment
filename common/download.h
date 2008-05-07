@@ -34,4 +34,3 @@ public:
 
 extern Download download;
 #endif
-

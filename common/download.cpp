@@ -55,13 +55,12 @@ bool Download::Get(const char* url, const char* save_as)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Peerfuse");
-//	curl_easy_setopt(curl, CURLOPT_PROXY, "address");
-//	curl_easy_setopt(curl, CURLOPT_PROXYPORT, 3128);
-	
-	
+	//	curl_easy_setopt(curl, CURLOPT_PROXY, "address");
+	//	curl_easy_setopt(curl, CURLOPT_PROXYPORT, 3128);
+
 	CURLcode r = curl_easy_perform(curl);
 	fclose(fd);
-	
+
 	if(r == CURLE_HTTP_RETURNED_ERROR)
 	{
 		long http_error = 0;

@@ -24,7 +24,7 @@
 #include "pf_exception.h"
 #include "pf_thread.h"
 
-class Crl /* : public Thread */
+class Crl					  /* : public Thread */
 {
 	std::string path;
 	std::string url;
