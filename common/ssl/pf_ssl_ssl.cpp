@@ -29,7 +29,7 @@
 #include "connection_ssl.h"
 #include "crl.h"
 
-SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_file) throw (Certificate::BadCertificate)
+SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_file)
 {
 	// TODO: handle return codes
 	SSL_load_error_strings();
@@ -79,12 +79,19 @@ void SslSsl::SetCertificates(SSL_CTX* ctx)
 	// Set the crl
 	if(!crl.GetDisabled())
 	{
-		if((ret = X509_STORE_add_crl(st, crl.GetSSL())) <= 0)
+		EVP_PKEY *pkey = X509_get_pubkey(cacert.GetSSL());
+
+		// Check the crl's validity
+		if((X509_CRL_verify(crl.GetSSL(), pkey) <= 0)
+		// Load the crl in the certificate store
+		|| (ret = X509_STORE_add_crl(st, crl.GetSSL())) <= 0)
 		{
 			std::string str = "CRL:" + std::string(ERR_error_string( ERR_get_error(), NULL));
+			EVP_PKEY_free(pkey);
 			throw Crl::BadCRL(str);
 		}
 		X509_STORE_set_flags(st, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
+		EVP_PKEY_free(pkey);
 	}
 }
 

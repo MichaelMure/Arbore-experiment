@@ -45,7 +45,7 @@ public:
 			SslHandshakeFailed(std::string err) : StrException(err) {}
 	};
 
-	SslSsl(std::string cert, std::string key, std::string ca) throw (Certificate::BadCertificate);
+	SslSsl(std::string cert, std::string key, std::string ca);
 	~SslSsl();
 
 	Certificate GetCertificate() const { return cert; }

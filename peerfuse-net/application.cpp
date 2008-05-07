@@ -138,14 +138,48 @@ int Application::main(int argc, char *argv[])
 			{
 				crl.Load();
 			}
+			catch(Crl::BadCRL &e)
+			{
+				log[W_ERR] << "Failed to load the crl: "<< e.GetString();
+				exit(EXIT_FAILURE);
+			}
 			catch(...)
 			{
-				log[W_ERR] << "Failed to download the crl.";
+				log[W_ERR] << "Failed to load the crl.";
+				exit(EXIT_FAILURE);
 			}
 		}
 		else
 			crl.Disable();
-		net.StartNetwork(&conf);
+		try
+		{
+			net.StartNetwork(&conf);
+		}
+		catch(Certificate::BadCertificate &e)
+		{
+			log[W_ERR] << "Unable to read certificate: " << e.GetString();
+			exit(EXIT_FAILURE);
+		}
+		catch(Certificate::BadFile &e)
+		{
+			log[W_ERR] << "Unable to read certificate file";
+			exit(EXIT_FAILURE);
+		}
+		catch(PrivateKey::BadPrivateKey &e)
+		{
+			log[W_ERR] << "Unable to read priveate key: " << e.GetString();
+			exit(EXIT_FAILURE);
+		}
+		catch(PrivateKey::BadFile &e)
+		{
+			log[W_ERR] << "Unable to read private key file";
+			exit(EXIT_FAILURE);
+		}
+		catch(Crl::BadCRL &e)
+		{
+			log[W_ERR] << "Unable to CRL file: " << e.GetString();
+			exit(EXIT_FAILURE);
+		}
 
 		cache.UpdateRespFiles();
 
@@ -184,26 +218,6 @@ int Application::main(int argc, char *argv[])
 		 * an other server, or I wait alone..
 		 */
 		log[W_ERR] << "Unable to resolve hostname, exiting..";
-	}
-	catch(Certificate::BadCertificate &e)
-	{
-		log[W_ERR] << "Unable to read certificate: " << e.GetString();
-	}
-	catch(Certificate::BadFile &e)
-	{
-		log[W_ERR] << "Unable to read certificate file";
-	}
-	catch(PrivateKey::BadPrivateKey &e)
-	{
-		log[W_ERR] << "Unable to read priveate key: " << e.GetString();
-	}
-	catch(PrivateKey::BadFile &e)
-	{
-		log[W_ERR] << "Unable to read private key file";
-	}
-	catch(Crl::BadCRL &e)
-	{
-		log[W_ERR] << "Unable to CRL file: " << e.GetString();
 	}
 	catch(Hdd::HddAccessFailure &e)
 	{
