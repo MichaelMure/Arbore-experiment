@@ -64,7 +64,6 @@ private:
 protected:
 	Ssl *ssl;
 
-
 	void Listen(uint16_t port, const char* bind) throw (CantOpenSock, CantListen);
 	void CloseAll();
 	void Loop();
