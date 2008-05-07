@@ -83,8 +83,8 @@ void SslSsl::SetCertificates(SSL_CTX* ctx)
 
 		// Check the crl's validity
 		if((X509_CRL_verify(crl.GetSSL(), pkey) <= 0)
-		// Load the crl in the certificate store
-		|| (ret = X509_STORE_add_crl(st, crl.GetSSL())) <= 0)
+			// Load the crl in the certificate store
+			|| (ret = X509_STORE_add_crl(st, crl.GetSSL())) <= 0)
 		{
 			std::string str = "CRL:" + std::string(ERR_error_string( ERR_get_error(), NULL));
 			EVP_PKEY_free(pkey);
