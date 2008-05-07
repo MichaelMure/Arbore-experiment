@@ -73,14 +73,14 @@ Peer* Network::AddPeer(Peer* peer)
 
 	p = NetworkBase::AddPeer(peer);
 
-#ifdef DEBUG
+	#ifdef DEBUG
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 
 	log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
 		log[W_INFO] << *it;
-#endif
+	#endif
 
 	return p;
 
@@ -88,14 +88,14 @@ Peer* Network::AddPeer(Peer* peer)
 
 void Network::OnRemovePeer(Peer* peer)
 {
-#ifdef DEBUG
+	#ifdef DEBUG
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 
 	log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
 		log[W_INFO] << *it;
-#endif
+	#endif
 
 	if(!peer->IsHighLink() || peer->IsAnonymous())
 		return;

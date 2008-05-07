@@ -278,7 +278,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	{
 		case PeersList::IS_ON_NETWORK:
 		case PeersList::IS_CONNECTED:
-			return; /* We are already connected to him. */
+			return;			  /* We are already connected to him. */
 		case PeersList::IS_UNKNOWN:
 			break;
 	}
