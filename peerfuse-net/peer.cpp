@@ -271,8 +271,14 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	uint32_t now = msg->GetArg<uint32_t>(NET_PEER_CONNECTION_NOW);
 	Certificate cert = msg->GetArg<Certificate>(NET_PEER_CONNECTION_CERTIFICATE);
 
-	if(peers_list.IsIDOnNetwork(addr.id))
-		return;				  /* I'm already connected to him. */
+	switch(peers_list.WhatIsThisID(addr.id))
+	{
+		case PeersList::IS_ON_NETWORK:
+		case PeersList::IS_CONNECTED:
+			return; /* We are already connected to him. */
+		case PeersList::IS_UNKNOWN:
+			break;
+	}
 
 	Peer* p = new Peer(addr, NULL, 0, GetID());
 	p->SetTimestampDiff(now);

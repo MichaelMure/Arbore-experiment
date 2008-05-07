@@ -79,6 +79,23 @@ Peer* PeersListBase::PeerFromID(pf_id id) const
 	return p;
 }
 
+PeersListBase::id_state_t PeersListBase::WhatIsThisID(pf_id id)
+{
+        Peer* p = PeerFromID(id);
+	enum id_state_t id_state;
+
+	if(!p)
+		id_state = IS_UNKNOWN;
+	else if(p->IsConnection())
+		id_state = IS_CONNECTED;
+	else
+		id_state = IS_ON_NETWORK;
+
+        log[W_DEBUG] << "PeersList::WhatIsThisID(" << id << ") = " << id_state;
+
+        return id_state;
+}
+
 // Public methods
 void PeersListBase::Add(Peer* p)
 {

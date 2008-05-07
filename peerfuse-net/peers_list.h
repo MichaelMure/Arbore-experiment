@@ -43,7 +43,6 @@ public:
 	 */
 	std::vector<pf_addr> RemoveDownLinks(Peer* p);
 
-	bool IsIDOnNetwork(pf_id id);
 	/** Return a list of connected high linkes */
 	StaticPeersList GetDirectHighLinks() const;
 

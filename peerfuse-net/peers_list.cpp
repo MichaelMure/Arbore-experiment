@@ -214,12 +214,3 @@ void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 		(*it) != but_one)
 			(*it)->SendMsg(pckt);
 }
-
-bool PeersList::IsIDOnNetwork(pf_id id)
-{
-	Peer* p = PeerFromID(id);
-
-	log[W_DEBUG] << "PeersList::IsIDOnNetwork(" << id << ") = " << (p ? "true" : "false");
-
-	return !!p;
-}

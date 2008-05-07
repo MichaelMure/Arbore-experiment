@@ -275,13 +275,8 @@ void NetworkBase::Connect(pf_addr addr)
 	BlockLockMutex lock(this);
 	assert(ssl);
 
-	#if 0
-	if(addr.id)
-	{
-		BlockLock net_lock(&peers_list);
-		Peer* p =
-	}
-	#endif
+	if(addr.id && peers_list.WhatIsThisID(addr.id) == PeersListBase::IS_CONNECTED)
+		return;
 
 	/* Socket creation
 	 * Note: during initialisation, as = {0} isn't compatible everywhere, we set it to

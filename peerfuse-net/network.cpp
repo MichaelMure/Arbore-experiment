@@ -54,20 +54,33 @@ Peer* Network::AddPeer(Peer* peer)
 {
 	Peer* p;
 
-	if(!peers_list.IsIDOnNetwork(peer->GetID()))
-		peer->SetHighLink(peer);
+	switch(peers_list.WhatIsThisID(peer->GetID()))
+	{
+		case PeersList::IS_CONNECTED:
+			log[W_WARNING] << "A peer (" << peer->GetAddr() << ") wants to connect to me but someone with the same ID is already connected";
+			delete peer;
+			return NULL;
+		case PeersList::IS_UNKNOWN:
+			peer->SetHighLink(true);
+			break;
+		case PeersList::IS_ON_NETWORK:
+			peer->SetHighLink(false);
+			break;
+	}
 
 	if(peer->HasFlag(Peer::SERVER))
 		peer->SendHello();
 
 	p = NetworkBase::AddPeer(peer);
 
+#ifdef DEBUG
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 
 	log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
 		log[W_INFO] << *it;
+#endif
 
 	return p;
 
@@ -75,6 +88,15 @@ Peer* Network::AddPeer(Peer* peer)
 
 void Network::OnRemovePeer(Peer* peer)
 {
+#ifdef DEBUG
+	std::vector<std::string> list;
+	peers_list.GetMapOfNetwork(list);
+
+	log[W_INFO] << "Network map:";
+	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
+		log[W_INFO] << *it;
+#endif
+
 	if(!peer->IsHighLink() || peer->IsAnonymous())
 		return;
 
