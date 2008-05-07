@@ -7,8 +7,8 @@ Piggledy:
 - Documentation
 - Website: FAQ, Warning, doc
 - Store the version number in the session.cfg to cleanly exit if an uupgrade is not compatible
-- CRL handling
-- comply with OpenSSL license
+- CRL handling [DONE]
+- comply with OpenSSL license [DONE]
 - implement rename() (0.2 ?)
 - add a release compilation target
 
