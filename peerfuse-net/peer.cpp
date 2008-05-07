@@ -271,6 +271,9 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	uint32_t now = msg->GetArg<uint32_t>(NET_PEER_CONNECTION_NOW);
 	Certificate cert = msg->GetArg<Certificate>(NET_PEER_CONNECTION_CERTIFICATE);
 
+	/* TODO: Check remote certificate to NOT allow an other peer to introduce a fake peer
+	 * with an unvalid certificate. */
+
 	switch(peers_list.WhatIsThisID(addr.id))
 	{
 		case PeersList::IS_ON_NETWORK:
