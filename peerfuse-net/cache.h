@@ -61,7 +61,7 @@ class Cache : public CacheBase
 	virtual FileList GetAllFiles();
 
 	/* SetAttr of file, use this method when you already have FileEntry* and Peer* objects */
-	void _set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers);
+	void _set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers, bool keep_newest = true, bool erase_on_modification = false);
 
 public:
 
@@ -70,7 +70,7 @@ public:
 
 	void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0);
 	void RmFile(std::string path);
-	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true);
+	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true, bool erase_on_modification = false);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 	void AddSharer(std::string path, pf_id sender);
 

@@ -300,7 +300,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
 
-	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID(), HasFlag(MERGING)));
+	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID(), HasFlag(MERGING),environment.merging.Get()));
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)

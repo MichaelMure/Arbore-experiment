@@ -94,7 +94,7 @@ public:
 
 	virtual void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0) = 0;
 	virtual void RmFile(std::string path) = 0;
-	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true) = 0;
+	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true, bool erase_on_modification = false) = 0;
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0) = 0;
 
 	void Write(std::string path, const char* buf, size_t size, off_t offset);

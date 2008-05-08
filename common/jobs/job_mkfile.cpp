@@ -29,7 +29,7 @@ bool JobMkFile::Start()
 {
 	try
 	{
-		cache.SetAttr(file, stat, sharers, sender, keep_newest);
+		cache.SetAttr(file, stat, sharers, sender, keep_newest, erase_on_modification);
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{

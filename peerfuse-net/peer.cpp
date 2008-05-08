@@ -325,7 +325,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 	IDList sharers = msg->GetArg<IDList>(NET_MKFILE_SHARERS);
 
-	scheduler_queue.Queue(new JobMkFile(filename, stat, sharers, GetID(), /* keep_newest */ true));
+	scheduler_queue.Queue(new JobMkFile(filename, stat, sharers, GetID(), /* keep_newest */ true, /* erase_on_modification */ true));
 }
 
 /** NET_LS_DIR

@@ -199,7 +199,7 @@ void Cache::RmFile(std::string path)
 
 }
 
-void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest)
+void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex lock(this);
 	Peer* peer = 0;
@@ -217,7 +217,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	_set_attr(file, stat, peer, sharers);
 }
 
-void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers)
+void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex cache_lock(this);
 	BlockLockMutex peer_lock(&peers_list);
@@ -246,9 +246,24 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
+		else
+		if(erase_on_modification)
+		{
+			FileContent& file_content = content_list.GetFile(file->GetFullName());
+			file_content.Truncate(0);
+		}
+		else
+		if(stat.size < file->GetAttr().size)
+		{
+			FileContent& file_content = content_list.GetFile(file->GetFullName());
+			file_content.Truncate(stat.size);
+		}
+
 	}
 	else
+	{
 		stat.meta_mtime = time(NULL);
+	}
 
 	log[W_DEBUG] << "Updating file.";
 

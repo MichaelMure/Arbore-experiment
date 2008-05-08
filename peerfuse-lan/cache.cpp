@@ -169,15 +169,29 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		peers_list.Broadcast(CreateMkFilePacket(f));
 }
 
-void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest)
+void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
 	if(!f)
 		throw NoSuchFileOrDir();
 
-	if(stat.meta_mtime >= f->GetAttr().meta_mtime)
+	if(stat.meta_mtime >= f->GetAttr().meta_mtime || !keep_newest)
+	{
+		if(erase_on_modification)
+		{
+			FileContent& file = content_list.GetFile(path);
+			file.Truncate(0);
+		}
+		else
+		if(stat.size < f->GetAttr().size)
+		{
+			FileContent& file = content_list.GetFile(path);
+			file.Truncate(stat.size);
+		}
+
 		f->SetAttr(stat);
+	}
 	else
 		log[W_DEBUG] << "Won't update stats";
 
