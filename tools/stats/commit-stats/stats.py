@@ -427,7 +427,7 @@ def main():
     else:
         output = ''
 
-    weekday2name = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    weekday2name = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
     users = {}
     dates = {}
