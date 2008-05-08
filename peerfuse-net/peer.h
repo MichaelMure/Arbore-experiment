@@ -37,6 +37,22 @@ typedef std::vector<Peer*> StaticPeersList;
 
 class Peer : public PeerBase
 {
+public:
+	/* Exceptions */
+
+	class CreateLowLinkConnection : std::exception
+	{
+	public:
+		int fd;
+		pf_id id;
+
+		CreateLowLinkConnection(int _fd, pf_id _id)
+			: fd(_fd), id(_id)
+		{
+		}
+	};
+
+private:
 	/* Network is representer for me like this:
 	 *  me
 	 *  |- direct downpeer1

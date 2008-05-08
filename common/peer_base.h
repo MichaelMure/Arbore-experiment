@@ -70,6 +70,7 @@ public:
 
 	bool IsConnection() const { return !!conn; }
 	void SetConnection(Connection* _conn) { conn = _conn; }
+	Connection* GetConnection() const { return conn; }
 	int GetFd() const { return conn ? conn->GetFd() : -1; }
 	pf_addr GetAddr() const { return addr; }
 

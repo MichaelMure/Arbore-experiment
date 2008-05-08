@@ -186,21 +186,36 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 	DelFlag(ANONYMOUS);
 
-	if(IsLowLink())
+	switch(peers_list.WhatIsThisID(addr.id))
 	{
-		BlockLockMutex net_lock(&peers_list);
-		Peer* p = peers_list.PeerFromID(addr.id);
-		if(p)
-		{
-			/* Already a connection from this peer, disallow
-			 * a second connection */
-			if(p->IsConnection())
+		case PeersList::IS_CONNECTED:
+			if(IsLowLink())
+			{
+				log[W_WARNING] << "Lowlink connection from " << addr << " which is a peer already connected";
 				throw MustDisconnect();
-
-			/* We want to switch connection to the other Peer object. */
-			SetFlag(ANONYMOUS);
-			p->SetConnection(conn);
+			}
+			/* Do not break here because for highlinks this is the
+			 * same treatment than IS_ON_NETWORK. */
+		case PeersList::IS_ON_NETWORK:
+		{
+			/* We disallow a highlink connection from someone which
+			 * is already on network */
+			if(IsHighLink())
+			{
+				throw MustDisconnect();
+				log[W_WARNING] << "Highlink connection from " << addr << " which is a peer already on network";
+			}
+			else
+			{
+				/* Lowlink, so as there is already a Peer object associated to this ID, we mark it
+				 * as anonymous to catch it at the end of this function, and raise an exception to
+				 * tell Network to change Connection objet to the other Peer object.
+				 */
+				SetFlag(ANONYMOUS);
+			}
 		}
+		case PeersList::IS_UNKNOWN:
+			break;
 	}
 
 	/* If this is a client, we answer an HELLO message. */
@@ -224,15 +239,12 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		peers_list.Broadcast(pckt, this);  /* Don't send to this peer a creation message about him! */
 	}
 
-	/* if we reset flags to anonymous above, we switch the Connection object to an other
-	 * Peer object. So we ask Network to remove this object.
+	/* if we reset flags to anonymous above, want to associate peer connection
+	 * to the real Peer object.
+	 * We tell Network to do it.
 	 */
 	if(IsAnonymous())
-	{
-		conn = NULL;
-
-		throw MustDisconnect();
-	}
+		throw CreateLowLinkConnection(GetFd(), GetID());
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)

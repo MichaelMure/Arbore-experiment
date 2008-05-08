@@ -56,6 +56,8 @@ public:
 	void SendPeerList(Peer* to) const;
 
 	void GetMapOfNetwork(std::vector<std::string> &list, Peer* from = 0, std::string prefix = "") const;
+
+	void PeerSetConnection(pf_id id, int fd);
 };
 
 extern PeersList peers_list;

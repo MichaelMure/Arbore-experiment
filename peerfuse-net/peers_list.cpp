@@ -207,6 +207,27 @@ void PeersList::EraseFromID(pf_id id)
 	delete p;
 }
 
+void PeersList::PeerSetConnection(pf_id id, int fd)
+{
+	BlockLockMutex lock(this);
+
+	Peer* anonymous = PeerFromFD(fd);
+	Peer* lowlink = PeerFromID(id);
+
+	if(!anonymous)
+		return;
+
+	if(!lowlink)
+	{
+		Erase(fd);
+		return;
+	}
+
+	lowlink->SetConnection(anonymous->GetConnection());
+	anonymous->SetConnection(NULL);
+	RemovePeer(anonymous);
+}
+
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 {
 	BlockLockMutex lock(&peers_list);
