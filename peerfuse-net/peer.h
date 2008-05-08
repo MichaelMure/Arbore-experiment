@@ -42,14 +42,14 @@ public:
 
 	class CreateLowLinkConnection : std::exception
 	{
-	public:
-		int fd;
-		pf_id id;
+		public:
+			int fd;
+			pf_id id;
 
-		CreateLowLinkConnection(int _fd, pf_id _id)
-			: fd(_fd), id(_id)
-		{
-		}
+			CreateLowLinkConnection(int _fd, pf_id _id)
+				: fd(_fd), id(_id)
+			{
+			}
 	};
 
 private:
@@ -66,8 +66,8 @@ private:
 	 *
 	 *  NOTE: IT IS FOR HIGHLINKS ONLY!
 	 */
-	pf_id uplink;				  /**< Peer where this peer is connected */
-	std::vector<pf_id> downlinks;		  /**< Peer connected to this one */
+	pf_id uplink;			  /**< Peer where this peer is connected */
+	std::vector<pf_id> downlinks;	  /**< Peer connected to this one */
 	Certificate certificate;
 
 	// Receiving functions
