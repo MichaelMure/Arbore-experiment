@@ -76,7 +76,7 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
 	section->AddItem(new ConfigItem_string("ca", "CA certificate path"));
 	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
-	section->AddItem(new ConfigItem_string("crl_url", "URL of the crl"));
+	section->AddItem(new ConfigItem_string("crl_url", "URL of the crl", "http://"));
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));

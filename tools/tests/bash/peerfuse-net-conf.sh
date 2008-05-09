@@ -80,6 +80,8 @@ ssl {
 	key = $TESTS/conf/certs/$KEY
 
 	cert = $TESTS/conf/certs/$CERT
+
+	disable_crl = true
 }
 
 # Harddisk configuration
