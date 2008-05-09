@@ -9,10 +9,10 @@ Piggledy:
 - Store the version number in the session.cfg to cleanly exit if an uupgrade is not compatible
 - CRL handling [DONE]
 - comply with OpenSSL license [DONE]
-- implement rename() (0.2 ?)
 - add a release compilation target
 
 - Handle file modifications (0.2 ?)
+- implement rename() (0.2 ?)
 - Add a non-debug compilation target that disables stdout/err logging and disables the log Mutex. (0.2 ?)
 - make install (0.2 ?)
 - Handle anticipated download (0.2 ?)
@@ -35,8 +35,8 @@ Fri 25 April - Sun 27 April
 - Fix file truncating [DONE]
 - Connection to multiple peer on pfnet
 - Download from multiple peers (trivial)
-- NET_REFRESH_FILE_REF handling(almost done)
-- NET_FILE_UNREF handling
+- NET_REFRESH_FILE_REF handling(almost done) [DONE]
+- NET_FILE_UNREF handling [DONE]
 
 Mon 28 April - Wed 30 April
 ---------------------------
