@@ -40,13 +40,13 @@ class Peer : public PeerBase
 public:
 	/* Exceptions */
 
-	class CreateLowLinkConnection : std::exception
+	class CopyLowLinkConnection : std::exception
 	{
 		public:
 			int fd;
 			pf_id id;
 
-			CreateLowLinkConnection(int _fd, pf_id _id)
+			CopyLowLinkConnection(int _fd, pf_id _id)
 				: fd(_fd), id(_id)
 			{
 			}

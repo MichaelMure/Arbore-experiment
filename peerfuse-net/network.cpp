@@ -162,7 +162,7 @@ void Network::ThrowHandler()
 		log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
 		exit(EXIT_FAILURE);
 	}
-	catch(Peer::CreateLowLinkConnection &e)
+	catch(Peer::CopyLowLinkConnection &e)
 	{
 		/* When a peer is connecting to me as a lowlink, I already has a Peer object
 		 * to describe it. Now we have a Connection object to put on it.

@@ -184,7 +184,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	SetTimestampDiff(pckt->GetArg<uint32_t>(NET_HELLO_NOW));
 	addr.port = (uint16_t) pckt->GetArg<uint32_t>(NET_HELLO_PORT);
 
-	DelFlag(ANONYMOUS);
+	bool copy_low_link_connection = false;
 
 	switch(peers_list.WhatIsThisID(addr.id))
 	{
@@ -207,16 +207,18 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 			}
 			else
 			{
-				/* Lowlink, so as there is already a Peer object associated to this ID, we mark it
-				 * as anonymous to catch it at the end of this function, and raise an exception to
+				/* Lowlink, so as there is already a Peer object associated to this ID, we set this
+				 * bolean to true to catch it at the end of this function, and raise an exception to
 				 * tell Network to change Connection objet to the other Peer object.
 				 */
-				SetFlag(ANONYMOUS);
+				copy_low_link_connection = true;
 			}
 		}
 		case PeersList::IS_UNKNOWN:
 			break;
 	}
+
+	DelFlag(ANONYMOUS);
 
 	/* If this is a client, we answer an HELLO message. */
 	if(IsClient())
@@ -239,12 +241,12 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		peers_list.Broadcast(pckt, this);  /* Don't send to this peer a creation message about him! */
 	}
 
-	/* if we reset flags to anonymous above, want to associate peer connection
+	/* if we set this boolean above, want to associate peer connection
 	 * to the real Peer object.
 	 * We tell Network to do it.
 	 */
-	if(IsAnonymous())
-		throw CreateLowLinkConnection(GetFd(), GetID());
+	if(copy_low_link_connection)
+		throw CopyLowLinkConnection(GetFd(), GetID());
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
