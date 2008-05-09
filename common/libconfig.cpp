@@ -41,7 +41,7 @@ MyConfig conf;
 	T::iterator x##lb = v.lower_bound(label); \
 	T::iterator x##ub = v.upper_bound(label); \
 	for(T::iterator x = x##lb; x != x##ub; ++x)
-#define Error(x) do { std::cerr << path << ":" << line << ": " << x << std::endl ; error = true; } while(0)
+#define Error(x) do { std::cerr << path << ":" << line_count << ": " << x << std::endl ; error = true; } while(0)
 			
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n");
 			
@@ -73,7 +73,7 @@ bool MyConfig::Load(std::string _path)
 		this->path = _path;
 
 	if(path.empty())
-		throw error("Filename is empty");
+		throw error_exc("Filename is empty");
 
 	std::ifstream fp(path.c_str());
 
@@ -84,12 +84,12 @@ bool MyConfig::Load(std::string _path)
 	}
 
 	std::string ligne;
-	line = 0;
+	line_count = 0;
 	bool error = false;
 	ConfigSection* section = 0;
 	while(std::getline(fp, ligne))
 	{
-		++line;
+		++line_count;
 
 		const char* ptr = ligne.c_str();
 		while(ptr && *ptr && (*ptr == ' ' || *ptr == '\t')) ++ptr;
@@ -243,13 +243,13 @@ ConfigSection* MyConfig::AddSection(ConfigSection* section)
 	return section;
 }
 
-ConfigSection* MyConfig::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error)
+ConfigSection* MyConfig::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc)
 {
-	if(loaded) throw error("Configuration is already loaded !");
+	if(loaded) throw error_exc("Configuration is already loaded !");
 
 	FORit(SectionMap, sections, it)
 		if(it->second->Label() == label)
-		throw error("Section " + label + " has a name already used");
+		throw error_exc("Section " + label + " has a name already used");
 
 	return AddSection(new ConfigSection(label, description, multiple, this, 0));
 }
@@ -338,7 +338,7 @@ bool ConfigSection::FindEmpty()
 {
 	std::string begin = "in «" + Label() + (Name().empty() ? "" : ("(" + Name() + ")")) + "»: ";
 	bool error = false;			  // Error() macro change this value
-	int line = config->NbLines();		  /* Récuperation des informations de MyConfig */
+	int line_count = config->NbLines();		  /* Récuperation des informations de MyConfig */
 	std::string path = config->Path();	  /* pour pouvoir utiliser la macro Error()    */
 
 	FORit(ItemMap, items, it)
@@ -365,11 +365,11 @@ ConfigSection* ConfigSection::AddSection(ConfigSection* section)
 	return section;
 }
 
-ConfigSection* ConfigSection::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error)
+ConfigSection* ConfigSection::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc)
 {
 	FORit(SectionMap, sections, it)
 		if(it->second->Label() == label)
-		throw MyConfig::error("Section " + label + " has a name already used in section \"" + Label() + "\"");
+		throw MyConfig::error_exc("Section " + label + " has a name already used in section \"" + Label() + "\"");
 
 	return AddSection(new ConfigSection(label, description, multiple, config, this));
 }
@@ -383,18 +383,18 @@ ConfigItem* ConfigSection::GetItem(std::string label)
 		return it->second;
 }
 
-void ConfigSection::AddItem(ConfigItem* item, bool is_name) throw(MyConfig::error)
+void ConfigSection::AddItem(ConfigItem* item, bool is_name) throw(MyConfig::error_exc)
 {
 	try
 	{
 		if(!item)
-			throw MyConfig::error("You have to give an item !!");
+			throw MyConfig::error_exc("You have to give an item !!");
 
 		if(items[item->Label()] != 0)
-			throw MyConfig::error("There is already an item in \"" + Label() + "\" section named \"" + item->Label() + "\"");
+			throw MyConfig::error_exc("There is already an item in \"" + Label() + "\" section named \"" + item->Label() + "\"");
 
 		if(is_name && name_item)
-			throw MyConfig::error("I want to add an 'is_name' item, but I have already one !");
+			throw MyConfig::error_exc("I want to add an 'is_name' item, but I have already one !");
 
 		item->config = config;
 		item->parent = this;

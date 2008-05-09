@@ -142,10 +142,10 @@ public:
 public:
 
 	/** This class is an exception class throwed when there is a problem in building of sections/items */
-	class error
+	class error_exc
 	{
 		public:
-			error(std::string _reason) : reason(_reason) {}
+			error_exc(std::string _reason) : reason(_reason) {}
 
 			std::string Reason() const { return reason; }
 
@@ -183,9 +183,9 @@ public:
 	 * @param description section's description, sended to user when this section is forgotten
 	 * @param multiple if setted, this section can have multiple definitions (see ConfigSection::AddItem)
 	 */
-	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(error);
+	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(error_exc);
 
-	unsigned NbLines() const { return line; }
+	unsigned NbLines() const { return line_count; }
 	std::string Path() const { return path; }
 
 	/* Variables privées */
@@ -194,7 +194,7 @@ private:
 	std::string path;
 	bool loaded;
 	SectionMap sections;
-	unsigned line;
+	unsigned int line_count;
 };
 
 /********************************************************************************************
@@ -239,7 +239,7 @@ public:
 	 * @param description section's description, sended to user when this section is forgotten
 	 * @param multiple if setted, this section can have multiple definitions (see ConfigSection::AddItem)
 	 */
-	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error);
+	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc);
 
 	/** Get an item from his label */
 	ConfigItem* GetItem(std::string label);
@@ -250,7 +250,7 @@ public:
 	 * @param item this is a new item of a derived type from ConfigItem. It will be deleted if there is an exception
 	 * @param is_name if true, this is the name (identificator) of the section.
 	 */
-	void AddItem(ConfigItem* item, bool is_name = false) throw(MyConfig::error);
+	void AddItem(ConfigItem* item, bool is_name = false) throw(MyConfig::error_exc);
 
 	/** Is this is a multiple struct, name is an identificator of this type of struct in the configuration */
 	std::string Name() const { return name; }

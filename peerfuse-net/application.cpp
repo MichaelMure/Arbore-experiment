@@ -199,7 +199,7 @@ int Application::main(int argc, char *argv[])
 		Exit();
 		#endif
 	}
-	catch(MyConfig::error &e)
+	catch(MyConfig::error_exc &e)
 	{
 		log[W_ERR] << "Error while loading:";
 		log[W_ERR] << e.Reason();
