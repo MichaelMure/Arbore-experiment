@@ -202,8 +202,8 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 			 * is already on network */
 			if(IsHighLink())
 			{
-				throw MustDisconnect();
 				log[W_WARNING] << "Highlink connection from " << addr << " which is a peer already on network";
+				throw MustDisconnect();
 			}
 			else
 			{
