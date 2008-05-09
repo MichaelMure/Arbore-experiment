@@ -63,6 +63,7 @@ time_t PeerBase::Timestamp(time_t ts) const
 
 void PeerBase::Flush()
 {
+	assert(conn);
 	while(!send_queue.empty())
 	{
 		send_queue.front().Send(conn);
