@@ -29,8 +29,11 @@
 
 ConnectionSsl::~ConnectionSsl()
 {
-	SSL_shutdown(ssl);
-	SSL_free(ssl);
+	if(ssl)
+	{
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+	}
 }
 
 void ConnectionSsl::SocketWrite() throw(WriteError)

@@ -119,7 +119,7 @@ void SslSsl::CheckPeerCertificate(SSL* ssl)
 {
 	int ret;
 	if(SSL_get_peer_certificate(ssl) == NULL)
-		throw SslHandshakeFailed("The peer didn't cert any certificate");
+		throw SslHandshakeFailed("The peer didn't send any certificate");
 
 	if((ret = SSL_get_verify_result(ssl)) != X509_V_OK)
 	{

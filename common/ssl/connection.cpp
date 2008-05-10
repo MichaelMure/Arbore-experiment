@@ -42,7 +42,8 @@ Connection::Connection(int _fd) : fd(_fd),
 
 Connection::~Connection()
 {
-	close(fd);
+	if(fd != -1)
+		close(fd);
 }
 
 // Read "size" octets from the read buffer
