@@ -62,8 +62,7 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 			std::string err = ERR_error_string(ERR_get_error(), NULL);
 			throw WriteError(err);
 		}
-		else
-		if(written == 0)
+		else if(written == 0)
 		{
 			throw WriteError("Peer disconnected");
 		}
@@ -103,8 +102,7 @@ void ConnectionSsl::SocketRead() throw(RecvError)
 			memcpy(read_buf + read_buf_size, buf, received);
 			read_buf_size += received;
 		}
-		else
-		if(received == 0)
+		else if(received == 0)
 		{
 			throw RecvError("Peer disconnected");
 		}

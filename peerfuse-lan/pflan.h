@@ -24,5 +24,14 @@
 #ifndef PFLAN_H
 #define PFLAN_H
 
-#define PEERFUSE_VERSION        "peerfuse-lan 0.1"
+#define PEERFUSE_VERSION_NAME   "peerfuse-lan"
+#define PEERFUSE_VERSION_MAJOR  "0"
+#define PEERFUSE_VERSION_MINOR  "1"
+#define PEERFUSE_VERSION_PROTO  "1"
+
+#define PEERFUSE_VERSION        PEERFUSE_VERSION_NAME " " \
+                                PEERFUSE_VERSION_MAJOR "." \
+                                PEERFUSE_VERSION_MINOR "-" \
+                                PEERFUSE_VERSION_PROTO
+
 #endif						  /* PFLAN_H */

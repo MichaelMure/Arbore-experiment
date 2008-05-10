@@ -76,7 +76,6 @@ IF(PF_NET)
 		peerfuse-net/filedist.cpp
 		peerfuse-net/job_new_conn_req.cpp
 		peerfuse-net/job_update_resp_files.cpp
-		peerfuse-net/job_add_sharer.cpp
 		peerfuse-net/job_ls_dir.cpp
 		peerfuse-net/job_end_of_ls.cpp
 		peerfuse-net/packet.cpp

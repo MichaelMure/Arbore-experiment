@@ -47,8 +47,6 @@ enum job_type
 	JOB_NEW_CONN_QUEUE,
 	/* Update responsibles files */
 	JOB_UPDATE_RESP_FILES,
-	/* Add a sharer to a file. */
-	JOB_ADD_SHARER,
 	/* Send list of files in a directory to a peer */
 	JOB_LS_DIR,
 	/* Tell cache we receive all of the directory files */

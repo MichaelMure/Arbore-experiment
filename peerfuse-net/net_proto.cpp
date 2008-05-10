@@ -34,7 +34,6 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_END_OF_MERGE */     "END_OF_MERGE",
 	/* NET_END_OF_MERGE_ACK */ "END_OF_MERGE_ACK",
 	/* NET_PEER_BYE */         "PEER_BYE",
-	/* NET_I_HAVE_FILE */      "I_HAVE_FILE",
 	/* NET_WANT_REF_FILE */    "WANT_REF_FILE",
 	/* NET_REF_FILE */         "REF_FILE",
 	/* NET_REFRESH_REF_FILE */ "REFRESH_REF_FILE",
@@ -90,12 +89,6 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 
 	// NET_PEER_BYE
 	{ T_NONE},
-
-	// NET_I_HAVE_FILE
-	{
-		/* NET_I_HAVE_FILE_FILENAME */ T_STR,
-		T_NONE
-	},
 
 	// NET_WANT_REF_FILE
 	{

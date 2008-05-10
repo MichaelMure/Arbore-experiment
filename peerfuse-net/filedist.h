@@ -91,8 +91,6 @@ public:
 	/* Flags are defined in cache.h */
 	void AddFile(FileEntry* f, Peer* sender);
 
-	void AddSharer(FileEntry* f, pf_id);
-
 	void SendDirFiles(DirEntry* dir, Peer* to);
 
 	/** Create a packet that create a file.

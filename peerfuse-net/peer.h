@@ -77,7 +77,6 @@ private:
 	void Handle_net_peer_goodbye(struct Packet* pckt);
 	void Handle_net_end_of_merge(struct Packet* pckt);
 	void Handle_net_end_of_merge_ack(struct Packet* pckt);
-	void Handle_net_i_have_file(struct Packet* pckt);
 	void Handle_net_want_ref_file(struct Packet* pckt);
 	void Handle_net_ref_file(struct Packet* pckt);
 	void Handle_net_refresh_ref_file(struct Packet* pckt);

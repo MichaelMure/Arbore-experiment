@@ -25,6 +25,14 @@
 #include "peers_list.h"
 #include "packet.h"
 #include "cache.h"
+#include "environment.h"
+
+void FileContent::SetChunk(FileChunk chunk)
+{
+	FileContentBase::SetChunk(chunk);
+
+	cache.AddSharer(filename, environment.my_id.Get());
+}
 
 FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {

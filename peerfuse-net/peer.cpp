@@ -41,7 +41,6 @@
 #include "job_send_chunk.h"
 #include "job_set_chunk.h"
 #include "job_set_shared_part.h"
-#include "job_add_sharer.h"
 #include "job_ls_dir.h"
 #include "job_end_of_ls.h"
 #include "connection_ssl.h"
@@ -368,18 +367,6 @@ void Peer::Handle_net_end_of_ls(struct Packet* msg)
 	#endif
 }
 
-/** NET_I_HAVE_FILE
- *
- * Args:
- *	NET_I_HAVE_FILE_FILENAME
- */
-void Peer::Handle_net_i_have_file(struct Packet* msg)
-{
-	std::string filename;
-	filename = msg->GetArg<std::string>(NET_I_HAVE_FILE_FILENAME);
-	scheduler_queue.Queue(new JobAddSharer(filename, GetID()));
-}
-
 /** NET_WANT_REF_FILE
  *
  * Peer wants a reference number for a file (he probably wants to download it)
@@ -483,7 +470,6 @@ void Peer::HandleMsg(Packet* pckt)
 		{ &Peer::Handle_net_end_of_merge,     PERM_HIGHLINK  },
 		{ &Peer::Handle_net_end_of_merge_ack, PERM_HIGHLINK  },
 		{ &Peer::Handle_net_peer_goodbye,     PERM_HIGHLINK  },
-		{ &Peer::Handle_net_i_have_file,      0              },
 		{ &Peer::Handle_net_want_ref_file,    0              },
 		{ &Peer::Handle_net_ref_file,         0              },
 		{ &Peer::Handle_net_refresh_ref_file, 0              },

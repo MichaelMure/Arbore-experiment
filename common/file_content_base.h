@@ -99,7 +99,7 @@ public:
 	bool HaveAnyChunk();
 	void GetSharedContent(off_t& offset, off_t& size);
 
-	void SetChunk(FileChunk chunk);
+	virtual void SetChunk(FileChunk chunk);
 
 	void Truncate(off_t offset);
 

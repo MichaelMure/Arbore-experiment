@@ -35,7 +35,6 @@ enum msg_type
 	NET_END_OF_MERGE,
 	NET_END_OF_MERGE_ACK,
 	NET_PEER_GOODBYE,
-	NET_I_HAVE_FILE,
 	NET_WANT_REF_FILE,
 	NET_REF_FILE,
 	NET_REFRESH_REF_FILE,
@@ -79,12 +78,6 @@ enum net_mkfile_args
 	NET_MKFILE_SHARERS,
 	NET_MKFILE_PF_MODE,
 	// ...
-};
-
-// NET_I_HAVE_FILE
-enum net_i_have_file
-{
-	NET_I_HAVE_FILE_FILENAME
 };
 
 enum net_want_ref_file

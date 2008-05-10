@@ -32,6 +32,8 @@ public:
 	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 
+	virtual void SetChunk(FileChunk chunk);
+
 	chunk_availability NetworkRequestChunk(FileChunkDesc chunk);
 };
 #endif						  /* FILE_CONTENT_H */

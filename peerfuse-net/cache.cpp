@@ -23,6 +23,7 @@
 
 #include <stack>
 #include <cstring>
+#include <algorithm>
 
 #include "cache.h"
 #include "log.h"
@@ -246,14 +247,12 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
-		else
-		if(erase_on_modification)
+		else if(erase_on_modification)
 		{
 			FileContent& file_content = content_list.GetFile(file->GetFullName());
 			file_content.Truncate(0);
 		}
-		else
-		if(stat.size < file->GetAttr().size)
+		else if(stat.size < file->GetAttr().size)
 		{
 			FileContent& file_content = content_list.GetFile(file->GetFullName());
 			file_content.Truncate(stat.size);
@@ -277,7 +276,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	filedist.AddFile(file, sender);
 }
 
-void Cache::AddSharer(std::string path, pf_id sender)
+void Cache::AddSharer(std::string path, pf_id sharer)
 {
 	BlockLockMutex lock(this);
 	FileEntry* f = Path2File(path);
@@ -285,7 +284,16 @@ void Cache::AddSharer(std::string path, pf_id sender)
 	if(!f)
 		throw NoSuchFileOrDir();
 
-	filedist.AddSharer(f, sender);
+	IDList idl = f->GetSharers();
+	if(std::find(idl.begin(), idl.end(), sharer) != idl.end())
+		return;
+
+	idl.push_back(sharer);
+	pf_stat stat = f->GetAttr();
+	stat.meta_mtime = time(NULL);
+
+	_set_attr(f, stat, 0, idl);
+
 }
 
 void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
