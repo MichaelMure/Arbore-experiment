@@ -206,6 +206,7 @@ PacketBase& PacketBase::Write(const AddrList& addr_list)
 	{
 		pf_addr addr = pf_addr_ton(*it);
 		memcpy(ptr, &addr, sizeof(pf_addr));
+		ptr += sizeof(pf_addr);
 	}
 	size += addr_list.size() * sizeof(pf_addr);
 	datas = new_datas;
@@ -230,6 +231,7 @@ PacketBase& PacketBase::Write(const IDList& id_list)
 	{
 		pf_id id = htonl(*it);
 		memcpy(ptr, &id, sizeof(pf_id));
+		ptr += sizeof(pf_id);
 	}
 	size += id_list.size() * sizeof(pf_id);
 	datas = new_datas;
@@ -421,12 +423,10 @@ IDList PacketBase::ReadIDList()
 	uint32_t list_size = ReadInt32();
 	ASSERT((size * sizeof(pf_id)) >= list_size);
 
-	// This is missing some endian tweakings ?
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
-		pf_id id;
-		memcpy(&id, datas, sizeof(pf_id));
-		id_list.push_back(ntohl(id));
+		pf_id id = ntohl(*(pf_id*)(datas+(i * sizeof(pf_id))));
+		id_list.push_back(id);
 	}
 
 	char* new_datas;
