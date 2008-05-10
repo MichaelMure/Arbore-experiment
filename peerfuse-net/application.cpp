@@ -130,7 +130,13 @@ int Application::main(int argc, char *argv[])
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
+		// Try saving at start to avoid bad surprises when exiting
+		if(!session_cfg.Save())
+			exit(EXIT_FAILURE);
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
+		// Try saving at start to avoid bad surprises when exiting
+		if(!tree_cfg.Save())
+			exit(EXIT_FAILURE);
 
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 

@@ -24,6 +24,7 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <iostream>
 #include <stdlib.h>
 #include "session_config.h"
 #include "log.h"
@@ -84,7 +85,7 @@ void SessionConfig::Load(const std::string& _filename)
 	log[W_INFO] << "SessionConfig: Loaded " << filename;
 }
 
-void SessionConfig::Save()
+bool SessionConfig::Save()
 {
 	BlockLockMutex lock(this);
 	std::fstream fout;
@@ -94,7 +95,8 @@ void SessionConfig::Save()
 		// Save is called by SessionConfig's destructor
 		// the log functions may not be available at this moment
 		//log[W_ERR] << "SessionConfig: Unable to save config file to " << filename;
-		return;
+		std::cerr << "SessionConfig: Unable to save config file to " << filename << std::endl;
+		return false;
 	}
 
 	for(std::map<std::string, std::string>::iterator it = list.begin();
@@ -104,7 +106,9 @@ void SessionConfig::Save()
 		fout << it->first << "=" << it->second << std::endl;
 	}
 	fout.close();
+	std::cout << "SessionConfig: Config saved in " << filename << std::endl;
 	//log[W_INFO] << "SessionConfig: Config saved in " << filename;
+	return true;
 }
 
 void SessionConfig::Parse(const std::string& line)

@@ -41,7 +41,7 @@ public:
 	~SessionConfig();
 
 	void Load(const std::string& file);
-	void Save();
+	bool Save();
 	void Display();
 
 	template<class T>
