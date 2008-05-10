@@ -1,5 +1,13 @@
 To try peerfuse:
 
+Dependences:
+------------
+
+* cmake
+* libssl-dev
+* libcurl-dev
+* libfuse-dev
+
 Compilation:
 ------------
 
