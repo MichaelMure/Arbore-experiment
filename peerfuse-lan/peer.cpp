@@ -301,6 +301,7 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
 
 	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID(), HasFlag(MERGING),environment.merging.Get()));
+	session_cfg.Set("last_view_" + TypToStr(GetID()), time(NULL));
 }
 
 void Peer::Handle_net_end_of_merge(struct Packet* msg)
@@ -437,7 +438,5 @@ bool Peer::Receive()
 
 	HandleMsg(*packet);
 
-	if(!HasFlag(MERGING))
-		session_cfg.Set("last_view_" + TypToStr(GetID()), time(NULL));
 	return false;
 }
