@@ -17,8 +17,29 @@
 # $Id$
 #
 
+RST2HTML=""
+if [ -e /usr/bin/rst2html ]
+then
+	RST2HTML=/usr/bin/rst2html
+fi
+if [ -e /usr/bin/rst2html.py ]
+then
+	RST2HTML=/usr/bin/rst2html.py
+fi
+
+if [ "$RST2HTML" == "" ]
+then
+	echo "Unable to find the RST to html converter, install docutils."
+	exit 1
+fi
+
+if [ "$1" == "" ]
+then
+	echo "Syntax: $0 <file_to_htmlize>"
+	exit 1
+fi
 
 cat html/header.html
-rst2html "$1" | sed -e '1,7d'
+"$RST2HTML" "$1" | sed -e '1,7d'
 cat html/footer.html
 
