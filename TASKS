@@ -10,7 +10,7 @@ Here are tasks:
 | 00017 | Closed |  PFnet   |   romain   | Related to the bug #00008, add a timer to send a MKFILE only a second after. So, when we want
 |       |        |          |            |    to send 1000 MKFILE (for example because of a `cp'), only one per second will be sent.
 | 00016 |  Open  |  Global  |            | Support file moving/renaming.
-| 00015 |  Open  |  PFnet   |            | To prevent flood, when I receive a NET_MKFILE for a file older than mine, if I send a
+| 00015 |  Open  |  PFnet   |            | To prevent unlimited loop, when I receive a NET_MKFILE for a file older than mine, if I send a
 |       |        |          |            |   NET_MKFILE to correct him, store it somewhere to do that one time. If I receive the
 |       |        |          |            |   same message from the same peer, do not correct him.
 | 00014 |  Open  |  PFnet   |            | Set an expiration time for LS_DIR

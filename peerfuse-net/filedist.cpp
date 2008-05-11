@@ -264,6 +264,9 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	if(sender != NULL)
 		relayed_peers.erase(sender);
 
+	if(relayed_peers.empty())
+		return;
+
 	std::string filename = f->GetFullName();
 	std::map<std::string, IDList>::iterator delayed_mkfile = cache.delayed_mkfile_send.find(filename);
 	if(delayed_mkfile != cache.delayed_mkfile_send.end())
