@@ -52,7 +52,11 @@ void ContentListBase::Loop()
 			break;
 		}
 		else
+		{
+			/* Sync what we can */
+			it->second.SyncToHdd(false);
 			++it;
+		}
 	}
 }
 
