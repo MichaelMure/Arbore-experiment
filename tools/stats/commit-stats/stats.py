@@ -392,8 +392,16 @@ def stat_commits(all_commits, hours, months, dates, week):
             if not dates:
                 now = datetime.today().date()
                 d = dt.date()
+                i = 0
                 while d <= now:
-                    dates[d] = CommitList('%s-%d-%d' % (str(d.year)[2:4], d.month, d.day))
+                    s = ''
+                    if not i:
+                        s = '%s-%d-%d' % (str(d.year)[2:4], d.month, d.day)
+                    i += 1
+                    if i >= 3:
+                        i = 0
+
+                    dates[d] = CommitList(s)
                     d = d + timedelta(days=1)
 
             dates[dt.date()].add_commit(commit)
