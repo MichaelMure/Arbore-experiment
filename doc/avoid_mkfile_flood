@@ -1,0 +1,37 @@
+System used to avoid MKFILE flood
+**********************************
+
+1. Problem
+----------
+
+When we cp a file on the network, there are a lot of setattr() call.
+It results by a flooding call of Cache::SetAttr(), and it'll flood network
+with NET_MKFILE message.
+
+2. Solution
+-----------
+
+In Cache::SetAttr, we check if a modification by fuse (sender == 0) has the
+same meta_mtime (now) than last meta_mtime value.
+In this case, we create a JobSendMkFile in scheduler queue, and store information
+that there is a job for this file in the Cache::delayed_mkfile_send variable.
+
+For PFNet, we also store the receivers' IDs list.
+
+This job will be run the next second.
+
+If there is an other call of Cache::SetAttr() from fuse in the same second, we
+check if there is already this file in delayed_mkfile_send. As it is in, we
+do only update receivers list for pfnet, or nothing for pflan.
+
+When job run:
+	- Broadcast for pflan
+	- Send to stored receivers for pfnet
+
+And we remove file in delayed_mkfile_send.
+
+3. Conclusion
+-------------
+
+When a flood can be occured, this system sends only one NET_MKFILE message
+per seconds.
