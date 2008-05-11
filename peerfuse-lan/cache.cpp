@@ -214,6 +214,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 		if(last_meta_mtime == stat.meta_mtime)
 		{
 			std::string filename = f->GetFullName();
+			log[W_DEBUG] << "last_meta_mtime == stat.meta_mtime: we delay NET_MKFILE message";
 			if(std::find(delayed_mkfile_send.begin(), delayed_mkfile_send.end(), filename) == delayed_mkfile_send.end())
 			{
 				delayed_mkfile_send.push_back(filename);
@@ -235,8 +236,17 @@ void Cache::SendMkFile(std::string filename)
 	if(!f)
 		throw NoSuchFileOrDir();
 
+	log[W_DEBUG] << "Send delayed NET_MKFILE:";
 	peers_list.Broadcast(CreateMkFilePacket(f));
-	std::remove(delayed_mkfile_send.begin(), delayed_mkfile_send.end(), filename);
+
+	for(std::vector<std::string>::iterator it = delayed_mkfile_send.begin();
+		it != delayed_mkfile_send.end();)
+	{
+		if(*it == filename)
+			it = delayed_mkfile_send.erase(it);
+		else
+			++it;
+	}
 }
 
 void Cache::RmFile(std::string path)
