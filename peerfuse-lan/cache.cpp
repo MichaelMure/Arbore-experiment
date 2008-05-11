@@ -23,6 +23,7 @@
 
 #include <cstring>
 #include <stack>
+#include <algorithm>
 
 #include "cache.h"
 #include "log.h"
@@ -31,6 +32,8 @@
 #include "session_config.h"
 #include "hdd.h"
 #include "content_list.h"
+#include "scheduler_queue.h"
+#include "jobs/job_send_mkfile.h"
 
 Cache cache;
 
@@ -176,15 +179,16 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	if(!f)
 		throw NoSuchFileOrDir();
 
-	if(stat.meta_mtime >= f->GetAttr().meta_mtime || !keep_newest)
+	time_t last_meta_mtime = f->GetAttr().meta_mtime;
+
+	if(stat.meta_mtime >= last_meta_mtime || !keep_newest)
 	{
 		if(erase_on_modification)
 		{
 			FileContent& file = content_list.GetFile(path);
 			file.Truncate(0);
 		}
-		else
-		if(stat.size < f->GetAttr().size)
+		else if(stat.size < f->GetAttr().size)
 		{
 			FileContent& file = content_list.GetFile(path);
 			file.Truncate(stat.size);
@@ -193,15 +197,46 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 		f->SetAttr(stat);
 	}
 	else
+	{
 		log[W_DEBUG] << "Won't update stats";
+		return;
+	}
 
 	hdd.UpdateFile(f);
 
 	/* if it's me who created/modified file */
 	if(sender == 0)
-		peers_list.Broadcast(CreateMkFilePacket(f));
+	{
+		/* If there is already a modification at the same date, to prevent flood
+		 * we don't broadcast NET_MKFILE now, but we delay it with a job in scheduler,
+		 * which will be executed the next second.
+		 */
+		if(last_meta_mtime == stat.meta_mtime)
+		{
+			std::string filename = f->GetFullName();
+			if(std::find(delayed_mkfile_send.begin(), delayed_mkfile_send.end(), filename) == delayed_mkfile_send.end())
+			{
+				delayed_mkfile_send.push_back(filename);
+				scheduler_queue.Queue(new JobSendMkFile(filename));
+			}
+		}
+		else
+			peers_list.Broadcast(CreateMkFilePacket(f));
+	}
 	/* TODO: Set attribute on hdd */
 	/* hdd.SetAttr(stat); */
+}
+
+void Cache::SendMkFile(std::string filename)
+{
+	BlockLockMutex lock(this);
+	FileEntry* f = Path2File(filename);
+
+	if(!f)
+		throw NoSuchFileOrDir();
+
+	peers_list.Broadcast(CreateMkFilePacket(f));
+	std::remove(delayed_mkfile_send.begin(), delayed_mkfile_send.end(), filename);
 }
 
 void Cache::RmFile(std::string path)
@@ -239,9 +274,4 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 	/* TODO: implement it. */
 
 	Unlock();
-}
-
-void Cache::SendMkFile(std::string filename)
-{
-
 }

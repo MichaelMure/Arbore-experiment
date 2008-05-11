@@ -270,7 +270,6 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 		 */
 		if(file->GetAttr().meta_mtime == now)
 		{
-			log[W_DEBUG] << "local.meta_mtime = now, so we are looking for delay mkfile message";
 			std::string filename = file->GetFullName();
 			if(delayed_mkfile_send.find(filename) == delayed_mkfile_send.end())
 				delayed_mkfile_send[filename] = IDList();
