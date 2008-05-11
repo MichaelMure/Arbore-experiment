@@ -164,8 +164,23 @@ void Hdd::MkFile(FileEntry* f)
 		int r = mkdir(path.c_str(), f->GetAttr().mode);
 		if(r)
 		{
-			log[W_ERR] << "mkdir failed: " << strerror(errno);
-			throw HddWriteFailure(path);
+			/* Try to create parent directory. */
+			if(!f->GetParent())
+				throw HddWriteFailure(path);
+			try
+			{
+				MkFile(f->GetParent());
+			}
+			catch(HddWriteFailure &e)
+			{
+				throw HddWriteFailure(path);
+			}
+			r = mkdir(path.c_str(), f->GetAttr().mode);
+			if(r)
+			{
+				log[W_ERR] << "mkdir failed: " << strerror(errno);
+				throw HddWriteFailure(path);
+			}
 		}
 		log[W_INFO] << "mkdir on " << path;
 	}
@@ -181,7 +196,23 @@ void Hdd::MkFile(FileEntry* f)
 
 		int fd = creat(path.c_str(), f->GetAttr().mode);
 		if(fd == -1)
-			throw HddWriteFailure(path);
+		{
+			/* Try to create parent directory. */
+			if(!f->GetParent())
+				throw HddWriteFailure(path);
+			try
+			{
+				MkFile(f->GetParent());
+			}
+			catch(HddWriteFailure &e)
+			{
+				throw HddWriteFailure(path);
+			}
+
+			fd = creat(path.c_str(), f->GetAttr().mode);
+			if(fd == -1)
+				throw HddWriteFailure(path);
+		}
 		close(fd);
 		log[W_INFO] << "creat on " << path;
 	}
