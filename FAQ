@@ -49,9 +49,9 @@ if you want to be convinced. :)
 
 A: Peerfuse is written with security in mind and should be fairly safe. Public
 key encryption is used for every message transmitted, authentication is
-performed using standards X509 certficates. As of version 0.1, we know
+performed using standards X509 certficates. As of version 0.0, we know
 Peerfuse is subject to some DOS attacks, which we'll be resolved for
-the next version. Since the version 0.1 is only meant as a demo release and
+the next version. Since the version 0.0 is only meant as a demo release and
 doesn't present enough feature to be used in a production environment, we
 don't consider it as harmful.
 
