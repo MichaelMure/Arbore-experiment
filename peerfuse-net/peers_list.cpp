@@ -226,6 +226,7 @@ void PeersList::PeerSetConnection(pf_id id, int fd)
 	lowlink->SetConnection(anonymous->GetConnection());
 	anonymous->SetConnection(NULL);
 	RemovePeer(anonymous);
+	fd2peer[fd] = lowlink;
 }
 
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const

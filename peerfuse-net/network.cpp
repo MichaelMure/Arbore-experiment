@@ -169,6 +169,7 @@ void Network::ThrowHandler()
 		 * The temporary anonymous Peer object previously attached to it
 		 * can be removed.
 		 */
+		log[W_DEBUG] << "Switch lowlink connection to an other Peer for " << e.id;
 		BlockLockMutex lock(&peers_list); /* avoid race condition */
 		peers_list.PeerFlush(e.fd); /* flush messages before */
 		peers_list.PeerSetConnection(e.id, e.fd);

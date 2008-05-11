@@ -30,6 +30,7 @@
 #include "environment.h"
 #include "packet.h"
 #include "scheduler_queue.h"
+#include "jobs/job_new_connection.h"
 #include "jobs/job_send_mkfile.h"
 
 FileDistribution::FileDistribution()
@@ -289,16 +290,20 @@ void FileDistribution::RequestFileRefs(const FileEntry* f)
 {
 	IDList idlist = f->GetSharers();
 
-	BlockLockMutex net_lock(&peers_list);
 	Packet packet(NET_WANT_REF_FILE, environment.my_id.Get());
 	packet.SetArg(NET_WANT_REF_FILE_PATH, f->GetFullName());
 	for(IDList::iterator id = idlist.begin(); id != idlist.end(); ++id)
 	{
-		Peer* peer = peers_list.PeerFromID(*id);
-		if(peer)
+		switch(peers_list.WhatIsThisID(*id))
 		{
-			packet.SetDstID(*id);
-			peer->SendMsg(packet);
+			case PeersList::IS_UNKNOWN:
+				continue;
+			case PeersList::IS_ON_NETWORK:
+				scheduler_queue.Queue(new JobNewConnection(peers_list.GetPeerAddr(*id)));
+			case PeersList::IS_CONNECTED:
+				packet.SetDstID(*id);
+				peers_list.SendMsg(*id, packet);
+				break;
 		}
 	}
 }

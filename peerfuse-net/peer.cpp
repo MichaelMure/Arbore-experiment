@@ -210,6 +210,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 				 * bolean to true to catch it at the end of this function, and raise an exception to
 				 * tell Network to change Connection objet to the other Peer object.
 				 */
+				log[W_DEBUG] << "Copy low link connection for " << GetAddr();
 				copy_low_link_connection = true;
 			}
 		}
