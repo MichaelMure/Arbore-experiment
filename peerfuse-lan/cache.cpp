@@ -181,6 +181,9 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 
 	time_t last_meta_mtime = f->GetAttr().meta_mtime;
 
+	if(!sender)
+		stat.meta_mtime = time(NULL);
+
 	if(stat.meta_mtime >= last_meta_mtime || !keep_newest)
 	{
 		if(erase_on_modification)
