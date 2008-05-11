@@ -80,7 +80,6 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 			memcpy(new_buf, buf_queue.front().buf + written, buf_queue.front().size);
 			free(buf_queue.front().buf);
 			buf_queue.front().buf = new_buf;
-			log[W_DEBUG] << "Partial send";
 			break;
 		}
 	}
