@@ -83,8 +83,10 @@ Peer* PeersListBase::PeerFromID(pf_id id) const
 	return p;
 }
 
-PeersListBase::id_state_t PeersListBase::WhatIsThisID(pf_id id)
+PeersListBase::id_state_t PeersListBase::WhatIsThisID(pf_id id) const
 {
+	BlockLockMutex lock(this);
+
 	Peer* p = PeerFromID(id);
 	enum id_state_t id_state;
 
@@ -98,6 +100,15 @@ PeersListBase::id_state_t PeersListBase::WhatIsThisID(pf_id id)
 	log[W_DEBUG] << "PeersList::WhatIsThisID(" << id << ") = " << id_state;
 
 	return id_state;
+}
+
+pf_addr PeersListBase::GetPeerAddr(pf_id id) const
+{
+	BlockLockMutex lock(this);
+
+	Peer* p = PeerFromID(id);
+
+	return p->GetAddr();
 }
 
 // Public methods

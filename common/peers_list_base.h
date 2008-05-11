@@ -84,6 +84,7 @@ public:
 	// TODO: move-me into private section
 	Peer* PeerFromID(pf_id id) const;
 
+
 	enum id_state_t
 	{
 		IS_UNKNOWN,
@@ -91,7 +92,10 @@ public:
 		IS_CONNECTED,
 	};
 	/** Return state of this ID on network. */
-	enum id_state_t WhatIsThisID(pf_id id);
+	enum id_state_t WhatIsThisID(pf_id id) const;
+
+	/** Get addr of a peer */
+	pf_addr GetPeerAddr(pf_id) const;
 
 	/** Send a message to a peer */
 	void SendMsg(pf_id id, const Packet &p) const;
