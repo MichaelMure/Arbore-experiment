@@ -126,6 +126,13 @@ IF(NOT PF_SERVER_MODE)
 		MESSAGE(FATAL_ERROR "Unable to find Fuse library")
 	ELSE(NOT FUSE_FOUND)
 		MESSAGE(STATUS "Found Fuse: ${FUSE_LINK_DIR} ${FUSE_LDFLAGS}")
+
+		## Check the version
+		INCLUDE(CheckLibraryExists)
+		CHECK_LIBRARY_EXISTS(fuse fuse_main_real_compat25 "" HAVE_FUSE26)
+		IF(NOT HAVE_FUSE26)
+			MESSAGE(FATAL_ERROR "The Fuse library installed isn't recent enough. Please install libfuse-2.6 or higher.")
+		ENDIF(NOT HAVE_FUSE26)
 	ENDIF(NOT FUSE_FOUND)
 ENDIF(NOT PF_SERVER_MODE)
 
