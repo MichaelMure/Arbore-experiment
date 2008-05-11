@@ -88,3 +88,14 @@ void FileEntryBase::SetSharers(IDList idl)
 	tree_cfg.Set(GetFullName() + "#sharers", list);
 	#endif
 }
+
+void FileEntryBase::LoadAttr()
+{
+	uint32_t cfg_val = 0;
+	if(tree_cfg.Get(GetFullName() + "#meta", cfg_val))
+		stat.meta_mtime = (time_t)cfg_val;
+	if(tree_cfg.Get(GetFullName() + "#size", cfg_val))
+		stat.size = (size_t)cfg_val;
+	if(tree_cfg.Get(GetFullName() + "#pfmode", cfg_val))
+		stat.pf_mode = (uint32_t)cfg_val;
+}

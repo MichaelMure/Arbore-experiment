@@ -76,6 +76,9 @@ public:
 	pf_stat GetAttr() const { return stat; };
 	void SetAttr(pf_stat stat);
 
+	/** Load attributes from tree_cfg file. */
+	virtual void LoadAttr();
+
 	bool IsRemoved() const { return stat.pf_mode & pf_stat::S_PF_REMOVED; }
 	void SetRemoved() { stat.pf_mode |= pf_stat::S_PF_REMOVED; }
 	void ClearRemoved() { stat.pf_mode |= pf_stat::S_PF_REMOVED; }

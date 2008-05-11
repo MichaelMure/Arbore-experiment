@@ -22,6 +22,7 @@
  */
 
 #include "pf_file.h"
+#include "session_config.h"
 
 bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 {
@@ -40,4 +41,20 @@ FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* parent)
 	/* Calculate serial */
 	for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
 		path_serial += (path_serial << 3) + (unsigned char)*c;
+}
+
+void FileEntry::LoadAttr()
+{
+	FileEntryBase::LoadAttr();
+
+	std::string cfg_val_s;
+	if(tree_cfg.Get(GetFullName() + "#sharers", cfg_val_s))
+	{
+		IDList idlist;
+		std::string id;
+		while((id = stringtok(cfg_val_s, ",")).empty() == false)
+			idlist.insert(StrToTyp<uint32_t>(id));
+		SetSharers(idlist);
+	}
+
 }

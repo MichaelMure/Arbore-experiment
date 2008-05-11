@@ -46,7 +46,9 @@ public:
 
 	FileEntry(std::string _name, pf_stat _stat, DirEntry* parent);
 
-	/* TODO: calculate this */
 	unsigned int GetPathSerial() const { return path_serial; }
+
+	virtual void LoadAttr();
+
 };
 #endif						  /* PFNET_FILE_H */
