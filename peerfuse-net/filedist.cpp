@@ -184,34 +184,31 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 		/* this function can be called when this file is updated, so add
 		 * it in list only if it isn't already in. */
 		if(resp_files.find(f) == resp_files.end())
-		{
 			resp_files.insert(f);
 
-			/* if file has just been created, send it to parent
-			 * directory's responsibles */
-			if(sender != NULL && f->GetParent() && !IsResponsible(sender->GetID(), f))
-			{
-				std::set<Peer*> peers = GetRespPeers(f->GetParent());
+		/* send it to parent directory's responsibles */
+		if(f->GetParent() && (!sender || !IsResponsible(sender->GetID(), f)))
+		{
+			std::set<Peer*> peers = GetRespPeers(f->GetParent());
 
-				/* If I'm also responsible of this file's parent, I send message
-				 * to all other responsibles. In other case, I only send it
-				 * to the a responsible who will relay message to other responsibles.
-				 */
-				if(IsResponsible(environment.my_id.Get(), f->GetParent()))
-				{
-					log[W_DEBUG] << "I'm responsible of this file which has been created, and I'm responsible "
-						<< "of parent dir, so I send creation to them.";
-					relayed_peers.insert(peers.begin(), peers.end());
-				}
-				else if(peers.empty() == false)
-				{
-					log[W_DEBUG] << "I'm responsible of this file which has been created, so I send it "
-						<< " to a parent dir responsible";
-					relayed_peers.insert(*peers.begin());
-				}
-				else
-					log[W_WARNING] << "There isn't any responsible for this file !?" << f->GetParent();
+			/* If I'm also responsible of this file's parent, I send message
+			 * to all other responsibles. In other case, I only send it
+			 * to the a responsible who will relay message to other responsibles.
+			 */
+			if(IsResponsible(environment.my_id.Get(), f->GetParent()))
+			{
+				log[W_DEBUG] << "I'm responsible of this file and I'm responsible "
+					<< "of parent dir, so I send creation to them.";
+				relayed_peers.insert(peers.begin(), peers.end());
 			}
+			else if(peers.empty() == false)
+			{
+				log[W_DEBUG] << "I'm responsible of this file so I send it "
+					<< " to a parent dir responsible";
+				relayed_peers.insert(*peers.begin());
+			}
+			else
+				log[W_WARNING] << "There isn't any responsible for this file !?" << f->GetParent();
 		}
 
 		/* Send packet to other responsibles peers if it's me that
