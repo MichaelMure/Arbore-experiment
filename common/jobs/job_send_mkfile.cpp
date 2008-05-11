@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: job_mkfile.cpp 1008 2008-05-08 17:07:32Z lds $
+ * $Id$
  */
 
 #include "job_send_mkfile.h"
