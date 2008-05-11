@@ -374,6 +374,11 @@ void FileContentBase::SyncToHdd(bool force)
 			++it;
 		}
 	}
+	if(ondisk_synced && ondisk_fd != -1)
+	{
+		close(ondisk_fd);
+		ondisk_fd = -1;
+	}
 }
 
 void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
