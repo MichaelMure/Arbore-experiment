@@ -55,5 +55,7 @@ enum job_type
 	/* We asked other peers to connect to a new peer
 	   this job checks wether they all answered */
 	JOB_OTHER_CONNECT,
+	/* Delay a send of a NET_MKFILE message. */
+	JOB_SEND_MKFILE,
 };
 #endif

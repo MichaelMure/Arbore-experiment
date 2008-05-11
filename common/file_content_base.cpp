@@ -114,7 +114,7 @@ void FileContentBase::OnDiskWrite(FileChunk& chunk)
 		return;
 	}
 
-	log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+	//log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	ondisk_size = (size_t)MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), (off_t)ondisk_size);
 	chunk.SetHddSynced(true);
 }
@@ -492,7 +492,7 @@ IDList FileContentBase::GetSharers()
 	IDList lst;
 	std::map<pf_id, struct sharedchunks>::iterator it;
 	for(it = sharers.begin(); it != sharers.end(); ++it)
-		lst.push_back(it->first);
+		lst.insert(it->first);
 	return lst;
 }
 

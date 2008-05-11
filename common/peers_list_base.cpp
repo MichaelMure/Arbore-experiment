@@ -222,8 +222,14 @@ void PeersListBase::SendMsg(pf_id id, const Packet &p) const
 void PeersListBase::SendMsg(IDList ids, const Packet &p) const
 {
 	BlockLockMutex lock(this);
+	Packet packet = p;
 	for(IDList::iterator it = ids.begin(); it != ids.end(); ++it)
-		SendMsg(*it, p);
+	{
+#ifdef PF_NET
+		packet.SetDstID(*it);
+#endif
+		SendMsg(*it, packet);
+	}
 }
 
 void PeersListBase::RequestChunk(std::string filename, pf_id id, off_t offset, size_t size)

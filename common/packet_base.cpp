@@ -426,7 +426,7 @@ IDList PacketBase::ReadIDList()
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
 		pf_id id = ntohl(*(pf_id*)(datas+(i * sizeof(pf_id))));
-		id_list.push_back(id);
+		id_list.insert(id);
 	}
 
 	char* new_datas;

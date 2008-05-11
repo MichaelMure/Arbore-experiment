@@ -18,40 +18,30 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: job_mkfile.h 1008 2008-05-08 17:07:32Z lds $
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#ifndef JOB_SEND_MKFILE_H
+#define JOB_SEND_MKFILE_H
 
-enum job_type
+#include "job.h"
+#include "pf_file.h"
+#include "pf_types.h"
+
+class JobSendMkFile : public Job
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* SetAttr triggered by a peer */
-	JOB_FILE_SETATTR,
-	/* A peer for a reference to a file */
-	JOB_SEND_REF_FILE,
-	/* A peer told us the part of the file he has */
-	JOB_SET_SHARED_PART,
-	/* Send a chunk to a peer */
-	JOB_SEND_CHUNK,
-	/* Receive a chunk from a peer */
-	JOB_SET_CHUNK,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Tries connecting to a list of peers */
-	JOB_NEW_CONN_QUEUE,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
-	/* Send list of files in a directory to a peer */
-	JOB_LS_DIR,
-	/* Tell cache we receive all of the directory files */
-	JOB_END_OF_LS,
-	/* Delay a send of a NET_MKFILE message */
-	JOB_SEND_MKFILE,
+	std::string file;
+public:
+	JobSendMkFile(std::string _file)
+		: Job(time(NULL)+1, REPEAT_NONE),
+		file(_file)
+		{}
+	~JobSendMkFile() {}
+
+	bool Start();
+
+	job_type GetType() const { return JOB_SEND_MKFILE; }
+	std::string GetName() const { return "JobSendMkFile"; }
 };
-#endif
+
+#endif						  /* JOB_SEND_MKFILE_H */

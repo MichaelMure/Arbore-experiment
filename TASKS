@@ -7,7 +7,7 @@ Here are tasks:
 |       |        |          |            |    protected method.
 | 00018 |  Open  |  PFnet   |            | NET_PEER_CONNECTION: check certificates to disallow a peer to introduce a fake
 |       |        |          |            |    peer with an unvalid certificate.
-| 00017 |  Open  |  PFnet   |            | Related to the bug #00008, add a timer to send a MKFILE only a second after. So, when we want
+| 00017 | Closed |  PFnet   |   romain   | Related to the bug #00008, add a timer to send a MKFILE only a second after. So, when we want
 |       |        |          |            |    to send 1000 MKFILE (for example because of a `cp'), only one per second will be sent.
 | 00016 |  Open  |  Global  |            | Support file moving/renaming.
 | 00015 |  Open  |  PFnet   |            | To prevent flood, when I receive a NET_MKFILE for a file older than mine, if I send a

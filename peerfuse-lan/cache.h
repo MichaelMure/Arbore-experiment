@@ -32,6 +32,7 @@
 
 class Cache : public CacheBase
 {
+	std::vector<std::string> delayed_mkfile_send;
 public:
 
 	Cache();
@@ -41,6 +42,8 @@ public:
 	virtual void RmFile(std::string path);
 	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true, bool erase_on_modification = false);
 	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
+
+	virtual void SendMkFile(std::string filename);
 
 	void SendChanges(pf_id peer, time_t last_view);
 

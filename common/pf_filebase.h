@@ -71,7 +71,7 @@ public:
 
 	IDList GetSharers() const { return sharers; }
 	void SetSharers(IDList l);
-	void AddSharer(pf_id id) { sharers.push_back(id); SetSharers(sharers); }
+	void AddSharer(pf_id id) { sharers.insert(id); SetSharers(sharers); }
 
 	pf_stat GetAttr() const { return stat; };
 	void SetAttr(pf_stat stat);

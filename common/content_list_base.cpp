@@ -167,7 +167,7 @@ void ContentListBase::AddReferer(std::string path, pf_id referer)
 	if(refered_by.find(path) == refered_by.end())
 		refered_by.insert(make_pair(path, IDList()));
 
-	refered_by[path].push_back(referer);
+	refered_by[path].insert(referer);
 }
 
 void ContentListBase::DelReferer(std::string path, pf_id referer)

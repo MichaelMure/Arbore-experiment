@@ -126,7 +126,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		if(sender == 0)
 		{
-			sharers.push_back(environment.my_id.Get());
+			sharers.insert(environment.my_id.Get());
 			stat.uid = environment.my_id.Get();
 			stat.gid = environment.my_id.Get();
 		}
@@ -241,12 +241,14 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			sender->SendMsg(pckt);
 			return;
 		}
+		#if 0 /* TODO: for now, if local.meta_mtime == dist.meta_mtime, we update file. */
 		else if(file->GetAttr().meta_mtime == dist_ts)
 		{
 			log[W_DEBUG] << "Same timestamp... What can we do ??";
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
+		#endif
 		else if(erase_on_modification)
 		{
 			FileContent& file_content = content_list.GetFile(file->GetFullName());
@@ -261,7 +263,20 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	}
 	else
 	{
-		stat.meta_mtime = time(NULL);
+		time_t now = time(NULL);
+
+		/* If local meta_mtime == now, to prevent flood we delay NET_MKFILE message
+		 * to the next second
+		 */
+		if(file->GetAttr().meta_mtime == now)
+		{
+			log[W_DEBUG] << "local.meta_mtime = now, so we are looking for delay mkfile message";
+			std::string filename = file->GetFullName();
+			if(delayed_mkfile_send.find(filename) == delayed_mkfile_send.end())
+				delayed_mkfile_send[filename] = IDList();
+		}
+		else
+			stat.meta_mtime = now;
 	}
 
 	log[W_DEBUG] << "Updating file.";
@@ -288,11 +303,32 @@ void Cache::AddSharer(std::string path, pf_id sharer)
 	if(std::find(idl.begin(), idl.end(), sharer) != idl.end())
 		return;
 
-	idl.push_back(sharer);
+	idl.insert(sharer);
 	pf_stat stat = f->GetAttr();
 	stat.meta_mtime = time(NULL);
 
 	_set_attr(f, stat, 0, idl);
+
+}
+
+void Cache::SendMkFile(std::string filename)
+{
+	BlockLockMutex lock(this);
+
+	FileEntry* f = Path2File(filename);
+
+	if(!f)
+		throw NoSuchFileOrDir();
+
+	std::map<std::string, IDList>::iterator it;
+	if((it = delayed_mkfile_send.find(filename)) == delayed_mkfile_send.end())
+		return;
+
+	log[W_DEBUG] << "Send delayed MKFILE:";
+	Packet p = filedist.CreateMkFilePacket(f);
+	peers_list.SendMsg(it->second, p);
+
+	delayed_mkfile_send.erase(it);
 
 }
 

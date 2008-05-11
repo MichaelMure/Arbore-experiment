@@ -48,7 +48,7 @@ Hdd::~Hdd()
 			//{
 			//	return tree;
 			//}
-			
+
 void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 {
 	BlockLockMutex lock(this);
@@ -112,7 +112,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 				IDList idlist;
 				std::string id;
 				while((id = stringtok(cfg_val_s, ",")).empty() == false)
-					idlist.push_back(StrToTyp<uint32_t>(id));
+					idlist.insert(StrToTyp<uint32_t>(id));
 				f->SetSharers(idlist);
 			}
 			#endif

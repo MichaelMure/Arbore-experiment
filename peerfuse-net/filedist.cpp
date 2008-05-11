@@ -29,6 +29,8 @@
 #include "network.h"
 #include "environment.h"
 #include "packet.h"
+#include "scheduler_queue.h"
+#include "jobs/job_send_mkfile.h"
 
 FileDistribution::FileDistribution()
 {
@@ -262,10 +264,23 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 	if(sender != NULL)
 		relayed_peers.erase(sender);
 
-	for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+	std::string filename = f->GetFullName();
+	std::map<std::string, IDList>::iterator delayed_mkfile = cache.delayed_mkfile_send.find(filename);
+	if(delayed_mkfile != cache.delayed_mkfile_send.end())
 	{
-		pckt.SetDstID((*p)->GetID());
-		(*p)->SendMsg(pckt);
+		log[W_DEBUG] << "Delay mkfile";
+		if(delayed_mkfile->second.empty())
+			scheduler_queue.Queue(new JobSendMkFile(filename));
+		for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+			delayed_mkfile->second.insert((*p)->GetID());
+	}
+	else
+	{
+		for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+		{
+			pckt.SetDstID((*p)->GetID());
+			(*p)->SendMsg(pckt);
+		}
 	}
 
 }

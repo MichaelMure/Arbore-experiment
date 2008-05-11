@@ -35,6 +35,7 @@
 
 class Cache : public CacheBase
 {
+	std::map<std::string, IDList> delayed_mkfile_send;
 
 	#ifndef PF_SERVER_MODE
 	enum incoming_states_t
@@ -73,6 +74,8 @@ public:
 	void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true, bool erase_on_modification = false);
 	void RenameFile(std::string path, std::string new_path, pf_id sender = 0);
 	void AddSharer(std::string path, pf_id sharer);
+
+	void SendMkFile(std::string filename);
 
 	/* Send files dir to a peer */
 	void SendDirFiles(std::string path, pf_id to);

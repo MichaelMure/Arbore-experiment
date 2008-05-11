@@ -240,3 +240,8 @@ void Cache::RenameFile(std::string path, std::string new_path, pf_id sender)
 
 	Unlock();
 }
+
+void Cache::SendMkFile(std::string filename)
+{
+
+}

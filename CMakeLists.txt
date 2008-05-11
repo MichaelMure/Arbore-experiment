@@ -31,6 +31,7 @@ SET(SRC
 	common/jobs/job_set_chunk.cpp
 	common/jobs/job_set_shared_part.cpp
 	common/jobs/job_mkfile.cpp
+	common/jobs/job_send_mkfile.cpp
 
 	common/ssl/certificate.cpp
 	common/ssl/connection.cpp

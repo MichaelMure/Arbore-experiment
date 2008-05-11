@@ -18,40 +18,24 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: job_mkfile.cpp 1008 2008-05-08 17:07:32Z lds $
  */
 
-#ifndef JOB_TYPES_H
-#define JOB_TYPES_H
+#include "job_send_mkfile.h"
+#include "cache.h"
 
-enum job_type
+bool JobSendMkFile::Start()
 {
-	/* MKfile triggered by a peer */
-	JOB_MKFILE,
-	/* SetAttr triggered by a peer */
-	JOB_FILE_SETATTR,
-	/* A peer for a reference to a file */
-	JOB_SEND_REF_FILE,
-	/* A peer told us the part of the file he has */
-	JOB_SET_SHARED_PART,
-	/* Send a chunk to a peer */
-	JOB_SEND_CHUNK,
-	/* Receive a chunk from a peer */
-	JOB_SET_CHUNK,
-	/* Tries connecting to a peer */
-	JOB_NEW_CONNECT,
-	/* Tries connecting to a peer because an other
-	   peer asked us to it */
-	JOB_NEW_CONN_REQ,
-	/* Tries connecting to a list of peers */
-	JOB_NEW_CONN_QUEUE,
-	/* Update responsibles files */
-	JOB_UPDATE_RESP_FILES,
-	/* Send list of files in a directory to a peer */
-	JOB_LS_DIR,
-	/* Tell cache we receive all of the directory files */
-	JOB_END_OF_LS,
-	/* Delay a send of a NET_MKFILE message */
-	JOB_SEND_MKFILE,
-};
-#endif
+	try
+	{
+		cache.SendMkFile(file);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
+		/* Possible, this is because the file was deleted between
+		 * creation of this job and his execution.
+		 */
+	}
+
+	return false;
+}
