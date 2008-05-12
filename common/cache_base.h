@@ -62,7 +62,8 @@ protected:
 	enum p2f_flags
 	{
 		CREATE_UNKNOWN_DIRS = 1 << 0,
-		RESTORE_REMOVED_FILE = 1 << 1
+		RESTORE_REMOVED_FILE = 1 << 1,
+		GET_REMOVED_FILE = 1 << 2,
 	};
 	FileEntry* Path2File(std::string path, unsigned int flags = 0, std::string *filename = NULL);
 

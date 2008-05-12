@@ -27,6 +27,7 @@
 #include "file_content.h"
 #include "hdd.h"
 #include "session_config.h"
+#include "environment.h"
 
 CacheBase::CacheBase()
 			: Mutex(RECURSIVE_MUTEX),
@@ -49,9 +50,10 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 			if(path.empty())
 			{
 				/* we are in last dir, but this file doesn't exist */
-				if(tmp && flags & RESTORE_REMOVED_FILE)
+				if(tmp && (flags & (RESTORE_REMOVED_FILE|GET_REMOVED_FILE)))
 				{
-					tmp->ClearRemoved();
+					if(flags & RESTORE_REMOVED_FILE)
+						tmp->ClearRemoved();
 					return tmp;
 				}
 				else if(filename)
@@ -74,10 +76,10 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 					tmp = new DirEntry(name, stat, current_dir);
 					current_dir->AddFile(tmp);
 				}
-				else
+				if(flags & RESTORE_REMOVED_FILE)
 					tmp->ClearRemoved();
 			}
-			else
+			else if(!(flags & GET_REMOVED_FILE) || !tmp)
 				return NULL;
 		}
 
@@ -190,10 +192,12 @@ void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 	stat.meta_mtime = now;
 	stat.mtime = now;
 	stat.ctime = now;
+	IDList idlist;
+	idlist.insert(environment.my_id.Get());
 	if(off + (off_t)size > (off_t)stat.size)
 	{
 		stat.size = (size_t)off + size;
-		SetAttr(path, stat);
+		SetAttr(path, stat, idlist);
 	}
 
 	content_list.RefreshPeersRef(path);
@@ -243,12 +247,18 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 int CacheBase::Truncate(std::string path, off_t offset)
 {
 	log[W_DEBUG] << "Truncating \"" << path << "\" at " << offset;
+
 	pf_stat stat = GetAttr(path);
 	stat.size = (size_t)offset;
 	stat.ctime = time(NULL);
 	stat.mtime = stat.ctime;
 	stat.meta_mtime = stat.ctime;
-	SetAttr(path, stat);
+
+	IDList idlist;
+	idlist.insert(environment.my_id.Get());
+
+	SetAttr(path, stat, idlist);
+
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(offset);
 
