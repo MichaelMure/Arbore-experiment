@@ -237,6 +237,32 @@ void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 	for(it = peers_list.begin(); it != peers_list.end(); ++it)
 		if(!(*it)->IsAnonymous() &&
 		(*it)->IsHighLink() &&
+		(*it)->IsConnection() &&
 		(*it) != but_one)
 			(*it)->SendMsg(pckt);
 }
+
+void PeersList::SendMsg(pf_id id, const Packet &p) const
+{
+	BlockLockMutex lock(this);
+	Peer* peer = PeerFromID(id);
+	if(peer)
+	{
+		Packet packet = p;
+		if(packet.GetSrcID() == 0)
+			packet.SetSrcID(environment.my_id.Get());
+		peer->SendMsg(packet);
+	}
+}
+
+void PeersList::SendMsg(IDList ids, const Packet &p) const
+{
+	BlockLockMutex lock(this);
+	Packet packet = p;
+	for(IDList::iterator it = ids.begin(); it != ids.end(); ++it)
+	{
+		packet.SetDstID(*it);
+		SendMsg(*it, packet);
+	}
+}
+

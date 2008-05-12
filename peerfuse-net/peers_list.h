@@ -58,6 +58,12 @@ public:
 	void GetMapOfNetwork(std::vector<std::string> &list, Peer* from = 0, std::string prefix = "") const;
 
 	void PeerSetConnection(pf_id id, int fd);
+
+	/** Send a message to a peer */
+	virtual void SendMsg(pf_id id, const Packet &p) const;
+
+	/** Send a message to a list of peers. */
+	virtual void SendMsg(IDList ids, const Packet &p) const;
 };
 
 extern PeersList peers_list;

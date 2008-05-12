@@ -307,10 +307,8 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	{
 		FileContent& f = content_list.GetFile(file->GetFullName());
 		f.Truncate(0);
-	}
-			
-	if(file->IsRemoved())
 		file->SetSharers(IDList());
+	}
 
 	/* Update file */
 	hdd.UpdateFile(file);

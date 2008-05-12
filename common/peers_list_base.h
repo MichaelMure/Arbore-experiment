@@ -98,10 +98,10 @@ public:
 	pf_addr GetPeerAddr(pf_id) const;
 
 	/** Send a message to a peer */
-	void SendMsg(pf_id id, const Packet &p) const;
+	virtual void SendMsg(pf_id id, const Packet &p) const;
 
 	/** Send a message to a list of peers. */
-	void SendMsg(IDList ids, const Packet &p) const;
+	virtual void SendMsg(IDList ids, const Packet &p) const;
 
 	/** Request a file chunk to a peer. */
 	void RequestChunk(std::string filename, pf_id id, off_t offset, size_t size);
