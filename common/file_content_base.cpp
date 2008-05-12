@@ -363,6 +363,7 @@ void FileContentBase::SyncToHdd(bool force)
 				{
 					/* Came back later, let fuse continue to acces this file */
 					ondisk_synced = false;
+					it = erase(it);
 					return;
 				}
 			}
