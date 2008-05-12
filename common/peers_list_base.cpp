@@ -227,7 +227,8 @@ void PeersListBase::SendMsg(pf_id id, const Packet &p) const
 {
 	BlockLockMutex lock(this);
 	Peer* peer = PeerFromID(id);
-	peer->SendMsg(p);
+	if(peer)
+		peer->SendMsg(p);
 }
 
 void PeersListBase::SendMsg(IDList ids, const Packet &p) const
