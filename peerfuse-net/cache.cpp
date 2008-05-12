@@ -115,7 +115,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 	try
 	{
-		file = Path2File(path, CREATE_UNKNOWN_DIRS|RESTORE_REMOVED_FILE, &filename);
+		file = Path2File(path, CREATE_UNKNOWN_DIRS|GET_REMOVED_FILE, &filename);
 		DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 		if(!file)
@@ -205,7 +205,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	BlockLockMutex lock(this);
 	Peer* peer = 0;
 	std::string filename;
-	FileEntry* file = Path2File(path, 0, &filename);
+	FileEntry* file = Path2File(path, GET_REMOVED_FILE, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(file);
 
 	if(!file || (filename.empty() == false && dir))
@@ -280,10 +280,30 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 
 	log[W_DEBUG] << "Updating file.";
 
+	if(sharers.empty() == false)
+	{
+		/* If distant file has not the same content that mine, we get distant
+		 * sharers list.
+		 * In other case, we only merge list.
+		 */
+		if(file->GetAttr().mtime != stat.mtime)
+		{
+			log[W_DEBUG] << file->GetAttr().mtime << " != " << stat.mtime << ": we update sharers";
+			file->SetSharers(sharers);
+		}
+		else
+		{
+			log[W_DEBUG] << file->GetAttr().mtime << " == " << stat.mtime << ": we merge sharers";
+			IDList idlist = file->GetSharers();
+			idlist.insert(sharers.begin(), sharers.end());
+			file->SetSharers(idlist);
+		}
+	}
+
 	file->SetAttr(stat);
 
-	if(sharers.empty() == false)
-		file->SetSharers(sharers);
+	if(file->IsRemoved())
+		file->SetSharers(IDList());
 
 	/* Update file */
 	hdd.UpdateFile(file);
@@ -314,7 +334,7 @@ void Cache::SendMkFile(std::string filename)
 {
 	BlockLockMutex lock(this);
 
-	FileEntry* f = Path2File(filename);
+	FileEntry* f = Path2File(filename, GET_REMOVED_FILE);
 
 	if(!f)
 		throw NoSuchFileOrDir();
