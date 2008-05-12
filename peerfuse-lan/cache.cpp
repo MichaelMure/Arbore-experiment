@@ -198,7 +198,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 		}
 
 		f->SetAttr(stat);
-		if(f->IsRemoved())
+		if(f->IsRemoved() && !(f->GetAttr().mode & S_IFDIR))
 		{
 			FileContent& file = content_list.GetFile(path);
 			file.Truncate(0);
@@ -280,8 +280,11 @@ void Cache::RmFile(std::string path)
 
 	f->SetRemoved();
 
-	FileContent& file = content_list.GetFile(path);
-	file.Truncate(0);
+	if(!(f->GetAttr().mode & S_IFDIR))
+	{
+		FileContent& file = content_list.GetFile(path);
+		file.Truncate(0);
+	}
 	content_list.RemoveFile(f->GetFullName());
 
 	peers_list.Broadcast(CreateMkFilePacket(f));

@@ -196,8 +196,11 @@ void Cache::RmFile(std::string path)
 
 	_set_attr(f, stat, NULL, IDList());
 
-	FileContent& file = content_list.GetFile(path);
-	file.Truncate(0);
+	if(!(f->GetAttr().mode & S_IFDIR))
+	{
+		FileContent& file = content_list.GetFile(path);
+		file.Truncate(0);
+	}
 	content_list.RemoveFile(f->GetFullName());
 
 }
@@ -303,7 +306,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	}
 
 	file->SetAttr(stat);
-	if(file->IsRemoved())
+	if(!(file->GetAttr().mode & S_IFDIR) && file->IsRemoved())
 	{
 		FileContent& f = content_list.GetFile(file->GetFullName());
 		f.Truncate(0);
