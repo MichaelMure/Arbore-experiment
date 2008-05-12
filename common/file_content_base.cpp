@@ -395,22 +395,23 @@ void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
 	{
 		// TODO: we don't handle nicely chunks in ram
 		if(front().GetOffset() <= offset
-			&& front().GetOffset() + (off_t) front().GetSize() >= offset
-			&& front().GetOffset() + (off_t) front().GetSize() <= offset + (off_t)size)
+			&& front().GetEndOffset() >= offset
+			&& front().GetEndOffset() <= offset + size)
+		{
 			offset = front().GetOffset();
 
-		/* Find the last contiguous entry */
-		iterator it = begin();
-		off_t next_off = it->GetOffset();
-		while(it != end()
-			&& next_off == it->GetOffset())
-		{
-			next_off = it->GetOffset() + (off_t)it->GetSize();
-			++it;
+			/* Find the last contiguous entry */
+			iterator it = begin();
+			off_t next_off = it->GetEndOffset();
+			while(it != end() && next_off == it->GetOffset())
+			{
+				next_off = it->GetEndOffset();
+				++it;
+			}
+			--it;
+	
+			size =  MAX(it->GetEndOffset(), offset + (off_t)size) - offset;
 		}
-		--it;
-
-		size = (size_t) (MAX(it->GetOffset() + (off_t) it->GetSize(), offset + (off_t)size) - offset);
 	}
 }
 
