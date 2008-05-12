@@ -83,15 +83,16 @@ bool FileContentBase::LoadFd()
 	if(ondisk_fd == -1)
 	{
 		ondisk_fd = hdd.GetFd(filename);
-		off_t size = lseek(ondisk_fd, 0, SEEK_END);
-		if(size == (off_t)-1)
+		ondisk_size = lseek(ondisk_fd, 0, SEEK_END);
+		if(ondisk_size == (off_t)-1)
 		{
 			log[W_ERR] << "Error loading \"" << filename << "\": " << strerror(errno);
 			close(ondisk_fd);
 			ondisk_fd = -1;
+			ondisk_size = 0;
+			ondisk_offset = 0;
 			return false;
 		}
-		ondisk_size = (size_t) size;
 		log[W_DEBUG] << "\"" << filename << "\" have " << ondisk_size << " oct on hdd";
 	}
 	return (ondisk_fd != -1);
@@ -347,7 +348,7 @@ void FileContentBase::SyncToHdd(bool force)
 		return;
 
 	ondisk_synced = true;
-	log[W_DEBUG] << "Trying to sync " << filename;
+	//log[W_DEBUG] << "Trying to sync " << filename;
 	/* Write on disk, without doing "blanks" in the file */
 	iterator it = begin();
 	while(it != end() && it->GetOffset() <= ondisk_offset + (off_t)ondisk_size)
@@ -373,6 +374,8 @@ void FileContentBase::SyncToHdd(bool force)
 		{
 			ondisk_synced = false;
 			++it;
+			if(!force)
+				return;
 		}
 	}
 	if(ondisk_synced && ondisk_fd != -1)
@@ -393,25 +396,20 @@ void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
 
 	if(begin() != end())
 	{
-		// TODO: we don't handle nicely chunks in ram
-		if(front().GetOffset() <= offset
-			&& front().GetEndOffset() >= offset
-			&& front().GetEndOffset() <= offset + size)
-		{
+		if(front().GetOffset() <= offset && front().GetEndOffset() >= offset)
 			offset = front().GetOffset();
 
-			/* Find the last contiguous entry */
-			iterator it = begin();
-			off_t next_off = it->GetEndOffset();
-			while(it != end() && next_off == it->GetOffset())
-			{
-				next_off = it->GetEndOffset();
-				++it;
-			}
-			--it;
-	
-			size =  MAX(it->GetEndOffset(), offset + (off_t)size) - offset;
+		/* Find the last contiguous entry */
+		iterator it = begin();
+		off_t next_off = it->GetOffset();
+		while(it != end() && next_off == it->GetOffset())
+		{
+			next_off = it->GetEndOffset();
+			++it;
 		}
+		--it;
+	
+		size =  MAX(it->GetEndOffset(), ondisk_offset + ondisk_size) - offset;
 	}
 }
 
