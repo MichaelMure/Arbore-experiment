@@ -138,7 +138,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	BlockLockMutex lock(this);
 
 	std::string filename;
-	FileEntry* f = Path2File(path, 0, &filename);
+	FileEntry* f = Path2File(path, GET_REMOVED_FILE, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(f);
 
 	if(!f)
@@ -175,7 +175,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex lock(this);
-	FileEntry* f = Path2File(path);
+	FileEntry* f = Path2File(path, GET_REMOVED_FILE);
 	if(!f)
 		throw NoSuchFileOrDir();
 
@@ -234,7 +234,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 void Cache::SendMkFile(std::string filename)
 {
 	BlockLockMutex lock(this);
-	FileEntry* f = Path2File(filename);
+	FileEntry* f = Path2File(filename, GET_REMOVED_FILE);
 
 	if(!f)
 		throw NoSuchFileOrDir();
