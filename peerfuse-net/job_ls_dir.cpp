@@ -23,9 +23,21 @@
 
 #include "job_ls_dir.h"
 #include "cache.h"
+#include "environment.h"
+#include "peers_list.h"
 
 bool JobLsDir::Start()
 {
-	cache.SendDirFiles(path, id);
+	try
+	{
+		cache.SendDirFiles(path, id);
+	}
+	catch(Cache::NoSuchFileOrDir &e)
+	{
+		/* File doesn't exist. We send NET_END_OF_LS message... */
+		Packet pckt = Packet(NET_END_OF_LS, environment.my_id.Get(), id);
+		pckt.SetArg(NET_END_OF_LS_PATH, path);
+		peers_list.SendMsg(id, pckt);
+	}
 	return false;
 }
