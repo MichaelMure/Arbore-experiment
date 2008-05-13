@@ -196,11 +196,8 @@ void Cache::RmFile(std::string path)
 
 	_set_attr(f, stat, NULL, IDList());
 
-	if(!(f->GetAttr().mode & S_IFDIR))
-	{
-		FileContent& file = content_list.GetFile(path);
-		file.Truncate(0);
-	}
+	FileContent& file = content_list.GetFile(path);
+	file.Truncate(0);
 	content_list.RemoveFile(f->GetFullName());
 
 }
@@ -246,15 +243,13 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			sender->SendMsg(pckt);
 			return;
 		}
-		#if 0 /* TODO: for now, if local.meta_mtime == dist.meta_mtime, we update file. */
-		else if(file->GetAttr().meta_mtime == dist_ts)
+		else if(file->GetAttr() == stat)
 		{
-			log[W_DEBUG] << "Same timestamp... What can we do ??";
+			log[W_DEBUG] << "Same timestamp...";
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
-		#endif
-		else if(erase_on_modification)
+		else if(erase_on_modification && file->GetAttr().mtime != stat.mtime)
 		{
 			FileContent& file_content = content_list.GetFile(file->GetFullName());
 			file_content.Truncate(0);
@@ -264,7 +259,6 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			FileContent& file_content = content_list.GetFile(file->GetFullName());
 			file_content.Truncate(stat.size);
 		}
-
 	}
 	else
 	{
@@ -306,7 +300,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	}
 
 	file->SetAttr(stat);
-	if(!(file->GetAttr().mode & S_IFDIR) && file->IsRemoved())
+	if(file->IsRemoved())
 	{
 		FileContent& f = content_list.GetFile(file->GetFullName());
 		f.Truncate(0);

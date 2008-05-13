@@ -49,6 +49,20 @@ public:
 		mtime(0),
 		ctime(0),
 		meta_mtime(0) {}
+
+	bool operator==(const pf_stat& st)
+	{
+		return (size == st.size &&
+			atime == st.atime &&
+			mtime == st.mtime &&
+			ctime == st.ctime &&
+			meta_mtime == st.meta_mtime &&
+			pf_mode == st.pf_mode &&
+			mode == st.mode &&
+			uid == st.uid &&
+			gid == st.gid);
+	}
+
 };
 
 class FileEntryBase
