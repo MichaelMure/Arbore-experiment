@@ -177,7 +177,8 @@ Peer* PeersList::RemovePeer(Peer* p)
 		if((id = p->GetUpLink()))
 		{
 			Peer* uplink = PeerFromID(id);
-			uplink->RemoveDownLink(p->GetID());
+			if(uplink)
+				uplink->RemoveDownLink(p->GetID());
 		}
 	}
 
