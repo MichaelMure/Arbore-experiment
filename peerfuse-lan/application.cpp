@@ -113,7 +113,7 @@ int Application::main(int argc, char *argv[])
 
 	if(!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version"))
 	{
-		std::cout << PEERFUSE_VERSION << " (Build " __DATE__ " " __TIME__ ") © 2008 Laurent Defer, Romain Bignon" << std::endl;
+		std::cout << PEERFUSE_VERSION << " (Build " __DATE__ " " __TIME__ ") © 2008 Laurent Defert, Romain Bignon" << std::endl;
 		return EXIT_SUCCESS;
 	}
 
