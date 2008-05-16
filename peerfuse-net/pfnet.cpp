@@ -22,9 +22,10 @@
  */
 
 #include "application.h"
+#include <stdlib.h>
 
 int main(int argc, char** argv)
 {
 	Application app;
-	return app.main(argc, argv);
+	exit(app.main(argc, argv));
 }

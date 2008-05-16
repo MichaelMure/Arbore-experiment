@@ -43,6 +43,7 @@
 #include "environment.h"
 #include "hdd.h"
 #include "content_list.h"
+#include "pflan.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -99,8 +100,7 @@ void Application::Exit()
 	content_list.Stop();
 	net.Stop();
 	scheduler.Stop();
-	tree_cfg.Save();
-	session_cfg.Save();
+	/* It is not necessary to save session_cfg objects because destructor do this */
 }
 
 int Application::main(int argc, char *argv[])
@@ -108,8 +108,15 @@ int Application::main(int argc, char *argv[])
 	if(argc < 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
 	{
 		std::cerr << "Syntax: " << argv[0] << " <configpath> <mount point> [fuse options]" << std::endl;
-		exit(EXIT_FAILURE);
+		return (EXIT_FAILURE);
 	}
+
+	if(!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version"))
+	{
+		std::cout << PEERFUSE_VERSION << " (Build " __DATE__ " " __TIME__ ") © 2008 Laurent Defer, Romain Bignon" << std::endl;
+		return EXIT_SUCCESS;
+	}
+
 
 	struct rlimit rlim;
 	if(!getrlimit(RLIMIT_CORE, &rlim) && rlim.rlim_cur != RLIM_INFINITY)
@@ -124,7 +131,7 @@ int Application::main(int argc, char *argv[])
 		if(!conf.Load(argv[1]))
 		{
 			log[W_ERR] << "Unable to load configuration, exiting..";
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
 
@@ -132,13 +139,13 @@ int Application::main(int argc, char *argv[])
 		session_cfg.Display();
 		// Try saving at start to avoid bad surprises when exiting
 		if(!session_cfg.Save())
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 
 		tree_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/tree.cfg");
 		tree_cfg.Display();
 		// Try saving at start to avoid bad surprises when exiting
 		if(!tree_cfg.Save())
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 
 		/* cache.Load() depends on tree_cfg */
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
@@ -163,12 +170,12 @@ int Application::main(int argc, char *argv[])
 			catch(Crl::BadCRL &e)
 			{
 				log[W_ERR] << "Failed to load the crl: "<< e.GetString();
-				exit(EXIT_FAILURE);
+				return (EXIT_FAILURE);
 			}
 			catch(...)
 			{
 				log[W_ERR] << "Failed to load the crl.";
-				exit(EXIT_FAILURE);
+				return (EXIT_FAILURE);
 			}
 		}
 		else
@@ -180,27 +187,27 @@ int Application::main(int argc, char *argv[])
 		catch(Certificate::BadCertificate &e)
 		{
 			log[W_ERR] << "Unable to read certificate: " << e.GetString();
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		catch(Certificate::BadFile &e)
 		{
 			log[W_ERR] << "Unable to read certificate file";
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		catch(PrivateKey::BadPrivateKey &e)
 		{
 			log[W_ERR] << "Unable to read priveate key: " << e.GetString();
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		catch(PrivateKey::BadFile &e)
 		{
 			log[W_ERR] << "Unable to read private key file";
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 		catch(Crl::BadCRL &e)
 		{
 			log[W_ERR] << "Unable to CRL file: " << e.GetString();
-			exit(EXIT_FAILURE);
+			return (EXIT_FAILURE);
 		}
 
 		umask(0);
@@ -248,6 +255,6 @@ int Application::main(int argc, char *argv[])
 		log[W_ERR] << "Can't write to cache: " << e.dir;
 	}
 
-	exit(EXIT_FAILURE);
+	return (EXIT_FAILURE);
 
 }

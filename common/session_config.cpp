@@ -32,7 +32,7 @@
 SessionConfig session_cfg;
 SessionConfig tree_cfg;
 
-SessionConfig::SessionConfig() : Mutex(RECURSIVE_MUTEX), filename("")
+SessionConfig::SessionConfig() : Mutex(RECURSIVE_MUTEX)
 {
 }
 
@@ -88,6 +88,11 @@ void SessionConfig::Load(const std::string& _filename)
 bool SessionConfig::Save()
 {
 	BlockLockMutex lock(this);
+
+	/* Not loaded */
+	if(this->filename.empty())
+		return false;
+
 	std::fstream fout;
 	fout.open(filename.c_str(), std::fstream::out);
 	if(!fout)
