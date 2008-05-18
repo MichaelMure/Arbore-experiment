@@ -278,6 +278,19 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 	}
 
 	log[W_DEBUG] << "Updating file.";
+	if(!(stat.mode & (S_IFDIR|S_IFREG)))
+	{
+		log[W_WARNING] << "File isn't correct";
+		printf("%o\n", stat.mode);
+		if(file->GetAttr().mode & S_IFDIR)
+			stat.mode |= S_IFDIR;
+		else
+			stat.mode |= S_IFREG;
+		stat.meta_mtime = time(NULL);
+
+		/* TODO: DO NOT EXIT, BUT CORRECT SENDER!!!!! */
+		return;
+	}
 
 	if(sharers.empty() == false)
 	{
