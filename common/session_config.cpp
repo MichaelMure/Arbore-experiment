@@ -53,6 +53,11 @@ static ssize_t getline(std::string& line, std::fstream& file)
 void SessionConfig::Load(const std::string& _filename)
 {
 	BlockLockMutex lock(this);
+
+	/* If already loaded, save before loading with a new file. */
+	if(this->filename.empty() == false)
+		Save();
+
 	filename = _filename;
 
 	std::fstream fin;
