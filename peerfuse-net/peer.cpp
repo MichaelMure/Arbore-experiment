@@ -45,6 +45,7 @@
 #include "job_end_of_ls.h"
 #include "connection_ssl.h"
 #include "environment.h"
+#include "fs_utils.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
 			:						  /* anonymous is only when this is a real connection */
@@ -327,6 +328,9 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
 
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	pf_stat stat;
 	stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
@@ -339,6 +343,9 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 	IDList sharers = msg->GetArg<IDList>(NET_MKFILE_SHARERS);
 
+	if(!check_filemode(stat.mode))
+		throw Packet::Malformated();
+
 	scheduler_queue.Queue(new JobMkFile(filename, stat, sharers, GetID(), /* keep_newest */ true, /* erase_on_modification */ true));
 }
 
@@ -349,9 +356,13 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
  */
 void Peer::Handle_net_ls_dir(struct Packet* msg)
 {
-	std::string path;
-	path = msg->GetArg<std::string>(NET_LS_DIR_PATH);
-	scheduler_queue.Queue(new JobLsDir(path, GetID()));
+	std::string filename;
+	filename = msg->GetArg<std::string>(NET_LS_DIR_PATH);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
+	scheduler_queue.Queue(new JobLsDir(filename, GetID()));
 }
 
 /** NET_END_OF_LS
@@ -379,6 +390,10 @@ void Peer::Handle_net_want_ref_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_WANT_REF_FILE_PATH);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	scheduler_queue.Queue(new JobSendRefFile(filename, GetID()));
 }
 
@@ -399,6 +414,9 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
 	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REF_FILE_OFFSET);
 	off_t size = (size_t)msg->GetArg<uint64_t>(NET_REF_FILE_SIZE);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
 
 	file_refs.insert(make_pair(ref, filename));
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
