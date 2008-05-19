@@ -47,6 +47,7 @@
 #include "tools.h"
 #include "peers_list.h"
 #include "scheduler_queue.h"
+#include "fs_utils.h"
 
 const int merge_post_lastview_dt = 15 * 60;	  /* When merging, ask a diff of what's happened since last_view - 15m */
 
@@ -289,6 +290,9 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_MKFILE_PATH);
 
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	pf_stat stat;
 	stat.mode = msg->GetArg<uint32_t>(NET_MKFILE_MODE);
 	stat.uid = msg->GetArg<uint32_t>(NET_MKFILE_UID);
@@ -299,6 +303,9 @@ void Peer::Handle_net_mkfile(struct Packet* msg)
 	stat.meta_mtime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_META_MODIF_TIME));
 	stat.ctime = Timestamp(msg->GetArg<uint32_t>(NET_MKFILE_CREATE_TIME));
 	stat.pf_mode = msg->GetArg<uint32_t>(NET_MKFILE_PF_MODE);
+
+	if(!check_filemode(stat.mode))
+		throw Packet::Malformated();
 
 	scheduler_queue.Queue(new JobMkFile(filename, stat, IDList(), GetID(), HasFlag(MERGING),environment.merging.Get()));
 	session_cfg.Set("last_view_" + TypToStr(GetID()), time(NULL));
@@ -324,6 +331,10 @@ void Peer::Handle_net_who_has_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_WHO_HAS_FILE_PATH);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	scheduler_queue.Queue(new JobAdvertiseFile(filename, GetID()));
 }
 
@@ -331,6 +342,10 @@ void Peer::Handle_net_i_have_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_I_HAVE_FILE_PATH);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	scheduler_queue.Queue(new JobSetSharer(filename, GetID()));
 }
 
@@ -338,6 +353,10 @@ void Peer::Handle_net_want_ref_file(struct Packet* msg)
 {
 	std::string filename;
 	filename = msg->GetArg<std::string>(NET_WANT_REF_FILE_PATH);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
+
 	scheduler_queue.Queue(new JobSendRefFile(filename, GetID()));
 }
 
@@ -348,6 +367,9 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	uint32_t ref = msg->GetArg<uint32_t>(NET_REF_FILE_REF);
 	off_t offset = (off_t)msg->GetArg<uint64_t>(NET_REF_FILE_OFFSET);
 	off_t size = (size_t)msg->GetArg<uint64_t>(NET_REF_FILE_SIZE);
+
+	if(!check_filename(filename))
+		throw Packet::Malformated();
 
 	file_refs.insert(make_pair(ref, filename));
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
