@@ -27,8 +27,8 @@
  *           * std::string stringtok(std::string &in, const char * const delimiters);
  */
 
-#ifndef LIBCONFIG_H
-#define LIBCONFIG_H
+#ifndef PF_CONFIG_H
+#define PF_CONFIG_H
 
 #include <string>
 #include <vector>

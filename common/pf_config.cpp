@@ -25,7 +25,7 @@
 
 #include <fstream>
 #include <iostream>
-#include "libconfig.h"
+#include "pf_config.h"
 
 MyConfig conf;
 

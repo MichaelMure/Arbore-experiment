@@ -8,7 +8,7 @@ SET(SRC
 	common/file_chunk.cpp
 	common/file_content_base.cpp
 	common/fs_utils.cpp
-	common/libconfig.cpp
+	common/pf_config.cpp
 	common/log.cpp
 	common/mutex.cpp
 	common/network_base.cpp

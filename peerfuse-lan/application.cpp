@@ -28,7 +28,7 @@
 #include <sys/resource.h>
 #include <cstring>
 
-#include "libconfig.h"
+#include "pf_config.h"
 #include "application.h"
 #include "network.h"
 #include "pf_ssl_ssl.h"

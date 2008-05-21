@@ -37,7 +37,7 @@
 #include "connection.h"
 #include "connection_ssl.h"
 #include "log.h"
-#include "libconfig.h"
+#include "pf_config.h"
 #include "network_base.h"
 #include "tools.h"
 #include "job_new_connection.h"
