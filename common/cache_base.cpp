@@ -29,16 +29,21 @@
 #include "session_config.h"
 #include "environment.h"
 
-CacheBase::CacheBase()
-			: Mutex(RECURSIVE_MUTEX),
-			tree("", pf_stat(), NULL)
+CacheBase::CacheBase() : Mutex(RECURSIVE_MUTEX)
 {
+	tree = NULL;
+}
+
+CacheBase::~CacheBase()
+{
+	if(tree)
+		delete tree;
 }
 
 FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::string* filename)
 {
 	BlockLockMutex lock(this);
-	DirEntry* current_dir = &tree;
+	DirEntry* current_dir = tree;
 
 	std::string name;
 
@@ -103,6 +108,7 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 void CacheBase::Load(std::string hd_path)
 {
 	BlockLockMutex lock(this);
+	tree = new DirEntry("", pf_stat(), NULL);
 	try
 	{
 		hdd.BuildTree(GetTree(), hd_path);

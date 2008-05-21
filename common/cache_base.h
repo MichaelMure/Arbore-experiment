@@ -55,9 +55,9 @@ class FileEntry;
 class CacheBase : public Mutex
 {
 protected:
-	DirEntry tree;
+	DirEntry* tree;
 
-	DirEntry* GetTree() { return &tree; }
+	DirEntry* GetTree() { return tree; }
 
 	enum p2f_flags
 	{
@@ -77,7 +77,7 @@ public:
 	class FileUnavailable : public std::exception {};
 
 	CacheBase();
-	virtual ~CacheBase() {}
+	virtual ~CacheBase();
 
 	/** Load all tree from an hard drive path.
 	 * It will call the Hdd object to load it.
