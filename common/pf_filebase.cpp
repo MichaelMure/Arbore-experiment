@@ -29,9 +29,8 @@
 #include "session_config.h"
 
 FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
-			: name(_name), parent(_parent)
+			: name(_name), parent(_parent), stat(_stat)
 {
-	SetAttr(_stat);
 }
 
 FileEntryBase::~FileEntryBase()
@@ -63,15 +62,21 @@ bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
 	return (p);
 }
 
-void FileEntryBase::SetAttr(pf_stat new_stat)
+void FileEntryBase::SetAttr(pf_stat new_stat, bool force)
 {
 	// Update attribute
-	if(stat.size != new_stat.size)
+	if(stat.size != new_stat.size || force)
 		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
-	if(stat.meta_mtime != new_stat.meta_mtime)
+	if(stat.meta_mtime != new_stat.meta_mtime || force)
 		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
-	if(stat.pf_mode != new_stat.pf_mode)
+	if(stat.pf_mode != new_stat.pf_mode || force)
 		tree_cfg.Set(GetFullName() + "#pfmode", (uint32_t)new_stat.pf_mode);
+	if(stat.uid != new_stat.uid || force)
+		tree_cfg.Set(GetFullName() + "#uid", (uint32_t)new_stat.uid);
+	if(stat.gid != new_stat.gid || force)
+		tree_cfg.Set(GetFullName() + "#gid", (uint32_t)new_stat.gid);
+	if(stat.mode != new_stat.mode || force)
+		tree_cfg.Set(GetFullName() + "#mode", (uint32_t)new_stat.mode);
 	stat = new_stat;
 }
 
@@ -98,4 +103,10 @@ void FileEntryBase::LoadAttr()
 		stat.size = (size_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#pfmode", cfg_val))
 		stat.pf_mode = (uint32_t)cfg_val;
+	if(tree_cfg.Get(GetFullName() + "#uid", cfg_val))
+		stat.uid = (uint32_t)cfg_val;
+	if(tree_cfg.Get(GetFullName() + "#gid", cfg_val))
+		stat.gid = (uint32_t)cfg_val;
+	if(tree_cfg.Get(GetFullName() + "#mode", cfg_val))
+		stat.mode = (uint32_t)cfg_val;
 }

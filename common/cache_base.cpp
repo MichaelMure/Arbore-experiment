@@ -109,6 +109,9 @@ void CacheBase::Load(std::string hd_path)
 {
 	BlockLockMutex lock(this);
 	tree = new DirEntry("", pf_stat(), NULL);
+	pf_stat s = tree->GetAttr();
+	s.mode = S_IFDIR | S_IRWXU;
+	tree->SetAttr(s);
 	try
 	{
 		hdd.BuildTree(GetTree(), hd_path);

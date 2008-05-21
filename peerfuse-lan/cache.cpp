@@ -158,9 +158,14 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	else
 	{
 		if(stat.mode & S_IFDIR)
+		{
+			stat.mode |= S_IRWXU;
 			f = new DirEntry(filename, stat, dir);
+		}
 		else
 			f = new FileEntry(filename, stat, dir);
+
+		f->SetAttr(stat, true); // hack to force stats to be saved
 
 		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 		dir->AddFile(f);

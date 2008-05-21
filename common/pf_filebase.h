@@ -88,7 +88,7 @@ public:
 	void AddSharer(pf_id id) { sharers.insert(id); SetSharers(sharers); }
 
 	pf_stat GetAttr() const { return stat; };
-	void SetAttr(pf_stat stat);
+	void SetAttr(pf_stat stat, bool force = false);
 
 	/** Load attributes from tree_cfg file. */
 	virtual void LoadAttr();

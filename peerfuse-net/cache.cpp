@@ -132,10 +132,14 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		}
 
 		if(stat.mode & S_IFDIR)
+		{
+			stat.mode |= S_IRWXU;
 			file = new DirEntry(filename, stat, dir);
+		}
 		else
 			file = new FileEntry(filename, stat, dir);
 
+		file->SetAttr(stat); // hack to force stat to saved
 		file->SetSharers(sharers);
 
 		dir->AddFile(file);

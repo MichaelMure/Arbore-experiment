@@ -85,9 +85,6 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 				throw HddAccessFailure(f_path);
 
 			pf_stat file_stats;
-			file_stats.mode = stats.st_mode;
-			file_stats.uid = stats.st_uid;
-			file_stats.gid = stats.st_gid;
 			file_stats.atime = stats.st_atime;
 			file_stats.mtime = stats.st_mtime;
 			file_stats.ctime = stats.st_ctime;
@@ -150,7 +147,12 @@ void Hdd::MkFile(FileEntry* f)
 {
 	BlockLockMutex lock(this);
 	std::string path = root + f->GetFullName();
-	if(f->GetAttr().mode & S_IFDIR)
+
+	mode_t mode = f->GetAttr().mode;
+	mode &= S_IFREG | S_IFDIR;
+	mode |= S_IRUSR | S_IWUSR | (mode & S_IFDIR ? S_IXUSR : 0);
+
+	if(mode & S_IFDIR)
 	{
 		/* Try to open it to know if it exists */
 		DIR* d = opendir(path.c_str());
@@ -161,7 +163,7 @@ void Hdd::MkFile(FileEntry* f)
 			return;
 		}
 
-		int r = mkdir(path.c_str(), f->GetAttr().mode);
+		int r = mkdir(path.c_str(), mode);
 		if(r)
 		{
 			/* Try to create parent directory. */
@@ -175,7 +177,7 @@ void Hdd::MkFile(FileEntry* f)
 			{
 				throw HddWriteFailure(path);
 			}
-			r = mkdir(path.c_str(), f->GetAttr().mode);
+			r = mkdir(path.c_str(), mode);
 			if(r)
 			{
 				log[W_ERR] << "mkdir failed: " << strerror(errno);
@@ -194,7 +196,7 @@ void Hdd::MkFile(FileEntry* f)
 			return;
 		}
 
-		int fd = creat(path.c_str(), f->GetAttr().mode);
+		int fd = creat(path.c_str(), mode);
 		if(fd == -1)
 		{
 			/* Try to create parent directory. */
@@ -209,19 +211,13 @@ void Hdd::MkFile(FileEntry* f)
 				throw HddWriteFailure(path);
 			}
 
-			fd = creat(path.c_str(), f->GetAttr().mode);
+			fd = creat(path.c_str(), mode);
 			if(fd == -1)
 				throw HddWriteFailure(path);
 		}
 		close(fd);
 		log[W_INFO] << "creat on " << path;
 	}
-
-	#ifndef PF_NET
-	/* TODO: store somewhere owner and group of file. -> from pf_file.cpp */
-	if(lchown(path.c_str(), f->GetAttr().uid, f->GetAttr().gid) != 0)
-		throw HddWriteFailure(path);
-	#endif
 }
 
 void Hdd::RmFile(FileEntry* f)

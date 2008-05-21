@@ -26,11 +26,6 @@
 DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
 			: FileEntry(name, _stat, _parent)
 {
-	/* Set the specific directory flag, and remove file flag. */
-	pf_stat stat = GetAttr();
-	stat.mode |= S_IFDIR;
-	stat.mode &= ~S_IFREG;
-	SetAttr(stat);
 }
 
 DirEntry::~DirEntry()

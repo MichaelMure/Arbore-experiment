@@ -42,7 +42,7 @@ public:
 
 	FilePermissions()
 		: pf_mode(0),
-		mode(S_IFREG | S_IRWXU | S_IRWXG | S_IRUSR | S_IXUSR),
+		mode(S_IFREG | S_IRUSR | S_IWUSR),
 		uid(getuid()),
 		gid(getgid())
 		{}
