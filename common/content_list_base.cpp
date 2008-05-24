@@ -48,7 +48,7 @@ void ContentListBase::Loop()
 			log[W_DEBUG] << "Remove \"" << it->first << "\" from the content_list";
 			/* Force a sync to the disc */
 			it->second.SyncToHdd(true);
-			erase(it);
+			RemoveFile(it->first);
 			break;
 		}
 		else
@@ -96,23 +96,34 @@ void ContentListBase::RemoveFile(std::string path)
 {
 	BlockLockMutex lock(this);
 
-	/* Remove referer */
-	std::map<std::string, IDList>::iterator referer_it;
-	if((referer_it = refered_by.find(path)) != refered_by.end())
-		refered_by.erase(referer_it);
-
 	iterator it = find(path);
-	if(it != end())
-		erase(it);
-	/* TODO: optimize-me */
+	if(it == end())
+		return;
+
+	// Erase the content
+	erase(it);
+
+	// Find the ref and erase it
+	uint32_t ref;
 	std::map<uint32_t, std::string>::iterator ref_it;
 	for(ref_it = my_refs.begin(); ref_it != my_refs.end(); ++ref_it)
 	{
 		if(ref_it->second == path)
 		{
+			ref = ref_it->first;
 			my_refs.erase(ref_it);
 			break;
 		}
+	}
+
+	// Acknowledge peers we don't ref this file anymore
+	std::map<std::string, IDList>::iterator referer_it;
+	if((referer_it = refered_by.find(path)) != refered_by.end())
+	{
+		Packet packet(NET_UNREF_FILE);
+		packet.SetArg(NET_UNREF_FILE_REF, ref);
+		peers_list.SendMsg(referer_it->second, packet);
+		refered_by.erase(referer_it);
 	}
 }
 

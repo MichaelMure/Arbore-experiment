@@ -80,6 +80,7 @@ private:
 	void Handle_net_want_ref_file(struct Packet* pckt);
 	void Handle_net_ref_file(struct Packet* pckt);
 	void Handle_net_refresh_ref_file(struct Packet* pckt);
+	void Handle_net_unref_file(struct Packet* pckt);
 	void Handle_net_want_chunk(struct Packet* pckt);
 	void Handle_net_chunk(struct Packet* pckt);
 	void Handle_net_ls_dir(struct Packet* pckt);

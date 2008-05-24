@@ -375,6 +375,19 @@ void Peer::Handle_net_ref_file(struct Packet* msg)
 	scheduler_queue.Queue(new JobSetSharedPart(filename, GetID(), offset, size));
 }
 
+void Peer::Handle_net_unref_file(struct Packet* msg)
+{
+	uint32_t ref = msg->GetArg<uint32_t>(NET_UNREF_FILE_REF);
+
+	std::map<uint32_t, std::string>::iterator it;
+
+	if((it = file_refs.find(ref)) != file_refs.end())
+	{
+		log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
+		file_refs.erase(it);
+	}
+}
+
 void Peer::Handle_net_refresh_ref_file(struct Packet* msg)
 {
 	uint32_t ref = msg->GetArg<uint32_t>(NET_REFRESH_REF_FILE_REF);
@@ -431,6 +444,7 @@ void Peer::HandleMsg(Packet* pckt)
 		&Peer::Handle_net_want_ref_file,
 		&Peer::Handle_net_ref_file,
 		&Peer::Handle_net_refresh_ref_file,
+		&Peer::Handle_net_unref_file,
 		&Peer::Handle_net_want_chunk,
 		&Peer::Handle_net_chunk,
 	};

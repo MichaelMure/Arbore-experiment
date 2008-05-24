@@ -37,6 +37,7 @@ const char* type2str[NET_NB_MESSAGES] =
 	/* NET_WANT_REF_FILE */    "WANT_REF_FILE",
 	/* NET_REF_FILE */         "REF_FILE",
 	/* NET_REFRESH_REF_FILE */ "REFRESH_REF_FILE",
+	/* NET_UNREF_FILE */       "UNREF_FILE",
 	/* NET_WANT_CHUNK */       "WANT_CHUNK",
 	/* NET_CHUNK */            "CHUNK",
 	/* NET_LS_DIR */           "LS_DIR",
@@ -110,6 +111,12 @@ const PacketArgType packet_args[NET_NB_MESSAGES][MAX_PACKET_ARGS] =
 		/* NET_REFRESH_REF_FILE_REF */ T_UINT32, /* Reference of the file */
 		/* NET_REFRESH_REF_FILE_OFFSET */ T_UINT64, /* Offset of the content we own */
 		/* NET_REFRESH_REF_FILE_SIZE */ T_UINT64, /* Size of the content we own */
+		T_NONE
+	},
+
+	// NET_UNREF_FILE
+	{
+		/* NET_UNREF */ T_UINT32, /* Reference of the file */
 		T_NONE
 	},
 
