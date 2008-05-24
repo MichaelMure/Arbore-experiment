@@ -1,0 +1,5 @@
+- read/writes operations
+- automatic file replication
+- user defined space disk occupation
+- no (data) upload on file writes
+
