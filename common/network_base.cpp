@@ -162,7 +162,6 @@ void NetworkBase::Loop()
 		}
 	}
 
-	BlockLockMutex peers_lock(&peers_list);
 	/* About exceptions, when in a catch block we remove a peer,
 	 * the p iterator isn't valid anymore.
 	 * So, as we can't get a new iterator value for peers_list, we must
@@ -172,30 +171,30 @@ void NetworkBase::Loop()
 	 * would have a priority on other peers.
 	 * So, don't forget the "break" after a RemovePeer() call!
 	 */
-	for(PeersList::iterator p = peers_list.begin();
-		p != peers_list.end() && !peers_list.IsChanged();
-		++p)
+	IDList peers = peers_list.GetIDList();
+	for(IDList::iterator p = peers.begin(); p != peers.end(); ++p)
 	{
-		Peer* peer = *p;
-		if(peer->GetFd() < 0)
+		int fd = peers_list.GetPeersFD(*p);
+
+		if(fd < 0)
 			continue;
 
 		// Perform read operations
 		try
 		{
-			while(peer->Receive())
+			while(peers_list.PeerReceive(fd))
 				;
 		}
 		catch(Connection::RecvError &e)
 		{
 			log[W_WARNING] << "recv() error: " << e.GetString();
-			RemovePeer(peer->GetFd());
+			RemovePeer(fd);
 			break;
 		}
 		catch(Packet::Malformated &e)
 		{
 			log[W_ERR] << "Received malformed message!";
-			RemovePeer(peer->GetFd());
+			RemovePeer(fd);
 			break;
 		}
 		// TODO:Rename me into something like BanPeer as we won't reconnect to him
@@ -203,19 +202,19 @@ void NetworkBase::Loop()
 		catch(Peer::MustDisconnect &e)
 		{
 			log[W_WARNING] << "Must disconnected";
-			RemovePeer(peer->GetFd(), false);
+			RemovePeer(fd, false);
 			break;
 		}
 
 		// Perform write operations
 		try
 		{
-			peers_list.PeerFlush(peer->GetFd());
+			peers_list.PeerFlush(fd);
 		}
 		catch(Connection::WriteError &e)
 		{
 			log[W_WARNING] << "send() error: " << e.GetString();
-			RemovePeer(peer->GetFd());
+			RemovePeer(fd);
 			break;
 		}
 

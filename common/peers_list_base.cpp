@@ -252,3 +252,25 @@ void PeersListBase::SendChunk(uint32_t ref, pf_id id, FileChunk& chunk)
 	Peer* peer = PeerFromID(id);
 	peer->SendChunk(ref, chunk);
 }
+
+IDList PeersListBase::GetIDList()
+{
+	BlockLockMutex lock(this);
+	IDList r;
+	for(iterator it = begin(); it != end(); ++it)
+		r.insert((*it)->GetID());
+	return r;
+}
+
+int PeersListBase::GetPeersFD(pf_id peer_id)
+{
+	BlockLockMutex lock(this);
+	int fd = -1;
+	iterator it = begin();
+	while(it != end() && (*it)->GetID() != peer_id)
+		++it;
+
+	if(it != end())
+		fd = (*it)->GetFd();
+	return fd;
+}

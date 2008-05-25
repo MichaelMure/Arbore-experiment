@@ -112,5 +112,11 @@ public:
 	 * @param chunk file chunk
 	 */
 	void SendChunk(uint32_t ref, pf_id id, FileChunk& chunk);
+
+	/** Returns the list ID */
+	IDList GetIDList();
+
+	/** Returns the fd of a peers */
+	int GetPeersFD(pf_id);
 };
 #endif
