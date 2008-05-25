@@ -262,6 +262,15 @@ IDList PeersListBase::GetIDList()
 	return r;
 }
 
+std::list<int> PeersListBase::GetFDList()
+{
+	BlockLockMutex lock(this);
+	std::list<int> r;
+	for(iterator it = begin(); it != end(); ++it)
+		r.push_back((*it)->GetFd());
+	return r;
+}
+
 int PeersListBase::GetPeersFD(pf_id peer_id)
 {
 	BlockLockMutex lock(this);

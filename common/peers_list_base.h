@@ -26,6 +26,7 @@
 
 #include <map>
 #include <vector>
+#include <list>
 #include "peer.h"
 #include "mutex.h"
 #include "packet.h"
@@ -115,6 +116,9 @@ public:
 
 	/** Returns the list ID */
 	IDList GetIDList();
+
+	/** Returns the list ID */
+	std::list<int> GetFDList();
 
 	/** Returns the fd of a peers */
 	int GetPeersFD(pf_id);
