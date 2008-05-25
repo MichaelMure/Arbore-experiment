@@ -90,7 +90,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			file_stats.ctime = stats.st_ctime;
 
 			// Add file
-			if(dir->d_type & DT_DIR)
+			if(stats.st_mode & S_IFDIR)
 				f = new DirEntry(std::string(dir->d_name), file_stats, cache_dir);
 			else
 				f = new FileEntry(std::string(dir->d_name), file_stats, cache_dir);
@@ -100,7 +100,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 			log[W_INFO] << f->GetFullName() << " loaded.";
 
 			cache_dir->AddFile(f);
-			if(dir->d_type & DT_DIR)
+			if(stats.st_mode & S_IFDIR)
 				break;
 		}
 
