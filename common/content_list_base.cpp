@@ -199,6 +199,7 @@ void ContentListBase::DelReferer(std::string path, pf_id referer)
 
 void ContentListBase::DelReferer(pf_id referer)
 {
+	BlockLockMutex lock(this);
 	std::map<std::string, IDList>::iterator ref;
 	for(ref = refered_by.begin(); ref != refered_by.end(); ++ref)
 	{
