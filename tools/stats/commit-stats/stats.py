@@ -304,7 +304,12 @@ def blame(path, users):
 
     child.close()
 
+    REGEXP = re.compile("^trunk/(.*)")
+
     for f in files:
+        # Only count files in trunk
+        if not REGEXP.match(f):
+            continue
         file = os.path.join(path, f)
 
         # This is a directory, don't blame it.
@@ -358,18 +363,19 @@ def get_commits(path, users, all_commits, files):
             all_commits[-1].changed_files += [line]
             freg = re.match('^[ ]+([MA]) /trunk/([a-zA-Z0-9_./-]+)', line)
             if freg:
+                filename = '/' + freg.group(2)
                 try:
-                    file = files[freg.group(2)]
+                    file = files[filename]
                 except KeyError:
-                    file = File(freg.group(2))
-                    files[freg.group(2)] = file
+                    file = File(filename)
+                    files[filename] = file
 
                 file.commits.add_commit(commit)
                 all_commits[-1].files += [file]
                 try:
-                    user.files[freg.group(2)] += [commit]
+                    user.files[filename] += [commit]
                 except KeyError:
-                    user.files[freg.group(2)] = [commit]
+                    user.files[filename] = [commit]
         elif len(all_commits) > 0 and nb_lines > 0:
             if len(line) > 0:
                 all_commits[-1].message += [line]
