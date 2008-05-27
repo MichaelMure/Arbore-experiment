@@ -30,7 +30,7 @@
 class FileContent : public FileContentBase
 {
 public:
-	FileContent(std::string path) : FileContentBase(path), ref_request_time(0) {}
+	FileContent(std::string path) : FileContentBase(path) {}
 	~FileContent() {}
 
 	chunk_availability NetworkRequestChunk(FileChunkDesc chunk);
