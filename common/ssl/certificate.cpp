@@ -159,6 +159,7 @@ std::string Certificate::GetCommonName() const throw(BadCertificate)
 	ASN1_STRING *entry_str;
 	int len;
 	unsigned char *utf;
+	std::string output;
 
 	subject = X509_get_subject_name(ssl_cert);
 	pos = X509_NAME_get_index_by_NID(subject, NID_commonName, -1);
@@ -178,5 +179,10 @@ std::string Certificate::GetCommonName() const throw(BadCertificate)
 	/* Canonicalize to UTF-8 and validate */
 	len = ASN1_STRING_to_UTF8(&utf, entry_str);
 
-	return TypToStr(utf);
+	output = TypToStr(utf);
+
+	if(utf)
+		OPENSSL_free(utf);
+
+	return output;
 }
