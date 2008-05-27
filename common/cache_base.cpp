@@ -215,7 +215,7 @@ void CacheBase::Write(std::string path, const char* buf, size_t size, off_t off)
 		SetAttr(path, stat, idlist);
 	}
 
-	content_list.RefreshPeersRef(path);
+	//content_list.RefreshPeersRef(path);
 }
 
 int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
@@ -242,7 +242,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 	FileChunkDesc chunk_to_read(off, to_read);
 	FileContent::chunk_availability chunk_state;
 	while((chunk_state = file.HaveChunk(chunk_to_read)) == FileContent::CHUNK_NOT_READY)
-		usleep(10000);			  /* 0.01 sec */
+		usleep(100000);			  /* 0.1 sec */
 
 	if(chunk_state == FileContent::CHUNK_UNAVAILABLE)
 		throw FileUnavailable();
