@@ -96,3 +96,57 @@ bool PeerBase::ReceivePacket()
 
 	return true;
 }
+
+void PeerBase::AddAskedChunk(uint32_t ref, FileChunkDesc chunk)
+{
+	std::map<uint32_t, std::list<FileChunkDesc> >::iterator asked_it;
+	if((asked_it = asked_chunks.find(ref)) == asked_chunks.end())
+	{
+		std::list<FileChunkDesc> lst;
+		asked_chunks.insert(make_pair(ref, lst));
+		asked_it = asked_chunks.find(ref);
+		if(asked_it == asked_chunks.end())
+			return;
+	}
+
+	asked_it->second.push_back(chunk);
+}
+
+void PeerBase::DelAskedChunk(uint32_t ref, FileChunkDesc chunk)
+{
+	std::map<uint32_t, std::list<FileChunkDesc> >::iterator asked_it;
+	if((asked_it = asked_chunks.find(ref)) != asked_chunks.end())
+	{
+		std::list<FileChunkDesc>::iterator chunk_it;
+		if((chunk_it = find(asked_it->second.begin(),
+					asked_it->second.end(),
+					chunk)) != asked_it->second.end())
+		{
+			asked_it->second.erase(chunk_it);
+		}
+		else
+		{
+			log[W_ERR] << "Chunk wasn't asked ??";
+		}
+	}
+}
+	
+void PeerBase::ResendAskedChunks(uint32_t ref)
+{
+	std::map<uint32_t, std::string>::iterator ref_it;
+	if((ref_it = file_refs.find(ref)) == file_refs.end())
+		return;
+
+	std::string filename = ref_it->second;
+
+	std::map<uint32_t, std::list<FileChunkDesc> >::iterator asked_it;
+	if((asked_it = asked_chunks.find(ref)) != asked_chunks.end())
+	{
+		for(std::list<FileChunkDesc>::iterator chunk_it = asked_it->second.begin();
+				chunk_it != asked_it->second.end();
+				++chunk_it)
+		{
+			//scheduler_queue.Queue(new JobResendChunkReq(filename, *chunk_it));
+		}
+	}
+}

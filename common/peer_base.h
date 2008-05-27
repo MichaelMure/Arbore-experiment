@@ -26,12 +26,17 @@
 
 #include <map>
 #include <queue>
+#include <list>
 #include "pf_types.h"
 #include "connection.h"
 #include "packet.h"
+#include "file_chunk_desc.h"
 
 class PeerBase
 {
+	// how this peer maps refs to files
+	std::map<uint32_t, std::list<FileChunkDesc> > asked_chunks;
+
 protected:
 	pf_addr addr;
 	Connection* conn;
@@ -47,6 +52,14 @@ protected:
 
 	bool ReceivePacket();
 
+	/** Add the chunk to the list of asked chunks */
+	void AddAskedChunk(uint32_t ref, FileChunkDesc chunk);
+
+	/** Delete the chunk from the list of asked chunks */
+	void DelAskedChunk(uint32_t ref, FileChunkDesc chunk);
+
+	/** Resend request for all of this chunk, and forget what was already asked */
+	void ResendAskedChunks(uint32_t ref);
 public:
 	enum
 	{

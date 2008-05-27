@@ -127,11 +127,13 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 	if(it == file_refs.end())
 		return;
 
+	uint32_t ref = it->first;
 	Packet packet(NET_WANT_CHUNK, environment.my_id.Get(), addr.id);
-	packet.SetArg(NET_WANT_CHUNK_REF, it->first);
+	packet.SetArg(NET_WANT_CHUNK_REF, ref);
 	packet.SetArg(NET_WANT_CHUNK_OFFSET, (uint64_t)offset);
 	packet.SetArg(NET_WANT_CHUNK_SIZE, (uint32_t)size);
 	SendMsg(packet);
+	AddAskedChunk(ref, FileChunkDesc(offset, size));
 }
 
 void Peer::SendChunk(uint32_t ref, FileChunk& chunk)
@@ -450,6 +452,10 @@ void Peer::Handle_net_unref_file(struct Packet* msg)
 
 	if((it = file_refs.find(ref)) != file_refs.end())
 	{
+		// If we was downloading it, erase the already resend the already
+		// sent chunk requests:
+		ResendAskedChunks(ref);
+
 		log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
 		file_refs.erase(it);
 	}
@@ -485,6 +491,8 @@ void Peer::Handle_net_chunk(struct Packet* msg)
 		return;
 
 	FileChunk chunk = msg->GetArg<FileChunk>(NET_CHUNK_CHUNK);
+
+	DelAskedChunk(ref, chunk);
 	scheduler_queue.Queue(new JobSetChunk(it->second, chunk));
 }
 
