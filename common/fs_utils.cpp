@@ -37,6 +37,6 @@ bool check_filename(std::string f)
 
 bool check_filemode(mode_t m)
 {
-	mode_t authorized = S_IFREG | S_IFDIR | S_IRWXU | S_IRWXG | S_IRUSR | S_IXUSR;
+	mode_t authorized = S_IFREG | S_IFDIR | S_IRWXU | S_IRWXG | S_IRWXO;
 	return !((~authorized) & m);
 }

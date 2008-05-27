@@ -175,7 +175,10 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 
 	/* Forbid broadcast for this message */
 	if(pckt->GetDstID() == 0)
+	{
+		log[W_WARNING] << "A NET_HELLO packet has 0 as destination id";
 		throw MustDisconnect();
+	}
 
 	/* Flags */
 	uint32_t flags = pckt->GetArg<uint32_t>(NET_HELLO_FLAGS);
@@ -523,14 +526,14 @@ void Peer::HandleMsg(Packet* pckt)
 	if(HasFlag(ANONYMOUS) ^ !!(handler[pckt->GetType()].perm & PERM_ANONYMOUS))
 	{
 		log[W_WARNING] << "Received an anonymous command from a registered peer, or a non anonymous command from an anonymous peer";
-		throw Peer::MustDisconnect();
+		throw MustDisconnect();
 	}
 
 	#if 0					  /* TODO: check only if this is the sender */
 	if(!IsHighLink() && (handler[pckt->GetType()].perm & PERM_HIGHLINK))
 	{
 		log[W_WARNING] << "Received an HIGHLINK command from a non highlink peer";
-		throw Peer::MustDisconnect();
+		throw MustDisconnect();
 	}
 	#endif
 
