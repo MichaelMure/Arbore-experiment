@@ -35,16 +35,31 @@ class DirEntry : public FileEntry
 
 public:
 
+	/** Creator of DirEntry.
+	 * @param name dir's name (not full path).
+	 * @param stat stat informations. If S_IFREG is set in mode, it will changed to S_IFDIR.
+	 * @param parent parent directory (NULL if root dir)
+	 */
 	DirEntry(std::string name, pf_stat stat, DirEntry* parent);
 	~DirEntry();
 
 	const FileMap& GetFiles() { return files; }
 	size_t GetSize() const { return files.size(); }
+
+	/** Return number of existant files (which are not marked as removed) */
 	size_t CountExistantFiles() const;
 
+	/** Add a file in child list
+	 * @param file file to add.
+	 */
 	void AddFile(FileEntry* file);
-	void RemFile(FileEntry* file);	  /**< will *not* destroy object */
 
+	/** Remove file from child list.
+	 * It will *not destroy object.
+	 */
+	void RemFile(FileEntry* file);
+
+	/** Get a file from name. */
 	FileEntry* GetFile(std::string name) const;
 };
 #endif						  /* PF_DIR_H */

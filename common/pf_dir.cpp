@@ -26,6 +26,8 @@
 DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
 			: FileEntry(name, _stat, _parent)
 {
+	stat.mode &= ~S_IFREG;
+	stat.mode |= S_IFDIR;
 }
 
 DirEntry::~DirEntry()
@@ -59,7 +61,9 @@ void DirEntry::AddFile(FileEntry* file)
 
 void DirEntry::RemFile(FileEntry* file)
 {
-	/* TODO: Remove-me ? */
+	FileMap::iterator it = files.find(file->GetName());
+	if(it != files.end())
+		files.erase(it);
 }
 
 FileEntry* DirEntry::GetFile(std::string name) const
