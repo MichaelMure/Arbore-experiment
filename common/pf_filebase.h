@@ -71,6 +71,7 @@ class FileEntryBase
 	DirEntry* parent;
 	IDList sharers;
 
+protected:
 	pf_stat stat;
 public:
 

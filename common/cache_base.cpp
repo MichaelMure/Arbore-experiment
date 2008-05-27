@@ -49,17 +49,17 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 
 	while((name = stringtok(path, "/")).empty() == false)
 	{
-		FileEntry* tmp = current_dir->GetFile(name);
-		if(!tmp || tmp->IsRemoved())
+		FileEntry* child_file = current_dir->GetFile(name);
+		if(!child_file || child_file->IsRemoved())
 		{
 			if(path.empty())
 			{
 				/* we are in last dir, but this file doesn't exist */
-				if(tmp && (flags & (RESTORE_REMOVED_FILE|GET_REMOVED_FILE)))
+				if(child_file && (flags & (RESTORE_REMOVED_FILE|GET_REMOVED_FILE)))
 				{
 					if(flags & RESTORE_REMOVED_FILE)
-						tmp->ClearRemoved();
-					return tmp;
+						child_file->ClearRemoved();
+					return child_file;
 				}
 				else if(filename)
 				{
@@ -73,28 +73,34 @@ FileEntry* CacheBase::Path2File(std::string path, unsigned int flags, std::strin
 			/* we aren't in last dir, so the path isn't found. */
 			if(flags & CREATE_UNKNOWN_DIRS)
 			{
-				if(!tmp)
+				if(child_file && !dynamic_cast<DirEntry*>(child_file))
+				{
+					current_dir->RemFile(child_file);
+					child_file = NULL;
+				}
+
+				if(!child_file)
 				{
 					pf_stat stat;
 					stat.uid = 0;
 					stat.gid = 0;
-					tmp = new DirEntry(name, stat, current_dir);
-					current_dir->AddFile(tmp);
+					child_file = new DirEntry(name, stat, current_dir);
+					current_dir->AddFile(child_file);
 				}
 				if(flags & RESTORE_REMOVED_FILE)
-					tmp->ClearRemoved();
+					child_file->ClearRemoved();
 			}
-			else if(!(flags & GET_REMOVED_FILE) || !tmp)
+			else if(!(flags & GET_REMOVED_FILE) || !child_file)
 				return NULL;
 		}
 
-		if(!(current_dir = dynamic_cast<DirEntry*>(tmp)))
+		if(!(current_dir = dynamic_cast<DirEntry*>(child_file)))
 		{
 			/* This isn't a directory. */
 			if(path.empty())
 			{
-				/* We are on last dir, so it is a file. */
-				return tmp;
+				/* We are on last dir, so it is the requested file. */
+				return child_file;
 			}
 			/* it isn't a file in path, so the path isn't found. */
 
