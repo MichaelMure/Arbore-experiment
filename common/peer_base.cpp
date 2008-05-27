@@ -23,6 +23,7 @@
 
 #include "log.h"
 #include "peer_base.h"
+#include <algorithm>
 
 PeerBase::PeerBase(pf_addr _addr, Connection* _conn, unsigned int _flags) :
 			addr(_addr),
@@ -118,9 +119,9 @@ void PeerBase::DelAskedChunk(uint32_t ref, FileChunkDesc chunk)
 	if((asked_it = asked_chunks.find(ref)) != asked_chunks.end())
 	{
 		std::list<FileChunkDesc>::iterator chunk_it;
-		if((chunk_it = find(asked_it->second.begin(),
-					asked_it->second.end(),
-					chunk)) != asked_it->second.end())
+		if((chunk_it = std::find(asked_it->second.begin(),
+		                         asked_it->second.end(),
+		                         chunk)) != asked_it->second.end())
 		{
 			asked_it->second.erase(chunk_it);
 		}
@@ -130,7 +131,7 @@ void PeerBase::DelAskedChunk(uint32_t ref, FileChunkDesc chunk)
 		}
 	}
 }
-	
+
 void PeerBase::ResendAskedChunks(uint32_t ref)
 {
 	std::map<uint32_t, std::string>::iterator ref_it;
