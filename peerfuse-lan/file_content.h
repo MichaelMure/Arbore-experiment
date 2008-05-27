@@ -29,7 +29,6 @@
 
 class FileContent : public FileContentBase
 {
-	time_t ref_request_time;
 public:
 	FileContent(std::string path) : FileContentBase(path), ref_request_time(0) {}
 	~FileContent() {}

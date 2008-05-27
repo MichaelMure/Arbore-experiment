@@ -61,9 +61,9 @@ protected:
 	std::string filename;
 	std::map<pf_id, struct sharedchunks> sharers;
 	pf_id last_peer_requested;
+	time_t ref_request_time;
 
 	void NetworkFlushRequests();
-	bool waiting_for_sharers;
 	std::list<FileChunkDesc> net_pending_request;
 	virtual chunk_availability NetworkRequestChunk(FileChunkDesc chunk) = 0;
 

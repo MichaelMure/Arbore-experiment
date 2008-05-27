@@ -44,7 +44,7 @@ FileContentBase::FileContentBase(std::string _filename) :
 			ondisk_synced(true),
 			filename(_filename),
 			last_peer_requested(0),
-			waiting_for_sharers(false)
+			ref_request_time(0)
 {
 	uint32_t nbr = 0;
 	tree_cfg.Get(filename + "#ondisk_off", nbr);
@@ -61,7 +61,7 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 			ondisk_synced(other.ondisk_synced),
 			filename(other.filename),
 			last_peer_requested(other.last_peer_requested),
-			waiting_for_sharers(other.waiting_for_sharers)
+			ref_request_time(other.ref_request_time)
 {
 	BlockLockMutex lock(&other);
 	if(other.ondisk_fd != -1)

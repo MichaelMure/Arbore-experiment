@@ -27,6 +27,8 @@
 #include "cache.h"
 #include "environment.h"
 
+const time_t ref_request_refresh = 30;
+
 void FileContent::SetChunk(FileChunk chunk)
 {
 	FileContentBase::SetChunk(chunk);
@@ -36,35 +38,36 @@ void FileContent::SetChunk(FileChunk chunk)
 
 FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {
-	if(sharers.size() == 0 && !waiting_for_sharers)
+	time_t now = time(NULL);
+	if(now > ref_request_time + ref_request_refresh)
 	{
 		// We don't know who have which part of the file
 		log[W_DEBUG] << "Request for file refs";
 		cache.RequestFileRefs(filename);
-		waiting_for_sharers = true;
+		ref_request_time = time(NULL);
 	}
-	else
+
+	// Check the chunk presence on the network
+	if(/* TODO: enter this only if all FILE_REF have been received */ false)
 	{
-		// Check the chunk presence on the network
-		if(/* TODO: enter this only if all FILE_REF have been received */ false)
+		std::map<pf_id, struct sharedchunks>::iterator it;
+		bool found = false;
+		for(it = sharers.begin(); it != sharers.end(); ++it)
 		{
-			std::map<pf_id, struct sharedchunks>::iterator it;
-			bool found = false;
-			for(it = sharers.begin(); it != sharers.end(); ++it)
+			if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
 			{
-				if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
-				{
-					found = true;
-					break;
-				}
-			}
-			if(!found)
-			{
-				log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
-				return CHUNK_UNAVAILABLE;
+				found = true;
+				break;
 			}
 		}
-		NetworkFlushRequests();
+		if(!found)
+		{
+			log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+			return CHUNK_UNAVAILABLE;
+		}
 	}
+	if(sharers.size() != 0)
+		NetworkFlushRequests();
+
 	return CHUNK_NOT_READY;
 }

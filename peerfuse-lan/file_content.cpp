@@ -28,44 +28,43 @@
 #include "log.h"
 
 const time_t ref_request_timeout = 5;
+const time_t ref_request_refresh = 30;
 
 FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc chunk)
 {
 	BlockLockMutex lock(this);
-	if(sharers.size() == 0 && !waiting_for_sharers)
+	time_t now = time(NULL);
+	if(now > ref_request_time + ref_request_refresh)
 	{
 		// We don't know who have this file, so ask it first
 		Packet packet(NET_WHO_HAS_FILE);
 		packet.SetArg(NET_WHO_HAS_FILE_PATH, filename);
 		peers_list.Broadcast(packet);
-		waiting_for_sharers = true;
 		ref_request_time = time(NULL);
 		log[W_DEBUG] << "Now waiting for sharers to advertise their files";
 	}
-	else
+	// Check the chunk presence on the network
+	if(now > ref_request_time + ref_request_timeout)
 	{
-		// Check the chunk presence on the network
-		if(time(NULL) > ref_request_time + ref_request_timeout)
+		std::map<pf_id, struct sharedchunks>::iterator it;
+		bool found = false;
+		for(it = sharers.begin(); it != sharers.end(); ++it)
 		{
-			std::map<pf_id, struct sharedchunks>::iterator it;
-			bool found = false;
-			for(it = sharers.begin(); it != sharers.end(); ++it)
+			if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
 			{
-				if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
-				{
-					found = true;
-					break;
-				}
-			}
-			if(!found)
-			{
-				log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
-				return CHUNK_UNAVAILABLE;
+				found = true;
+				break;
 			}
 		}
-
-		NetworkFlushRequests();
+		if(!found)
+		{
+			log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+			return CHUNK_UNAVAILABLE;
+		}
 	}
+
+	if(sharers.size() != 0)
+		NetworkFlushRequests();
 	return CHUNK_NOT_READY;
 }
 
