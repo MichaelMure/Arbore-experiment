@@ -4,6 +4,7 @@ Severity is a level from 1 to 5
 +-------+--------+----------+----------+
 | Bug no| Status | Category | Severity | Comments
 +-------+--------+----------+----------+
+| 00010 |  Open  |          |     1    | When the crl is downloaded, the connection to retrieve it is not cleanly closed
 | 00009 |  Open  | PFN-Dist |     4    | When I create a file, I send a MKFILE to responsible of this file, but no to the parent dir responsible
 | 00008 | Closed |  PFNet   |     5    | If two modifications of a file are sent at the same second, second modification will not be applied!
 | 00007 | Closed |  PFNet   |     5    | When A<->B<->C, if B disconnects, A will trying to connect to C, but it doesn't work.
