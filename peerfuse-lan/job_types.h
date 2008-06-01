@@ -51,7 +51,6 @@ enum job_type
 	JOB_NEW_CONN_REQ,
 	/* Tries connecting to a list of peers */
 	JOB_NEW_CONN_QUEUE,
-	/* Mkfile triggered by a peer */
 	/* We asked other peers to connect to a new peer
 	   this job checks wether they all answered */
 	JOB_OTHER_CONNECT,

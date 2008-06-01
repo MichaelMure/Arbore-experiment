@@ -30,8 +30,6 @@
 #include "pf_file.h"
 #include "packet.h"
 
-class Peer;
-
 const size_t NB_PEERS_PER_FILE = 2;
 
 class FileDistribution
@@ -52,7 +50,7 @@ class FileDistribution
 	 * @param id_list list of ids on network.
 	 * @return set of Peer*
 	 */
-	std::set<Peer*> _get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& id_list) const;
+	IDList _get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& id_list) const;
 
 public:
 
@@ -65,7 +63,7 @@ public:
 	 * @param f file
 	 * @return set of Peer*
 	 */
-	std::set<Peer*> GetRespPeers(const FileEntry* f) const;
+	IDList GetRespPeers(const FileEntry* f) const;
 
 	/** Is this peer responsible of that file?
 	 * It calls the internal _is_responsible() method with this->id_list
@@ -89,9 +87,9 @@ public:
 	void RequestFileRefs(const FileEntry*);
 
 	/* Flags are defined in cache.h */
-	void AddFile(FileEntry* f, Peer* sender);
+	void AddFile(FileEntry* f, pf_id sender);
 
-	void SendDirFiles(DirEntry* dir, Peer* to);
+	void SendDirFiles(DirEntry* dir, pf_id to);
 
 	/** Create a packet that create a file.
 	 * @param file file to send

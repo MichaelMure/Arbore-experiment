@@ -3,7 +3,7 @@ Here are tasks:
 +-------+--------+----------+------------+
 |Task no| Status | Category | Assign. to | Comments
 +-------+--------+----------+------------+
-| 00019 |  Open  |  PFnet   |            | PeersListBase might have a protected vector base class, not public. And PeerFromID() might be
+| 00019 | Closed |  PFnet   |   romain   | PeersListBase might have a protected vector base class, not public. And PeerFromID() might be
 |       |        |          |            |    protected method.
 | 00018 |  Open  |  PFnet   |            | NET_PEER_CONNECTION: check certificates to disallow a peer to introduce a fake
 |       |        |          |            |    peer with an unvalid certificate.
@@ -30,6 +30,6 @@ Here are tasks:
 | 00004 |  Open  |  Global  |            | Catch SIGHUP to reload the configuration file
 | 00003 |  Open  |  Global  |            | Catch SIGTERM to call Application::Exit()
 | 00002 |  Open  |  Global  |            | Simplify logging system (we only need DEBUG/WARNING/ERRORS)
-| 00001 |  Open  | FileSys. |            | Support file deletion (mark file as deleted in tree_cfg, truncate
+| 00001 |?Closed?| FileSys. |            | Support file deletion (mark file as deleted in tree_cfg, truncate
 |       |        |          |            |   them in the cache)
 +-------+--------+----------+------------+

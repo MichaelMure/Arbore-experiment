@@ -70,16 +70,16 @@ bool FileDistribution::IsResponsible(const pf_id peer_id, const FileEntry* file)
 	return _is_responsible(peer_id, file, id_list);
 }
 
-std::set<Peer*> FileDistribution::GetRespPeers(const FileEntry* f) const
+IDList FileDistribution::GetRespPeers(const FileEntry* f) const
 {
 	return _get_resp_peers_from_idlist(f, id_list);
 }
 
-std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& idl) const
+IDList FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const std::vector<pf_id>& idl) const
 {
 	assert(f != NULL);
 
-	std::set<Peer*> list;
+	IDList list;
 	BlockLockMutex lock(&peers_list);
 
 	std::string debug;
@@ -87,7 +87,7 @@ std::set<Peer*> FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
 		unsigned int num = (f->GetPathSerial() > i ? (f->GetPathSerial() - i) : (f->GetPathSerial() + idl.size() - i)) % idl.size();
-		Peer* peer = peers_list.PeerFromID(idl[num]);
+		pf_id peer = idl[num];
 		debug += TypToStr(idl[num]) + ", ";
 
 		/* It is possible that there isn't any Peer object for this
@@ -154,30 +154,30 @@ Packet FileDistribution::CreateMkFilePacket(FileEntry* f)
 	return pckt;
 }
 
-void FileDistribution::SendDirFiles(DirEntry* dir, Peer* to)
+void FileDistribution::SendDirFiles(DirEntry* dir, pf_id to)
 {
 	assert(dir != NULL);
-	assert(to != NULL);
+	assert(to != 0);
 
 	const FileMap& files = dir->GetFiles();
 	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
 	{
 		Packet pckt = CreateMkFilePacket(it->second);
-		pckt.SetDstID(to->GetID());
-		to->SendMsg(pckt);
+		pckt.SetDstID(to);
+		peers_list.SendMsg(to, pckt);
 	}
 
-	Packet pckt = Packet(NET_END_OF_LS, environment.my_id.Get(), to->GetID());
+	Packet pckt = Packet(NET_END_OF_LS, environment.my_id.Get(), to);
 	pckt.SetArg(NET_END_OF_LS_PATH, dir->GetFullName());
-	to->SendMsg(pckt);
+	peers_list.SendMsg(to, pckt);
 }
 
-void FileDistribution::AddFile(FileEntry* f, Peer* sender)
+void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 {
 	assert(f != NULL);			  /* exists */
 
 	BlockLockMutex net_lock(&peers_list);
-	std::set<Peer*> relayed_peers;
+	IDList relayed_peers;
 
 	/* I'm responsible of this file. */
 	if(IsResponsible(environment.my_id.Get(), f))
@@ -188,9 +188,9 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 			resp_files.insert(f);
 
 		/* send it to parent directory's responsibles */
-		if(f->GetParent() && (!sender || !IsResponsible(sender->GetID(), f)))
+		if(f->GetParent() && (!sender || !IsResponsible(sender, f)))
 		{
-			std::set<Peer*> peers = GetRespPeers(f->GetParent());
+			IDList peers = GetRespPeers(f->GetParent());
 
 			/* If I'm also responsible of this file's parent, I send message
 			 * to all other responsibles. In other case, I only send it
@@ -215,23 +215,23 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 		/* Send packet to other responsibles peers if it's me that
 		 * created file, or if sender isn't responsible of this
 		 * packet. */
-		if(!sender || !IsResponsible(sender->GetID(), f))
+		if(!sender || !IsResponsible(sender, f))
 		{
 			if(!sender)
 				log[W_DEBUG] << "I've created this file, so I send it to other resps";
 			else
 				log[W_DEBUG] << "Sender of this file isn't a responsible of it, so I relay on other resps";
-			std::set<Peer*> lp = GetRespPeers(f);
+			IDList lp = GetRespPeers(f);
 			relayed_peers.insert(lp.begin(), lp.end());
 		}
 	}
-	else if(sender == NULL)
+	else if(sender == 0)
 	{
 		/* I created this file and I'm not the responsible,
 		 * so I send it to a responsible.
 		 */
 
-		std::set<Peer*> resps = GetRespPeers(f);
+		IDList resps = GetRespPeers(f);
 
 		log[W_DEBUG] << "I created this file but I'm not responsible of it. So I send info to a responsible";
 
@@ -241,9 +241,9 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 			relayed_peers.insert(*resps.begin());
 	}
 
-	if(f->GetParent() && sender != NULL &&
+	if(f->GetParent() && sender != 0 &&
 		IsResponsible(environment.my_id.Get(), f->GetParent()) &&
-		!IsResponsible(sender->GetID(), f->GetParent()))
+		!IsResponsible(sender, f->GetParent()))
 	{
 		/* Someone sent this file to me, and I'm responsible of its parent directory,
 		 * but him isn't responsible of it.
@@ -252,14 +252,14 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 		log[W_DEBUG] << "Someone sent this file to me, and I'm responsible of its parent "
 			<< "directory, but him isn't responsible of it. So I relay message to "
 			<< "others file's parent responsibles";
-		std::set<Peer*> peers = GetRespPeers(f->GetParent());
+		IDList peers = GetRespPeers(f->GetParent());
 		relayed_peers.insert(peers.begin(), peers.end());
 	}
 
 	/* Create and send message to relayed peers. */
 	Packet pckt = CreateMkFilePacket(f);
 
-	if(sender != NULL)
+	if(sender != 0)
 		relayed_peers.erase(sender);
 
 	if(relayed_peers.empty())
@@ -272,15 +272,15 @@ void FileDistribution::AddFile(FileEntry* f, Peer* sender)
 		log[W_DEBUG] << "Delay mkfile";
 		if(delayed_mkfile->second.empty())
 			scheduler_queue.Queue(new JobSendMkFile(filename));
-		for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
-			delayed_mkfile->second.insert((*p)->GetID());
+		for(IDList::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+			delayed_mkfile->second.insert(*p);
 	}
 	else
 	{
-		for(std::set<Peer*>::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
+		for(IDList::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
 		{
-			pckt.SetDstID((*p)->GetID());
-			(*p)->SendMsg(pckt);
+			pckt.SetDstID(*p);
+			peers_list.SendMsg(*p, pckt);
 		}
 	}
 
@@ -317,11 +317,10 @@ void FileDistribution::UpdateRespFiles()
 
 	/* First set new list of id */
 	id_list.clear();
+	IDList new_idl = peers_list.GetIDList();
+	for(IDList::iterator it = new_idl.begin(); it != new_idl.end(); ++it)
+		id_list.push_back(*it);
 	id_list.push_back(environment.my_id.Get());
-
-	BlockLockMutex lock(&peers_list);
-	for(PeersList::const_iterator it = peers_list.begin(); it != peers_list.end(); ++it)
-		id_list.push_back((*it)->GetID());
 
 	/* Sort it */
 	std::sort(id_list.begin(), id_list.end());
@@ -341,17 +340,17 @@ void FileDistribution::UpdateRespFiles()
 
 		Packet pckt = CreateMkFilePacket(*it);
 		/* get actual peer list */
-		std::set<Peer*> peers = GetRespPeers(*it);
+		IDList peers = GetRespPeers(*it);
 
 		/* TODO do not send message to peers we know they have already this file version */
-		for(std::set<Peer*>::iterator peer = peers.begin(); peer != peers.end(); ++peer)
+		for(IDList::iterator peer = peers.begin(); peer != peers.end(); ++peer)
 		{
 			log[W_DEBUG] << "  -> " << *peer;
-			if(!_is_responsible((*peer)->GetID(), *it, last_id_list))
+			if(!_is_responsible(*peer, *it, last_id_list))
 			{
-				log[W_DEBUG] << "     sending file to " << (*peer)->GetID() << " who wasn't responsible of it.";
-				pckt.SetDstID((*peer)->GetID());
-				(*peer)->SendMsg(pckt);
+				log[W_DEBUG] << "     sending file to " << *peer << " who wasn't responsible of it.";
+				pckt.SetDstID(*peer);
+				peers_list.SendMsg(*peer, pckt);
 			}
 		}
 	}

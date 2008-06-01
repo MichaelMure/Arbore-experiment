@@ -108,7 +108,10 @@ pf_addr PeersListBase::GetPeerAddr(pf_id id) const
 
 	Peer* p = PeerFromID(id);
 
-	return p->GetAddr();
+	if(p)
+		return p->GetAddr();
+	else /* if p doesn't exist, return an empty addr */
+		return pf_addr();
 }
 
 // Public methods
@@ -147,6 +150,8 @@ Peer* PeersListBase::RemovePeer(Peer* p)
 
 void PeersListBase::Pop(int fd, Peer** p)
 {
+	assert(p);
+
 	BlockLockMutex lock(this);
 	PeerMap::iterator it = fd2peer.find(fd);
 	Peer* peer = NULL;

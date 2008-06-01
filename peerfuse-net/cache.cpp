@@ -107,11 +107,6 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 	std::string filename;
 	FileEntry* file = 0;
 	BlockLockMutex lock(this);
-	BlockLockMutex peer_lock(&peers_list);
-	Peer* peer = 0;
-
-	if(sender > 0)
-		peer = peers_list.PeerFromID(sender);
 
 	try
 	{
@@ -150,7 +145,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 		hdd.MkFile(file);
 
 		/* Add file on FileDistribution */
-		filedist.AddFile(file, peer);
+		filedist.AddFile(file, sender);
 
 	}
 	catch(Cache::FileAlreadyExists &e)
@@ -168,7 +163,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		log[W_DEBUG] << "File already exists... Update it.";
 
-		_set_attr(file, stat, peer, sharers);
+		_set_attr(file, stat, sender, sharers);
 	}
 }
 
@@ -198,7 +193,7 @@ void Cache::RmFile(std::string path)
 	stat.meta_mtime = time(NULL);
 	stat.mtime = stat.meta_mtime;
 
-	_set_attr(f, stat, NULL, IDList());
+	_set_attr(f, stat, 0, IDList());
 
 	FileContent& file = content_list.GetFile(path);
 	file.Truncate(0);
@@ -209,7 +204,6 @@ void Cache::RmFile(std::string path)
 void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex lock(this);
-	Peer* peer = 0;
 	std::string filename;
 	FileEntry* file = Path2File(path, GET_REMOVED_FILE, &filename);
 	DirEntry* dir = dynamic_cast<DirEntry*>(file);
@@ -217,14 +211,10 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	if(!file || (filename.empty() == false && dir))
 		throw NoSuchFileOrDir();
 
-	BlockLockMutex peer_lock(&peers_list);
-	if(sender > 0)
-		peer = peers_list.PeerFromID(sender);
-
-	_set_attr(file, stat, peer, sharers);
+	_set_attr(file, stat, sender, sharers);
 }
 
-void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers, bool keep_newest, bool erase_on_modification)
+void Cache::_set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharers, bool keep_newest, bool erase_on_modification)
 {
 	BlockLockMutex cache_lock(this);
 	BlockLockMutex peer_lock(&peers_list);
@@ -243,8 +233,8 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharer
 			 */
 			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
 			Packet pckt = filedist.CreateMkFilePacket(file);
-			pckt.SetDstID(sender->GetID());
-			sender->SendMsg(pckt);
+			pckt.SetDstID(sender);
+			peers_list.SendMsg(sender, pckt);
 			return;
 		}
 		else if(file->GetAttr() == stat)
@@ -372,10 +362,7 @@ void Cache::SendDirFiles(std::string path, pf_id to)
 	if(!dir)
 		throw NoSuchFileOrDir();
 
-	BlockLockMutex net_lock(&peers_list);
-	Peer* peer = peers_list.PeerFromID(to);
-
-	filedist.SendDirFiles(dir, peer);
+	filedist.SendDirFiles(dir, to);
 }
 
 #ifndef PF_SERVER_MODE
@@ -422,7 +409,7 @@ void Cache::FillReadDir(const char* _path, void *buf, fuse_fill_dir_t filler, of
 		if(!filedist.IsResponsible(environment.my_id.Get(), dir))
 		{
 			BlockLockMutex lock(&peers_list);
-			std::set<Peer*> peers = filedist.GetRespPeers(dir);
+			std::set<pf_id> peers = filedist.GetRespPeers(dir);
 
 			if(peers.empty())
 				log[W_WARNING] << "Cache::FillReadDir: there isn't any responsible of " << dir->GetFullName() << " ??";
@@ -431,11 +418,11 @@ void Cache::FillReadDir(const char* _path, void *buf, fuse_fill_dir_t filler, of
 				std::map<std::string, incoming_states_t>::iterator incoming = dir_incoming.find(path);
 				if(incoming == dir_incoming.end() || incoming->second != GETTING)
 				{
-					Peer* resp = *peers.begin();
+					pf_id resp = *peers.begin();
 
-					Packet pckt = Packet(NET_LS_DIR, environment.my_id.Get(), resp->GetID());
+					Packet pckt = Packet(NET_LS_DIR, environment.my_id.Get(), resp);
 					pckt.SetArg(NET_LS_DIR_PATH, path);
-					resp->SendMsg(pckt);
+					peers_list.SendMsg(resp, pckt);
 
 					dir_incoming[path] = GETTING;
 				}

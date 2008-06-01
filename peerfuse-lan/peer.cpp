@@ -250,15 +250,9 @@ void Peer::Handle_net_peer_connection_rst(struct Packet* msg)
 	scheduler_queue.Unlock();
 
 	// notifiy the peer he can't be contacted by *this
-	BlockLockMutex lock(&peers_list);
-	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
-		if((*it)->GetAddr() == new_peer)
-	{
-		Packet p(NET_PEER_CONNECTION_REJECTED);
-		p.SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr());
-		(*it)->SendMsg(p);
-		break;
-	}
+	Packet pckt(NET_PEER_CONNECTION_REJECTED);
+	pckt.SetArg(NET_PEER_CONNECTION_REJECTED_ADDRESS, GetAddr());
+	peers_list.SendMsg(new_peer.id, pckt);
 }
 
 void Peer::Handle_net_peer_connection_rejected(struct Packet* msg)

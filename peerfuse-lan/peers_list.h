@@ -36,6 +36,10 @@ public:
 	 * If but_one != NULL, do not send a packet to him.
 	 */
 	virtual void Broadcast(Packet pckt, const Peer* but_one = 0) const;
+
+	void SendGetStructDiff(pf_id to) const;
+
+	bool CheckOtherConnection(pf_id connect_to, std::list<pf_id>& is_connecting, std::list<pf_id>& is_connected) const;
 };
 
 extern PeersList peers_list;

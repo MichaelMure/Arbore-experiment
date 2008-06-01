@@ -61,8 +61,8 @@ class Cache : public CacheBase
 	 */
 	virtual FileList GetAllFiles();
 
-	/* SetAttr of file, use this method when you already have FileEntry* and Peer* objects */
-	void _set_attr(FileEntry* file, pf_stat stat, Peer* sender, IDList sharers, bool keep_newest = true, bool erase_on_modification = false);
+	/* SetAttr of file, use this method when you already have FileEntry* */
+	void _set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharers, bool keep_newest = true, bool erase_on_modification = false);
 
 public:
 

@@ -109,7 +109,6 @@ void SslSsl::ForceDisconnect(SSL* ssl, int fd)
 	{
 		SSL_shutdown(ssl);
 		SSL_free(ssl);
-		ssl = NULL;
 	}
 	if(fd != -1)
 		close(fd);

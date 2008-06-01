@@ -23,6 +23,7 @@
 
 #include <list>
 #include <exception>
+#include <cassert>
 #include "pf_ssl_nossl.h"
 #include "connection_nossl.h"
 
@@ -64,6 +65,8 @@ Connection* SslNoSsl::Connect(int fd)
 
 void SslNoSsl::Close(Connection* conn)
 {
+	assert(conn);
+	fd_map.erase(conn->GetFd());
 }
 
 void SslNoSsl::CloseAll()

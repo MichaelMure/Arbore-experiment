@@ -48,7 +48,7 @@
 #include "fs_utils.h"
 
 Peer::Peer(pf_addr _addr, Connection* _conn, unsigned int _flags, pf_id parent)
-			:						  /* anonymous is only when this is a real connection */
+			:						  /* anonymous is only needed when this is a real connection */
 			PeerBase(_addr, _conn, (_conn ? ANONYMOUS : 0) | _flags),
 			uplink(parent)
 {
@@ -302,17 +302,20 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 	{
 		case PeersList::IS_ON_NETWORK:
 		case PeersList::IS_CONNECTED:
-			return;			  /* We are already connected to him. */
+			/* We are already connected to him. */
+			log[W_WARNING] << "Received a NET_PEER_CONNECTION for a peer who is already connected to me: " << addr.id;
+			return;
 		case PeersList::IS_UNKNOWN:
+		{
+			Peer* p = new Peer(addr, /*connection*/NULL, /*flags*/0, /*parent*/GetID());
+			p->SetTimestampDiff(now);
+			p->certificate = cert;
+			peers_list.Add(p);
+
+			downlinks.push_back(addr.id);
 			break;
+		}
 	}
-
-	Peer* p = new Peer(addr, NULL, 0, GetID());
-	p->SetTimestampDiff(now);
-	p->certificate = cert;
-	peers_list.Add(p);
-
-	downlinks.push_back(addr.id);
 }
 
 /** NET_PEER_GOODBYE
@@ -325,7 +328,6 @@ void Peer::Handle_net_peer_goodbye(struct Packet* msg)
 	peers_list.RemoveFromID(GetID());
 
 	scheduler_queue.Queue(new JobUpdateRespFiles());
-
 }
 
 void Peer::Handle_net_mkfile(struct Packet* msg)
@@ -578,15 +580,8 @@ bool Peer::Receive()
 	}
 	else if((*packet)->GetDstID())
 	{
-		Peer* relay_to = peers_list.PeerFromID((*packet)->GetDstID());
-		if(relay_to)
-		{
-			log[W_DEBUG] << "Relay packet to " << relay_to->GetID();
-			relay_to->SendMsg(**packet);
-		}
-		else
-			log[W_WARNING] << "Received a message to an unknown ID !?"
-				<< "from=" << (*packet)->GetSrcID() << " to=" << (*packet)->GetDstID();
+		log[W_DEBUG] << "Relay packet to " << (*packet)->GetDstID();
+		peers_list.SendMsg((*packet)->GetDstID(), **packet);
 	}
 
 	/* Route broadcast packets */

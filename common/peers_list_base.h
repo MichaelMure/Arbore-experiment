@@ -32,7 +32,7 @@
 #include "packet.h"
 #include "file_chunk.h"
 
-class PeersListBase: public std::vector<Peer*>, public Mutex
+class PeersListBase: protected std::vector<Peer*>, public Mutex
 {
 protected:
 	bool changed;
@@ -40,6 +40,7 @@ protected:
 	PeerMap fd2peer;
 
 	Peer* PeerFromFD(int fd);
+	Peer* PeerFromID(pf_id id) const;
 
 	/** Remove a peer from list.
 	 * It will *NOT* delete peer!
@@ -81,10 +82,6 @@ public:
 
 	/** Create an ID not used by any other peer in network */
 	pf_id CreateID();
-
-	// TODO: move-me into private section
-	Peer* PeerFromID(pf_id id) const;
-
 
 	enum id_state_t
 	{

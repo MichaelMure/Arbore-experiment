@@ -28,8 +28,58 @@ PeersList peers_list;
 
 void PeersList::Broadcast(Packet pckt, const Peer* but_one) const
 {
-	BlockLockMutex lock(&peers_list);
-	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
+	BlockLockMutex lock(this);
+	for(const_iterator it = begin(); it != end(); ++it)
 		if(*it != but_one)
 			(*it)->SendMsg(pckt);
+}
+
+void PeersList::SendGetStructDiff(pf_id to) const
+{
+	BlockLockMutex lock(this);
+	Peer* p = PeerFromID(to);
+	if(p && p->IsClient())
+		p->SendGetStructDiff();
+}
+
+bool PeersList::CheckOtherConnection(pf_id connect_to, std::list<pf_id>& is_connecting, std::list<pf_id>& is_connected) const
+{
+	BlockLockMutex lock(this);
+
+	bool everybody_connected = true;
+
+	Peer* peer = PeerFromID(connect_to);
+	if(!peer)
+	{
+		// the peer disconnected, no need to ask others to connect to him
+		return false;
+	}
+
+	// Ask all other peers to check their connection to this peer
+	// TODO: replace this loop+find with a while the 3 lists (peers, is_connecting
+	// and is connected) to spare some cpu
+	for(const_iterator it = begin(); it != end(); ++it)
+	{
+		if((*it)->GetID() == connect_to)
+			continue;
+
+		// Check if we already asked this peer to connect to the "connect_to" peer
+		if(find(is_connecting.begin(), is_connecting.end(), (*it)->GetID()) == is_connecting.end())
+		{
+			Packet p(NET_PEER_CONNECTION);
+			p.SetArg(NET_PEER_CONNECTION_ADDRESS, peer->GetAddr());
+			(*it)->SendMsg(p);
+			is_connecting.push_back((*it)->GetID());
+			everybody_connected = false;
+		}
+
+		// Check if this peer is already connected to the "connect_to" peer
+		if(find(is_connected.begin(), is_connected.end(), (*it)->GetID()) == is_connected.end())
+			everybody_connected = false;
+	}
+
+	if(!everybody_connected)
+		return true;
+	peer->SendMsg(Packet(NET_PEER_ALL_CONNECTED));
+	return false;
 }

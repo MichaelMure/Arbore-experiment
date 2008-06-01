@@ -35,58 +35,12 @@ JobOtherConnect::JobOtherConnect(pf_id _connect_to) : Job(time(NULL), REPEAT_PER
 
 bool JobOtherConnect::Start()
 {
-	BlockLockMutex lock(&peers_list);
-
-	bool everybody_connected = true;
-
-	Peer* peer = peers_list.PeerFromID(connect_to);
-	if(!peer)
-	{
-		// the peer disconnected, no need to ask others to connect to him
-		return false;
-	}
-
-	// Ask all other peers to check their connection to this peer
-	// TODO: replace this loop+find with a while the 3 lists (peers, is_connecting
-	// and is connected) to spare some cpu
-	for(PeersList::iterator it = peers_list.begin(); it != peers_list.end(); ++it)
-	{
-		if((*it)->GetID() == connect_to)
-			continue;
-
-		// Check if we already asked this peer to connect to the "connect_to" peer
-		if(find(is_connecting.begin(), is_connecting.end(), (*it)->GetID()) == is_connecting.end())
-		{
-			Packet p(NET_PEER_CONNECTION);
-			p.SetArg(NET_PEER_CONNECTION_ADDRESS, peer->GetAddr());
-			(*it)->SendMsg(p);
-			is_connecting.push_back((*it)->GetID());
-			everybody_connected = false;
-		}
-
-		// Check if this peer is already connected to the "connect_to" peer
-		if(find(is_connected.begin(), is_connected.end(), (*it)->GetID()) == is_connected.end())
-			everybody_connected = false;
-	}
-
-	if(!everybody_connected)
-		return true;
-	peer->SendMsg(Packet(NET_PEER_ALL_CONNECTED));
-	return false;
+	return peers_list.CheckOtherConnection(connect_to, is_connecting, is_connected);
 }
 
 bool JobOtherConnect::IsConnectingTo(pf_addr addr)
 {
-	BlockLockMutex lock(&peers_list);
-
-	Peer* peer = peers_list.PeerFromID(connect_to);
-	if(!peer)
-	{
-		// the peers disconnected
-		return false;
-	}
-
-	return (peer->GetAddr() == addr);
+	return (peers_list.GetPeerAddr(connect_to) == addr);
 }
 
 void JobOtherConnect::PeerConnected(pf_id peer)
