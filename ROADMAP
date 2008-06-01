@@ -1,23 +1,42 @@
 Roadmap for the 0.1 release
 ***************************
 
+Implementation of the new protocol:
+- cf doc
+
+Features:
+- implement rename()
+- Handle anticipated download
+- Handle file modifications (???????)
+
+Bugs:
+- Fix fucking SSL crash
+
+Security:
+- stress tests scripts
+- limit ram usage
+- limit packet size, limit the number of opened fd, pf_assert() that exits,
+  script to test random read/write size and offset
+
 Piggledy:
-- Security: limit packet size, limit the number of opened fd, pf_assert() that exits, script to test random read/write size and offset
+- Add a non-debug compilation target that disables stdout/err logging and
+  disables the log Mutex.
+- make install
+- Store the version number in the session.cfg to cleanly exit if an
+  upgrade is not compatible
 - Valgrind / helgrind check
-- Documentation
-- Website: FAQ, Warning, doc
-- Store the version number in the session.cfg to cleanly exit if an uupgrade is not compatible
-- CRL handling [DONE]
-- comply with OpenSSL license [DONE]
+- Dev documentation
 - add a release compilation target
 
-- Handle file modifications (0.2 ?)
-- implement rename() (0.2 ?)
-- Add a non-debug compilation target that disables stdout/err logging and disables the log Mutex. (0.2 ?)
-- make install (0.2 ?)
-- Handle anticipated download (0.2 ?)
-- Security: stress tests scripts (0.2 ?)
-- Security: limit ram usage (0.2 ?)
+-------------------------------------------------------------------------------
+
+Roadmap for the 0.0 release
+***************************
+
+Piggledy:
+- Website: FAQ, Warning, doc [DONE]
+- CRL handling [DONE]
+- comply with OpenSSL license [DONE]
 
 Mon 21 April
 ------------
@@ -33,8 +52,8 @@ Fri 25 April - Sun 27 April
 ----------------------------
 
 - Fix file truncating [DONE]
-- Connection to multiple peer on pfnet
-- Download from multiple peers (trivial)
+- Connection to multiple peer on pfnet [DONE]
+- Download from multiple peers (trivial) [DONE]
 - NET_REFRESH_FILE_REF handling(almost done) [DONE]
 - NET_FILE_UNREF handling [DONE]
 
@@ -48,9 +67,14 @@ Mon 28 April - Wed 30 April
 Thu 1 May
 ---------
 
-- Packaging
+- Packaging [REPORTED]
 
 Fri 2 May
 ---------
 
-- Release 0.1
+- Release 0.1 [REPORTED]
+
+Mon 13 May
+----------
+
+- Release 0.0
