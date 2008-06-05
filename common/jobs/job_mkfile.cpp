@@ -39,7 +39,7 @@ bool JobMkFile::Start()
 		}
 		catch(Cache::NoSuchFileOrDir &e)
 		{
-			log[W_DESYNCH] << "Unable to create " << file ": File already exists";
+			log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
 			/* XXX: DO SOMETHING */
 		}
 	}
