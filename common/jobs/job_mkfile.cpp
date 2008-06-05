@@ -33,7 +33,15 @@ bool JobMkFile::Start()
 	}
 	catch(Cache::NoSuchFileOrDir &e)
 	{
-		cache.MkFile(file, stat, sharers, sender);
+		try
+		{
+			cache.MkFile(file, stat, sharers, sender);
+		}
+		catch(Cache::NoSuchFileOrDir &e)
+		{
+			log[W_DESYNCH] << "Unable to create " << file ": File already exists";
+			/* XXX: DO SOMETHING */
+		}
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{

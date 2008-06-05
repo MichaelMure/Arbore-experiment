@@ -4,6 +4,8 @@ Severity is a level from 1 to 5
 +-------+--------+----------+----------+
 | Bug no| Status | Category | Severity | Comments
 +-------+--------+----------+----------+
+| 00012 |  Open  |  Cache   |     4    | When there is a *file* /A, if an other peer tries to create /A/B (it considers that /A is a directory),
+|       |        |          |          |    a NoSuchFileOrDir exception is raised and there is a desynch.
 | 00011 |  Open  |  Cache   |     5    | There is an undefined behavior which can cause a crash. Here is an example of backtrace:
 |       |        |          |          |    #0  0xffffe410 in __kernel_vsyscall ()
 |       |        |          |          |    #1  0xb7cf0701 in raise () from /lib/libc.so.6
