@@ -1,0 +1,19 @@
+Peerfuse                                                       June 2008
+
+                    Peerfuse-net protocol
+
+Abstract
+
+   Peerfuse-net is the subproject of Peerfuse which can be deployed on
+   a wide network like Internet. To prevent security issues, the
+   protocol is very robust.
+
+   To understand the base protocol, please read the "Peerfuse basis
+   protocol" RFC.
+
+Table of contents:
+
+1.  INTRODUCTION
+2.  PROTOCOL
+
+1.  INTRODUCTION
