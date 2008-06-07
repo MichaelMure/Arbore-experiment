@@ -1,8 +1,8 @@
 Specs PFNet
 
 - Cache de la DHT
- * Chaque peer routant un paquet garde ce paquet en cache. Ce cache timeout lors de la réception d'un pong du client (réémission autrement).
- * Cache pour les lectures, timeout en fonction de la distance du peer émetteur
+ * Un peer émettant un paquet garde ce paquet en cache. Ce paquet est réémis si le peer ne répond au ping/pong suivant.
+ * Cache pour les lectures de la DHT, timeout en fonction de la distance du peer émetteur. Lorsqu'un peer renvoie une valeur, il indique l'ancienneté de la valeur (afin de ne pas garder trop longtemps des data provenant déja d'un autre cache)
  * Durée du ping à déterminer (variable en fonction de l'uptime, fréquence de connexion ...)
  * Envoie des paquets par plusieurs route (?) (supppression du 1er point dans ce cas ?)
 
