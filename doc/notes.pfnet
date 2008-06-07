@@ -1,0 +1,24 @@
+Specs PFNet
+
+- Cache de la DHT
+ * Chaque peer routant un paquet garde ce paquet en cache. Ce cache timeout lors de la réception d'un pong du client (réémission autrement).
+ * Cache pour les lectures, timeout en fonction de la distance du peer émetteur
+ * Durée du ping à déterminer (variable en fonction de l'uptime, fréquence de connexion ...)
+ * Envoie des paquets par plusieurs route (?) (supppression du 1er point dans ce cas ?)
+
+- ID
+ * Id X509 ? limitation ?
+ * Id aléatoire
+
+- Limitation des données redondées
+ Chaque peer a un peer associé qui le surveille (en face sur le cercle) -> Impose un Id X509
+ * A veut envoyer des data à C, il envoie le nombre total signé qu'il a écrit
+ * C demande à B le nombre qui était écrit, en transmettant le nouveau nombre signé
+ * B réponds l'ancien signé, et stoque le nouveau s'il n'y a pas dépassement.
+ * C vérifie et accepte les données en cas de succès.
+
+- Suppression des fichiers avec le temps
+ * Suppression du cache du HDD quand il n'y a plus de place
+ * Suppression de la DHT avec timeout (à déterminer)
+
+- Suppression des certificats ?
