@@ -52,7 +52,7 @@ void DirEntry::AddFile(FileEntry* file)
 	FileMap::iterator it;
 	if((it = files.find(file->GetName())) != files.end())
 	{
-		log[W_DEBUG] << "File already exists, replacing it";
+		pf_log[W_DEBUG] << "File already exists, replacing it";
 		delete it->second;
 	}
 

@@ -25,7 +25,7 @@
 #include <algorithm>
 #include <time.h>
 #include "content_list_base.h"
-#include "log.h"
+#include "pf_log.h"
 #include "peers_list.h"
 #include "pf_types.h"
 
@@ -45,7 +45,7 @@ void ContentListBase::Loop()
 	{
 		if(it->second.GetAccessTime() + remove_from_list_timeout < time(NULL))
 		{
-			log[W_DEBUG] << "Remove \"" << it->first << "\" from the content_list";
+			pf_log[W_DEBUG] << "Remove \"" << it->first << "\" from the content_list";
 			/* Force a sync to the disc */
 			it->second.SyncToHdd(true);
 			RemoveFile(it->first);
@@ -171,7 +171,7 @@ uint32_t ContentListBase::GetRef(std::string filename)
 	while(my_refs.find(ref) != my_refs.end())
 		ref++;
 	my_refs[ref] = filename;
-	log[W_DEBUG] << "Giving ref " << ref << " to \"" << filename << "\"";
+	pf_log[W_DEBUG] << "Giving ref " << ref << " to \"" << filename << "\"";
 
 	return ref;
 }

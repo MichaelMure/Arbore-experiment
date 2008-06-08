@@ -26,7 +26,7 @@
 #include "mutex.h"
 #include "job.h"
 #include "job_types.h"
-#include "log.h"
+#include "pf_log.h"
 
 SchedulerQueue scheduler_queue;
 
@@ -34,7 +34,7 @@ SchedulerQueue scheduler_queue;
 void SchedulerQueue::Queue(Job* job)
 {
 	BlockLockMutex lock(this);
-	log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
+	pf_log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
 
 	for(iterator it = begin();
 		it != end();

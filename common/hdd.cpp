@@ -31,7 +31,7 @@
 #include <errno.h>
 #include "hdd.h"
 #include "mutex.h"
-#include "log.h"
+#include "pf_log.h"
 #include "session_config.h"
 
 Hdd hdd;
@@ -97,7 +97,7 @@ void Hdd::BuildTree(DirEntry* cache_dir, std::string _root)
 
 			f->LoadAttr();
 
-			log[W_INFO] << f->GetFullName() << " loaded.";
+			pf_log[W_INFO] << f->GetFullName() << " loaded.";
 
 			cache_dir->AddFile(f);
 			if(stats.st_mode & S_IFDIR)
@@ -180,11 +180,11 @@ void Hdd::MkFile(FileEntry* f)
 			r = mkdir(path.c_str(), mode);
 			if(r)
 			{
-				log[W_ERR] << "mkdir failed: " << strerror(errno);
+				pf_log[W_ERR] << "mkdir failed: " << strerror(errno);
 				throw HddWriteFailure(path);
 			}
 		}
-		log[W_INFO] << "mkdir on " << path;
+		pf_log[W_INFO] << "mkdir on " << path;
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void Hdd::MkFile(FileEntry* f)
 				throw HddWriteFailure(path);
 		}
 		close(fd);
-		log[W_INFO] << "creat on " << path;
+		pf_log[W_INFO] << "creat on " << path;
 	}
 }
 
@@ -229,14 +229,14 @@ void Hdd::RmFile(FileEntry* f)
 		int r = rmdir(path.c_str());
 		if(r)
 			throw HddWriteFailure(path);
-		log[W_INFO] << "rmdir on " << path;
+		pf_log[W_INFO] << "rmdir on " << path;
 	}
 	else
 	{
 		int fd = unlink(path.c_str());
 		if(fd == -1)
 			throw HddWriteFailure(path);
-		log[W_INFO] << "unlink on " << path;
+		pf_log[W_INFO] << "unlink on " << path;
 	}
 }
 
@@ -246,6 +246,6 @@ int Hdd::GetFd(std::string path)
 	std::string full_path = root + path;
 	int f = open(full_path.c_str(), O_CREAT|O_RDWR);
 	if(f == -1)
-		log[W_ERR] << "Unable to load file \"" << full_path << "\" from harddisk :" << strerror(errno);
+		pf_log[W_ERR] << "Unable to load file \"" << full_path << "\" from harddisk :" << strerror(errno);
 	return f;
 }

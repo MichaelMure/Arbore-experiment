@@ -27,7 +27,7 @@
 #include "job.h"
 #include "scheduler.h"
 #include "scheduler_queue.h"
-#include "log.h"
+#include "pf_log.h"
 
 Scheduler scheduler;
 
@@ -47,7 +47,7 @@ void Scheduler::Loop()
 
 		if(job)				  /* The queue may have been emptied externaly */
 		{
-			log[W_DEBUG] << "Begining handling job \"" << job->GetName() << "\". Queue_size:" <<scheduler_queue.GetQueueSize();
+			pf_log[W_DEBUG] << "Begining handling job \"" << job->GetName() << "\". Queue_size:" <<scheduler_queue.GetQueueSize();
 			if(job->DoStart())
 				scheduler_queue.Queue(job);
 			else

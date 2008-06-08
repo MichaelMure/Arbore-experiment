@@ -24,7 +24,7 @@
 #include "peers_list_base.h"
 #include "peer.h"
 #include "mutex.h"
-#include "log.h"
+#include "pf_log.h"
 #include "environment.h"
 
 PeersListBase::PeersListBase() : Mutex(RECURSIVE_MUTEX), changed(false)
@@ -97,7 +97,7 @@ PeersListBase::id_state_t PeersListBase::WhatIsThisID(pf_id id) const
 	else
 		id_state = IS_ON_NETWORK;
 
-	log[W_DEBUG] << "PeersList::WhatIsThisID(" << id << ") = " << id_state;
+	pf_log[W_DEBUG] << "PeersList::WhatIsThisID(" << id << ") = " << id_state;
 
 	return id_state;
 }
@@ -133,7 +133,7 @@ Peer* PeersListBase::RemovePeer(Peer* p)
 	if(it == end())
 		return NULL;
 
-	log[W_DEBUG] << "Removing peer from list: " << p->GetID();
+	pf_log[W_DEBUG] << "Removing peer from list: " << p->GetID();
 
 	erase(it);
 	if(p->IsConnection())
@@ -158,7 +158,7 @@ void PeersListBase::Pop(int fd, Peer** p)
 	if(it != fd2peer.end())
 	{
 		peer = RemovePeer(it->second);
-		log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << peer->GetID() << ")";
+		pf_log[W_CONNEC] << "<- Removing a peer: " << fd << " (" << peer->GetID() << ")";
 	}
 
 	*p = peer;

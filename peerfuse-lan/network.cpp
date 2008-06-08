@@ -23,7 +23,7 @@
 
 #include "network.h"
 #include "mutex.h"
-#include "log.h"
+#include "pf_log.h"
 #include "scheduler_queue.h"
 #include "job_types.h"
 
@@ -39,15 +39,15 @@ void Network::ThrowHandler()
 	{
 		scheduler_queue.CancelType(JOB_NEW_CONNECT);
 		CloseAll();
-		log[W_ERR]  << "Host " << e.addr << " can't connect.";
-		log[W_ERR]  << "We'll stay disconnected.";
+		pf_log[W_ERR]  << "Host " << e.addr << " can't connect.";
+		pf_log[W_ERR]  << "We'll stay disconnected.";
 	}
 	catch(PeerBase::SelfConnect &e)
 	{
 		/* pfnet throws this while handling the SSL handshake */
 		/* We are connecting to ourself, this is quiet dangerous */
-		log[W_ERR] << "I'm trying to connect to myself, this is bad.";
-		log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
+		pf_log[W_ERR] << "I'm trying to connect to myself, this is bad.";
+		pf_log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
 		exit(EXIT_FAILURE);
 	}
 }

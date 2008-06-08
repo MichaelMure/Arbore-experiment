@@ -30,7 +30,7 @@
 #include <time.h>
 #include "file_perms.h"
 #include "pf_types.h"
-#include "log.h"
+#include "pf_log.h"
 
 class DirEntry;
 

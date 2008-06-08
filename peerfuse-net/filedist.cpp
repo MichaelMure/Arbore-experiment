@@ -25,7 +25,7 @@
 #include "filedist.h"
 #include "peers_list.h"
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 #include "network.h"
 #include "environment.h"
 #include "packet.h"
@@ -50,7 +50,7 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 
 	if(it == id_l.end())
 	{
-		log[W_WARNING] << "FileDistribution::_is_responsible(): " << peer_id << " isn't in list";
+		pf_log[W_WARNING] << "FileDistribution::_is_responsible(): " << peer_id << " isn't in list";
 		return false;
 	}
 
@@ -60,7 +60,7 @@ bool FileDistribution::_is_responsible(const pf_id peer_id, const FileEntry* fil
 	for(; i < NB_PEERS_PER_FILE && (file->GetPathSerial() % id_l.size() != (id_n + i) % id_l.size()); ++i)
 		;
 
-	log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ") = "
+	pf_log[W_DEBUG] << "FileDist::_is_responsible(" << peer_id << ", " << file->GetFullName() << ", " << file->GetPathSerial() << ") = "
 		<< (i < NB_PEERS_PER_FILE ? "true" : "false");
 	return (i < NB_PEERS_PER_FILE);
 }
@@ -97,7 +97,7 @@ IDList FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const s
 			list.insert(peer);
 	}
 
-	log[W_DEBUG] << "FileDist::_get_resp_peers(" << f->GetFullName() << ", " << f->GetPathSerial() << ") = " << debug;
+	pf_log[W_DEBUG] << "FileDist::_get_resp_peers(" << f->GetFullName() << ", " << f->GetPathSerial() << ") = " << debug;
 
 	return list;
 }
@@ -198,18 +198,18 @@ void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 			 */
 			if(IsResponsible(environment.my_id.Get(), f->GetParent()))
 			{
-				log[W_DEBUG] << "I'm responsible of this file and I'm responsible "
+				pf_log[W_DEBUG] << "I'm responsible of this file and I'm responsible "
 					<< "of parent dir, so I send creation to them.";
 				relayed_peers.insert(peers.begin(), peers.end());
 			}
 			else if(peers.empty() == false)
 			{
-				log[W_DEBUG] << "I'm responsible of this file so I send it "
+				pf_log[W_DEBUG] << "I'm responsible of this file so I send it "
 					<< " to a parent dir responsible";
 				relayed_peers.insert(*peers.begin());
 			}
 			else
-				log[W_WARNING] << "There isn't any responsible for this file !?" << f->GetParent();
+				pf_log[W_WARNING] << "There isn't any responsible for this file !?" << f->GetParent();
 		}
 
 		/* Send packet to other responsibles peers if it's me that
@@ -218,9 +218,9 @@ void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 		if(!sender || !IsResponsible(sender, f))
 		{
 			if(!sender)
-				log[W_DEBUG] << "I've created this file, so I send it to other resps";
+				pf_log[W_DEBUG] << "I've created this file, so I send it to other resps";
 			else
-				log[W_DEBUG] << "Sender of this file isn't a responsible of it, so I relay on other resps";
+				pf_log[W_DEBUG] << "Sender of this file isn't a responsible of it, so I relay on other resps";
 			IDList lp = GetRespPeers(f);
 			relayed_peers.insert(lp.begin(), lp.end());
 		}
@@ -233,10 +233,10 @@ void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 
 		IDList resps = GetRespPeers(f);
 
-		log[W_DEBUG] << "I created this file but I'm not responsible of it. So I send info to a responsible";
+		pf_log[W_DEBUG] << "I created this file but I'm not responsible of it. So I send info to a responsible";
 
 		if(resps.empty())
-			log[W_WARNING] << "There isn't any responsible of this file !?!?!? " << f;
+			pf_log[W_WARNING] << "There isn't any responsible of this file !?!?!? " << f;
 		else
 			relayed_peers.insert(*resps.begin());
 	}
@@ -249,7 +249,7 @@ void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 		 * but him isn't responsible of it.
 		 * So I relay message to others file's parent responsibles.
 		 */
-		log[W_DEBUG] << "Someone sent this file to me, and I'm responsible of its parent "
+		pf_log[W_DEBUG] << "Someone sent this file to me, and I'm responsible of its parent "
 			<< "directory, but him isn't responsible of it. So I relay message to "
 			<< "others file's parent responsibles";
 		IDList peers = GetRespPeers(f->GetParent());
@@ -269,7 +269,7 @@ void FileDistribution::AddFile(FileEntry* f, pf_id sender)
 	std::map<std::string, IDList>::iterator delayed_mkfile = cache.delayed_mkfile_send.find(filename);
 	if(delayed_mkfile != cache.delayed_mkfile_send.end())
 	{
-		log[W_DEBUG] << "Delay mkfile";
+		pf_log[W_DEBUG] << "Delay mkfile";
 		if(delayed_mkfile->second.empty())
 			scheduler_queue.Queue(new JobSendMkFile(filename));
 		for(IDList::iterator p = relayed_peers.begin(); p != relayed_peers.end(); ++p)
@@ -313,7 +313,7 @@ void FileDistribution::UpdateRespFiles()
 	/* Store last id list */
 	std::vector<pf_id> last_id_list = id_list;
 
-	log[W_DEBUG] << "Updating responsible files";
+	pf_log[W_DEBUG] << "Updating responsible files";
 
 	/* First set new list of id */
 	id_list.clear();
@@ -326,7 +326,7 @@ void FileDistribution::UpdateRespFiles()
 	std::sort(id_list.begin(), id_list.end());
 
 	for(std::vector<pf_id>::const_iterator it = id_list.begin(); it != id_list.end(); ++it)
-		log[W_DEBUG] << "     LISTpeer: " << *it;
+		pf_log[W_DEBUG] << "     LISTpeer: " << *it;
 
 	/* Get all new files I have responsible */
 	FileList last_resp = resp_files;
@@ -336,7 +336,7 @@ void FileDistribution::UpdateRespFiles()
 
 	for(FileList::iterator it = last_resp.begin(); it != last_resp.end(); ++it)
 	{
-		log[W_DEBUG] << "- file " << (*it)->GetFullName();
+		pf_log[W_DEBUG] << "- file " << (*it)->GetFullName();
 
 		Packet pckt = CreateMkFilePacket(*it);
 		/* get actual peer list */
@@ -345,14 +345,14 @@ void FileDistribution::UpdateRespFiles()
 		/* TODO do not send message to peers we know they have already this file version */
 		for(IDList::iterator peer = peers.begin(); peer != peers.end(); ++peer)
 		{
-			log[W_DEBUG] << "  -> " << *peer;
+			pf_log[W_DEBUG] << "  -> " << *peer;
 			if(!_is_responsible(*peer, *it, last_id_list))
 			{
-				log[W_DEBUG] << "     sending file to " << *peer << " who wasn't responsible of it.";
+				pf_log[W_DEBUG] << "     sending file to " << *peer << " who wasn't responsible of it.";
 				pckt.SetDstID(*peer);
 				peers_list.SendMsg(*peer, pckt);
 			}
 		}
 	}
-	log[W_DEBUG] << "End of updating.";
+	pf_log[W_DEBUG] << "End of updating.";
 }

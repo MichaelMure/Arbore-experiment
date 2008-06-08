@@ -26,7 +26,7 @@
 #include <algorithm>
 
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 #include "tools.h"
 #include "peers_list.h"
 #include "session_config.h"
@@ -76,11 +76,11 @@ void Cache::SendChanges(pf_id peer, time_t last_view)
 
 	while(current_dir)
 	{
-		log[W_DEBUG] << "- We are in " << current_dir->GetFullName();
+		pf_log[W_DEBUG] << "- We are in " << current_dir->GetFullName();
 		for(; it != end; ++it)
 		{
 			DirEntry* dir = dynamic_cast<DirEntry*>(it->second);
-			log[W_DEBUG] << " |- File " << it->second->GetName();
+			pf_log[W_DEBUG] << " |- File " << it->second->GetName();
 
 			/* File is newer than Peer's */
 			if(it->second->GetAttr().mtime > last_view)
@@ -98,7 +98,7 @@ void Cache::SendChanges(pf_id peer, time_t last_view)
 		/* End of dir, we go back on top folder */
 		if(it == end)
 		{
-			log[W_DEBUG] << " `- end of dir, bye";
+			pf_log[W_DEBUG] << " `- end of dir, bye";
 			current_dir = current_dir->GetParent();
 			if(current_dir)
 			{
@@ -164,7 +164,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		f->SetAttr(stat, true); // hack to force stats to be saved
 
-		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
+		pf_log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 		dir->AddFile(f);
 		hdd.MkFile(f);
 	}
@@ -208,7 +208,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 	}
 	else
 	{
-		log[W_DEBUG] << "Won't update stats";
+		pf_log[W_DEBUG] << "Won't update stats";
 		return;
 	}
 
@@ -224,7 +224,7 @@ void Cache::SetAttr(std::string path, pf_stat stat, IDList sharers, pf_id sender
 		if(last_meta_mtime == stat.meta_mtime)
 		{
 			std::string filename = f->GetFullName();
-			log[W_DEBUG] << "last_meta_mtime == stat.meta_mtime: we delay NET_MKFILE message";
+			pf_log[W_DEBUG] << "last_meta_mtime == stat.meta_mtime: we delay NET_MKFILE message";
 			if(std::find(delayed_mkfile_send.begin(), delayed_mkfile_send.end(), filename) == delayed_mkfile_send.end())
 			{
 				delayed_mkfile_send.push_back(filename);
@@ -246,7 +246,7 @@ void Cache::SendMkFile(std::string filename)
 	if(!f)
 		throw NoSuchFileOrDir();
 
-	log[W_DEBUG] << "Send delayed NET_MKFILE:";
+	pf_log[W_DEBUG] << "Send delayed NET_MKFILE:";
 	peers_list.Broadcast(CreateMkFilePacket(f));
 
 	for(std::vector<std::string>::iterator it = delayed_mkfile_send.begin();
@@ -278,7 +278,7 @@ void Cache::RmFile(std::string path)
 	if(!f->GetParent())
 		throw NoPermission();
 
-	log[W_DEBUG] << "Removed " << path;
+	pf_log[W_DEBUG] << "Removed " << path;
 
 	f->SetRemoved();
 

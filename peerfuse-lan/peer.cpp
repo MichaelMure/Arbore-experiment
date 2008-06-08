@@ -32,7 +32,7 @@
 #include "net_proto.h"
 #include "pf_types.h"
 #include "pflan.h"
-#include "log.h"
+#include "pf_log.h"
 #include "job_other_connect.h"
 #include "job_new_conn_req.h"
 #include "job_mkfile.h"
@@ -68,7 +68,7 @@ Peer::~Peer()
 
 void Peer::SendMsg(const Packet& pckt)
 {
-	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
+	pf_log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 	send_queue.push(pckt);
 }
 
@@ -86,7 +86,7 @@ void Peer::SendHello()
 
 void Peer::SendStartMerge()
 {
-	log[W_DEBUG] << "Merge should start";
+	pf_log[W_DEBUG] << "Merge should start";
 	// Initiate the merge if it's the first peer we connect to
 	if(peers_list.Size() == 1)
 	{
@@ -114,7 +114,7 @@ void Peer::RequestChunk(std::string filename, off_t offset, size_t size)
 
 	if(it == file_refs.end())
 	{
-		log[W_ERR] << "This peer has no ref to this file ??";
+		pf_log[W_ERR] << "This peer has no ref to this file ??";
 		return;
 	}
 
@@ -154,7 +154,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 {
 	if(pckt->GetArg<std::string>(NET_HELLO_VERSION) != std::string(PEERFUSE_VERSION))
 	{
-		log[W_WARNING] << "Versions are different !";
+		pf_log[W_WARNING] << "Versions are different !";
 		throw MustDisconnect();
 	}
 
@@ -189,7 +189,7 @@ void Peer::Handle_net_your_id(struct Packet* pckt)
 		throw MustDisconnect();
 	environment.my_id.Set(pckt->GetArg<uint32_t>(NET_YOUR_ID_ID));
 	session_cfg.Set("my_id", environment.my_id.Get());
-	log[W_INFO] << "My ID now is " << environment.my_id.Get();
+	pf_log[W_INFO] << "My ID now is " << environment.my_id.Get();
 
 	if(IsServer())
 		SendStartMerge();
@@ -259,7 +259,7 @@ void Peer::Handle_net_peer_connection_rejected(struct Packet* msg)
 {
 	pf_addr peer = msg->GetArg<pf_addr>(NET_PEER_CONNECTION_REJECTED_ADDRESS);
 
-	log[W_ERR] << "Host " << peer << " can't connect.";
+	pf_log[W_ERR] << "Host " << peer << " can't connect.";
 	throw PeerCantConnect(peer);
 }
 
@@ -383,7 +383,7 @@ void Peer::Handle_net_unref_file(struct Packet* msg)
 		// sent chunk requests:
 		ResendAskedChunks(ref);
 
-		log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
+		pf_log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
 		file_refs.erase(it);
 	}
 }

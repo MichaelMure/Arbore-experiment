@@ -31,7 +31,7 @@
 #include "net_proto.h"
 #include "pf_types.h"
 #include "pfnet.h"
-#include "log.h"
+#include "pf_log.h"
 #include "session_config.h"
 #include "peers_list.h"
 #include "scheduler_queue.h"
@@ -82,11 +82,11 @@ void Peer::SendMsg(const Packet& pckt)
 		if(uplink)
 			peers_list.SendMsg(uplink, pckt);
 		else
-			log[W_ERR] << "Trying to send packet to " << this << " but this is my highlink"
+			pf_log[W_ERR] << "Trying to send packet to " << this << " but this is my highlink"
 				<< " and there isn't any connection with him!?";
 		return;
 	}
-	log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
+	pf_log[W_PARSE] << "-> (" << GetFd() << "/" << GetID() << ") " << pckt.GetPacketInfo();
 
 	send_queue.push(pckt);
 }
@@ -171,14 +171,14 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 	/* Version check */
 	if(pckt->GetArg<std::string>(NET_HELLO_VERSION) != std::string(PEERFUSE_VERSION))
 	{
-		log[W_WARNING] << "Versions are different !";
+		pf_log[W_WARNING] << "Versions are different !";
 		throw MustDisconnect();
 	}
 
 	/* Forbid broadcast for this message */
 	if(pckt->GetDstID() == 0)
 	{
-		log[W_WARNING] << "A NET_HELLO packet has 0 as destination id";
+		pf_log[W_WARNING] << "A NET_HELLO packet has 0 as destination id";
 		throw MustDisconnect();
 	}
 
@@ -196,7 +196,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 		case PeersList::IS_CONNECTED:
 			if(IsLowLink())
 			{
-				log[W_WARNING] << "Lowlink connection from " << addr << " which is a peer already connected";
+				pf_log[W_WARNING] << "Lowlink connection from " << addr << " which is a peer already connected";
 				throw MustDisconnect();
 			}
 			/* Do not break here because for highlinks this is the
@@ -207,7 +207,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 			 * is already on network */
 			if(IsHighLink())
 			{
-				log[W_WARNING] << "Highlink connection from " << addr << " which is a peer already on network";
+				pf_log[W_WARNING] << "Highlink connection from " << addr << " which is a peer already on network";
 				throw MustDisconnect();
 			}
 			else
@@ -216,7 +216,7 @@ void Peer::Handle_net_hello(struct Packet* pckt)
 				 * bolean to true to catch it at the end of this function, and raise an exception to
 				 * tell Network to change Connection objet to the other Peer object.
 				 */
-				log[W_DEBUG] << "Copy low link connection for " << GetAddr();
+				pf_log[W_DEBUG] << "Copy low link connection for " << GetAddr();
 				copy_low_link_connection = true;
 			}
 		}
@@ -271,9 +271,9 @@ void Peer::Handle_net_end_of_merge(struct Packet* msg)
 
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
-	log[W_INFO] << "Network map:";
+	pf_log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
-		log[W_INFO] << *it;
+		pf_log[W_INFO] << *it;
 }
 
 void Peer::Handle_net_end_of_merge_ack(struct Packet* msg)
@@ -303,7 +303,7 @@ void Peer::Handle_net_peer_connection(struct Packet* msg)
 		case PeersList::IS_ON_NETWORK:
 		case PeersList::IS_CONNECTED:
 			/* We are already connected to him. */
-			log[W_WARNING] << "Received a NET_PEER_CONNECTION for a peer who is already connected to me: " << addr.id;
+			pf_log[W_WARNING] << "Received a NET_PEER_CONNECTION for a peer who is already connected to me: " << addr.id;
 			return;
 		case PeersList::IS_UNKNOWN:
 		{
@@ -458,7 +458,7 @@ void Peer::Handle_net_unref_file(struct Packet* msg)
 		// sent chunk requests:
 		ResendAskedChunks(ref);
 
-		log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
+		pf_log[W_DEBUG] << "Peer " << GetID() << " unreferenced " << it->second;
 		file_refs.erase(it);
 	}
 }
@@ -535,14 +535,14 @@ void Peer::HandleMsg(Packet* pckt)
 	 */
 	if(HasFlag(ANONYMOUS) ^ !!(handler[pckt->GetType()].perm & PERM_ANONYMOUS))
 	{
-		log[W_WARNING] << "Received an anonymous command from a registered peer, or a non anonymous command from an anonymous peer";
+		pf_log[W_WARNING] << "Received an anonymous command from a registered peer, or a non anonymous command from an anonymous peer";
 		throw MustDisconnect();
 	}
 
 	#if 0					  /* TODO: check only if this is the sender */
 	if(!IsHighLink() && (handler[pckt->GetType()].perm & PERM_HIGHLINK))
 	{
-		log[W_WARNING] << "Received an HIGHLINK command from a non highlink peer";
+		pf_log[W_WARNING] << "Received an HIGHLINK command from a non highlink peer";
 		throw MustDisconnect();
 	}
 	#endif
@@ -572,7 +572,7 @@ bool Peer::Receive()
 		/* If source is not me, I translate packet to real source. */
 		if((*packet)->GetSrcID() && (*packet)->GetSrcID() != GetID() && GetID())
 		{
-			log[W_DEBUG] << "Translate packet from " << GetID() << " to " << (*packet)->GetSrcID();
+			pf_log[W_DEBUG] << "Translate packet from " << GetID() << " to " << (*packet)->GetSrcID();
 			peers_list.GivePacketTo((*packet)->GetSrcID(), *packet);
 		}
 		else
@@ -580,7 +580,7 @@ bool Peer::Receive()
 	}
 	else if((*packet)->GetDstID())
 	{
-		log[W_DEBUG] << "Relay packet to " << (*packet)->GetDstID();
+		pf_log[W_DEBUG] << "Relay packet to " << (*packet)->GetDstID();
 		peers_list.SendMsg((*packet)->GetDstID(), **packet);
 	}
 

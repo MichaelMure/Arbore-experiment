@@ -29,7 +29,7 @@
 
 #include <fuse.h>
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 
 int pf_truncate(const char* path, off_t offset)
 {
@@ -39,7 +39,7 @@ int pf_truncate(const char* path, off_t offset)
 	}
 	catch(...)
 	{
-		log[W_ERR] << "Failed to truncate to " << path;
+		pf_log[W_ERR] << "Failed to truncate to " << path;
 		return -ENOENT;
 	}
 	return 0;

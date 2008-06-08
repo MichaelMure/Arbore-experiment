@@ -21,8 +21,8 @@
  * $Id$
  */
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef PF_LOG_H
+#define PF_LOG_H
 
 #include <string>
 #include <sstream>
@@ -44,18 +44,18 @@ enum
 
 #define DEFAULT_LOGGED_FLAGS (W_WARNING|W_BIGWARNING|W_ERR|W_INFO)
 
-#define FLog(flags, msg) log[flags] << __FILE__ << ":" << __PRETTY_FUNCTION << "():" << __LINE__ << ": " << msg
+#define FLog(flags, msg) pf_log[flags] << __FILE__ << ":" << __PRETTY_FUNCTION << "():" << __LINE__ << ": " << msg
 
 /***************************
  *     Log                 *
  ***************************
  *
  * Usage:
- *   log[flags] << messages;
+ *   pf_log[flags] << messages;
  *
  * Examples:
- *   log[W_WARNING] << cl << "There is a problem with this: " << i;
- *   log[W_ERR] << "This user isn't allowed to do this!";
+ *   pf_log[W_WARNING] << cl << "There is a problem with this: " << i;
+ *   pf_log[W_ERR] << "This user isn't allowed to do this!";
  */
 
 class Log
@@ -118,5 +118,5 @@ inline Log::flux& Log::flux::operator<< <pf_addr> (pf_addr addr)
 	return *this;
 }
 
-extern Log log;
-#endif						  /* LOG_H */
+extern Log pf_log;
+#endif						  /* PF_LOG_H */

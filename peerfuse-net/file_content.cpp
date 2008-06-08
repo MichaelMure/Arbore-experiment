@@ -42,7 +42,7 @@ FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDe
 	if(now > ref_request_time + ref_request_refresh)
 	{
 		// We don't know who have which part of the file
-		log[W_DEBUG] << "Request for file refs";
+		pf_log[W_DEBUG] << "Request for file refs";
 		cache.RequestFileRefs(filename);
 		ref_request_time = time(NULL);
 	}
@@ -62,7 +62,7 @@ FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDe
 		}
 		if(!found)
 		{
-			log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+			pf_log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
 			return CHUNK_UNAVAILABLE;
 		}
 	}

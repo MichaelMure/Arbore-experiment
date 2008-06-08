@@ -27,7 +27,7 @@
 #include <vector>
 #include <cassert>
 #include <string>
-#include "log.h"
+#include "pf_log.h"
 #include "packet_base.h"
 
 class Packet : public PacketBase

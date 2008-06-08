@@ -38,7 +38,7 @@ void PeersList::GivePacketTo(pf_id id, Packet* packet) const
 	if(it != end())
 		(*it)->HandleMsg(packet);
 	else
-		log[W_WARNING] << "Received a packet from unknown peer";
+		pf_log[W_WARNING] << "Received a packet from unknown peer";
 }
 
 void PeersList::SendPeerList(Peer* to) const

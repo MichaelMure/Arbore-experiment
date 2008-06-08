@@ -22,7 +22,7 @@
  */
 
 #include "job_new_conn_req_base.h"
-#include "log.h"
+#include "pf_log.h"
 #include "network.h"
 
 bool JobNewConnReqBase::Start()
@@ -34,7 +34,7 @@ bool JobNewConnReqBase::Start()
 	}
 	catch(Network::CantConnectTo &e)
 	{
-		log[W_INFO] << "Unable to connect to " << (pf_addr)*this;
+		pf_log[W_INFO] << "Unable to connect to " << (pf_addr)*this;
 		OnFailure();
 	}
 	return false;

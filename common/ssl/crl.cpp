@@ -25,7 +25,7 @@
 #include <openssl/x509.h>
 #include <openssl/safestack.h>
 #include "crl.h"
-#include "log.h"
+#include "pf_log.h"
 #include "download.h"
 
 Crl crl;
@@ -43,10 +43,10 @@ void Crl::Load()
 {
 	if(!download.Get(url.c_str(), path.c_str()))
 	{
-		log[W_INFO] << "CRL download failed";
+		pf_log[W_INFO] << "CRL download failed";
 		throw DownloadFailed();
 	}
-	log[W_INFO] << "Loading CRL file : \"" << path << "\".";
+	pf_log[W_INFO] << "Loading CRL file : \"" << path << "\".";
 
 	if(crl)
 	{
@@ -83,7 +83,7 @@ void Crl::Load()
 	}
 
 	char* str = X509_NAME_oneline (X509_CRL_get_issuer (crl), 0, 0);
-	log[W_INFO] << "CRL issued by: " << str;
+	pf_log[W_INFO] << "CRL issued by: " << str;
 }
 
 void Crl::Loop()

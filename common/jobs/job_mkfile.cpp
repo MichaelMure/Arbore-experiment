@@ -23,7 +23,7 @@
 
 #include "job_mkfile.h"
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 
 bool JobMkFile::Start()
 {
@@ -39,13 +39,13 @@ bool JobMkFile::Start()
 		}
 		catch(Cache::NoSuchFileOrDir &e)
 		{
-			log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
+			pf_log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
 			/* XXX: DO SOMETHING */
 		}
 	}
 	catch(Cache::FileAlreadyExists &e)
 	{
-		log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
+		pf_log[W_DESYNCH] << "Unable to create " << file << ": File already exists";
 		/* XXX: DO SOMETHING */
 	}
 

@@ -36,7 +36,7 @@
 #include "pf_ssl_nossl.h"
 #include "connection.h"
 #include "connection_ssl.h"
-#include "log.h"
+#include "pf_log.h"
 #include "pf_config.h"
 #include "network_base.h"
 #include "tools.h"
@@ -68,7 +68,7 @@ NetworkBase::~NetworkBase()
 
 Peer* NetworkBase::AddPeer(Peer* p)
 {
-	log[W_CONNEC] << "-> Added a new peer: " << p->GetAddr() << " (" << p->GetFd() <<")";
+	pf_log[W_CONNEC] << "-> Added a new peer: " << p->GetAddr() << " (" << p->GetFd() <<")";
 
 	#if 0
 	if(p->GetFd() >= 0)
@@ -129,7 +129,7 @@ void NetworkBase::Loop()
 	{
 		if(errno != EINTR)
 		{
-			log[W_ERR] << "Error in select() (" << errno << ": " << strerror(errno) << ")";
+			pf_log[W_ERR] << "Error in select() (" << errno << ": " << strerror(errno) << ")";
 			return;
 		}
 	}
@@ -155,7 +155,7 @@ void NetworkBase::Loop()
 				}
 				catch(SslSsl::SslHandshakeFailed &e)
 				{
-					log [W_WARNING] << "SSL handshake failure: " << e.GetString();
+					pf_log[W_WARNING] << "SSL handshake failure: " << e.GetString();
 				}
 
 			}
@@ -187,13 +187,13 @@ void NetworkBase::Loop()
 		}
 		catch(Connection::RecvError &e)
 		{
-			log[W_WARNING] << "recv() error: " << e.GetString();
+			pf_log[W_WARNING] << "recv() error: " << e.GetString();
 			RemovePeer(fd);
 			break;
 		}
 		catch(Packet::Malformated &e)
 		{
-			log[W_ERR] << "Received malformed message!";
+			pf_log[W_ERR] << "Received malformed message!";
 			RemovePeer(fd);
 			break;
 		}
@@ -201,7 +201,7 @@ void NetworkBase::Loop()
 		/* Yes and no, it is not the good name because it's not really a ban -romain */
 		catch(Peer::MustDisconnect &e)
 		{
-			log[W_WARNING] << "Must disconnected";
+			pf_log[W_WARNING] << "Must disconnected";
 			RemovePeer(fd, false);
 			break;
 		}
@@ -213,7 +213,7 @@ void NetworkBase::Loop()
 		}
 		catch(Connection::WriteError &e)
 		{
-			log[W_WARNING] << "send() error: " << e.GetString();
+			pf_log[W_WARNING] << "send() error: " << e.GetString();
 			RemovePeer(fd);
 			break;
 		}
@@ -303,7 +303,7 @@ void NetworkBase::Connect(pf_addr addr)
 	fsocket.sin_family = AF_INET;
 	fsocket.sin_port = htons(addr.port);
 
-	log[W_INFO] << "Connecting to " << addr;
+	pf_log[W_INFO] << "Connecting to " << addr;
 	/* Connexion */
 	if(connect(sock, (struct sockaddr *) &fsocket, sizeof fsocket) < 0)
 	{
@@ -318,7 +318,7 @@ void NetworkBase::Connect(pf_addr addr)
 	}
 	catch(SslSsl::SslHandshakeFailed &e)
 	{
-		log [W_WARNING] << "SSL handshake failure: " << e.GetString();
+		pf_log[W_WARNING] << "SSL handshake failure: " << e.GetString();
 		throw CantConnectTo(errno, addr);
 	}
 
@@ -378,14 +378,14 @@ void NetworkBase::StartNetwork(MyConfig* conf)
 	ConfigSection* section = conf->GetSection("ssl");
 	if(section && (!section->GetItem("enabled") || section->GetItem("enabled")->Boolean() == true))
 	{
-		log[W_INFO] << "Using a SSL wrapper";
+		pf_log[W_INFO] << "Using a SSL wrapper";
 		ssl = new SslSsl(section->GetItem("cert")->String(),
 			section->GetItem("key")->String(),
 			section->GetItem("ca")->String());
 	}
 	else
 	{
-		log[W_INFO] << "Not using a SSL wrapper";
+		pf_log[W_INFO] << "Not using a SSL wrapper";
 		ssl = new SslNoSsl();
 	}
 
@@ -418,7 +418,7 @@ void NetworkBase::AddDisconnected(const pf_addr& addr)
 void NetworkBase::DelDisconnected(const pf_addr& addr)
 {
 	BlockLockMutex lock(this);
-	log[W_INFO] << "Removed disconnected: " << addr;
+	pf_log[W_INFO] << "Removed disconnected: " << addr;
 	disconnected_list.remove(addr);
 
 	/* Remove connection from queue. */
@@ -430,7 +430,7 @@ void NetworkBase::DelDisconnected(const pf_addr& addr)
 		JobNewConnection* job = dynamic_cast<JobNewConnection*>(*it);
 		if(job && job->IsMe(addr))
 		{
-			log[W_DEBUG] << "-> removed a job";
+			pf_log[W_DEBUG] << "-> removed a job";
 			scheduler_queue.Cancel(job);
 		}
 	}

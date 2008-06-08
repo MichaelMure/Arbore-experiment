@@ -25,7 +25,7 @@
 #define SESSION_CONFIG_H
 #include <map>
 #include <string>
-#include "log.h"
+#include "pf_log.h"
 #include "mutex.h"
 #include "tools.h"
 

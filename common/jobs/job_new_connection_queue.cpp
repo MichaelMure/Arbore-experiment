@@ -22,7 +22,7 @@
  */
 
 #include "job_new_connection_queue.h"
-#include "log.h"
+#include "pf_log.h"
 #include "network.h"
 
 bool JobNewConnQueue::Start()
@@ -36,7 +36,7 @@ bool JobNewConnQueue::Start()
 	}
 	catch(Network::CantConnectTo &e)
 	{
-		log[W_INFO] << "Unable to connect to " << *current;
+		pf_log[W_INFO] << "Unable to connect to " << *current;
 		++current;
 		return true;
 	}

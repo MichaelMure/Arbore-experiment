@@ -224,7 +224,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(off >= file_size)
 	{
-		log[W_WARNING] << "Fuse trying to read out of file";
+		pf_log[W_WARNING] << "Fuse trying to read out of file";
 		return 0;
 	}
 
@@ -235,7 +235,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(!to_read)
 	{
-		log[W_WARNING] << "Fuse trying to read out of file";
+		pf_log[W_WARNING] << "Fuse trying to read out of file";
 		return 0;
 	}
 
@@ -251,7 +251,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 	if(!chunk.GetData())			  /* shouldn't happen */
 	{
-		log[W_WARNING] << "FileContent returned an empty chunk??";
+		pf_log[W_WARNING] << "FileContent returned an empty chunk??";
 		return 0;
 	}
 
@@ -261,7 +261,7 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 
 int CacheBase::Truncate(std::string path, off_t offset)
 {
-	log[W_DEBUG] << "Truncating \"" << path << "\" at " << offset;
+	pf_log[W_DEBUG] << "Truncating \"" << path << "\" at " << offset;
 
 	pf_stat stat = GetAttr(path);
 	stat.size = (size_t)offset;

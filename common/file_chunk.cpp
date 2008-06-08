@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <string.h>
 #include "file_chunk.h"
-#include "log.h"
+#include "pf_log.h"
 
 FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : FileChunkDesc(_offset, _size), hdd_synced(false)
 {
@@ -99,7 +99,7 @@ void FileChunk::Merge(FileChunk chunk)
 
 	memcpy(data + buf_start, chunk.GetData() + chu_start, common_part.GetSize());
 
-	log[W_DEBUG] << "Chunk merged: off:" << chunk.GetOffset() << ", size:" << chunk.GetSize() << " inside off:" << offset << ", size:" << size;
+	pf_log[W_DEBUG] << "Chunk merged: off:" << chunk.GetOffset() << ", size:" << chunk.GetSize() << " inside off:" << offset << ", size:" << size;
 }
 
 void FileChunk::Concatenate(FileChunk other)
@@ -114,7 +114,7 @@ void FileChunk::Concatenate(FileChunk other)
 	}
 
 	if(offset + (off_t)size != other.GetOffset())
-		log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
+		pf_log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
 
 	access_time = time(NULL);
 	hdd_synced = false;
@@ -133,7 +133,7 @@ void FileChunk::Concatenate(FileChunk other)
 
 	size = new_size;
 	data = new_data;
-	log[W_DEBUG] << "Chunk concatenated: off:" << other.GetOffset() << ", size:" << other.GetSize() << " to off:" << offset << ", size:" << size;
+	pf_log[W_DEBUG] << "Chunk concatenated: off:" << other.GetOffset() << ", size:" << other.GetSize() << " to off:" << offset << ", size:" << size;
 }
 
 FileChunk FileChunk::GetPart(FileChunkDesc chunk_desc)

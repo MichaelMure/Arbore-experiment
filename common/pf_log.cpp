@@ -25,9 +25,9 @@
 #include <syslog.h>
 #include <sys/time.h>
 #include "tools.h"
-#include "log.h"
+#include "pf_log.h"
 
-Log log;
+Log pf_log;
 
 static struct
 {
@@ -50,7 +50,7 @@ Log::flux::~flux()
 {
 	int i;
 
-	if(!(flag & log.LoggedFlags()))
+	if(!(flag & pf_log.LoggedFlags()))
 		return;
 
 	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(flag & all_flags[i].flag); --i)
@@ -60,19 +60,19 @@ Log::flux::~flux()
 		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", flag, str.c_str());
 	else
 	{
-		if((all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING) && log.ToSyslog())
+		if((all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING) && pf_log.ToSyslog())
 			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
 
 		struct timeval t;
 		gettimeofday(&t, NULL);
-		log.std_lock.Lock();
+		pf_log.std_lock.Lock();
 		(all_flags[i].level == LOG_ERR ? std::cerr : std::cout)
 			<< (t.tv_sec % (24 * 60 * 60)) / (60 * 60)
 			<< ":" << (t.tv_sec % (60 * 60)) / 60
 			<< ":" << t.tv_sec % 60
 			<< "." << t.tv_usec / 1000
 			<< "[" << all_flags[i].s << "] " << str << std::endl;
-		log.std_lock.Unlock();
+		pf_log.std_lock.Unlock();
 	}
 }
 

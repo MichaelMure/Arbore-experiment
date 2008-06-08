@@ -78,7 +78,7 @@ void Mutex::Lock() const
 {
 	int res = pthread_mutex_lock(mutex);
 	//assert(res == 0);
-	if(res)					  // Don't use log[] !
+	if(res)					  // Don't use pf_log[] !
 		std::cerr << "Failed to lock " << this;
 }
 
@@ -86,6 +86,6 @@ void Mutex::Unlock() const
 {
 	int res = pthread_mutex_unlock(mutex);
 	//assert(res == 0);
-	if(res)					  // Don't use log[] !
+	if(res)					  // Don't use pf_log[] !
 		std::cerr << "Failed to unlock " << this;
 }

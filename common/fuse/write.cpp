@@ -29,7 +29,7 @@
 
 #include <fuse.h>
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 
 int pf_write(const char *path, const char *buf, size_t size,
 off_t offset, struct fuse_file_info *fi)
@@ -41,7 +41,7 @@ off_t offset, struct fuse_file_info *fi)
 	}
 	catch(...)
 	{
-		log[W_ERR] << "Failed to write to " << path;
+		pf_log[W_ERR] << "Failed to write to " << path;
 		return -ENOENT;
 	}
 	return 0;

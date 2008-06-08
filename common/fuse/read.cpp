@@ -29,7 +29,7 @@
 
 #include <fuse.h>
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 
 int pf_read(const char *path, char *buf, size_t size,
 off_t offset, struct fuse_file_info *fi)
@@ -41,12 +41,12 @@ off_t offset, struct fuse_file_info *fi)
 	}
 	catch(Cache::FileUnavailable e)
 	{
-		log[W_INFO] << "File \"" << path << "\" is not available.";
+		pf_log[W_INFO] << "File \"" << path << "\" is not available.";
 		return -ENOENT;
 	}
 	catch(...)
 	{
-		log[W_ERR] << "Failed to read to " << path;
+		pf_log[W_ERR] << "Failed to read to " << path;
 		return -ENOENT;
 	}
 	return 0;

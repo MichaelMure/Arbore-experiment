@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <curl/curl.h>
 #include "download.h"
-#include "log.h"
+#include "pf_log.h"
 
 Download download;
 
@@ -46,10 +46,10 @@ size_t download_callback(void* buf, size_t size, size_t nmemb, void* fd)
 bool Download::Get(const char* url, const char* save_as)
 {
 	FILE* fd = fopen( save_as, "w");
-	log[W_INFO] << "Downloading " << url;
+	pf_log[W_INFO] << "Downloading " << url;
 	if(fd == NULL)
 	{
-		log[W_ERR] << "Download failed.";
+		pf_log[W_ERR] << "Download failed.";
 		return false;
 	}
 	curl_easy_setopt(curl, CURLOPT_FILE, fd);
@@ -69,11 +69,11 @@ bool Download::Get(const char* url, const char* save_as)
 	{
 		long http_error = 0;
 		curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE , &http_error);
-		log[W_ERR] << "Received http error " << http_error;
+		pf_log[W_ERR] << "Received http error " << http_error;
 	}
 
 	if(r != CURLE_OK)
-		log[W_ERR] << "Download failed, curl error : " << r;
+		pf_log[W_ERR] << "Download failed, curl error : " << r;
 
 	return (r == CURLE_OK);
 }

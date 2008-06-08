@@ -25,7 +25,7 @@
 #include "file_content.h"
 #include "peers_list.h"
 #include "packet.h"
-#include "log.h"
+#include "pf_log.h"
 
 const time_t ref_request_timeout = 5;
 const time_t ref_request_refresh = 30;
@@ -41,7 +41,7 @@ FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDe
 		packet.SetArg(NET_WHO_HAS_FILE_PATH, filename);
 		peers_list.Broadcast(packet);
 		ref_request_time = time(NULL);
-		log[W_DEBUG] << "Now waiting for sharers to advertise their files";
+		pf_log[W_DEBUG] << "Now waiting for sharers to advertise their files";
 	}
 	// Check the chunk presence on the network
 	if(now > ref_request_time + ref_request_timeout)
@@ -58,7 +58,7 @@ FileContentBase::chunk_availability FileContent::NetworkRequestChunk(FileChunkDe
 		}
 		if(!found)
 		{
-			log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+			pf_log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
 			return CHUNK_UNAVAILABLE;
 		}
 	}

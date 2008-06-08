@@ -25,7 +25,7 @@
 #include "content_list.h"
 #include "file_content.h"
 #include "peers_list.h"
-#include "log.h"
+#include "pf_log.h"
 
 bool JobSendChunk::Start()
 {
@@ -36,18 +36,18 @@ bool JobSendChunk::Start()
 		/* TODO: make OnDiskHaveChunk non-blockant and repeat the job */
 		|| f.OnDiskHaveChunk(requested_chunk))
 	{
-		log[W_DEBUG] << "Sending chunk";
+		pf_log[W_DEBUG] << "Sending chunk";
 		FileChunk chunk = f.GetChunk(requested_chunk);
 		if(chunk.GetData() == NULL)
 		{
-			log[W_ERR] << "Trying to send an empty chunk..";
+			pf_log[W_ERR] << "Trying to send an empty chunk..";
 			return false;
 		}
 		peers_list.SendChunk(ref, sendto, chunk);
 		return false;
 	}
 	else
-		log[W_DEBUG] << "I don't have this chunk ??";
+		pf_log[W_DEBUG] << "I don't have this chunk ??";
 
 	return false;
 }

@@ -21,7 +21,7 @@
  * $Id$
  */
 
-#include "log.h"
+#include "pf_log.h"
 #include "peer_base.h"
 #include <algorithm>
 
@@ -51,7 +51,7 @@ void PeerBase::SetTimestampDiff(uint32_t now)
 	else
 		ts_diff = - (int)(now - local);
 
-	log[W_INFO] << " Peer TS Diff: " << ts_diff << "(" << local << " - " << now << ")";
+	pf_log[W_INFO] << " Peer TS Diff: " << ts_diff << "(" << local << " - " << now << ")";
 }
 
 time_t PeerBase::Timestamp(time_t ts) const
@@ -93,7 +93,7 @@ bool PeerBase::ReceivePacket()
 	if(incoming->GetDataSize() > 0 && !incoming->ReceiveContent(conn))
 		return false;			  // All the content couldn't be retrieved yet -> exit
 
-	log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
+	pf_log[W_PARSE] << "<- (" << GetFd() << "/" << GetID() << ") " << incoming->GetPacketInfo();
 
 	return true;
 }
@@ -127,7 +127,7 @@ void PeerBase::DelAskedChunk(uint32_t ref, FileChunkDesc chunk)
 		}
 		else
 		{
-			log[W_ERR] << "Chunk wasn't asked ??";
+			pf_log[W_ERR] << "Chunk wasn't asked ??";
 		}
 	}
 }

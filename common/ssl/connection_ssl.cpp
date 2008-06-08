@@ -25,7 +25,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include "connection_ssl.h"
-#include "log.h"
+#include "pf_log.h"
 
 ConnectionSsl::~ConnectionSsl()
 {
@@ -58,7 +58,7 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 			if(SSL_get_error(ssl, written) == SSL_ERROR_WANT_READ
 				|| SSL_get_error(ssl, written) == SSL_ERROR_WANT_WRITE)
 				return;
-			log[W_DEBUG] << "Write failed";
+			pf_log[W_DEBUG] << "Write failed";
 			std::string err = ERR_error_string(ERR_get_error(), NULL);
 			throw WriteError(err);
 		}

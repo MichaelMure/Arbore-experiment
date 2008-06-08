@@ -26,7 +26,7 @@
 #include <sys/socket.h>
 #include <errno.h>
 #include "connection_nossl.h"
-#include "log.h"
+#include "pf_log.h"
 
 ConnectionNoSsl::ConnectionNoSsl(int _fd)
 			: Connection(_fd)

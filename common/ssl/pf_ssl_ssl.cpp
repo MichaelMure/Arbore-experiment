@@ -27,7 +27,7 @@
 #include <openssl/x509.h>
 #include <openssl/err.h>
 #include <openssl/store.h>
-#include "log.h"
+#include "pf_log.h"
 #include "pf_ssl_ssl.h"
 #include "certificate.h"
 #include "connection_ssl.h"
@@ -49,11 +49,11 @@ SslSsl::SslSsl(std::string cert_file, std::string key_file, std::string cacert_f
 	client_ctx = SSL_CTX_new(meth);
 	SSL_CTX_set_mode(client_ctx, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
-	log[W_INFO] << "Loading private key: " << key_file;
+	pf_log[W_INFO] << "Loading private key: " << key_file;
 	key.LoadPem(key_file, "");
-	log[W_INFO] << "Loading certificate: " << cert_file;
+	pf_log[W_INFO] << "Loading certificate: " << cert_file;
 	cert.LoadPem(cert_file, "");
-	log[W_INFO] << "Loading CA certificate: " << cacert_file;
+	pf_log[W_INFO] << "Loading CA certificate: " << cacert_file;
 	cacert.LoadPem(cacert_file, "");
 
 	SetCertificates(server_ctx);
@@ -130,7 +130,7 @@ void SslSsl::CheckPeerCertificate(SSL* ssl)
 
 	X509* client_cert = SSL_get_peer_certificate (ssl);
 	char* str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
-	log[W_INFO] << "SSL connection established with: " << str;
+	pf_log[W_INFO] << "SSL connection established with: " << str;
 	OPENSSL_free (str);
 }
 

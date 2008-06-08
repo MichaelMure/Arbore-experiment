@@ -27,7 +27,7 @@
 #include <unistd.h>				  // fcntl
 #include <fcntl.h>				  // fcntl
 #include "connection.h"
-#include "log.h"
+#include "pf_log.h"
 
 Connection::Connection(int _fd) : fd(_fd),
 			read_buf(NULL),

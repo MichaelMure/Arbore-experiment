@@ -9,7 +9,7 @@ SET(SRC
 	common/file_content_base.cpp
 	common/fs_utils.cpp
 	common/pf_config.cpp
-	common/log.cpp
+	common/pf_log.cpp
 	common/mutex.cpp
 	common/network_base.cpp
 	common/peer_base.cpp

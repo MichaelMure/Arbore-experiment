@@ -26,7 +26,7 @@
 #include <algorithm>
 
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 #include "tools.h"
 #include "peers_list.h"
 #include "environment.h"
@@ -139,7 +139,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 
 		dir->AddFile(file);
 
-		log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
+		pf_log[W_DEBUG] << "Created " << (stat.mode & S_IFDIR ? "dir " : "file ") << filename << " in " << path << ". There are " << dir->GetSize() << " files and directories";
 
 		/* Write file on cache */
 		hdd.MkFile(file);
@@ -161,7 +161,7 @@ void Cache::MkFile(std::string path, pf_stat stat, IDList sharers, pf_id sender)
 				throw;
 		}
 
-		log[W_DEBUG] << "File already exists... Update it.";
+		pf_log[W_DEBUG] << "File already exists... Update it.";
 
 		_set_attr(file, stat, sender, sharers);
 	}
@@ -186,7 +186,7 @@ void Cache::RmFile(std::string path)
 	if(!f->GetParent())
 		throw NoPermission();
 
-	log[W_DEBUG] << "Removed " << path;
+	pf_log[W_DEBUG] << "Removed " << path;
 
 	pf_stat stat = f->GetAttr();
 	stat.pf_mode |= FilePermissions::S_PF_REMOVED;
@@ -231,7 +231,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharer
 			/* My file is more recent than peer's, so I send it a mkfile
 			 * to correct this.
 			 */
-			log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
+			pf_log[W_DEBUG] << "My file is more recent than peer's, so I correct him";
 			Packet pckt = filedist.CreateMkFilePacket(file);
 			pckt.SetDstID(sender);
 			peers_list.SendMsg(sender, pckt);
@@ -239,7 +239,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharer
 		}
 		else if(file->GetAttr() == stat)
 		{
-			log[W_DEBUG] << "Same timestamp...";
+			pf_log[W_DEBUG] << "Same timestamp...";
 			/* TODO Same timestamp, what can we do?... */
 			return;			  /* same version, go out */
 		}
@@ -271,7 +271,7 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharer
 			stat.meta_mtime = now;
 	}
 
-	log[W_DEBUG] << "Updating file.";
+	pf_log[W_DEBUG] << "Updating file.";
 
 	if(sharers.empty() == false)
 	{
@@ -281,12 +281,12 @@ void Cache::_set_attr(FileEntry* file, pf_stat stat, pf_id sender, IDList sharer
 		 */
 		if(file->GetAttr().mtime != stat.mtime)
 		{
-			log[W_DEBUG] << file->GetAttr().mtime << " != " << stat.mtime << ": we update sharers";
+			pf_log[W_DEBUG] << file->GetAttr().mtime << " != " << stat.mtime << ": we update sharers";
 			file->SetSharers(sharers);
 		}
 		else
 		{
-			log[W_DEBUG] << file->GetAttr().mtime << " == " << stat.mtime << ": we merge sharers";
+			pf_log[W_DEBUG] << file->GetAttr().mtime << " == " << stat.mtime << ": we merge sharers";
 			IDList idlist = file->GetSharers();
 			idlist.insert(sharers.begin(), sharers.end());
 			file->SetSharers(idlist);
@@ -339,7 +339,7 @@ void Cache::SendMkFile(std::string filename)
 	if((it = delayed_mkfile_send.find(filename)) == delayed_mkfile_send.end())
 		return;
 
-	log[W_DEBUG] << "Send delayed MKFILE:";
+	pf_log[W_DEBUG] << "Send delayed MKFILE:";
 	Packet p = filedist.CreateMkFilePacket(f);
 	peers_list.SendMsg(it->second, p);
 
@@ -412,7 +412,7 @@ void Cache::FillReadDir(const char* _path, void *buf, fuse_fill_dir_t filler, of
 			std::set<pf_id> peers = filedist.GetRespPeers(dir);
 
 			if(peers.empty())
-				log[W_WARNING] << "Cache::FillReadDir: there isn't any responsible of " << dir->GetFullName() << " ??";
+				pf_log[W_WARNING] << "Cache::FillReadDir: there isn't any responsible of " << dir->GetFullName() << " ??";
 			else
 			{
 				std::map<std::string, incoming_states_t>::iterator incoming = dir_incoming.find(path);

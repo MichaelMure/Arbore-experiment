@@ -86,14 +86,14 @@ bool FileContentBase::LoadFd()
 		ondisk_size = lseek(ondisk_fd, 0, SEEK_END);
 		if(ondisk_size == (off_t)-1)
 		{
-			log[W_ERR] << "Error loading \"" << filename << "\": " << strerror(errno);
+			pf_log[W_ERR] << "Error loading \"" << filename << "\": " << strerror(errno);
 			close(ondisk_fd);
 			ondisk_fd = -1;
 			ondisk_size = 0;
 			ondisk_offset = 0;
 			return false;
 		}
-		log[W_DEBUG] << "\"" << filename << "\" have " << ondisk_size << " oct on hdd";
+		pf_log[W_DEBUG] << "\"" << filename << "\" have " << ondisk_size << " oct on hdd";
 	}
 	return (ondisk_fd != -1);
 }
@@ -104,18 +104,18 @@ void FileContentBase::OnDiskWrite(FileChunk& chunk)
 	ondisk_offset = 0;
 	if(!LoadFd())
 	{
-		log[W_ERR] << "Unable to save \"" << filename <<"\" in cache.";
+		pf_log[W_ERR] << "Unable to save \"" << filename <<"\" in cache.";
 		return;
 	}
 
 	if(lseek(ondisk_fd, chunk.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1
 		|| (size_t)write(ondisk_fd, chunk.GetData(), chunk.GetSize()) != chunk.GetSize())
 	{
-		log[W_ERR] << "Unable to save \"" << filename <<"\" in cache: " <<strerror(errno);
+		pf_log[W_ERR] << "Unable to save \"" << filename <<"\" in cache: " <<strerror(errno);
 		return;
 	}
 
-	log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+	pf_log[W_DEBUG] << "Synced \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	ondisk_size = (size_t)MAX(chunk.GetOffset() + (off_t)chunk.GetSize(), (off_t)ondisk_size);
 	chunk.SetHddSynced(true);
 }
@@ -129,10 +129,10 @@ bool FileContentBase::OnDiskLoad(FileChunkDesc chunk_desc)
 	if(lseek(ondisk_fd, chunk_desc.GetOffset() - ondisk_offset, SEEK_SET) == (off_t)-1)
 		return false;
 
-	log[W_DEBUG] << "Loading from cache \"" << filename << "\" off:" << chunk_desc.GetOffset() << ", size:" << chunk_desc.GetSize();
+	pf_log[W_DEBUG] << "Loading from cache \"" << filename << "\" off:" << chunk_desc.GetOffset() << ", size:" << chunk_desc.GetSize();
 	char* buf = new char[chunk_desc.GetSize()];
 	if(read(ondisk_fd, buf, chunk_desc.GetSize()) == -1)
-		log[W_ERR] << "Error while loading \"" << filename << "\": "<< strerror(errno);
+		pf_log[W_ERR] << "Error while loading \"" << filename << "\": "<< strerror(errno);
 	FileChunk new_chunk(buf, chunk_desc.GetOffset(), chunk_desc.GetSize());
 	new_chunk.SetHddSynced(true);
 	delete []buf;
@@ -147,13 +147,13 @@ bool FileContentBase::OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_lo
 	LoadFd();				  /* Needed to update the ondisk_size value */
 
 	/* TODO: load only the missing part of the chunk */
-	//log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+	//pf_log[W_DEBUG] << "Loading chunk of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 	if(chunk_desc.GetOffset() >= ondisk_offset
 		&& (chunk_desc.GetOffset() + (off_t)chunk_desc.GetSize() <= ondisk_offset + (off_t)ondisk_size))
 	{
 		if(!OnDiskLoad(chunk_desc))
 		{
-			log[W_ERR] << "Unable to read file from cache !";
+			pf_log[W_ERR] << "Unable to read file from cache !";
 			return false;
 		}
 		return true;
@@ -171,7 +171,7 @@ FileChunk FileContentBase::GetChunk(FileChunkDesc chunk_desc)
 
 	if(it == end())
 	{
-		log[W_ERR] << "Oops! Trying to read out of file content";
+		pf_log[W_ERR] << "Oops! Trying to read out of file content";
 		FileChunk chunk(NULL, 0, 0);
 		return chunk;
 	}
@@ -221,7 +221,7 @@ FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkD
 
 	if(std::find(net_requested.begin(), net_requested.end(), chunk_desc) == net_requested.end())
 	{
-		log[W_DEBUG] << "Sending request no " << net_requested.size();
+		pf_log[W_DEBUG] << "Sending request no " << net_requested.size();
 		net_requested.push_back(chunk_desc);
 		net_pending_request.push_back(chunk_desc);
 	}
@@ -261,7 +261,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	std::list<FileChunkDesc>::iterator net_it;
 	if((net_it = find(net_requested.begin(), net_requested.end(), chunk)) != net_requested.end())
 	{
-		log[W_DEBUG] << "Erasing matching request";
+		pf_log[W_DEBUG] << "Erasing matching request";
 		net_requested.erase(net_it);
 	}
 
@@ -274,7 +274,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	{
 		/* It doesn't overlap with previous data
 		 * add it to the end */
-		log[W_DEBUG] << "Adding chunk at the end of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
+		pf_log[W_DEBUG] << "Adding chunk at the end of \"" << filename << "\" off:" << chunk.GetOffset() << " size:" << chunk.GetSize();
 		push_back(chunk);
 		return;
 	}
@@ -298,7 +298,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 		++it;
 	}
 	size_t size = (size_t) (chunk.GetOffset() + chunk.GetSize() - offset);
-	log[W_DEBUG] << "Inserting chunk in the middle of \"" << filename << "\" off:" << offset << " size:" << size;
+	pf_log[W_DEBUG] << "Inserting chunk in the middle of \"" << filename << "\" off:" << offset << " size:" << size;
 	FileChunk new_chunk = chunk.GetPart(FileChunkDesc(offset, size));
 	insert(it, new_chunk);
 }
@@ -348,7 +348,7 @@ void FileContentBase::SyncToHdd(bool force)
 		return;
 
 	ondisk_synced = true;
-	//log[W_DEBUG] << "Trying to sync " << filename;
+	//pf_log[W_DEBUG] << "Trying to sync " << filename;
 	/* Write on disk, without doing "blanks" in the file */
 	iterator it = begin();
 	while(it != end() && it->GetOffset() <= ondisk_offset + (off_t)ondisk_size)

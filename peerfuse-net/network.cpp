@@ -32,7 +32,7 @@
 #include <netdb.h>
 #include <time.h>
 
-#include "log.h"
+#include "pf_log.h"
 #include "network_base.h"
 #include "network.h"
 #include "tools.h"
@@ -61,7 +61,7 @@ Peer* Network::AddPeer(Peer* peer)
 	switch(peers_list.WhatIsThisID(peer->GetID()))
 	{
 		case PeersList::IS_CONNECTED:
-			log[W_WARNING] << "A peer (" << peer->GetAddr() << ") wants to connect to me but someone with the same ID is already connected";
+			pf_log[W_WARNING] << "A peer (" << peer->GetAddr() << ") wants to connect to me but someone with the same ID is already connected";
 			delete peer;
 			return NULL;
 		case PeersList::IS_UNKNOWN:
@@ -81,9 +81,9 @@ Peer* Network::AddPeer(Peer* peer)
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 
-	log[W_INFO] << "Network map:";
+	pf_log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
-		log[W_INFO] << *it;
+		pf_log[W_INFO] << *it;
 	#endif
 
 	return p;
@@ -96,9 +96,9 @@ void Network::OnRemovePeer(Peer* peer)
 	std::vector<std::string> list;
 	peers_list.GetMapOfNetwork(list);
 
-	log[W_INFO] << "Network map:";
+	pf_log[W_INFO] << "Network map:";
 	for(std::vector<std::string>::iterator it = list.begin(); it != list.end(); ++it)
-		log[W_INFO] << *it;
+		pf_log[W_INFO] << *it;
 	#endif
 
 	if(!peer->IsHighLink() || peer->IsAnonymous())
@@ -158,8 +158,8 @@ void Network::ThrowHandler()
 	{
 		/* pfnet throws this while handling the SSL handshake */
 		/* We are connecting to ourself, this is quiet dangerous */
-		log[W_ERR] << "I'm trying to connect to myself, this is bad.";
-		log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
+		pf_log[W_ERR] << "I'm trying to connect to myself, this is bad.";
+		pf_log[W_ERR] << "Check your configuration, and check peerfuse is not already running.";
 		exit(EXIT_FAILURE);
 	}
 	catch(Peer::CopyLowLinkConnection &e)
@@ -169,7 +169,7 @@ void Network::ThrowHandler()
 		 * The temporary anonymous Peer object previously attached to it
 		 * can be removed.
 		 */
-		log[W_DEBUG] << "Switch lowlink connection to an other Peer for " << e.id;
+		pf_log[W_DEBUG] << "Switch lowlink connection to an other Peer for " << e.id;
 		BlockLockMutex lock(&peers_list); /* avoid race condition */
 		peers_list.PeerFlush(e.fd); /* flush messages before */
 		peers_list.PeerSetConnection(e.id, e.fd);

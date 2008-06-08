@@ -27,7 +27,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "session_config.h"
-#include "log.h"
+#include "pf_log.h"
 
 SessionConfig session_cfg;
 SessionConfig tree_cfg;
@@ -79,7 +79,7 @@ void SessionConfig::Load(const std::string& _filename)
 		std::string::size_type equ_pos = line.find('=',0);
 		if(equ_pos == std::string::npos)
 		{
-			log[W_ERR] << "SessionConfig: Wrong format on line " << line_nbr;
+			pf_log[W_ERR] << "SessionConfig: Wrong format on line " << line_nbr;
 			continue;
 		}
 
@@ -87,7 +87,7 @@ void SessionConfig::Load(const std::string& _filename)
 	}
 
 	fin.close();
-	log[W_INFO] << "SessionConfig: Loaded " << filename;
+	pf_log[W_INFO] << "SessionConfig: Loaded " << filename;
 }
 
 bool SessionConfig::Save()
@@ -104,7 +104,7 @@ bool SessionConfig::Save()
 	{
 		// Save is called by SessionConfig's destructor
 		// the log functions may not be available at this moment
-		//log[W_ERR] << "SessionConfig: Unable to save config file to " << filename;
+		//pf_log[W_ERR] << "SessionConfig: Unable to save config file to " << filename;
 		std::cerr << "SessionConfig: Unable to save config file to " << filename << std::endl;
 		return false;
 	}
@@ -117,7 +117,7 @@ bool SessionConfig::Save()
 	}
 	fout.close();
 	std::cout << "SessionConfig: Config saved in " << filename << std::endl;
-	//log[W_INFO] << "SessionConfig: Config saved in " << filename;
+	//pf_log[W_INFO] << "SessionConfig: Config saved in " << filename;
 	return true;
 }
 
@@ -140,5 +140,5 @@ void SessionConfig::Display()
 	for(std::map<std::string, std::string>::iterator it = list.begin();
 		it != list.end();
 		++it)
-	log[W_INFO] << it->first << ":" << it->second;
+	pf_log[W_INFO] << it->first << ":" << it->second;
 }

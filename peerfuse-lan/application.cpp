@@ -35,7 +35,7 @@
 #include "certificate.h"
 #include "crl.h"
 #include "cache.h"
-#include "log.h"
+#include "pf_log.h"
 #include "pf_file.h"
 #include "session_config.h"
 #include "peers_list.h"
@@ -130,10 +130,10 @@ int Application::main(int argc, char *argv[])
 	{
 		if(!conf.Load(argv[1]))
 		{
-			log[W_ERR] << "Unable to load configuration, exiting..";
+			pf_log[W_ERR] << "Unable to load configuration, exiting..";
 			return (EXIT_FAILURE);
 		}
-		log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
+		pf_log.SetLoggedFlags(conf.GetSection("logging")->GetItem("level")->String(), conf.GetSection("logging")->GetItem("to_syslog")->Boolean());
 
 		session_cfg.Load(conf.GetSection("hdd")->GetItem("workdir")->String() + "/session.cfg");
 		session_cfg.Display();
@@ -154,10 +154,10 @@ int Application::main(int argc, char *argv[])
 		if(session_cfg.Get("my_id", my_id))
 		{
 			environment.my_id.Set((pf_id)my_id);
-			log[W_INFO] << "I have ID " << my_id;
+			pf_log[W_INFO] << "I have ID " << my_id;
 		}
 		else
-			log[W_INFO] << "I have no ID yet.";
+			pf_log[W_INFO] << "I have no ID yet.";
 
 		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
 		{
@@ -169,12 +169,12 @@ int Application::main(int argc, char *argv[])
 			}
 			catch(Crl::BadCRL &e)
 			{
-				log[W_ERR] << "Failed to load the crl: "<< e.GetString();
+				pf_log[W_ERR] << "Failed to load the crl: "<< e.GetString();
 				return (EXIT_FAILURE);
 			}
 			catch(...)
 			{
-				log[W_ERR] << "Failed to load the crl.";
+				pf_log[W_ERR] << "Failed to load the crl.";
 				return (EXIT_FAILURE);
 			}
 		}
@@ -186,27 +186,27 @@ int Application::main(int argc, char *argv[])
 		}
 		catch(Certificate::BadCertificate &e)
 		{
-			log[W_ERR] << "Unable to read certificate: " << e.GetString();
+			pf_log[W_ERR] << "Unable to read certificate: " << e.GetString();
 			return (EXIT_FAILURE);
 		}
 		catch(Certificate::BadFile &e)
 		{
-			log[W_ERR] << "Unable to read certificate file";
+			pf_log[W_ERR] << "Unable to read certificate file";
 			return (EXIT_FAILURE);
 		}
 		catch(PrivateKey::BadPrivateKey &e)
 		{
-			log[W_ERR] << "Unable to read priveate key: " << e.GetString();
+			pf_log[W_ERR] << "Unable to read priveate key: " << e.GetString();
 			return (EXIT_FAILURE);
 		}
 		catch(PrivateKey::BadFile &e)
 		{
-			log[W_ERR] << "Unable to read private key file";
+			pf_log[W_ERR] << "Unable to read private key file";
 			return (EXIT_FAILURE);
 		}
 		catch(Crl::BadCRL &e)
 		{
-			log[W_ERR] << "Unable to CRL file: " << e.GetString();
+			pf_log[W_ERR] << "Unable to CRL file: " << e.GetString();
 			return (EXIT_FAILURE);
 		}
 
@@ -224,35 +224,35 @@ int Application::main(int argc, char *argv[])
 	}
 	catch(MyConfig::error_exc &e)
 	{
-		log[W_ERR] << "Error while loading:";
-		log[W_ERR] << e.Reason();
+		pf_log[W_ERR] << "Error while loading:";
+		pf_log[W_ERR] << e.Reason();
 	}
 	catch(Thread::CantRun &e)
 	{
-		log[W_ERR] << "Unable to create network thread, exiting..";
+		pf_log[W_ERR] << "Unable to create network thread, exiting..";
 	}
 	catch(Network::CantOpenSock &e)
 	{
-		log[W_ERR] << "Unable to open socket, exiting..";
+		pf_log[W_ERR] << "Unable to open socket, exiting..";
 	}
 	catch(Network::CantListen &e)
 	{
-		log[W_ERR] << "Unable to listen on port " << e.port << ", exiting..";
+		pf_log[W_ERR] << "Unable to listen on port " << e.port << ", exiting..";
 	}
 	catch(Network::CantResolvHostname &e)
 	{
 		/* NOTE: This must never arrive because when I can't connect to server, I try
 		 * an other server, or I wait alone..
 		 */
-		log[W_ERR] << "Unable to resolve hostname, exiting..";
+		pf_log[W_ERR] << "Unable to resolve hostname, exiting..";
 	}
 	catch(Hdd::HddAccessFailure &e)
 	{
-		log[W_ERR] << "Can't access cache root directory: " << e.dir;
+		pf_log[W_ERR] << "Can't access cache root directory: " << e.dir;
 	}
 	catch(Hdd::HddWriteFailure &e)
 	{
-		log[W_ERR] << "Can't write to cache: " << e.dir;
+		pf_log[W_ERR] << "Can't write to cache: " << e.dir;
 	}
 
 	return (EXIT_FAILURE);
