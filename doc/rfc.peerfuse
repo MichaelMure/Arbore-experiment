@@ -17,8 +17,139 @@ Table of contents:
 1.  INTRODUCTION
    1.1  Peers
    1.2  Network
-   1.3  Tree
+   1.3  File tree
 2.  PROTOCOL
-   1.1
+   1.1 Packets
+   1.2 Connection to network
+3.  MESSAGES
 
 1.  INTRODUCTION
+
+1.1 Peers
+
+   Everybody on network has the same status, they are peer. A peer
+   can share files etc.
+
+   A peer has a uniq ID encoded on 160 bits, choosen randomly.
+
+
+   It can be connected to one of several other peers, and doesn't know
+   all peers of network.
+
+1.2 Network
+
+   Network is constitued by peer. We can represent the network like a circle:
+
+                                  1    96
+                            2                87
+
+		       4                         84
+
+
+		    7                              73
+
+                    8                              68
+
+
+		      10                        59
+		           11              53
+			         23   43
+
+1.3 File tree
+
+   The tree is common on each peers. A path is represented like this:
+
+       /[dir1/[dir2/[file1]]]
+
+   All files can have UNIX permissions:
+
+       S_IRUSR : +r UID    :User permission to read file
+       S_IWUSR : +w UID    :User permission to write file
+       S_IXUSR : +x UID    :User permission to execute file
+       S_IRGRP : +r GID    :Group permission to read file
+       S_IWGRP : +w GID    :Group permission to write file
+       S_IXGRP : +x GID    :Group permission to execute file
+       S_IROTH : +r        :Other permission to read file
+       S_IWOTH : +w        :Other permission to write file
+       S_IXOTH : +x        :Other permission to execute file
+
+2. PROTOCOL
+
+2.1 Packets
+
+   All packets are like this:
+
+     .   32 bits  .   32 bits  .   32 bits  .   32 bits  .   32 bits  .
+     |------------'------------'------------'------------'------------|
+     |                             srcID                              |
+     |                           (uint160)                            |
+     |----------------------------------------------------------------|
+     |                             dstID                              |
+     |                           (uint160)                            |
+     |------------.------------.--------------------------------------|
+     |    type    |    size    |                                      |
+     |  (uint32)  |  (uint32)  |                                      |
+     |------------'------------'                                     -|
+     |                                 BODY                           |
+     |                                (size)                          |
+     |                                                                |
+     |                                                                |
+     '----------------------------------------------------------------'
+
+2.2 Connection to network
+
+   To join to network, the peer A has to know one peer B already connected
+   and to establish a connection with it.
+
+   a. A -> B : NET_HELLO
+
+      This packets contains information about him, like current time
+      (for clock synchronisation), etc.
+
+      For more information about this message, refer to the 3. MESSAGES
+      section.
+
+   b. B -> A : NET_HELLO
+
+      B sends the same message. At this time, connection is established
+      between the two peers.
+
+   c. A -> C : NET_DISCOVER
+
+      Now, A is a peer on the 'circle' and have to connect to some other
+      peers to have a good routing performances.
+
+      For example, on our circle:
+
+                                  ,----- E
+                                  1    96
+                            2     |          87
+                                   \
+		       4            \            84
+                                     |
+                                     |
+	     D -----7__________      | ____________73------ C
+                               \     ||
+                    8           \    ||            68
+                                 \   ||
+                                  \  ||
+		      10           \ || ________59----- B
+		           11       ||||   53
+			         23 |_43
+				       `---- A
+
+      A is connected to B, but we want to connect to three peers:
+      - one which is opposed on circle
+      - two which are on middle of each side between E and A.
+
+      To connect to them, A will send a NET_DISCOVER message to B
+      (which is the only peer connected to A).
+
+      NET_DISCOVER is a message which must be router to a final ID.
+      See the 2.3 Routing protocol.
+
+      So we take opposite ID for A, i.e (id_A + ID_MAX) % ID_MAX. Packet
+      will be handled by the peer which have the nearest ID of it, in case
+      this is C.
+
+   d. C -> A :
