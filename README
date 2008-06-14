@@ -4,6 +4,7 @@ Dependences:
 ------------
 
 * cmake
+* pkg-config
 * libssl-dev
 * libcurl-dev
 * libfuse-dev
