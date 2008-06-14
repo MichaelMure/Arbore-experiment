@@ -36,7 +36,7 @@
 #include "crl.h"
 #include "cache.h"
 #include "pf_log.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "session_config.h"
 #include "scheduler.h"
 #include "hdd.h"

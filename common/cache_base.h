@@ -40,7 +40,7 @@
 
 #include <vector>
 #include "mutex.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "dir_entry.h"
 #include "packet.h"
 

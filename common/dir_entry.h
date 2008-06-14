@@ -25,7 +25,7 @@
 #define DIR_ENTRY_H
 
 #include <map>
-#include "pf_file.h"
+#include "file_entry.h"
 
 typedef std::map<std::string, FileEntry*> FileMap;
 

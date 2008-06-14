@@ -25,7 +25,7 @@
 #define JOB_SEND_MKFILE_H
 
 #include "job.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "pf_types.h"
 
 class JobSendMkFile : public Job

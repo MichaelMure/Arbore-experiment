@@ -36,7 +36,7 @@
 #include "crl.h"
 #include "cache.h"
 #include "pf_log.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "session_config.h"
 #include "peers_list.h"
 #include "scheduler.h"

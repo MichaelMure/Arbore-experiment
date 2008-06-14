@@ -21,17 +21,40 @@
  * $Id$
  */
 
-#ifndef PF_FILE_H
-#define PF_FILE_H
+#include "file_entry.h"
+#include "session_config.h"
 
-#include "pf_filebase.h"
-
-class FileEntry : public FileEntryBase
+bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 {
-public:
+	if(f1->IsChildOf(f2))
+		return false;
+	else if(f2->IsChildOf(f1))
+		return true;
+	else
+		return f1 < f2;
+}
 
-	FileEntry(std::string _name, pf_stat stat, DirEntry* parent)
-		: FileEntryBase(_name, stat, parent)
-		{}
-};
-#endif						  /* PFLAN_FILE_H */
+FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* parent)
+			: FileEntryBase(_name, _stat, parent),
+			path_serial(0u)
+{
+	/* Calculate serial */
+	for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
+		path_serial += (path_serial << 3) + (unsigned char)*c;
+}
+
+void FileEntry::LoadAttr()
+{
+	FileEntryBase::LoadAttr();
+
+	std::string cfg_val_s;
+	if(tree_cfg.Get(GetFullName() + "#sharers", cfg_val_s))
+	{
+		IDList idlist;
+		std::string id;
+		while((id = stringtok(cfg_val_s, ",")).empty() == false)
+			idlist.insert(StrToTyp<uint32_t>(id));
+		SetSharers(idlist);
+	}
+
+}

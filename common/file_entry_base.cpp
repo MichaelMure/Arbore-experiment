@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/types.h>
-#include "pf_filebase.h"
+#include "file_entry_base.h"
 #include "dir_entry.h"
 #include "session_config.h"
 

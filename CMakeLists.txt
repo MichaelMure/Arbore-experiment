@@ -15,7 +15,7 @@ SET(SRC
 	common/network_base.cpp
 	common/peer_base.cpp
 	common/peers_list_base.cpp
-	common/pf_filebase.cpp
+	common/file_entry_base.cpp
 	common/pf_thread.cpp
 	common/packet_base.cpp
 	common/session_config.cpp
@@ -74,7 +74,7 @@ IF(PF_NET)
 		peerfuse-net/pfnet.cpp
 		peerfuse-net/pfnet_fuse.cpp
 		peerfuse-net/cache.cpp
-		peerfuse-net/pf_file.cpp
+		peerfuse-net/file_entry.cpp
 		peerfuse-net/filedist.cpp
 		peerfuse-net/job_new_conn_req.cpp
 		peerfuse-net/job_update_resp_files.cpp

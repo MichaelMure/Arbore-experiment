@@ -24,31 +24,14 @@
 #ifndef PF_FILE_H
 #define PF_FILE_H
 
-#include <set>
-
-#include "pf_types.h"
-#include "pf_filebase.h"
-
-class FileEntry;
-
-struct CompFiles
-{
-	bool operator() (const FileEntry* f1, const FileEntry* f2) const;
-};
-
-typedef std::set<FileEntry*, CompFiles> FileList;
+#include "file_entry_base.h"
 
 class FileEntry : public FileEntryBase
 {
-	unsigned int path_serial;
-
 public:
 
-	FileEntry(std::string _name, pf_stat _stat, DirEntry* parent);
-
-	unsigned int GetPathSerial() const { return path_serial; }
-
-	virtual void LoadAttr();
-
+	FileEntry(std::string _name, pf_stat stat, DirEntry* parent)
+		: FileEntryBase(_name, stat, parent)
+		{}
 };
-#endif						  /* PFNET_FILE_H */
+#endif						  /* PFLAN_FILE_H */

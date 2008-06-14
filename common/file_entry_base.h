@@ -21,8 +21,8 @@
  * $Id$
  */
 
-#ifndef PF_FILEBASE_H
-#define PF_FILEBASE_H
+#ifndef FILE_ENTRY_BASE
+#define FILE_ENTRY_BASE
 
 #include <string>
 #include <sys/types.h>
@@ -105,4 +105,4 @@ inline Log::flux& Log::flux::operator<< <FileEntryBase*> (FileEntryBase* file)
 	str += file->GetFullName();
 	return *this;
 }
-#endif						  /* PF_FILEBASE_H */
+#endif						  /* FILE_ENTRY_BASE */

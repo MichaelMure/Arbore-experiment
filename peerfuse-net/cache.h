@@ -29,7 +29,7 @@
 #include "cache_base.h"
 #include "dir_entry.h"
 #include "pf_types.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "packet.h"
 #include "filedist.h"
 

@@ -21,40 +21,34 @@
  * $Id$
  */
 
-#include "pf_file.h"
-#include "session_config.h"
+#ifndef FILE_ENTRY_H
+#define FILE_ENTRY_H
 
-bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
+#include <set>
+
+#include "pf_types.h"
+#include "file_entry_base.h"
+
+class FileEntry;
+
+struct CompFiles
 {
-	if(f1->IsChildOf(f2))
-		return false;
-	else if(f2->IsChildOf(f1))
-		return true;
-	else
-		return f1 < f2;
-}
+	bool operator() (const FileEntry* f1, const FileEntry* f2) const;
+};
 
-FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* parent)
-			: FileEntryBase(_name, _stat, parent),
-			path_serial(0u)
+typedef std::set<FileEntry*, CompFiles> FileList;
+
+class FileEntry : public FileEntryBase
 {
-	/* Calculate serial */
-	for(std::string::iterator c = _name.begin(); c != _name.end(); ++c)
-		path_serial += (path_serial << 3) + (unsigned char)*c;
-}
+	unsigned int path_serial;
 
-void FileEntry::LoadAttr()
-{
-	FileEntryBase::LoadAttr();
+public:
 
-	std::string cfg_val_s;
-	if(tree_cfg.Get(GetFullName() + "#sharers", cfg_val_s))
-	{
-		IDList idlist;
-		std::string id;
-		while((id = stringtok(cfg_val_s, ",")).empty() == false)
-			idlist.insert(StrToTyp<uint32_t>(id));
-		SetSharers(idlist);
-	}
+	FileEntry(std::string _name, pf_stat _stat, DirEntry* parent);
 
-}
+	unsigned int GetPathSerial() const { return path_serial; }
+
+	virtual void LoadAttr();
+
+};
+#endif						  /* FILE_ENTRY_H */

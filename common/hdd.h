@@ -26,7 +26,7 @@
 #define HDD_H
 #include <string>
 #include <exception>
-#include "pf_file.h"
+#include "file_entry.h"
 #include "dir_entry.h"
 #include "mutex.h"
 

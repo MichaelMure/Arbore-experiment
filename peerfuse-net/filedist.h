@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "pf_types.h"
-#include "pf_file.h"
+#include "file_entry.h"
 #include "packet.h"
 
 const size_t NB_PEERS_PER_FILE = 2;
