@@ -110,7 +110,7 @@ Table of contents:
 
    a. A -> B : NET_HELLO
 
-      This packets contains information about him, like current time
+      This packet contains information about him, like current time
       (for clock synchronisation), etc.
 
       For more information about this message, refer to the 3. MESSAGES
@@ -155,7 +155,7 @@ Table of contents:
       NET_DISCOVER is a message which must be router to a final ID.
       See the 2.3 Routing protocol.
 
-      So we take opposite ID for A, i.e (id_A + ID_MAX) % ID_MAX. Packet
+      So we take opposite ID for A, i.e (id_A + ID_MAX/2) % ID_MAX. Packet
       will be handled by the peer which have the nearest ID of it, in case
       this is C.
 
