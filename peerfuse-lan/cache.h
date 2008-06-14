@@ -26,7 +26,7 @@
 
 #include <vector>
 #include "cache_base.h"
-#include "pf_dir.h"
+#include "dir_entry.h"
 #include "pf_file.h"
 #include "packet.h"
 

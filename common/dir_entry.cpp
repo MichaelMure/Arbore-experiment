@@ -21,7 +21,7 @@
  * $Id$
  */
 
-#include "pf_dir.h"
+#include "dir_entry.h"
 
 DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
 			: FileEntry(name, _stat, _parent)

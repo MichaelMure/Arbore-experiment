@@ -27,7 +27,7 @@
 #include <string>
 #include <exception>
 #include "pf_file.h"
-#include "pf_dir.h"
+#include "dir_entry.h"
 #include "mutex.h"
 
 class Hdd : public Mutex

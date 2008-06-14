@@ -41,7 +41,7 @@
 #include <vector>
 #include "mutex.h"
 #include "pf_file.h"
-#include "pf_dir.h"
+#include "dir_entry.h"
 #include "packet.h"
 
 class FileEntry;

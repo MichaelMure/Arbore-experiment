@@ -4,17 +4,17 @@ SET(SRC
 	common/cache_base.cpp
 	common/content_list_base.cpp
 	common/download.cpp
-	common/hdd.cpp
+	common/dir_entry.cpp
 	common/file_chunk.cpp
 	common/file_content_base.cpp
 	common/fs_utils.cpp
+	common/hdd.cpp
 	common/pf_config.cpp
 	common/pf_log.cpp
 	common/mutex.cpp
 	common/network_base.cpp
 	common/peer_base.cpp
 	common/peers_list_base.cpp
-	common/pf_dir.cpp
 	common/pf_filebase.cpp
 	common/pf_thread.cpp
 	common/packet_base.cpp

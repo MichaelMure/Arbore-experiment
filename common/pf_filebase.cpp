@@ -25,7 +25,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include "pf_filebase.h"
-#include "pf_dir.h"
+#include "dir_entry.h"
 #include "session_config.h"
 
 FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
