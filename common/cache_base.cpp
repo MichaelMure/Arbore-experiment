@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: cache_base.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <string.h>
@@ -256,7 +256,9 @@ int CacheBase::Read(std::string path, char* buf, size_t size, off_t off)
 	}
 
 	memcpy(buf, chunk.GetData(), to_read);
-	return to_read;
+
+	/* TODO CHECK THIS CONVERSION. FUSE CAN ONLY RETURN AN INTEGER, SO IT IS NEEDED. */
+	return (int)to_read;
 }
 
 int CacheBase::Truncate(std::string path, off_t offset)

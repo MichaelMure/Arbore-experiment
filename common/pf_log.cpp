@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: pf_log.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <iostream>
@@ -57,7 +57,7 @@ Log::flux::~flux()
 		;
 
 	if(i < 0)
-		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", flag, str.c_str());
+		syslog(LOG_WARNING, "[SYSLOG] (%lX) Unable to find how to log this message: %s", flag, str.c_str());
 	else
 	{
 		if((all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING) && pf_log.ToSyslog())

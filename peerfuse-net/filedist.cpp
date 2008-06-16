@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: filedist.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <algorithm>
@@ -86,7 +86,7 @@ IDList FileDistribution::_get_resp_peers_from_idlist(const FileEntry* f, const s
 
 	for(size_t i = 0; i < NB_PEERS_PER_FILE; ++i)
 	{
-		unsigned int num = (f->GetPathSerial() > i ? (f->GetPathSerial() - i) : (f->GetPathSerial() + idl.size() - i)) % idl.size();
+		size_t num = (f->GetPathSerial() > i ? (f->GetPathSerial() - i) : (f->GetPathSerial() + idl.size() - i)) % idl.size();
 		pf_id peer = idl[num];
 		debug += TypToStr(idl[num]) + ", ";
 

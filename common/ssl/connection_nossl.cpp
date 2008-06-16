@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: connection_nossl.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <stdlib.h>
@@ -51,7 +51,7 @@ void ConnectionNoSsl::SocketRead() throw(RecvError)
 	const int buf_size = 128;
 	char buf[buf_size];
 
-	int received = 0;
+	ssize_t received = 0;
 
 	do
 	{

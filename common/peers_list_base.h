@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: peers_list_base.h 1128 2008-06-01 18:02:39Z romain $
  */
 
 #ifndef PEERS_LIST_BASE_H
@@ -51,7 +51,7 @@ public:
 	PeersListBase();
 	virtual ~PeersListBase();
 
-	unsigned int Size() const { return size(); }
+	size_t Size() const { return size(); }
 
 	/** Add a peer to list */
 	void Add(Peer* p);

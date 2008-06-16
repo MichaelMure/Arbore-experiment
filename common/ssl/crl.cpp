@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: crl.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <string.h>
@@ -72,7 +72,10 @@ void Crl::Load()
 		throw BadCRL(std::string(strerror(errno)));
 	}
 
-	BIO* raw_crl = BIO_new_mem_buf(buf, file_size);
+	if(file_size > INT_MAX)
+		throw BadCRL(std::string("File is too big"));
+
+	BIO* raw_crl = BIO_new_mem_buf(buf, (int)file_size);
 	crl = PEM_read_bio_X509_CRL(raw_crl, NULL, NULL, NULL);
 	BIO_free(raw_crl);
 

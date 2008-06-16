@@ -18,12 +18,13 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: private_key.cpp 1004 2008-05-07 22:51:21Z romain $
  */
 
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <cstring>
+#include <climits>
 #include "private_key.h"
 
 PrivateKey::PrivateKey() : ssl_key(NULL), raw_key(NULL), raw_key_size(0)
@@ -65,7 +66,10 @@ void PrivateKey::LoadBuf(const char* buf, size_t size) throw(BadPrivateKey)
 		ssl_key = NULL;
 	}
 
-	BIO* raw_key_bio = BIO_new_mem_buf(raw_key, size);
+	if(size > INT_MAX)
+		throw BadPrivateKey(std::string("File is too big"));
+
+	BIO* raw_key_bio = BIO_new_mem_buf(raw_key, (int)size);
 	ssl_key = PEM_read_bio_PrivateKey(raw_key_bio, NULL, &PasswordCallback, NULL);
 	BIO_free(raw_key_bio);
 

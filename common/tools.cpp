@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: tools.cpp 1004 2008-05-07 22:51:21Z romain $
  */
 
 #include <arpa/inet.h>
@@ -36,7 +36,7 @@ bool is_ip(const char *ip)
 	{					  /* Note about strtol: stores in endptr either NULL or '\0' if conversion is complete */
 		if(!isdigit((unsigned char) *ip)  /* most current case (not ip, letter host) */
 						  /* ok, valid number? */
-			|| (d = strtol(ip, &ptr, 10)) < 0 || d > 255
+			|| (d = (int)strtol(ip, &ptr, 10)) < 0 || d > 255
 			|| (ptr && *ptr != 0 && (*ptr != '.' || 3 == i) && ptr != ip)) return false;
 		if(ptr) ip = ptr + 1, ptr = NULL;  /* jump the dot */
 	}

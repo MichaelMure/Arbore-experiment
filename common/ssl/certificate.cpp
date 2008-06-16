@@ -18,13 +18,14 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: certificate.cpp 1126 2008-05-27 22:49:49Z romain $
  */
 
 #include <openssl/err.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 #include <cstring>
+#include <climits>
 #include "certificate.h"
 #include "tools.h"
 
@@ -79,7 +80,10 @@ void Certificate::LoadPem(std::string filename, std::string password) throw(BadF
 		throw BadFile();
 	fclose(f);
 
-	BIO* raw_cert_bio = BIO_new_mem_buf(buf, file_size);
+	if(file_size > UINT_MAX)
+		throw BadFile();
+
+	BIO* raw_cert_bio = BIO_new_mem_buf(buf, (uint32_t)file_size);
 	ssl_cert = PEM_read_bio_X509(raw_cert_bio, NULL, NULL, NULL);
 	BIO_free(raw_cert_bio);
 
@@ -145,7 +149,7 @@ pf_id Certificate::GetIDFromCertificate() throw(BadCertificate)
 	if(id <= 0 || (unsigned long)id > ID_MAX)
 		throw BadCertificate("Can't read certificate's serial number");
 
-	return id;
+	return (pf_id)id;
 }
 
 std::string Certificate::GetCommonName() const throw(BadCertificate)

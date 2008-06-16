@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: packet_base.cpp 1040 2008-05-11 09:05:03Z romain $
  */
 
 #include <assert.h>
@@ -126,6 +126,8 @@ uint32_t PacketBase::GetSize() const
 
 PacketBase& PacketBase::Write(uint32_t nbr)
 {
+	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+
 	char* new_datas = new char [size + sizeof nbr];
 
 	nbr = htonl(nbr);
@@ -134,7 +136,7 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 	if(datas)
 		delete []datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
-	size += sizeof(nbr);
+	size += (uint32_t)sizeof(nbr);
 	datas = new_datas;
 
 	return *this;
@@ -142,6 +144,8 @@ PacketBase& PacketBase::Write(uint32_t nbr)
 
 PacketBase& PacketBase::Write(uint64_t nbr)
 {
+	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+
 	char* new_datas = new char [size + sizeof nbr];
 
 	nbr = htonll(nbr);
@@ -150,7 +154,7 @@ PacketBase& PacketBase::Write(uint64_t nbr)
 	if(datas)
 		delete []datas;
 	memcpy(new_datas + size, &nbr, sizeof(nbr));
-	size += sizeof(nbr);
+	size += (uint32_t)sizeof(nbr);
 	datas = new_datas;
 
 	return *this;
@@ -158,6 +162,7 @@ PacketBase& PacketBase::Write(uint64_t nbr)
 
 PacketBase& PacketBase::Write(pf_addr addr)
 {
+	ASSERT(((uint32_t)sizeof(addr)) + size >= size);
 	char* new_datas = new char [size + sizeof addr];
 
 	addr = pf_addr_ton(addr);
@@ -166,7 +171,7 @@ PacketBase& PacketBase::Write(pf_addr addr)
 	if(datas)
 		delete []datas;
 	memcpy(new_datas + size, &addr, sizeof(addr));
-	size += sizeof(addr);
+	size += (uint32_t)sizeof(addr);
 	datas = new_datas;
 
 	return *this;
@@ -174,8 +179,13 @@ PacketBase& PacketBase::Write(pf_addr addr)
 
 PacketBase& PacketBase::Write(const std::string& str)
 {
-	uint32_t str_len = str.size();
+	ASSERT(str.size() <= UINT_MAX);
+
+	uint32_t str_len = (uint32_t)str.size();
+	ASSERT(str_len + size >= size);
+
 	Write(str_len);
+
 	char* new_datas = new char [size + str_len];
 	if(datas)
 		memcpy(new_datas, datas, size);
@@ -191,8 +201,10 @@ PacketBase& PacketBase::Write(const std::string& str)
 
 PacketBase& PacketBase::Write(const AddrList& addr_list)
 {
+	ASSERT(addr_list.size() <= UINT_MAX);
 	Write((uint32_t)addr_list.size());
 
+	ASSERT((addr_list.size() * sizeof(pf_addr)) + size >= size);
 	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
 
 	if(datas)
@@ -208,7 +220,7 @@ PacketBase& PacketBase::Write(const AddrList& addr_list)
 		memcpy(ptr, &addr, sizeof(pf_addr));
 		ptr += sizeof(pf_addr);
 	}
-	size += addr_list.size() * sizeof(pf_addr);
+	size += (uint32_t)(addr_list.size() * sizeof(pf_addr));
 	datas = new_datas;
 
 	return *this;
@@ -216,8 +228,10 @@ PacketBase& PacketBase::Write(const AddrList& addr_list)
 
 PacketBase& PacketBase::Write(const IDList& id_list)
 {
+	ASSERT(id_list.size() <= UINT_MAX);
 	Write((uint32_t)id_list.size());
 
+	ASSERT((id_list.size() * sizeof(pf_id)) + size >= size);
 	char* new_datas = new char [size + (id_list.size() * sizeof(pf_id))];
 
 	if(datas)
@@ -233,7 +247,7 @@ PacketBase& PacketBase::Write(const IDList& id_list)
 		memcpy(ptr, &id, sizeof(pf_id));
 		ptr += sizeof(pf_id);
 	}
-	size += id_list.size() * sizeof(pf_id);
+	size += (uint32_t)(id_list.size() * sizeof(pf_id));
 	datas = new_datas;
 
 	return *this;
@@ -241,6 +255,8 @@ PacketBase& PacketBase::Write(const IDList& id_list)
 
 PacketBase& PacketBase::Write(FileChunk chunk)
 {
+	ASSERT(chunk.GetSize() <= UINT_MAX);
+	ASSERT(((uint32_t)sizeof(chunk.GetOffset()) + ((uint32_t)sizeof(chunk.GetSize())) + chunk.GetSize()) + size >= size);
 	Write((uint64_t)chunk.GetOffset());
 	Write((uint32_t)chunk.GetSize());
 
@@ -254,7 +270,7 @@ PacketBase& PacketBase::Write(FileChunk chunk)
 	char* ptr = new_datas + size;
 	memcpy(ptr, chunk.GetData(), chunk.GetSize());
 
-	size += chunk.GetSize();
+	size += (uint32_t)chunk.GetSize();
 	datas = new_datas;
 
 	return *this;
@@ -266,6 +282,8 @@ PacketBase& PacketBase::Write(const Certificate& cert)
 	size_t str_len;
 	cert.GetRaw(&buf, &str_len);
 
+	ASSERT(str_len <= UINT_MAX);
+
 	Write((uint32_t)str_len);
 	char* new_datas = new char [size + str_len];
 	if(datas)
@@ -274,7 +292,7 @@ PacketBase& PacketBase::Write(const Certificate& cert)
 		delete []datas;
 
 	memcpy(new_datas + size, buf, str_len);
-	size += str_len;
+	size += (uint32_t)str_len;
 	datas = new_datas;
 
 	return *this;
@@ -293,8 +311,8 @@ uint32_t PacketBase::ReadInt32()
 	ASSERT(size >= sizeof(uint32_t));
 	uint32_t val = ntohl(*(uint32_t*)datas);
 
-	char* new_datas;
-	size -= sizeof(uint32_t);
+	char* new_datas = NULL;
+	size -= (uint32_t)sizeof(uint32_t);
 	if(size > 0)
 	{
 		new_datas = new char [size];
@@ -317,7 +335,7 @@ uint64_t PacketBase::ReadInt64()
 	uint64_t val = ntohll(*(uint64_t*)datas);
 
 	char* new_datas;
-	size -= sizeof(uint64_t);
+	size -= (uint32_t)sizeof(uint64_t);
 	if(size > 0)
 	{
 		new_datas = new char [size];
@@ -340,7 +358,7 @@ pf_addr PacketBase::ReadAddr()
 	pf_addr val = nto_pf_addr(*(pf_addr*)datas);
 
 	char* new_datas;
-	size -= sizeof(pf_addr);
+	size -= (uint32_t)sizeof(pf_addr);
 	if(size > 0)
 	{
 		new_datas = new char [size];
@@ -400,7 +418,7 @@ AddrList PacketBase::ReadAddrList()
 	}
 
 	char* new_datas;
-	size -= list_size * sizeof(pf_addr);
+	size -= list_size * (uint32_t)sizeof(pf_addr);
 	if(size > 0)
 	{
 		new_datas = new char [size];
@@ -430,7 +448,7 @@ IDList PacketBase::ReadIDList()
 	}
 
 	char* new_datas;
-	size -= list_size * sizeof(pf_id);
+	size -= list_size * (uint32_t)sizeof(pf_id);
 	if(size > 0)
 	{
 		new_datas = new char [size];
@@ -450,7 +468,7 @@ IDList PacketBase::ReadIDList()
 FileChunk PacketBase::ReadChunk()
 {
 	off_t c_offset = ReadInt64();
-	size_t c_size = ReadInt32();
+	uint32_t c_size = ReadInt32();
 
 	FileChunk chunk(datas, c_offset, c_size);
 

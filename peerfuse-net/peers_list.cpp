@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: peers_list.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include "peers_list.h"
@@ -53,7 +53,7 @@ void PeersList::_send_peer_list(Peer* to, Peer* from) const
 {
 	BlockLockMutex lock(&peers_list);
 	StaticPeersList peers = from ? GetDownLinks(from) : GetDirectHighLinks();
-	uint32_t now = time(NULL);
+	uint32_t now = (uint32_t)time(NULL);
 	for(StaticPeersList::iterator it = peers.begin(); it != peers.end(); ++it)
 	{
 		/* Do not send information about himself! */

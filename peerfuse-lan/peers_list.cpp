@@ -18,9 +18,10 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: peers_list.cpp 1128 2008-06-01 18:02:39Z romain $
  */
 
+#include <algorithm>
 #include "peers_list.h"
 #include "peers_list_base.h"
 
@@ -64,7 +65,7 @@ bool PeersList::CheckOtherConnection(pf_id connect_to, std::list<pf_id>& is_conn
 			continue;
 
 		// Check if we already asked this peer to connect to the "connect_to" peer
-		if(find(is_connecting.begin(), is_connecting.end(), (*it)->GetID()) == is_connecting.end())
+		if(std::find(is_connecting.begin(), is_connecting.end(), (*it)->GetID()) == is_connecting.end())
 		{
 			Packet p(NET_PEER_CONNECTION);
 			p.SetArg(NET_PEER_CONNECTION_ADDRESS, peer->GetAddr());
@@ -74,7 +75,7 @@ bool PeersList::CheckOtherConnection(pf_id connect_to, std::list<pf_id>& is_conn
 		}
 
 		// Check if this peer is already connected to the "connect_to" peer
-		if(find(is_connected.begin(), is_connected.end(), (*it)->GetID()) == is_connected.end())
+		if(std::find(is_connected.begin(), is_connected.end(), (*it)->GetID()) == is_connected.end())
 			everybody_connected = false;
 	}
 

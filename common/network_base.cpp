@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: network_base.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <iostream>
@@ -53,7 +53,9 @@ NetworkBase::NetworkBase()
 			ssl(NULL)
 {
 	FD_ZERO(&global_read_set);
-	srand(time(NULL));
+
+	/* Berk Bouh Bah Caca. */
+	srand((unsigned int)time(NULL));
 }
 
 NetworkBase::~NetworkBase()

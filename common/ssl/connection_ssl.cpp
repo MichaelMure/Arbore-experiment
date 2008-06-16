@@ -18,12 +18,13 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id$
+ * $Id: connection_ssl.cpp 1138 2008-06-08 12:22:09Z romain $
  */
 
 #include <assert.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include <climits>
 #include "connection_ssl.h"
 #include "pf_log.h"
 
@@ -50,7 +51,9 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 
 	while(!buf_queue.empty())
 	{
-		int written = SSL_write(ssl, buf_queue.front().buf, buf_queue.front().size);
+		if(buf_queue.front().size > INT_MAX)
+			throw WriteError(std::string("Packet is too big"));
+		int written = SSL_write(ssl, buf_queue.front().buf, (int)buf_queue.front().size);
 		if(written < 0)
 		{
 			// No error, we are just waiting for datas
