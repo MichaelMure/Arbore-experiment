@@ -21,6 +21,7 @@
  * $Id$
  */
 
+#include "pf_id.h"
 
 pf_id::pf_id()
 {

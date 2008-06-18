@@ -24,6 +24,7 @@
 #ifndef PF_ID_H
 #define PF_ID_H
 
+/** 160/8 = 20 */
 #define HASH_LEN 20
 
 class pf_id
