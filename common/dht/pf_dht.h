@@ -24,8 +24,12 @@
 #ifndef PF_DHT_H
 #define PF_DHT_H
 
+/** Interface of DHT */
 class DHT
 {
+
+public:
+
 
 };
 
