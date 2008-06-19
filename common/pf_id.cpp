@@ -35,34 +35,34 @@ pf_id::~pf_id()
 
 pf_id::pf_id(const pf_id& id)
 {
-	for(int i = 0; i < HASH_LEN; ++i)
+	for(size_t i = 0; i < nlen; ++i)
 		hash[i] = id.hash[i];
 }
 
 pf_id& pf_id::operator=(const pf_id& id)
 {
-	for(int i = 0; i < HASH_LEN; ++i)
+	for(size_t i = 0; i < nlen; ++i)
 		hash[i] = id.hash[i];
 }
 
 bool pf_id::operator==(const pf_id& id)
 {
-	int i;
-	for(i = 0; i < HASH_LEN && hash[i] == id.hash[i]; ++i);
+	size_t i;
+	for(i = 0; i < nlen && hash[i] == id.hash[i]; ++i);
 
-	return (i >= HASH_LEN);
+	return (i >= nlen);
 }
 
 std::string pf_id::toString() const
 {
 	std::string s;
-	for(i = 0; i < HASH_LEN; ++i)
-		for(j = sizeof(hash[i]); j >= 0; --j)
+	for(size_t i = 0; i < nlen; ++i)
+		for(size_t j = sizeof(hash[i]); j >= 0; --j)
 			s += "0123456789abcdef"[((hash[i] >> j*4) & 0xF)];
 	return s;
 }
 
-std::ostream& operator<<(ostream& os, const pf_id& id)
+std::ostream& operator<<(std::ostream& os, const pf_id& id)
 {
 	os << id.toString();
 	return os;

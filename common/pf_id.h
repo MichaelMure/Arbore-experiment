@@ -26,12 +26,12 @@
 
 #include <ostream>
 
-/** 160/8 = 20 */
-#define HASH_LEN 20
-
 class pf_id
 {
-	unsigned char hash[HASH_LEN];
+	static const size_t IdLength = 160;
+	static const size_t nlen = IdLength / sizeof(uint32_t);
+
+	uint32_t hash[nlen];
 
 public:
 
@@ -45,6 +45,6 @@ public:
 
 };
 
-std::ostream& operator<<(const std::ostream&);
+std::ostream& operator<<(std::ostream&, const pf_id&);
 
 #endif /* PF_ID_H */
