@@ -53,3 +53,18 @@ bool pf_id::operator==(const pf_id& id)
 	return (i >= HASH_LEN);
 }
 
+std::string pf_id::toString() const
+{
+	std::string s;
+	for(i = 0; i < HASH_LEN; ++i)
+		for(j = sizeof(hash[i]); j >= 0; --j)
+			s += "0123456789abcdef"[((hash[i] >> j*4) & 0xF)];
+	return s;
+}
+
+std::ostream& operator<<(ostream& os, const pf_id& id)
+{
+	os << id.toString();
+	return os;
+}
+

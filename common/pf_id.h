@@ -41,9 +41,10 @@ public:
 	pf_id& operator=(const pf_id&);
 	bool operator==(const pf_id&);
 
-	ostream& operator<<(const ostream&);
-
+	std::string toString() const;
 
 };
+
+std::ostream& operator<<(const std::ostream&);
 
 #endif /* PF_ID_H */
