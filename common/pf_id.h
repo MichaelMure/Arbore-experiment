@@ -24,6 +24,8 @@
 #ifndef PF_ID_H
 #define PF_ID_H
 
+#include <ostream>
+
 /** 160/8 = 20 */
 #define HASH_LEN 20
 
@@ -38,6 +40,8 @@ public:
 	pf_id(const pf_id&);
 	pf_id& operator=(const pf_id&);
 	bool operator==(const pf_id&);
+
+	ostream& operator<<(const ostream&);
 
 
 };
