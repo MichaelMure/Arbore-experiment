@@ -1,27 +1,28 @@
 PROJECT(peerfuse)
 
 SET(SRC
-	common/files/cache_base.cpp
-	common/files/content_list_base.cpp
 	common/download.cpp
-	common/files/dir_entry.cpp
-	common/files/file_chunk.cpp
-	common/files/file_content_base.cpp
-	common/fuse/fs_utils.cpp
-	common/files/hdd.cpp
 	common/pf_config.cpp
 	common/pf_log.cpp
 	common/mutex.cpp
-	common/net/network_base.cpp
-	common/net/peer_base.cpp
-	common/net/peers_list_base.cpp
-	common/files/file_entry_base.cpp
 	common/pf_thread.cpp
 	common/net/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
 	common/scheduler_queue.cpp
 	common/tools.cpp
+
+	common/files/cache_base.cpp
+	common/files/content_list_base.cpp
+	common/files/dir_entry.cpp
+	common/files/file_chunk.cpp
+	common/files/file_content_base.cpp
+	common/files/hdd.cpp
+	common/files/file_entry_base.cpp
+
+	common/net/network_base.cpp
+	common/net/peer_base.cpp
+	common/net/peers_list_base.cpp
 
 	common/jobs/job.cpp
 	common/jobs/job_new_connection.cpp
@@ -42,6 +43,8 @@ SET(SRC
 	common/ssl/pf_ssl_ssl.cpp
 	common/ssl/pf_ssl_nossl.cpp
 	common/ssl/private_key.cpp
+
+	common/fuse/fs_utils.cpp
 	)
 
 IF(NOT PF_SERVER_MODE)
