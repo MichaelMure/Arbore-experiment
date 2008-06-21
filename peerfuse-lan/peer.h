@@ -27,8 +27,8 @@
 #include "connection.h"
 #include "pf_types.h"
 #include "packet.h"
-#include "peer_base.h"
-#include "file_chunk.h"
+#include "net/peer_base.h"
+#include "files/file_chunk.h"
 
 class Peer;
 

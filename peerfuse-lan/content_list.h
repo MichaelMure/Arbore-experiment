@@ -23,8 +23,9 @@
 
 #ifndef CONTENT_LIST_H
 #define CONTENT_LIST_H
+
 #include <string.h>
-#include "content_list_base.h"
+#include "files/content_list_base.h"
 
 class ContentList : public ContentListBase
 {

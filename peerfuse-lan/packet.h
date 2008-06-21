@@ -24,7 +24,7 @@
 #ifndef PACKET_H
 #define PACKET_H
 
-#include "packet_base.h"
+#include "net/packet_base.h"
 
 class Packet : public PacketBase
 {

@@ -24,7 +24,7 @@
 #ifndef PF_FILE_H
 #define PF_FILE_H
 
-#include "file_entry_base.h"
+#include "files/file_entry_base.h"
 
 class FileEntry : public FileEntryBase
 {

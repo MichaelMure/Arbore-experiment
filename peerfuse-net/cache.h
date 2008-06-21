@@ -26,8 +26,8 @@
 
 #include <vector>
 #include <map>
-#include "cache_base.h"
-#include "dir_entry.h"
+#include "files/cache_base.h"
+#include "files/dir_entry.h"
 #include "pf_types.h"
 #include "file_entry.h"
 #include "packet.h"

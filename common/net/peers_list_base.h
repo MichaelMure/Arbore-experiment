@@ -30,7 +30,7 @@
 #include "peer.h"
 #include "mutex.h"
 #include "packet.h"
-#include "file_chunk.h"
+#include "files/file_chunk.h"
 
 class PeersListBase: protected std::vector<Peer*>, public Mutex
 {

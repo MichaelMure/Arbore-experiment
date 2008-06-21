@@ -22,7 +22,7 @@
  */
 
 #include <string>
-#include "packet_arg.h"
+#include "net/packet_arg.h"
 #include "net_proto.h"
 
 const char* type2str[NET_NB_MESSAGES] =

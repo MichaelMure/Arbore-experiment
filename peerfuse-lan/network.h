@@ -23,7 +23,7 @@
 
 #ifndef NETWORK_H
 #define NETWORK_H
-#include "network_base.h"
+#include "net/network_base.h"
 
 class Network: public NetworkBase
 {

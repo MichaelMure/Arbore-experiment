@@ -28,7 +28,7 @@
 #include <cassert>
 #include <string>
 #include "pf_log.h"
-#include "packet_base.h"
+#include "net/packet_base.h"
 
 class Packet : public PacketBase
 {

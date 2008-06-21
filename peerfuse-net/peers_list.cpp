@@ -22,7 +22,6 @@
  */
 
 #include "peers_list.h"
-#include "peers_list_base.h"
 #include "environment.h"
 
 PeersList peers_list;

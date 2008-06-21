@@ -30,7 +30,7 @@
 #include "tools.h"
 #include "peers_list.h"
 #include "session_config.h"
-#include "hdd.h"
+#include "files/hdd.h"
 #include "content_list.h"
 #include "scheduler_queue.h"
 #include "jobs/job_send_mkfile.h"

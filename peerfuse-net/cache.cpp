@@ -31,7 +31,7 @@
 #include "peers_list.h"
 #include "environment.h"
 #include "session_config.h"
-#include "hdd.h"
+#include "files/hdd.h"
 #include "content_list.h"
 
 Cache cache;

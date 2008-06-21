@@ -23,9 +23,10 @@
 
 #ifndef FILE_CONTENT_H
 #define FILE_CONTENT_H
+
 #include<time.h>
-#include "file_content_base.h"
-#include "file_chunk_desc.h"
+#include "files/file_content_base.h"
+#include "files/file_chunk_desc.h"
 
 class FileContent : public FileContentBase
 {

@@ -27,12 +27,12 @@
 #include <vector>
 #include <cassert>
 #include <string>
-#include "connection.h"
-#include "certificate.h"
+#include "ssl/connection.h"
+#include "ssl/certificate.h"
 #include "pf_types.h"
 #include "net_proto.h"
 #include "packet_arg.h"
-#include "file_chunk.h"
+#include "files/file_chunk.h"
 
 class PacketBase
 {

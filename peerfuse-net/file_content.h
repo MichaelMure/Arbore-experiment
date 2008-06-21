@@ -23,8 +23,9 @@
 
 #ifndef FILE_CONTENT_H
 #define FILE_CONTENT_H
-#include "file_content_base.h"
-#include "file_chunk.h"
+
+#include "files/file_content_base.h"
+#include "files/file_chunk.h"
 
 class FileContent : public FileContentBase
 {

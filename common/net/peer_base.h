@@ -30,7 +30,7 @@
 #include "pf_types.h"
 #include "connection.h"
 #include "packet.h"
-#include "file_chunk_desc.h"
+#include "files/file_chunk_desc.h"
 
 class PeerBase
 {

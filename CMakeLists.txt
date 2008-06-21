@@ -1,23 +1,23 @@
 PROJECT(peerfuse)
 
 SET(SRC
-	common/cache_base.cpp
-	common/content_list_base.cpp
+	common/files/cache_base.cpp
+	common/files/content_list_base.cpp
 	common/download.cpp
-	common/dir_entry.cpp
-	common/file_chunk.cpp
-	common/file_content_base.cpp
-	common/fs_utils.cpp
-	common/hdd.cpp
+	common/files/dir_entry.cpp
+	common/files/file_chunk.cpp
+	common/files/file_content_base.cpp
+	common/fuse/fs_utils.cpp
+	common/files/hdd.cpp
 	common/pf_config.cpp
 	common/pf_log.cpp
 	common/mutex.cpp
-	common/network_base.cpp
-	common/peer_base.cpp
-	common/peers_list_base.cpp
-	common/file_entry_base.cpp
+	common/net/network_base.cpp
+	common/net/peer_base.cpp
+	common/net/peers_list_base.cpp
+	common/files/file_entry_base.cpp
 	common/pf_thread.cpp
-	common/packet_base.cpp
+	common/net/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
 	common/scheduler_queue.cpp

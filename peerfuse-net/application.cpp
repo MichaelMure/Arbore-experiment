@@ -39,7 +39,7 @@
 #include "file_entry.h"
 #include "session_config.h"
 #include "scheduler.h"
-#include "hdd.h"
+#include "files/hdd.h"
 #include "content_list.h"
 #include "pfnet.h"
 

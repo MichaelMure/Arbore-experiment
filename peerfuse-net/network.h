@@ -32,7 +32,7 @@
 #include <map>
 #include <time.h>
 
-#include "network_base.h"
+#include "net/network_base.h"
 #include "pf_types.h"
 #include "peer.h"
 

@@ -24,7 +24,7 @@
 #ifndef PEERS_LIST_H
 #define PEERS_LIST_H
 
-#include "peers_list_base.h"
+#include "net/peers_list_base.h"
 
 class PeersList: public PeersListBase
 {

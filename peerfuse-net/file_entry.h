@@ -27,7 +27,7 @@
 #include <set>
 
 #include "pf_types.h"
-#include "file_entry_base.h"
+#include "files/file_entry_base.h"
 
 class FileEntry;
 
