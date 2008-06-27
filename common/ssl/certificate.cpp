@@ -124,10 +124,14 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len) const
 	// Returns a certificate in binary format
 	// Non-tested
 	unsigned char *p;
+	int i = i2d_X509(ssl_cert, NULL);
 
-	*len = (size_t)i2d_X509(ssl_cert, NULL);
+	if(i < 0)
+		throw BadCertificate(std::string(ERR_error_string(ERR_get_error(), NULL)));
 
-	*buf = (unsigned char*)malloc(*len);
+	*len = (size_t) i;
+
+	*buf = (unsigned char*)OPENSSL_malloc(*len);
 	p = *buf;
 
 	i2d_X509(ssl_cert, &p);
