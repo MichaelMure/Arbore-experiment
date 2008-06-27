@@ -28,7 +28,7 @@
 
 class pf_id
 {
-	static const size_t IdLength = 160;
+	static const size_t IdLength = 160; /**< bits */
 	static const size_t nlen = IdLength / sizeof(uint32_t);
 
 	uint32_t hash[nlen];

@@ -52,6 +52,7 @@ public:
 	void LoadPem(std::string filename, std::string password) throw(BadPrivateKey, BadFile);
 	void LoadBuf(const char* buf, size_t size) throw(BadPrivateKey);
 
+	/* Not implemented yet */
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 	void Sign(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
 

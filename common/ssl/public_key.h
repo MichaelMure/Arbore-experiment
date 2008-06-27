@@ -26,18 +26,22 @@
 #include <exception>
 #include <string>
 
+/** \note PublicKey class
+ *
+ * This class is *NOT* yet implemented!
+ */
 class PublicKey
 {
 
 public:
 	class BadPublicKey : public std::exception {};
 
-	PublicKey();
+	PublicKey() {}
 
-	void LoadPem(std::string filename);
-	void LoadBuf(const char* buf, size_t size);
+	void LoadPem(std::string filename) {}
+	void LoadBuf(const char* buf, size_t size) {}
 
-	void Crypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);
-	bool CheckSignature(const char* buf, size_t but_size, const char* signature, size_t crypt_size);
+	void Crypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size) {}
+	bool CheckSignature(const char* buf, size_t but_size, const char* signature, size_t crypt_size) {}
 };
 #endif						  // PF_PUBLIC_KEY_H
