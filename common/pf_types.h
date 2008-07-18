@@ -63,6 +63,14 @@ public:
 typedef std::vector<pf_addr> AddrList;
 typedef std::set<pf_id> IDList;
 
+/** Auto-deleter class for dynamical objects
+ *
+ * This class will free a specified object when it will
+ * deleted.
+ *
+ * It's usefull to be sure that an object is free in all cases
+ * when we leave a block (with exception, inside returns, etc.)
+ */
 template<typename T>
 class Deleter
 {
