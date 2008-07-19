@@ -299,17 +299,15 @@ class CommitList:
 
 def blame(path, users):
 
-    child = os.popen("svn list -R %s" % path)
+    return
+
+    child = os.popen("git-ls-files %s" % path)
     files = child.read().split('\n')
 
     child.close()
 
-    REGEXP = re.compile("^trunk/(.*)")
-
     for f in files:
         # Only count files in trunk
-        if not REGEXP.match(f):
-            continue
         file = os.path.join(path, f)
 
         # This is a directory, don't blame it.
@@ -538,7 +536,7 @@ def main():
 		<li><a href="/">Home</a></li><li class="separator"></li>
 		<li><a href="/download.html">Download</a></li><li class="separator"></li>
 		<li><a href="/documentation.html">Documentation</a></li><li class="separator" />
-		<li><a class="current" href="http://peerfuse.org/stats/stats.html">SVN stats</a></li><li class="separator" />
+		<li><a class="current" href="http://peerfuse.org/stats/stats.html">GIT stats</a></li><li class="separator" />
 		<li><a href="http://bb.peerfuse.org/">Buildbot</a></li><li class="separator" />
 		<li><a href="http://peerfuse.org/mailman/listinfo/peerfuse">Mailing list</a></li>
 	</ul>
