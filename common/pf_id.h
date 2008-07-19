@@ -26,6 +26,8 @@
 
 #include <ostream>
 
+class PublicKey;
+
 class pf_id
 {
 	static const size_t IdLength = 160; /**< bits */
@@ -34,6 +36,9 @@ class pf_id
 	char hash[nlen];
 
 public:
+
+	static pf_id FromRandom();
+	static pf_id FromPublicKey(const PublicKey& key);
 
 	pf_id();
 	~pf_id();

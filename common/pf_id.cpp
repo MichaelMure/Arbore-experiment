@@ -21,7 +21,23 @@
  *
  */
 
+#include <stdlib.h>
+
 #include "pf_id.h"
+
+pf_id pf_id::FromRandom()
+{
+	unsigned char hash[nlen];
+	for(size_t i = 0; i < nlen; ++i)
+		hash[i] = rand();
+
+	return pf_id(hash);
+}
+
+pf_id pf_id::FromPublicKey(const PublicKey& key)
+{
+
+}
 
 pf_id::pf_id()
 {
@@ -91,11 +107,12 @@ int main()
 	std::cout << "Null id: " << id << std::endl;
 
 	id = sha;
-
 	std::cout << "Hash id: " << id << std::endl;
 
-	id2 = id;
+	srand(time(NULL));
+	std::cout << "Rand id: " << pf_id::FromRandom() << std::endl;
 
+	id2 = id;
 	if(id == id2)
 		std::cout << id << " = " << id2 << std::endl;
 	else
