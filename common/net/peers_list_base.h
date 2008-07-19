@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: peers_list_base.h 1128 2008-06-01 18:02:39Z romain $
+ * 
  */
 
 #ifndef PEERS_LIST_BASE_H

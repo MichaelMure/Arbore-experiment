@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: tools.cpp 1004 2008-05-07 22:51:21Z romain $
+ * 
  */
 
 #include <arpa/inet.h>

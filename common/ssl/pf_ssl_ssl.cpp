@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: pf_ssl_ssl.cpp 1138 2008-06-08 12:22:09Z romain $
+ * 
  */
 
 #include <list>

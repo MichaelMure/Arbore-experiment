@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: packet_base.cpp 1040 2008-05-11 09:05:03Z romain $
+ * 
  */
 
 #include <assert.h>

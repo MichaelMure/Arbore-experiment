@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: certificate.cpp 1126 2008-05-27 22:49:49Z romain $
+ * 
  */
 
 #include <openssl/err.h>

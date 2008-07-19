@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * $Id: private_key.cpp 1004 2008-05-07 22:51:21Z romain $
+ * 
  */
 
 #include <openssl/evp.h>
