@@ -18,14 +18,15 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include "pf_id.h"
 
 pf_id::pf_id()
 {
-
+	for(size_t i = 0; i < nlen; ++i)
+		hash[i] = 0;
 }
 
 pf_id::~pf_id()
@@ -39,10 +40,22 @@ pf_id::pf_id(const pf_id& id)
 		hash[i] = id.hash[i];
 }
 
+pf_id::pf_id(const unsigned char* dhash)
+{
+	for(size_t i = 0; i < nlen; ++i)
+		hash[i] = dhash[i];
+}
+
 pf_id& pf_id::operator=(const pf_id& id)
 {
 	for(size_t i = 0; i < nlen; ++i)
 		hash[i] = id.hash[i];
+}
+
+pf_id& pf_id::operator=(const unsigned char* dhash)
+{
+	for(size_t i = 0; i < nlen; ++i)
+		hash[i] = dhash[i];
 }
 
 bool pf_id::operator==(const pf_id& id)
@@ -55,9 +68,9 @@ bool pf_id::operator==(const pf_id& id)
 
 std::string pf_id::toString() const
 {
-	std::string s;
+	std::string s = "0x";
 	for(size_t i = 0; i < nlen; ++i)
-		for(size_t j = sizeof(hash[i]); j >= 0; --j)
+		for(int j = sizeof(hash[i]); j >= 0; --j)
 			s += "0123456789abcdef"[((hash[i] >> j*4) & 0xF)];
 	return s;
 }
@@ -68,3 +81,26 @@ std::ostream& operator<<(std::ostream& os, const pf_id& id)
 	return os;
 }
 
+#ifdef TESTS
+#include <iostream>
+int main()
+{
+	pf_id id, id2;
+	const unsigned char sha[20] = {128,1,28,83,37,112,234,12,48,89,254,8,87,209,221,187,37,123,211,0};
+
+	std::cout << "Null id: " << id << std::endl;
+
+	id = sha;
+
+	std::cout << "Hash id: " << id << std::endl;
+
+	id2 = id;
+
+	if(id == id2)
+		std::cout << id << " = " << id2 << std::endl;
+	else
+		std::cout << id << " != " << id2 << std::endl;
+
+	return 0;
+}
+#endif

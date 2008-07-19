@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PF_ID_H
@@ -29,16 +29,21 @@
 class pf_id
 {
 	static const size_t IdLength = 160; /**< bits */
-	static const size_t nlen = IdLength / sizeof(uint32_t);
+	static const size_t nlen = IdLength / (8*sizeof(char));
 
-	uint32_t hash[nlen];
+	char hash[nlen];
 
 public:
 
 	pf_id();
 	~pf_id();
+
 	pf_id(const pf_id&);
+	pf_id(const unsigned char* hash);
+
 	pf_id& operator=(const pf_id&);
+	pf_id& operator=(const unsigned char* hash);
+
 	bool operator==(const pf_id&);
 
 	std::string toString() const;
