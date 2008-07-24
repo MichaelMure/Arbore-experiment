@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef PF_ID_H
@@ -37,16 +36,22 @@ class pf_id
 
 public:
 
+	/** Create a random pf_id */
 	static pf_id FromRandom();
+
+	/** Create a pf_id from a public key.
+	 * It'll do a SHA-1 of it.
+	 */
 	static pf_id FromPublicKey(const PublicKey& key);
 
 	pf_id();
 	~pf_id();
 
 	pf_id(const pf_id&);
-	pf_id(const unsigned char* hash);
-
 	pf_id& operator=(const pf_id&);
+
+	/** hash must be an unsigned char[nlen] */
+	pf_id(const unsigned char* hash);
 	pf_id& operator=(const unsigned char* hash);
 
 	bool operator==(const pf_id&);
