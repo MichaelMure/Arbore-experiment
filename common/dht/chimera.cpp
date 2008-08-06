@@ -18,6 +18,8 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by Matthew Allen.
  *
  */
 
