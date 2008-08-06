@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <map>
@@ -114,14 +114,11 @@ public:
 			return;
 		}
 
-		// Check that the peer exist !
+		/* If we are not connected directly to peer, the fd
+		 * can be < 0.
+		 */
 		pf_id pfid = StrToTyp<pf_id>(s_id);
 		int fd = plb->GetPeersFD(pfid);
-		if (fd <= 0)
-		{
-			result = false;
-			return;
-		}
 
 		// Fill info
 		result["fd"] = fd;
