@@ -20,16 +20,15 @@
  *
  */
 
-#ifndef PF_DHT_H
-#define PF_DHT_H
+#ifndef CHIMERA_H
+#define CHIMERA_H
 
-/** Interface of DHT */
-class DHT
+#include "dht.h"
+
+class ChimeraDHT : public DHT
 {
-
-public:
-
 
 };
 
-#endif /* PF_DHT_H */
+#endif /* CHIMERA_H */
+

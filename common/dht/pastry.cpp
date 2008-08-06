@@ -20,16 +20,5 @@
  *
  */
 
-#ifndef PF_DHT_H
-#define PF_DHT_H
+#include "pastry.h"
 
-/** Interface of DHT */
-class DHT
-{
-
-public:
-
-
-};
-
-#endif /* PF_DHT_H */
