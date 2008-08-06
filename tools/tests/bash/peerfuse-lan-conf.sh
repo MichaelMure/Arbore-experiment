@@ -30,6 +30,11 @@ function build_conf
 		CONNECT_PORT=6789
 	fi
 
+	if [ "$XMLRPC_PORT" == "" ]
+	then
+		XMLRPC_PORT=1772
+	fi
+
 	if [ "$CACHE_ROOT" == "" ]
 	then
 		exit 1
@@ -90,6 +95,15 @@ hdd {
 	root = $CACHE_ROOT
 
 	workdir = ${!CONFDIR}
+}
+
+# Xmlrpc configuration
+xmlrpc {
+
+	bind = 127.0.0.1
+
+	port = $XMLRPC_PORT
+
 }
 
 # Log function

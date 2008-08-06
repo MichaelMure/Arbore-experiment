@@ -11,6 +11,8 @@ SET(SRC
 	common/scheduler.cpp
 	common/scheduler_queue.cpp
 	common/tools.cpp
+	common/xmlrpc_server.cpp
+	common/xmlrpc.cpp
 
 	common/files/cache_base.cpp
 	common/files/content_list_base.cpp
@@ -167,10 +169,10 @@ ELSE(XMLRPCXX_FOUND)
 ENDIF(XMLRPCXX_FOUND)
 
 
-INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS}
+INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${XMLRPCXX_INCLUDE_DIR}
 	"${BIN_NAME}/" "common/" "common/fuse" "common/jobs" "common/ssl")
-LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LINK_DIR})
-TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES})
+LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LINK_DIR} ${XMLRPCXX_LINK_DIR})
+TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES} ${XMLRPCXX_LDFLAGS})
 
 
 SET(CMAKE_BUILD_TYPE ${BUILD})

@@ -1,0 +1,23 @@
+Peerfuse XmlRpc
+~~~~~~~~~~~~~~~
+
+Exemple de connexion python
+---------------------------
+
+import xmlrpclib
+s = xmlrpclib.ServerProxy('http://localhost:1778')
+print "Version de peerfuse : " + s.pf.version()
+
+API version 0 (1 quand ca sera stabilisé)
+-------------------------------
+
+ - pf.version : Renvoit la version de peerfuse
+ - pf.infos : Renvoit un tableau d'informations contenant
+   - peerfuse.version : Idendique à la commande pf.version()
+   - peerfuse.build : Date du build peerfuse
+   - peerfuse.version.proto : Version du protocole peerfuse
+   - peerfuse.version.major : Numéro majeur de la version
+   - peerfuse.version.minor : Numéro mineur de la version
+   - peerfuse.version.name : Nom du programme peerfuse
+   - xmlrpc.version : Version de l'api Peerfuse XmlRpc
+

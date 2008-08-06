@@ -13,6 +13,10 @@ Dependences:
 * libssl-dev
 * libcurl-dev
 * libfuse-dev
+* libxmlrpc++-dev
+
+If your distro don't have libxmlrpc++ packaged, you can
+grab source at http://xmlrpcpp.sourceforge.net/ .
 
 Compilation:
 ------------

@@ -44,6 +44,7 @@
 #include "files/hdd.h"
 #include "content_list.h"
 #include "pflan.h"
+#include "xmlrpc.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -86,10 +87,15 @@ Application::Application()
 	section = conf.AddSection("hdd", "Harddisk configuration", false);
 	section->AddItem(new ConfigItem_string("root", "Root directory of storage"));
 	section->AddItem(new ConfigItem_string("workdir", "Root directory of config files"));
+
+	section = conf.AddSection("xmlrpc", "XmlRpc configuration", false);
+	section->AddItem(new ConfigItem_string("bind", "IP Binding"));
+	section->AddItem(new ConfigItem_int("port", "Port", 0, 65535));
 }
 
 void Application::StartThreads()
 {
+	xmlrpc.Start();
 	scheduler.Start();
 	net.Start();
 	content_list.Start();
@@ -100,6 +106,7 @@ void Application::Exit()
 	content_list.Stop();
 	net.Stop();
 	scheduler.Stop();
+	xmlrpc.Stop();
 	/* It is not necessary to save session_cfg objects because destructor do this */
 }
 

@@ -19,24 +19,32 @@
 #ifndef PF_XMLRPC_H
 #define PF_XMLRPC_H
 
+#include <list>
 #include <XmlRpc.h>
 #include "pf_thread.h"
+#include "xmlrpc_server.h"
 
-class PfXmlRpcServer : public Thread
+#define XMLRPC_VERSION	0
+
+class XmlRpcThread : public Thread
 {
 public:
-	PfXmlRpcServer();
-	~PfXmlRpcServer();
+	XmlRpcThread();
+	~XmlRpcThread();
+
 protected:
 	void Loop();
 	void OnStart();
 	void OnStop();
+
 private:
 	int port;
 	bool started;
-	XmlRpc::XmlRpcServer s;
+
+	PfXmlRpcServer s;
+	std::list<XmlRpc::XmlRpcServerMethod*> methods;
 };
 
-extern PfXmlRpcServer xmlrpc;
+extern XmlRpcThread xmlrpc;
 
 #endif

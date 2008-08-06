@@ -29,31 +29,58 @@
 #include "xmlrpc.h"
 #include "pf_config.h"
 
-PfXmlRpcServer xmlrpc;
+#ifdef PF_NET
+#include <pfnet.h>
+#elif PF_LAN
+#include <pflan.h>
+#endif
 
-class Hello : public XmlRpc::XmlRpcServerMethod
+using namespace XmlRpc;
+
+XmlRpcThread xmlrpc;
+
+// Method to give version of peerfuse
+class _PfVersion : public XmlRpcServerMethod
 {
 public:
-	Hello(XmlRpc::XmlRpcServer* s) : XmlRpc::XmlRpcServerMethod("Hello", s) {}
-	void execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result)
+	_PfVersion(XmlRpcServer* s) : XmlRpcServerMethod("pf.version", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
 	{
-		result = "Hello";
+		result = PEERFUSE_VERSION;
 	}
 };
 
+// Method to give all informations about peerfuse
+class _PfInfos : public XmlRpcServerMethod
+{
+public:
+	_PfInfos(XmlRpcServer* s) : XmlRpcServerMethod("pf.infos", s) {}
 
-PfXmlRpcServer::PfXmlRpcServer()
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
+	{
+		result["peerfuse.version"] = PEERFUSE_VERSION;
+		result["peerfuse.version.name"] = PEERFUSE_VERSION_NAME;
+		result["peerfuse.version.major"] = PEERFUSE_VERSION_MAJOR;
+		result["peerfuse.version.minor"] = PEERFUSE_VERSION_MINOR;
+		result["peerfuse.version.proto"] = PEERFUSE_VERSION_PROTO;
+		result["peerfuse.build"] = "Build " __DATE__ " " __TIME__;
+		result["xmlrpc.version"] = XMLRPC_VERSION;
+	}
+};
+
+XmlRpcThread::XmlRpcThread()
 {
 	port = 1772;
 	started = false;
 }
 
-PfXmlRpcServer::~PfXmlRpcServer()
+XmlRpcThread::~XmlRpcThread()
 {
 	started = false;
 }
 
-void PfXmlRpcServer::OnStart()
+void XmlRpcThread::OnStart()
 {
 	// Read from config
 	port = conf.GetSection("xmlrpc")->GetItem("port")->Integer();
@@ -61,23 +88,30 @@ void PfXmlRpcServer::OnStart()
 		return;
 
 	// Instances methods
-	new Hello(&s);
+	methods.push_back(new _PfVersion(&s));
+	methods.push_back(new _PfInfos(&s));
 
 	// Bind
 	started = true;
 	s.bindAndListen(port);
 }
 
-void PfXmlRpcServer::OnStop()
+void XmlRpcThread::OnStop()
 {
 	if(!started)
 		return;
 
 	s.exit();
 	s.shutdown();
+
+	std::list<XmlRpcServerMethod*>::iterator it = methods.begin();
+	while(it != methods.end())
+	{
+		delete (*it);
+	}
 }
 
-void PfXmlRpcServer::Loop()
+void XmlRpcThread::Loop()
 {
 	if(!started)
 		return;
@@ -85,31 +119,3 @@ void PfXmlRpcServer::Loop()
 	s.work(10);
 }
 
-/**
-class Hello : public XmlRpcServerMethod
-{
-public:
-  Hello(XmlRpcServer* s) : XmlRpcServerMethod("Hello", s) {}
-
-  void execute(XmlRpcValue& params, XmlRpcValue& result)
-  {
-    result = "Hello";
-  }
-
-} hello(&s);    // This constructor registers the method with the server
-
-
-// The port to use
-const int PORT = 8080;
-
-int main(int argc, char* argv[]) {
-
-  // Create the server socket on the specified port
-  s.bindAndListen(PORT);
-
-  // Wait for requests and process indefinitely (Ctrl-C to exit)
-  s.work(-1.0);
-
-  return 0;
-}
-**/

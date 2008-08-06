@@ -38,6 +38,7 @@ function start_fs
 		export NB_P2PFS=$1
 		export CONNECT_PORT=$((8000+$i))
 		export LISTEN_PORT=$((8001+$i))
+		export XMLRPC_PORT=$((9000+$i))
 		export CACHE_ROOT="$PWD/pf$i/cache"
 		export WORKDIR="$PWD/pf$i/work"
 		export CONFDIR=WORKDIR
