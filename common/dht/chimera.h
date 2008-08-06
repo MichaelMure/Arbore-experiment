@@ -34,6 +34,12 @@
 class ChimeraDHT
 {
 
+	int encode_hosts(char* s, int size, ChimeraHost** host) const;
+
+	ChimeraHost** ChimeraDHT::decode_hosts(char* s);
+
+	void send_rowinfo(Message* message);
+
 public:
 
 	/**
