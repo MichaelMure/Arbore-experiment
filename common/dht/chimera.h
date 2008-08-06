@@ -41,70 +41,70 @@ public:
 	 **  Initialize Chimera on port port and returns the ChimeraState * which
 	 ** contains global state of different chimera modules.
 	 */
-	ChimeraState *chimera_init (int port);
+	ChimeraDHT(int port);
 
 	/**
-	 ** chimera_join:
+	 ** join:
 	 ** Join the network that the bootstrap host is a part of
 	 */
-	void chimera_join (ChimeraState * state, ChimeraHost * bootstrap);
+	void Join (ChimeraHost * bootstrap);
 
 	/**
-	 * chimera_route:
+	 * route:
 	 * Send a message msg through the system to key. hint is currently
 	 * ignored, but it will one day be the next hop
 	*/
-	void chimera_route (ChimeraState * state, Key * key, Message * msg,
+	void Route (Key * key, Message * msg,
 			    ChimeraHost * hint);
 
 	/**
-	 ** chimera_forward:
+	 ** forward:
 	 ** Set the chimera forward upcall to func. This handler will be called every
 	 ** time a message is routed to a key through the current node. The host argument
 	 ** is upsupported, but will allow the programmer to choose the next hop
 	 */
-	void chimera_forward (ChimeraState * state, chimera_forward_upcall_t func);
+	void Forward (chimera_forward_upcall_t func);
 
 	/**
-	 ** chimera_deliver:
+	 ** deliver:
 	 ** Set the chimera deliver upcall to func. This handler will be called every
 	 ** time a message is delivered to the current node
 	 */
-	void chimera_deliver (ChimeraState * state, chimera_deliver_upcall_t func);
+	void Deliver (chimera_deliver_upcall_t func);
 
-	/** chimera_update:
+	/** update:
 	 ** Set the chimera update upcall to func. This handler will be called every
 	 ** time a host leaves or joins your neighbor set. The final integer is a 1 if
 	 ** the host joins and a 0 if the host leaves
 	*/
-	void chimera_update (ChimeraState * state, chimera_update_upcall_t func);
+	void Update (chimera_update_upcall_t func);
 
-	/** chimera_setkey:
+	/** setkey:
 	 ** Manually sets the key for the current node
 	 */
-	void chimera_setkey (ChimeraState * state, Key key);
+	void SetKey (Key key);
 
-	/** chimera_register:
+	/** register:
 	 ** register an integer message type to be routed by the chimera routing layer
 	 ** ack is the argument that defines wether this message type should be acked or not
 	 ** ack ==1 means message will be acknowledged, ack=2 means no acknowledge is necessary
 	 ** for this type of message.
 	 */
-	void chimera_register (ChimeraState * state, int type, int ack);
+	void Register (int type, int ack);
 
-	/** chimera_send:
+	/** send:
 	 ** Route a message of type to key containing size bytes of data. This will
 	 ** send data through the Chimera system and deliver it to the host closest to the
 	 ** key
 	 */
-	void chimera_send (ChimeraState * state, Key key, int type, int len,
+	void Send (Key key, int type, int len,
 			   char *data);
 
 	/**
-	 ** chimera_ping:
+	 ** ping:
 	 ** sends a ping message to the host. the message is acknowledged in network layer
 	 */
-	int chimera_ping (ChimeraState * state, ChimeraHost * host);
+	int Ping (ChimeraHost * host);
 
 };
 
