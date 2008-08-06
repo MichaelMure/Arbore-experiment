@@ -217,6 +217,9 @@ int Application::main(int argc, char *argv[])
 			return (EXIT_FAILURE);
 		}
 
+		xmlrpc.SetNetworkBase(net);
+		xmlrpc.SetPeersListBase(peers_list);
+
 		umask(0);
 		#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);

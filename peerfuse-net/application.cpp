@@ -41,6 +41,7 @@
 #include "scheduler.h"
 #include "files/hdd.h"
 #include "content_list.h"
+#include "peers_list.h"
 #include "pfnet.h"
 #include "xmlrpc.h"
 
@@ -203,6 +204,9 @@ int Application::main(int argc, char *argv[])
 			pf_log[W_ERR] << "Unable to CRL file: " << e.GetString();
 			return (EXIT_FAILURE);
 		}
+
+		xmlrpc.SetNetworkBase(net);
+		xmlrpc.SetPeersListBase(peers_list);
 
 		cache.UpdateRespFiles();
 

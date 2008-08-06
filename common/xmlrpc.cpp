@@ -22,12 +22,14 @@
  */
 
 #include <map>
+#include <vector>
 #include <iostream>
 #include <stdio.h>
 #include <pthread.h>
 #include <assert.h>
 #include "xmlrpc.h"
 #include "pf_config.h"
+#include "peer.h"
 
 #ifdef PF_NET
 #include <pfnet.h>
@@ -69,10 +71,39 @@ public:
 	}
 };
 
+// Method to give informations about peers
+class _PeersList : public XmlRpcServerMethod
+{
+public:
+	_PeersList(XmlRpcServer* s) : XmlRpcServerMethod("peers.list", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
+	{
+		PeersListBase* l;
+		std::vector<Peer*>::iterator it;
+		int index;
+		std::ostringstream oss;
+
+		l = xmlrpc.GetPeersListBase();
+		if(!l)
+			return;
+
+		it = l->begin();
+		for(index = 0; it != l->end(); it++, index++)
+		{
+			oss << (uint32_t)(**it).GetID();
+			result[index] = oss.str();
+			oss.str("");
+		}
+	}
+};
+
 XmlRpcThread::XmlRpcThread()
 {
 	port = 1772;
 	started = false;
+	network = NULL;
+	peers_list = NULL;
 }
 
 XmlRpcThread::~XmlRpcThread()
@@ -90,6 +121,7 @@ void XmlRpcThread::OnStart()
 	// Instances methods
 	methods.push_back(new _PfVersion(&s));
 	methods.push_back(new _PfInfos(&s));
+	methods.push_back(new _PeersList(&s));
 
 	// Bind
 	started = true;
@@ -104,11 +136,14 @@ void XmlRpcThread::OnStop()
 	s.exit();
 	s.shutdown();
 
+	/**
+	 * XXX Search in XmlRpcServer how methods are clean
 	std::list<XmlRpcServerMethod*>::iterator it = methods.begin();
 	while(it != methods.end())
 	{
 		delete (*it);
 	}
+	**/
 }
 
 void XmlRpcThread::Loop()

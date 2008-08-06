@@ -32,7 +32,7 @@
 #include "packet.h"
 #include "files/file_chunk.h"
 
-class PeersListBase: protected std::vector<Peer*>, public Mutex
+class PeersListBase: public std::vector<Peer*>, public Mutex
 {
 protected:
 	bool changed;

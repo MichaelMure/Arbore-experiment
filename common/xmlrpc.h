@@ -23,6 +23,8 @@
 #include <XmlRpc.h>
 #include "pf_thread.h"
 #include "xmlrpc_server.h"
+#include "net/network_base.h"
+#include "net/peers_list_base.h"
 
 #define XMLRPC_VERSION	0
 
@@ -32,6 +34,11 @@ public:
 	XmlRpcThread();
 	~XmlRpcThread();
 
+	void SetNetworkBase(NetworkBase& network) { this->network = & network; };
+	NetworkBase* GetNetworkBase() { return this->network; }
+	void SetPeersListBase(PeersListBase& peers_list) { this->peers_list = & peers_list; };
+	PeersListBase* GetPeersListBase() { return this->peers_list; }
+	
 protected:
 	void Loop();
 	void OnStart();
@@ -40,6 +47,9 @@ protected:
 private:
 	int port;
 	bool started;
+
+	NetworkBase *network;
+	PeersListBase *peers_list;
 
 	PfXmlRpcServer s;
 	std::list<XmlRpc::XmlRpcServerMethod*> methods;
