@@ -71,7 +71,7 @@ public:
 	}
 };
 
-// Method to give informations about peers
+// Method to give list of knowns peers
 class _PeersList : public XmlRpcServerMethod
 {
 public:
@@ -79,22 +79,69 @@ public:
 
 	void execute(XmlRpcValue& params, XmlRpcValue& result)
 	{
-		PeersListBase* l;
-		std::vector<Peer*>::iterator it;
-		int index;
-		std::ostringstream oss;
-
-		l = xmlrpc.GetPeersListBase();
-		if(!l)
+		int index = 0;
+		PeersListBase* plb = xmlrpc.GetPeersListBase();
+		if(!plb)
 			return;
 
-		it = l->begin();
-		for(index = 0; it != l->end(); it++, index++)
+		IDList list = plb->GetIDList();
+		while(list.size())
 		{
-			oss << (uint32_t)(**it).GetID();
-			result[index] = oss.str();
-			oss.str("");
+			result[index++] = TypToStr((uint32_t)(*(list.begin())));
+			list.erase(list.begin());
 		}
+	}
+};
+
+// Method to give information about a peer
+class _PeersInfo : public XmlRpcServerMethod
+{
+public:
+	_PeersInfo(XmlRpcServer* s) : XmlRpcServerMethod("peers.info", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
+	{
+		// Check we have a valid string
+		std::string s_id = params[0];
+		if(s_id == "")
+			return;
+
+		// Check we have a peerlistbase
+		PeersListBase* plb = xmlrpc.GetPeersListBase();
+		if(!plb)
+		{
+			result = false;
+			return;
+		}
+
+		// Check that the peer exist !
+		pf_id pfid = StrToTyp<pf_id>(s_id);
+		int fd = plb->GetPeersFD(pfid);
+		if (fd <= 0)
+		{
+			result = false;
+			return;
+		}
+
+		// Fill info
+		result["fd"] = fd;
+		result["pf_id"] = s_id;
+		result["pf_addr"] = pf_addr2string(plb->GetPeerAddr(pfid));
+		std::string state;
+		switch (plb->WhatIsThisID(pfid))
+		{
+			case PeersListBase::IS_ON_NETWORK:
+				state = "is_on_network";
+				break;
+			case PeersListBase::IS_CONNECTED:
+				state = "connected";
+				break;
+			default:
+			case PeersListBase::IS_UNKNOWN:
+				state = "unknown";
+				break;
+		}
+		result["state"] = state;
 	}
 };
 
@@ -122,6 +169,7 @@ void XmlRpcThread::OnStart()
 	methods.push_back(new _PfVersion(&s));
 	methods.push_back(new _PfInfos(&s));
 	methods.push_back(new _PeersList(&s));
+	methods.push_back(new _PeersInfo(&s));
 
 	// Bind
 	started = true;
