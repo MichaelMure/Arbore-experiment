@@ -1,23 +1,29 @@
 Peerfuse XmlRpc
 ~~~~~~~~~~~~~~~
 
-Exemple de connexion python
----------------------------
+Connection example with python
+------------------------------
 
-import xmlrpclib
-s = xmlrpclib.ServerProxy('http://localhost:1778')
-print "Version de peerfuse : " + s.pf.version()
+>>> import xmlrpclib
+>>> s = xmlrpclib.ServerProxy('http://localhost:1778')
+>>> print "Peerfuse version: " + s.pf.version()
+>>> [ a.peers.info(b) for b in a.peers.list() ]
 
-API version 0 (1 quand ca sera stabilisé)
+API version 0 (1 when it'll be stable)
 -------------------------------
 
- - pf.version : Renvoit la version de peerfuse
- - pf.infos : Renvoit un tableau d'informations contenant
-   - peerfuse.version : Idendique à la commande pf.version()
-   - peerfuse.build : Date du build peerfuse
-   - peerfuse.version.proto : Version du protocole peerfuse
-   - peerfuse.version.major : Numéro majeur de la version
-   - peerfuse.version.minor : Numéro mineur de la version
-   - peerfuse.version.name : Nom du programme peerfuse
-   - xmlrpc.version : Version de l'api Peerfuse XmlRpc
-
+ - pf.version : Return the peerfuse version
+ - pf.infos : Return some informations in a table with:
+   - peerfuse.version : Same that pf.version()
+   - peerfuse.build : build date of peerfuse
+   - peerfuse.version.proto : protocole version of peerfuse
+   - peerfuse.version.major : major version number
+   - peerfuse.version.minor : minor version number
+   - peerfuse.version.name : binary name
+   - xmlrpc.version : the peerfuse xmlrpc implementation version
+ - peers.list() : Return a list of peers (IDs)
+ - peers.info(id) : Return some information about a peer
+   - state : state of this peer (unknown, is_on_network or connected)
+   - pf_id : id of peer
+   - fd : the file descriptor for connection with this peer (-1 if not connected directly)
+   - pf_addr : IP address and port listened
