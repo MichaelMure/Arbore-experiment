@@ -69,6 +69,8 @@ if __name__ == '__main__':
 		connect = sys.argv[1] + ' ' + sys.argv[2]
 	elif len(sys.argv) > 1:
 		connect = sys.argv[1]
+	else:
+		connect = 'localhost'
 
 	client = PeerfuseInterpretor()
 	client.do_connect(connect)
