@@ -9,7 +9,7 @@ Here are tasks:
 | 00025 |  Open  |  PFnet   |            | Implement new cache system in DHT
 | 00024 |  Open  |  PFnet   |            | Remove FileDist and store files in new DHT
 | 00023 |  Open  |   SSL    |            | At first start, generate a private/public key pair, and use it instead of certificates
-| 00022 |  Open  |   DHT    |   romain   | Implement the Pastry DHT
+| 00022 |  Open  |   DHT    |   romain   | Implement the Chimera DHT
 | 00021 |  Open  |  Global  |            | Use the default "libconfig" library instead of our own parser (common/libconfig.h)
 | 00020 |  Open  |  Global  | hydromiel  | Support IPv6
 | 00019 | Closed |  PFnet   |   romain   | PeersListBase might have a protected vector base class, not public. And PeerFromID() might be
