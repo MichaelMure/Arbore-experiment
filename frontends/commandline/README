@@ -1,0 +1,21 @@
+			README
+			======
+
+How to connect to a daemon ?
+----------------------------
+
+Usage:
+peerfuse-client.py [host(localhost)] [port(1778)]
+
+Example:
+peerfuse-client.py localhost 1778
+
+
+Where can i have known commands ?
+---------------------------------
+
+Here is the list of known commands :
+- exit : exit the shell
+- help : display help of all commands
+- connect : connect to another dameon
+- plist : display list of peers
