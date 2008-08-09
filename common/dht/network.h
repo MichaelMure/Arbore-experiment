@@ -1,8 +1,33 @@
 /*
+ * Copyright(C) 2008 Romain Bignon
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
+ */
+
+/*
 ** $Id: network.h,v 1.14 2007/04/04 00:04:49 krishnap Exp $
 **
 ** Matthew Allen
-** description: 
+** description:
 */
 
 #ifndef _CHIMERA_NETWORK_H_
@@ -11,13 +36,13 @@
 #include "host.h"
 #include "jrb.h"
 
-/** 
+/**
  ** NETWORK_PACK_SIZE is the maximum packet size that will be handled by chimera network layer
  */
 #define NETWORK_PACK_SIZE 65536
-/** 
- ** TIMEOUT is the number of seconds to wait for receiving ack from the destination, if you want 
- ** the sender to wait forever put 0 for TIMEOUT. 
+/**
+ ** TIMEOUT is the number of seconds to wait for receiving ack from the destination, if you want
+ ** the sender to wait forever put 0 for TIMEOUT.
  */
 #define TIMEOUT 1.0
 
@@ -41,12 +66,12 @@ typedef struct AcknowledgEntry{
 unsigned long network_address (void *networkglobal, char *hostname);
 
 /** network_init:
- ** initiates the networking layer by creating socket and bind it to #port# 
+ ** initiates the networking layer by creating socket and bind it to #port#
  */
 void *network_init (void *logs, int port);
 
 /**
- ** network_activate: 
+ ** network_activate:
  ** NEVER RETURNS. Puts the network layer into listen mode. This thread
  ** manages acknowledgements, delivers incomming messages to the message
  ** handler, and drives the network layer. It should only be called once.

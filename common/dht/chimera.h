@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2008 Romain Bignon
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,12 +33,26 @@
 #include "message.h"
 #include "semaphore.h"
 
+typedef void (*chimera_forward_upcall_t) (Key **, Message **, ChimeraHost **);
+typedef void (*chimera_deliver_upcall_t) (Key *, Message *);
+typedef void (*chimera_update_upcall_t) (Key *, ChimeraHost *, int);
+
 class ChimeraDHT
 {
+	void *network;
+	void *message;
+	void *route;
+	void *log;
+	void *host;
+	void *chimera;
+	JRB bootstrapMsgStore;	/* for future security enhancement */
+	pthread_mutex_t bootstrapMutex;	/* for future security enhancement */
+	void *certificateStore;	/* for future security enhancement */
+	pthread_mutex_t certificateMutex;	/* for future security enhancement */
 
-	int encode_hosts(char* s, int size, ChimeraHost** host) const;
+	size_t encode_hosts(char* s, int size, ChimeraHost** host) const;
 
-	ChimeraHost** ChimeraDHT::decode_hosts(char* s);
+	ChimeraHost** decode_hosts(char* s);
 
 	void send_rowinfo(Message* message);
 
@@ -116,10 +130,6 @@ public:
 
 };
 
-
-typedef void (*chimera_forward_upcall_t) (Key **, Message **, ChimeraHost **);
-typedef void (*chimera_deliver_upcall_t) (Key *, Message *);
-typedef void (*chimera_update_upcall_t) (Key *, ChimeraHost *, int);
 
 typedef struct
 {

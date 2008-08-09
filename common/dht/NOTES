@@ -17,14 +17,14 @@ Flags:    +   port this file to a C++ implementation
 Filename     Flags    Description
 ---------------------------------
 base.h        [C]     :Some functions to integer base conversion
-chimera.c     [+]     :main functions of Chimera
-chimera.h     [+]     :main functions of Chimera
+chimera.c     [M]     :main functions of Chimera
+chimera.h     [M]     :main functions of Chimera
 dllist.c      [ ]     :double linked list
 dllist.h      [ ]     :double linked list
 dtime.c       [C]     :some time related functions
 dtime.h       [C]     :some time related functions
-host.c        [+]     :the chimera representation of hosts
-host.h        [+]     :the chimera representation of hosts
+host.c        [M]     :the chimera representation of hosts
+host.h        [M]     :the chimera representation of hosts
 include.h     [ ]     :useless declaration of the Bool type
 job_queue.c   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
 job_queue.h   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
@@ -47,3 +47,9 @@ route.h       [+]     :the routing protocol
 semaphore.c   [C]     :semaphore implementation
 semaphore.h   [C]     :semaphore implementation
 test.c        [+]     :test program
+
+******
+Notes:*
+******
+
+- The ChimeraState class is now ChimeraDHT.

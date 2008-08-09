@@ -1,3 +1,28 @@
+/*
+ * Copyright(C) 2008 Romain Bignon
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
+ */
+
 #ifndef _CHIMERA_ROUTE_H_
 #define _CHIMERA_ROUTE_H_
 
@@ -26,7 +51,7 @@ typedef struct
 } RouteGlobal;
 
 /** route_init:
-** Ininitiates routing table and leafsets. 
+** Ininitiates routing table and leafsets.
 */
 
 void *route_init (ChimeraHost * me);
@@ -40,8 +65,8 @@ ChimeraHost **route_lookup (ChimeraState * state, Key key, int count,
 			    int is_safe);
 
 
-/** route_neighbors: 
-** returns an array of count neighbor nodes with priority to closer nodes. 
+/** route_neighbors:
+** returns an array of count neighbor nodes with priority to closer nodes.
 */
 
 ChimeraHost **route_neighbors (ChimeraState * state, int count);
@@ -70,7 +95,7 @@ ChimeraHost **route_row_lookup (ChimeraState * state, Key key);
 
 ChimeraHost **route_get_table (ChimeraState * state);
 
-/** prints routing table, 
+/** prints routing table,
 */
 void printTable (ChimeraState * state);
 

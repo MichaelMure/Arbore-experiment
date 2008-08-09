@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2008 Romain Bignon
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,10 +44,10 @@
 #define GRACEPERIOD  30		/* seconds */
 
 
-int ChimeraDHT::encode_hosts (char *s, int size, ChimeraHost ** host)
+size_t ChimeraDHT::encode_hosts (char *s, int size, ChimeraHost ** host) const
 {
 
-    int i, j;
+    size_t i, j;
 
     s[0] = 0;
     for (i = 0; host[i] != NULL; i++)
@@ -55,7 +55,7 @@ int ChimeraDHT::encode_hosts (char *s, int size, ChimeraHost ** host)
 	    j = strlen (s);
 	    host_encode (s + j, size - j, host[i]);
 
-	    log[W_DEBUG] << "ENCODED " << i << " = " << s + j;
+	    pf_log[W_DEBUG] << "ENCODED " << i << " = " << s + j;
 	    strcat (s, "\n");	/* add a spacer */
 	}
 
@@ -68,7 +68,7 @@ ChimeraHost** ChimeraDHT::decode_hosts(char *s)
 
     ChimeraHost **host;
     int hostnum;
-    int i, j, k;
+    size_t i, j, k;
 
     for (i = 0, hostnum = 0; i < strlen (s); i++)
 	{

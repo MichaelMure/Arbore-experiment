@@ -1,8 +1,33 @@
 /*
+ * Copyright(C) 2008 Romain Bignon
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
+ */
+
+/*
 ** $Id: key.h,v 1.16 2006/06/07 09:21:28 krishnap Exp $
 **
 ** Matthew Allen
-** description: 
+** description:
 */
 
 #ifndef _CHIMERA_KEY_H_
@@ -50,7 +75,7 @@ void key_makehash (void *logs, Key * hashed, char *s);
 /* key_make_hash */
 void key_make_hash (Key * hashed, char *s, size_t size);
 
-/* key_init: 
+/* key_init:
 ** initializes Key_Max and Key_Half */
 
 void key_init ();
@@ -97,7 +122,7 @@ void key_assign (Key * k1, Key k2);
 
 void key_assign_ui (Key * k, unsigned long ul);
 
-/* key_equal:k1, k2 
+/* key_equal:k1, k2
 ** return 1 if #k1#==#k2# 0 otherwise*/
 
 int key_equal (Key k1, Key k2);
