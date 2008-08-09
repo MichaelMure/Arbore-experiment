@@ -33,8 +33,9 @@
 #define GOOD_LINK 0.8
 #define BAD_LINK 0.3
 
+class ChimeraDHT;
 
-typedef struct
+class ChimeraHost
 {
     char *name;
     unsigned long address;
@@ -48,26 +49,30 @@ typedef struct
     int success_win_index;
     float success_avg;
     Key key;
-} ChimeraHost;
 
-/** host_get:
- ** gets a host entry for the given host, getting it from the cache if
- ** possible, or alocates memory for it
- */
-ChimeraHost *host_get (ChimeraState * state, char *hn, int port);
+public:
+
+	/** host_get:
+	 ** gets a host entry for the given host, getting it from the cache if
+	 ** possible, or alocates memory for it
+	 */
+	ChimeraHost(ChimeraDHT* state, char *hn, int port);
+
+	/** host_decode:
+	 ** decodes a string into a chimera host structure. This acts as a
+	 ** host_get, and should be followed eventually by a host_release.
+	 */
+	ChimeraHost (ChimeraDHT* state, char *s);
+
+};
+
 
 /** host_release:
  ** releases a host from the cache, declaring that the memory could be
  ** freed any time. returns NULL if the entry is deleted, otherwise it
  ** returns #host#
  */
-void host_release (ChimeraState * state, ChimeraHost * host);
-
-/** host_decode:
- ** decodes a string into a chimera host structure. This acts as a
- ** host_get, and should be followed eventually by a host_release.
- */
-ChimeraHost *host_decode (ChimeraState * state, char *s);
+void host_release (ChimeraDHT * state, ChimeraHost * host);
 
 /** host_encode:
  ** encodes the #host# into a string, putting it in #s#, which has

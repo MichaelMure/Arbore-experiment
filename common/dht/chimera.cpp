@@ -25,6 +25,7 @@
 
 #include "chimera.h"
 #include "pf_log.h"
+#include "network.h"
 
 #define CHIMERA_JOIN       1
 #define CHIMERA_JOIN_ACK   2
@@ -67,7 +68,7 @@ ChimeraHost** ChimeraDHT::decode_hosts(char *s)
 {
 
     ChimeraHost **host;
-    int hostnum;
+    size_t hostnum;
     size_t i, j, k;
 
     for (i = 0, hostnum = 0; i < strlen (s); i++)
@@ -80,7 +81,7 @@ ChimeraHost** ChimeraDHT::decode_hosts(char *s)
     //memset(host, 0, (sizeof(ChimeraHost *) * (hostnum + 1)));
 
     /* gets the number of hosts in the lists and goes through them 1 by 1 */
-    for (i = 0, j = 0, k = 0; i < (int) hostnum; i++)
+    for (i = 0, j = 0, k = 0; i < hostnum; i++)
 	{
 	    while (s[k] != '\n')
 		{

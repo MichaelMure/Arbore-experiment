@@ -37,14 +37,29 @@ typedef void (*chimera_forward_upcall_t) (Key **, Message **, ChimeraHost **);
 typedef void (*chimera_deliver_upcall_t) (Key *, Message *);
 typedef void (*chimera_update_upcall_t) (Key *, ChimeraHost *, int);
 
+typedef struct
+{
+    ChimeraHost *me;
+    ChimeraHost *bootstrap;
+    void *join;			/* semaphore */
+    pthread_mutex_t lock;
+    chimera_forward_upcall_t forward;
+    chimera_deliver_upcall_t deliver;
+    chimera_update_upcall_t update;
+    Sema globalSeqNum;		/* for future security enhancement */
+} ChimeraGlobal;
+
+class HostGlobal;
+
 class ChimeraDHT
 {
 	void *network;
 	void *message;
 	void *route;
 	void *log;
-	void *host;
-	void *chimera;
+	HostGlobal *host;
+	ChimeraGlobal *chimera;
+
 	JRB bootstrapMsgStore;	/* for future security enhancement */
 	pthread_mutex_t bootstrapMutex;	/* for future security enhancement */
 	void *certificateStore;	/* for future security enhancement */
@@ -129,19 +144,5 @@ public:
 	int Ping (ChimeraHost * host);
 
 };
-
-
-typedef struct
-{
-    ChimeraHost *me;
-    ChimeraHost *bootstrap;
-    void *join;			/* semaphore */
-    pthread_mutex_t lock;
-    chimera_forward_upcall_t forward;
-    chimera_deliver_upcall_t deliver;
-    chimera_update_upcall_t update;
-    Sema globalSeqNum;		/* for future security enhancement */
-} ChimeraGlobal;
-
 
 #endif /* _CHIMERA_H_ */
