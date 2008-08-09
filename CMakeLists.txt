@@ -23,6 +23,8 @@ SET(SRC
 	common/files/hdd.cpp
 	common/files/file_entry_base.cpp
 
+	common/dht/chimera.cpp
+
 	common/net/network_base.cpp
 	common/net/peer_base.cpp
 	common/net/peers_list_base.cpp
