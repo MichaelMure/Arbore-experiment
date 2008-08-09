@@ -22,6 +22,7 @@
  */
 
 #include <map>
+#include <list>
 #include <vector>
 #include <iostream>
 #include <stdio.h>
@@ -30,6 +31,7 @@
 #include "xmlrpc.h"
 #include "pf_config.h"
 #include "peer.h"
+#include "cache.h"
 
 #ifdef PF_NET
 #include <pfnet.h>
@@ -142,6 +144,46 @@ public:
 	}
 };
 
+// Method to get file from directory
+int _BrowserReaddir_filler(void *buf, const char *name, const struct stat *stbuf, off_t off)
+{
+	((std::list<std::string> *)buf)->push_back(std::string(name));
+	return 0;
+}
+
+class _BrowserReaddir : public XmlRpcServerMethod
+{
+public:
+	_BrowserReaddir(XmlRpcServer* s) : XmlRpcServerMethod("browser.readdir", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
+	{
+		// Check we have a valid string
+		std::string s_path = params[0];
+		if(s_path == "")
+			s_path = "/";
+
+		std::list<std::string> data;
+		try
+		{
+			cache.FillReadDir(s_path.c_str(), (void*)&data, _BrowserReaddir_filler, 0, NULL);
+		}
+		catch (...)
+		{
+			result = false;
+			return;
+		}
+
+		int index = 0;
+		while (data.size())
+		{
+			result[index++] = *(data.begin());
+			data.pop_front();
+		}
+
+	}
+};
+
 XmlRpcThread::XmlRpcThread()
 {
 	port = 1772;
@@ -167,6 +209,7 @@ void XmlRpcThread::OnStart()
 	methods.push_back(new _PfInfos(&s));
 	methods.push_back(new _PeersList(&s));
 	methods.push_back(new _PeersInfo(&s));
+	methods.push_back(new _BrowserReaddir(&s));
 
 	// Bind
 	started = true;
