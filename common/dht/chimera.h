@@ -56,23 +56,24 @@ class ChimeraDHT
 	void *network;
 	void *message;
 	void *route;
-	void *log;
 	HostGlobal *host;
-	ChimeraGlobal *chimera;
 
 	JRB bootstrapMsgStore;	/* for future security enhancement */
 	pthread_mutex_t bootstrapMutex;	/* for future security enhancement */
 	void *certificateStore;	/* for future security enhancement */
 	pthread_mutex_t certificateMutex;	/* for future security enhancement */
 
-	size_t encode_hosts(char* s, int size, ChimeraHost** host) const;
+	size_t encode_hosts(char* s, size_t size, ChimeraHost** host) const;
 
 	ChimeraHost** decode_hosts(char* s);
 
 	void send_rowinfo(Message* message);
 
+	void join_complete(ChimeraHost* host);
+
 public:
 
+	ChimeraGlobal *chimera;
 	/**
 	 ** chimera_init: port
 	 **  Initialize Chimera on port port and returns the ChimeraState * which

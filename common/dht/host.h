@@ -28,6 +28,8 @@
 
 #include "key.h"
 #include "jrb.h"
+#include "mutex.h"
+#include "dllist.h"
 
 #define SUCCESS_WINDOW 20
 #define GOOD_LINK 0.8
@@ -35,60 +37,74 @@
 
 class ChimeraDHT;
 
-class ChimeraHost
+class HostGlobal : public Mutex
 {
-    char *name;
-    unsigned long address;
-    int failed;
-    double failuretime;
-    int port;
-    double latency;
-    double loss;
-    double success;
-    int success_win[SUCCESS_WINDOW];
-    int success_win_index;
-    float success_avg;
-    Key key;
+	JRB hosts;
+	Dllist free;
+	int size;
+	int max;
 
 public:
+
+	/** host_init:
+	 ** initialize a host struct with a #size# element cache.
+	 */
+	HostGlobal(size_t size);
 
 	/** host_get:
 	 ** gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
-	ChimeraHost(ChimeraDHT* state, char *hn, int port);
+	ChimeraHost* GetHost(ChimeraDHT* dht, char* hn, int port);
 
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
-	ChimeraHost (ChimeraDHT* state, char *s);
+	ChimeraHost* DecodeHost (ChimeraDHT* state, char *s);
 
+	/** host_release:
+	 ** releases a host from the cache, declaring that the memory could be
+	 ** freed any time. returns NULL if the entry is deleted, otherwise it
+	 ** returns #host#
+	 */
+	void host_release (ChimeraHost* host);
 };
 
+class ChimeraHost
+{
+	char *name;
+	unsigned long address;
+	int failed;
+	double failuretime;
+	int port;
+	double latency;
+	double loss;
+	double success;
+	int success_win[SUCCESS_WINDOW];
+	int success_win_index;
+	float success_avg;
+	Key key;
 
-/** host_release:
- ** releases a host from the cache, declaring that the memory could be
- ** freed any time. returns NULL if the entry is deleted, otherwise it
- ** returns #host#
- */
-void host_release (ChimeraDHT * state, ChimeraHost * host);
+public:
 
-/** host_encode:
- ** encodes the #host# into a string, putting it in #s#, which has
- ** #len# bytes in it.
- */
-void host_encode (char *s, size_t len, ChimeraHost * host);
+	/** host_encode:
+	 ** encodes the #host# into a string, putting it in #s#, which has
+	 ** #len# bytes in it.
+	 */
+	void Encode(char *s, size_t len) const;
 
-/** host_update_stat:
- ** updates the success rate to the host based on the SUCCESS_WINDOW average
- */
-void host_update_stat (ChimeraHost * host, int success);
+	/** host_update_stat:
+	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
+	 */
+	void UpdateStat (int success);
 
-/** host_init:
- ** initialize a host struct with a #size# element cache.
- */
-void *host_init (void *logs, size_t size);
+	const Key& GetKey() const { return key; }
+	const char* GetName() const { return name; }
+	int GetPort() const { return port; }
+	double GetFailureTime() const { return failuretime; }
+	void SetFailureTime(double f) { failuretime = f; }
 
+};
 
 #endif /* _HOST_H_ */
