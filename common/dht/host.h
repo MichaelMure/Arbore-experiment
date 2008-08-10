@@ -30,6 +30,7 @@
 #include "jrb.h"
 #include "mutex.h"
 #include "dllist.h"
+#include "pf_log.h"
 
 #define SUCCESS_WINDOW 20
 #define GOOD_LINK 0.8
@@ -68,7 +69,7 @@ public:
 	 ** freed any time. returns NULL if the entry is deleted, otherwise it
 	 ** returns #host#
 	 */
-	void host_release (ChimeraHost* host);
+	void Release(ChimeraHost* host);
 };
 
 class ChimeraHost
@@ -104,7 +105,16 @@ public:
 	int GetPort() const { return port; }
 	double GetFailureTime() const { return failuretime; }
 	void SetFailureTime(double f) { failuretime = f; }
+	float GetSuccessAvg() const { return success_avg; }
 
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <const ChimeraHost&> (const ChimeraHost& host)
+{
+	str += std::string(host.GetName()) + ":" + TypToStr(host.GetPort());
+	return *this;
+}
+
 
 #endif /* _HOST_H_ */

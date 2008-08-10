@@ -68,8 +68,16 @@ class ChimeraDHT
 	ChimeraHost** decode_hosts(char* s);
 
 	void send_rowinfo(Message* message);
+	void message (Message * message);
 
 	void join_complete(ChimeraHost* host);
+
+	static void *check_leafset (void *chstate);
+
+	int check_leafset_init();
+
+	void join_denied(Message* m);
+	void join_acknowledged(Message* m);
 
 public:
 
