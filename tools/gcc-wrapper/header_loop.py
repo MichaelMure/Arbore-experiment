@@ -22,7 +22,7 @@ def check_loop(file, top = False):
 		f = open(file)
 	except IOError:
 		pass
-	
+
 	if not f:
 		for inc_dir in include_dirs:
 			try:
@@ -46,7 +46,7 @@ def check_loop(file, top = False):
 				if file in ignore_list and m.group(1) in ignore_list[file]:
 					continue
 
-				print "Dependencie loop detected:", arg[0], "->", file
+				print "Dependencie loop detected:", filename, "->", file
 				return True
 
 			includes.append(m.group(1))
