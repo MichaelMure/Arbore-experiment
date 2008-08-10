@@ -23,6 +23,7 @@
  *
  */
 
+#include "route.h"
 #include "chimera.h"
 #include "pf_log.h"
 #include "network.h"

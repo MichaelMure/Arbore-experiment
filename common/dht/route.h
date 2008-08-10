@@ -26,7 +26,6 @@
 #ifndef _CHIMERA_ROUTE_H_
 #define _CHIMERA_ROUTE_H_
 
-#include "chimera.h"
 #include "semaphore.h"
 #include "key.h"
 
@@ -35,6 +34,8 @@
 #define MAX_ENTRY 3
 #define LEAFSET_SIZE 8		/* (must be even) excluding node itself */
 
+class ChimeraHost;
+class ChimeraDHT;
 
 typedef struct
 {
@@ -61,7 +62,7 @@ void *route_init (ChimeraHost * me);
 ** message being routed to key. is_save is ignored for now.
  */
 
-ChimeraHost **route_lookup (ChimeraState * state, Key key, int count,
+ChimeraHost **route_lookup (ChimeraDHT * state, Key key, int count,
 			    int is_safe);
 
 
@@ -69,7 +70,7 @@ ChimeraHost **route_lookup (ChimeraState * state, Key key, int count,
 ** returns an array of count neighbor nodes with priority to closer nodes.
 */
 
-ChimeraHost **route_neighbors (ChimeraState * state, int count);
+ChimeraHost **route_neighbors (ChimeraDHT * state, int count);
 
 
 /** route_update:
@@ -79,24 +80,24 @@ ChimeraHost **route_neighbors (ChimeraState * state, int count);
 ** then it is removed from the routing tables.
 */
 
-void route_update (ChimeraState * state, ChimeraHost * host, int joined);
+void route_update (ChimeraDHT * state, ChimeraHost * host, int joined);
 
 
 /** route_row_lookup:
 ** return the row in the routing table that matches the longest prefix with key.
 */
 
-ChimeraHost **route_row_lookup (ChimeraState * state, Key key);
+ChimeraHost **route_row_lookup (ChimeraDHT * state, Key key);
 
 
 /** route_get_table:
 ** returns all the entries in the routing table in an array of ChimeraHost.
 */
 
-ChimeraHost **route_get_table (ChimeraState * state);
+ChimeraHost **route_get_table (ChimeraDHT * state);
 
 /** prints routing table,
 */
-void printTable (ChimeraState * state);
+void printTable (ChimeraDHT * state);
 
 #endif /* _CHIMERA_ROUTE_H_ */
