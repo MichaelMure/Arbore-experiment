@@ -40,8 +40,8 @@ message.c     [M]     :functions to send and receive a message
 message.h     [M]     :functions to send and receive a message
 network.c     [C]     :network functions
 network.h     [C]     :network functions
-priqueue.c    [?]     :what is it?
-priqueue.h    [?]     :what is it?
+priqueue.c    [-]     :priority queue (not used by chimera)
+priqueue.h    [-]     :priority queue (not used by chimera)
 route.c       [+]     :the routing protocol
 route.h       [+]     :the routing protocol
 semaphore.c   [C]     :semaphore implementation
@@ -53,3 +53,7 @@ Notes:*
 ******
 
 - The ChimeraState class is now ChimeraDHT.
+
+- Chimera uses the UDP network layer to send and receive messages... Why?
+- Do we use the peerfuse scheduler (in only one thread), or keep all Chimera's threads?
+  We can also extend the peerfuse scheduler to create several instances and queues..

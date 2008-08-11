@@ -65,10 +65,10 @@ typedef void (*messagehandler_t) (ChimeraDHT *, Message *);
 
 class MessageGlobal : protected Mutex
 {
-    JRB handlers;
-    void *jobq;
-    pthread_attr_t attr;
-    pthread_mutex_t lock;
+	JRB handlers;
+	void *jobq;
+	pthread_attr_t attr;
+	pthread_mutex_t lock;
 
 public:
 
@@ -78,7 +78,7 @@ public:
 	 ** contains global state of message subsystem.
 	 ** message_init also initiate the network subsystem
 	 */
-	void *message_init (void *chstate, int port);
+	MessageGlobal(void *chstate, int port);
 
 	/**
 	 ** message_received:
