@@ -18,14 +18,16 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <map>
 #include <iostream>
 #include <stdio.h>
 #include <pthread.h>
+#include <errno.h>
 #include <assert.h>
+#include <cstring>
 #include "mutex.h"
 
 void Mutex::Init(MutexType _type)
@@ -34,28 +36,42 @@ void Mutex::Init(MutexType _type)
 	type = _type;
 
 	pthread_mutexattr_t attr;
-	pthread_mutexattr_init(&attr);
+	if(pthread_mutexattr_init(&attr) != 0)
+	{
+		std::cerr << "pthread_attr_init: " << strerror(errno);
+		throw MutexError();
+	}
 
 	switch(type)
 	{
 		case NORMAL_MUTEX:
 			//#ifdef DEBUG
-			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK);
+			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK) != 0)
+			{
+				std::cerr << "pthread_mutexattr_settype: " << strerror(errno);
+				throw MutexError();
+			}
 			//#else
 			//		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
 			//#endif
 			break;
 		case RECURSIVE_MUTEX:
-			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+
+			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0)
+			{
+				std::cerr << "pthread_mutexattr_settype: " << strerror(errno);
+				throw MutexError();
+			}
 			break;
 		default:
 			assert(false);
 	}
 
-	int r = pthread_mutex_init(mutex, &attr );
-	assert(r == 0);
-
-	pthread_mutexattr_destroy(&attr);
+	if(pthread_mutex_init(mutex, &attr) != 0)
+	{
+		std::cerr << "pthread_mutex_init: " << strerror(errno);
+		throw MutexError();
+	}
 }
 
 Mutex::Mutex(MutexType type)
@@ -70,7 +86,9 @@ Mutex::Mutex(const Mutex& m)
 
 Mutex::~Mutex()
 {
+	pthread_mutexattr_destroy(attr);
 	pthread_mutex_destroy(mutex);
+	delete attr;
 	delete mutex;
 }
 
@@ -78,7 +96,8 @@ void Mutex::Lock() const
 {
 	int res = pthread_mutex_lock(mutex);
 	//assert(res == 0);
-	if(res)					  // Don't use pf_log[] !
+	/* Don't use pf_log, because it locks the stdout mutex. */
+	if(res)
 		std::cerr << "Failed to lock " << this;
 }
 
@@ -86,6 +105,7 @@ void Mutex::Unlock() const
 {
 	int res = pthread_mutex_unlock(mutex);
 	//assert(res == 0);
-	if(res)					  // Don't use pf_log[] !
+	/* Don't use pf_log, because it locks the stdout mutex. */
+	if(res)
 		std::cerr << "Failed to unlock " << this;
 }
