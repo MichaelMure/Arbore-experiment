@@ -14,8 +14,9 @@ peerfuse-client.py localhost 1778
 Where can i have known commands ?
 ---------------------------------
 
-Here is the list of known commands :
+Here ! Take a look :
 - exit : exit the shell
 - help : display help of all commands
 - connect : connect to another dameon
 - plist : display list of peers
+- ls : listing file in directory
