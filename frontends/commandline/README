@@ -20,3 +20,4 @@ Here ! Take a look :
 - connect : connect to another dameon
 - plist : display list of peers
 - ls : listing file in directory
+- pwd : show current directory
