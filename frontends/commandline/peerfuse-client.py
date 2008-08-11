@@ -150,8 +150,7 @@ class PeerfuseInterpretor(cmd.Cmd):
 				# Read file in directory
 				files = self.proxy.browser.readdir(path)
 				if type(files) != list:
-					print 'ls: can\'t access to %s: no such file or directory' % path
-					continue
+					files = {}
 
 				print 'total %d' % (len(files))
 
