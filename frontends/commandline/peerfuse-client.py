@@ -57,6 +57,10 @@ class PeerfuseInterpretor(cmd.Cmd):
 		print
 		return -1
 
+	def do_pwd(self, arg):
+		"""\nShow the current directory\n"""
+		print self.cwd
+
 	def do_ls(self, arg):
 		"""\nShow content of current directory
 		-l : long listing format
