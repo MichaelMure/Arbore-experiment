@@ -36,8 +36,8 @@ key.c         [-]     :key used to represent a peer or a file
 key.h         [-]     :key used to represent a peer or a file
 log.c         [-]     :logging functions
 log.h         [-]     :logging functions
-message.c     [+]     :functions to send and receive a message
-message.h     [+]     :functions to send and receive a message
+message.c     [M]     :functions to send and receive a message
+message.h     [M]     :functions to send and receive a message
 network.c     [C]     :network functions
 network.h     [C]     :network functions
 priqueue.c    [?]     :what is it?

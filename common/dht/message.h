@@ -36,14 +36,15 @@
 #include "key.h"
 #include "host.h"
 #include "jrb.h"
-#include "include.h"
+#include "mutex.h"
+#include "pf_thread.h"
 
 #define DEFAULT_SEQNUM 0
 #define RETRANSMIT_THREAD_SLEEP 1
 #define RETRANSMIT_INTERVAL 1
 #define MAX_RETRY 3
 
-typedef struct
+class Message
 {
     Key dest;
     int type;			/* message type */
@@ -51,49 +52,67 @@ typedef struct
     char *payload;
     Key source;			/* for future security enhancement */
     unsigned long seqNum;	/* for future security enhancement */
-} Message;
+
+public:
+
+	const char* GetPayload() const { return payload; }
+	int GetType() const { return type; }
+	const Key* GetDest() const { return &dest; }
+};
 
 
 typedef void (*messagehandler_t) (ChimeraDHT *, Message *);
 
-/**
- ** message_init: chstate, port
- ** Initialize messaging subsystem on port and returns the MessageGlobal * which
- ** contains global state of message subsystem.
- ** message_init also initiate the network subsystem
- */
-void *message_init (void *chstate, int port);
+class MessageGlobal : protected Mutex
+{
+    JRB handlers;
+    void *jobq;
+    pthread_attr_t attr;
+    pthread_mutex_t lock;
 
-/**
- ** message_received:
- ** is called by network_activate and will be passed received data and size from socket
- **
- */
-void message_received (void *chstate, char *data, size_t size);
+public:
 
-/**
- ** registers the handler function #func# with the message type #type#,
- ** it also defines the acknowledgment requirement for this type
- */
-void message_handler (void *chstate, int type, messagehandler_t func,
-		      int ack);
+	/**
+	 ** message_init: chstate, port
+	 ** Initialize messaging subsystem on port and returns the MessageGlobal * which
+	 ** contains global state of message subsystem.
+	 ** message_init also initiate the network subsystem
+	 */
+	void *message_init (void *chstate, int port);
 
-/**
- ** message_send:
- ** sendt the message to destination #host# the retry arg indicates to the network
- ** layer if this message should be ackd or not
- */
-int message_send (void *chstate, ChimeraHost * host, Message * message,
-		  Bool retry);
+	/**
+	 ** message_received:
+	 ** is called by network_activate and will be passed received data and size from socket
+	 **
+	 */
+	void message_received (void *chstate, char *data, size_t size);
 
-/**
- ** message_create:
- ** creates the message to the destination #dest# the message format would be like:
- **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
- **
- */
-Message *message_create (Key dest, int type, size_t size, char *payload);
+	/**
+	 ** registers the handler function #func# with the message type #type#,
+	 ** it also defines the acknowledgment requirement for this type
+	 */
+	void message_handler (void *chstate, int type, messagehandler_t func,
+			      int ack);
 
-void message_free(Message* msg);
+	/**
+	 ** message_send:
+	 ** sendt the message to destination #host# the retry arg indicates to the network
+	 ** layer if this message should be ackd or not
+	 */
+	int message_send (void *chstate, ChimeraHost * host, Message * message,
+			  bool retry);
+
+	/**
+	 ** message_create:
+	 ** creates the message to the destination #dest# the message format would be like:
+	 **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
+	 **
+	 */
+	Message *message_create (Key dest, int type, size_t size, char *payload);
+
+	void message_free(Message* msg);
+
+};
+
 
 #endif /* _CHIMERA_MESSAGE_H_ */

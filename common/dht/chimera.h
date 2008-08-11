@@ -30,12 +30,14 @@
 #include "key.h"
 #include "log.h"
 #include <pthread.h>
-#include "message.h"
 #include "semaphore.h"
 
-typedef void (*chimera_forward_upcall_t) (Key **, Message **, ChimeraHost **);
-typedef void (*chimera_deliver_upcall_t) (Key *, Message *);
-typedef void (*chimera_update_upcall_t) (Key *, ChimeraHost *, int);
+class Message;
+class HostGlobal;
+
+typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost **);
+typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
+typedef void (*chimera_update_upcall_t) (const Key *, ChimeraHost *, int);
 
 typedef struct
 {
@@ -48,8 +50,6 @@ typedef struct
     chimera_update_upcall_t update;
     Sema globalSeqNum;		/* for future security enhancement */
 } ChimeraGlobal;
-
-class HostGlobal;
 
 class ChimeraDHT
 {
@@ -65,10 +65,10 @@ class ChimeraDHT
 
 	size_t encode_hosts(char* s, size_t size, ChimeraHost** host) const;
 
-	ChimeraHost** decode_hosts(char* s);
+	ChimeraHost** decode_hosts(const char* s);
 
 	void send_rowinfo(Message* message);
-	void message (Message * message);
+	void route_message (Message * message);
 
 	void join_complete(ChimeraHost* host);
 
@@ -100,7 +100,7 @@ public:
 	 * Send a message msg through the system to key. hint is currently
 	 * ignored, but it will one day be the next hop
 	*/
-	void Route (Key * key, Message * msg,
+	void Route (const Key * key, Message * msg,
 			    ChimeraHost * hint);
 
 	/**

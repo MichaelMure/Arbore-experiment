@@ -62,7 +62,7 @@ public:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
-	ChimeraHost* DecodeHost (ChimeraDHT* state, char *s);
+	ChimeraHost* DecodeHost (ChimeraDHT* state, const char *s);
 
 	/** host_release:
 	 ** releases a host from the cache, declaring that the memory could be

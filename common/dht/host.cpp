@@ -69,12 +69,13 @@ HostGlobal::HostGlobal(int size)
  ** decodes a string into a chimera host structure. This acts as a
  ** host_get, and should be followed eventually by a host_release.
  */
-ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, char *s)
+ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, const char *hostname)
 {
 	char *key = NULL, *name = NULL, *port = NULL;
 	ChimeraHost *host;
 	int i;
 	Key k;
+	char* s = strdup(hostname);
 
 	/* hex representation of key in front bytes */
 	key = s;
@@ -99,6 +100,8 @@ ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, char *s)
 
 	if (key_equal_ui (host->key, 0))
 		key_assign (&(host->key), k);
+
+	free(s);
 
 	return (host);
 
