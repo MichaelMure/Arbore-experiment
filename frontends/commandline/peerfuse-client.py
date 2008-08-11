@@ -61,6 +61,29 @@ class PeerfuseInterpretor(cmd.Cmd):
 		"""\nShow the current directory\n"""
 		print self.cwd
 
+	def do_cd(self, arg):
+		"""\nChange the current path\n"""
+		arg = [a for a in arg.split(' ') if a != '']
+		if len(arg) < 1:
+			return
+		try:
+			path = arg[0]
+			if not path.startswith('/'):
+				path = os.path.join(self.cwd, arg[0])
+			path = os.path.normpath(path)
+
+			stat = self.proxy.browser.getattr(path)
+			if type(stat) != dict:
+				print 'cd: %s: no such file or directory' % path
+			elif not S_ISDIR(stat['mode']):
+				print 'cd: %s: not a directory' % path
+			else:
+				self.cwd = path
+				self.__set_prompt()
+		except Exception, e:
+			print 'Error: ' + str(e)
+			return
+
 	def do_ls(self, arg):
 		"""\nShow content of current directory
 		-l : long listing format

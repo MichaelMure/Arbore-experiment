@@ -21,3 +21,4 @@ Here ! Take a look :
 - plist : display list of peers
 - ls : listing file in directory
 - pwd : show current directory
+- cd : change current directory
