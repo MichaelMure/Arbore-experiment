@@ -72,6 +72,7 @@ void Mutex::Init(MutexType _type)
 		std::cerr << "pthread_mutex_init: " << strerror(errno);
 		throw MutexError();
 	}
+	pthread_mutexattr_destroy(&attr);
 }
 
 Mutex::Mutex(MutexType type)
@@ -86,9 +87,7 @@ Mutex::Mutex(const Mutex& m)
 
 Mutex::~Mutex()
 {
-	pthread_mutexattr_destroy(attr);
 	pthread_mutex_destroy(mutex);
-	delete attr;
 	delete mutex;
 }
 

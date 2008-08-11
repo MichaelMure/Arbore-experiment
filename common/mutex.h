@@ -24,6 +24,7 @@
 #ifndef MUTEX_H
 #define MUTEX_H
 #include <pthread.h>
+
 enum MutexType
 {
 	NORMAL_MUTEX,
@@ -34,7 +35,6 @@ class Mutex
 {
 private:
 	pthread_mutex_t* mutex;
-	pthread_mutexattr_t* attr;
 
 	MutexType type;
 
