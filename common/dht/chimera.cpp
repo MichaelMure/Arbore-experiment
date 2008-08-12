@@ -350,7 +350,7 @@ void ChimeraDHT::Route(const Key * key, Message * message,
     ChimeraHost **tmp;
     //ChimeraHost **piggy;
     Message *real;
-    /* unused?
+    /* unused? -romain
      * unsigned long size;
      * char s[NETWORK_PACK_SIZE];
      */

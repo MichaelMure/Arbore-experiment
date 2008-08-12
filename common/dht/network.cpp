@@ -1,9 +1,27 @@
 /*
-** $Id: network.c,v 1.30 2007/04/04 00:04:49 krishnap Exp $
-**
-** Matthew Allen
-** description: 
-*/
+ * Copyright(C) 2008 Romain Bignon
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
+ */
 
 #include <stdio.h>
 #include <unistd.h>
@@ -29,14 +47,6 @@
 extern int errno;
 #define SEND_SIZE NETWORK_PACK_SIZE
 
-typedef struct
-{
-    int sock;
-    JRB waiting;
-    unsigned long seqstart, seqend;
-    pthread_mutex_t lock;
-	JRB retransmit;
-} NetworkGlobal;
 
 // allocate a new pointer and return it
 PQEntry* get_new_pqentry()
@@ -116,70 +126,7 @@ unsigned long network_address (void *networkglobal, char *hostname)
 
 }
 
-/** network_init:
- ** initiates the networking layer by creating socket and bind it to #port# 
- */
 
-void *network_init (void *logs, int port)
-{
-    int sd;
-    int ret;
-    struct sockaddr_in saddr;
-    int one;
-    NetworkGlobal *ng;
-
-    ng = (NetworkGlobal *) malloc (sizeof (NetworkGlobal));
-
-    /* create socket */
-    sd = socket (AF_INET, SOCK_DGRAM, 0);
-    if (sd < 0)
-	{
-	    if (LOGS)
-	      log_message (logs, LOG_ERROR, "network: socket: %s\n",
-			   strerror (errno));
-	    return (NULL);
-	}
-    if (setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, (void *) &one, sizeof (one))
-	== -1)
-	{
-	    if (LOGS)
-	      log_message (logs, LOG_ERROR, "network: setsockopt: %s\n: ",
-			   strerror (errno));
-	    close (sd);
-	    return (NULL);
-	}
-
-    /* attach socket to #port#. */
-    saddr.sin_family = AF_INET;
-    saddr.sin_addr.s_addr = htonl (INADDR_ANY);
-    saddr.sin_port = htons ((short) port);
-    if (bind (sd, (struct sockaddr *) &saddr, sizeof (saddr)) < 0)
-	{
-	    if (LOGS)
-	      log_message (logs, LOG_ERROR, "network: bind: %s:\n",
-			   strerror (errno));
-	    close (sd);
-	    return (NULL);
-	}
-
-    if ((ret = pthread_mutex_init (&(ng->lock), NULL)) != 0)
-	{
-	    if (LOGS)
-	      log_message (logs, LOG_ERROR,
-			   "network: pthread_mutex_init: %s:\n",
-			   strerror (ret));
-	    close (sd);
-	    return (NULL);
-	}
-
-    ng->sock = sd;
-    ng->waiting = make_jrb();
-    ng->seqstart = 0;
-    ng->seqend = 0;
-	ng->retransmit = make_jrb();
-
-    return ((void *) ng);
-}
 
 /** Never returns. Keep retransmitting the failed packets.
  **/
@@ -218,7 +165,7 @@ void *retransmit_packets(void *state)
 					resend = 1;
 					//jrb_insert_dbl(tempjrb, pqnode->key.d, new_jval_v(pqentry));-- to try doing send outside the lock block
 					double transmittime = dtime();
-					network_resend(state, pqentry->desthost, pqentry->data, pqentry->datasize, 1, pqentry->seqnum, &transmittime); 
+					network_resend(state, pqentry->desthost, pqentry->data, pqentry->datasize, 1, pqentry->seqnum, &transmittime);
 					pqentry->retry = pqentry->retry + 1;
 					if (pqentry->retry < MAX_RETRY)
 					{
@@ -249,7 +196,7 @@ void *retransmit_packets(void *state)
 					// packet is acked;
 					// update the host latency and the success measurements
 					host_update_stat (pqentry->desthost, 1);
-					double latency = ackentry->acktime - pqentry->transmittime; 
+					double latency = ackentry->acktime - pqentry->transmittime;
 					if(latency > 0)
 					{
 						//kpkp - debug enable
@@ -281,7 +228,7 @@ void *retransmit_packets(void *state)
 		   for(pqnode = jrb_first(tempjrb); pqnode != jrb_nil(tempjrb); pqnode = jrb_next(pqnode))
 		   {
 		   pqentry = (PQEntry *) pqnode->val.v;
-		   network_resend(state, pqentry->desthost, pqentry->data, pqentry->datasize, 1, pqentry->seqnum); 
+		   network_resend(state, pqentry->desthost, pqentry->data, pqentry->datasize, 1, pqentry->seqnum);
 		   jrb_delete_node(pqnode);
 		   }
 		 */
@@ -291,7 +238,7 @@ void *retransmit_packets(void *state)
 }
 
 /**
- ** network_activate: 
+ ** network_activate:
  ** NEVER RETURNS. Puts the network layer into listen mode. This thread
  ** manages acknowledgements, delivers incomming messages to the message
  ** handler, and drives the network layer. It should only be called once.
@@ -407,50 +354,88 @@ void *network_activate (void *state)
 	}
 }
 
+/** network_init:
+ ** initiates the networking layer by creating socket and bind it to #port#
+ */
+
+NetworkGlobal::NetworkGlobal(int port)
+{
+	int sd;
+	int ret;
+	struct sockaddr_in saddr;
+	int one;
+
+	/* create socket */
+	sd = socket (AF_INET, SOCK_DGRAM, 0);
+	if (sd < 0)
+	{
+		log[W_ERR] << "network: socket: " << strerror (errno);
+		assert (1 == 0);
+	}
+	if (setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, (void *) &one, sizeof (one)) == -1)
+	{
+		log[W_ERR] << "network: setsockopt: " << strerror (errno);
+		close (sd);
+		assert (1 == 0);
+	}
+
+	/* attach socket to #port#. */
+	saddr.sin_family = AF_INET;
+	saddr.sin_addr.s_addr = htonl (INADDR_ANY);
+	saddr.sin_port = htons ((short) port);
+	if (bind (sd, (struct sockaddr *) &saddr, sizeof (saddr)) < 0)
+	{
+		log[W_ERR] << "network: bind: " << strerror (errno);
+		close (sd);
+		assert(1 == 0);
+	}
+
+	this->sock = sd;
+	this->waiting = make_jrb();
+	this->seqstart = 0;
+	this->seqend = 0;
+	this->retransmit = make_jrb();
+}
+
 /**
  ** network_send: host, data, size
  ** Sends a message to host, updating the measurement info.
  */
-int network_send (void *state, ChimeraHost * host, char *data, int size,
+int NetworkGlobal::network_send (ChimeraHost * host, char *data, int size,
 		  unsigned long ack)
 {
-    struct sockaddr_in to;
-    int ret, retval;
-    unsigned long seq, seqnumbackup, ntype;
+	struct sockaddr_in to;
+	int ret, retval;
+	unsigned long seq, seqnumbackup, ntype;
 	int sizebackup;
-    char s[SEND_SIZE];
-    void *semaphore;
-    JRB node;
+	char s[SEND_SIZE];
+	void *semaphore;
+	JRB node;
 	JRB priqueue;
-    double start;
-    ChimeraState *chstate = (ChimeraState *) state;
-    NetworkGlobal *ng;
+	double start;
+	ChimeraState *chstate = (ChimeraState *) state;
+	NetworkGlobal *ng;
 
-    ng = (NetworkGlobal *) chstate->network;
+	ng = (NetworkGlobal *) chstate->network;
 
-    if (size > NETWORK_PACK_SIZE)
+	if (size > NETWORK_PACK_SIZE)
 	{
-	    if (LOGS)
-	      log_message (chstate->log, LOG_ERROR,
-			   "network_send: cannot send data over %lu bytes!\n",
-			   NETWORK_PACK_SIZE);
-	    return (0);
+		log[W_ERR] << "network_send: cannot send data over " << NETWORK_PACK_SIZE << " bytes!";
+		return (0);
 	}
-    if (ack != 1 && ack != 2)
+	if (ack != 1 && ack != 2)
 	{
-	    if (LOGS)
-	      log_message (chstate->log, LOG_ERROR,
-			   "network_send: FAILED, unexpected message ack property %i !\n", ack);
-	    return (0);
+		log[W_ERR] << "network_send: FAILED, unexpected message ack property " << ack << " !";
+		return (0);
 	}
-    memset (&to, 0, sizeof (to));
-    to.sin_family = AF_INET;
-    to.sin_addr.s_addr = host->address;
-    to.sin_port = htons ((short) host->port);
+	memset (&to, 0, sizeof (to));
+	to.sin_family = AF_INET;
+	to.sin_addr.s_addr = host->address;
+	to.sin_port = htons ((short) host->port);
 
-    AckEntry *ackentry = get_new_ackentry();
+	AckEntry *ackentry = get_new_ackentry();
 	sizebackup = size;
-    /* get sequence number and initialize acknowledgement indicator*/
+	/* get sequence number and initialize acknowledgement indicator*/
 	pthread_mutex_lock (&(ng->lock));
 	node = jrb_insert_int (ng->waiting, ng->seqend, new_jval_v(ackentry));
 	seqnumbackup = ng->seqend;
@@ -458,36 +443,30 @@ int network_send (void *state, ChimeraHost * host, char *data, int size,
 	ng->seqend++;		/* needs to be fixed to modplus */
 	pthread_mutex_unlock (&(ng->lock));
 
-    /* create network header */
-    ntype = htonl (ack);
-    memcpy (s, &ntype, sizeof (unsigned long));
-    memcpy (s + sizeof (unsigned long), &seq, sizeof (unsigned long));
-    memcpy (s + (2 * sizeof (unsigned long)), data, size);
-    size += (2 * sizeof (unsigned long));
+	/* create network header */
+	ntype = htonl (ack);
+	memcpy (s, &ntype, sizeof (unsigned long));
+	memcpy (s + sizeof (unsigned long), &seq, sizeof (unsigned long));
+	memcpy (s + (2 * sizeof (unsigned long)), data, size);
+	size += (2 * sizeof (unsigned long));
 
-    /* send data */
-    seq = ntohl (seq);
-    if (LOGS)
-      log_message (chstate->log, LOG_NETWORKDEBUG,
-		   "network_send: sending message seq=%d ack=%d to %s:%d  data:%s\n",
-		   seq, ack, host->name, host->port, data);
-    start = dtime ();
+	/* send data */
+	seq = ntohl (seq);
+	log[W_DEBUG] << "network_send: sending message seq=" << seq << " ack=" << ack
+		                                     " to " << *host << " data:" << data;
+	start = dtime ();
 
-    ret = sendto (ng->sock, s, size, 0, (struct sockaddr *) &to, sizeof (to));
-    if (LOGS)
-      log_message (chstate->log, LOG_NETWORKDEBUG,
-		   "network_send: sent message: %s\n", s);
+	ret = sendto (ng->sock, s, size, 0, (struct sockaddr *) &to, sizeof (to));
+	log[W_DEBUG] << "network_send: sent message: " << s;
 
-    if (ret < 0)
+	if (ret < 0)
 	{
-	    if (LOGS)
-	      log_message (chstate->log, LOG_ERROR,
-			   "network_send: sendto: %s\n", strerror (errno));
-	    host_update_stat (host, 0);
-	    return (0);
+		log[W_ERR] << "network_send: sendto: " << strerror (errno);
+		host_update_stat (host, 0);
+		return (0);
 	}
 
-    if (ack == 1)
+	if (ack == 1)
 	{
 		// insert a record into the priority queue with the following information:
 		// key: starttime + next retransmit time
@@ -505,52 +484,52 @@ int network_send (void *state, ChimeraHost * host, char *data, int size,
 		pthread_mutex_unlock (&(ng->lock));
 
 		//kpkp - enable
-	    // fprintf(stderr, "network_send: sent seq=%d; inserted entry into the retransmit priqueue with time %f\n", pqrecord->seqnum, start+1);
+		// fprintf(stderr, "network_send: sent seq=%d; inserted entry into the retransmit priqueue with time %f\n", pqrecord->seqnum, start+1);
 
-	    // wait for ack  
-		/* // This code is for the semaphore implmentation -- this should be deleted once 
+		// wait for ack
+		/* // This code is for the semaphore implmentation -- this should be deleted once
 		   // the priority queue is well tested and stabilized
 
-	    if (LOGS)
-	      log_message (chstate->log, LOG_NETWORKDEBUG,
+		if (LOGS)
+		  log_message (chstate->log, LOG_NETWORKDEBUG,
 			   "network_send: waiting for acknowledgement for seq=%d\n",
 			   seq);
-	    retval = sema_p (semaphore, TIMEOUT);
-	    if (LOGS) {
-	      if (retval != 0)
+		retval = sema_p (semaphore, TIMEOUT);
+		if (LOGS) {
+		  if (retval != 0)
 		log_message (chstate->log, LOG_NETWORKDEBUG,
-			     "network_send: acknowledgement timer seq=%d TIMEDOUT\n",
-			     seq);
-	      else
+				 "network_send: acknowledgement timer seq=%d TIMEDOUT\n",
+				 seq);
+		  else
 		log_message (chstate->log, LOG_NETWORKDEBUG,
-			     "network_send: acknowledgement for seq=%d received\n",
-			     seq);
-	    }
-	    pthread_mutex_lock (&(ng->lock));
-	    sema_destroy (semaphore);
-	    jrb_delete_node (node);
-	    pthread_mutex_unlock (&(ng->lock));
+				 "network_send: acknowledgement for seq=%d received\n",
+				 seq);
+		}
+		pthread_mutex_lock (&(ng->lock));
+		sema_destroy (semaphore);
+		jrb_delete_node (node);
+		pthread_mutex_unlock (&(ng->lock));
 
-	    if (retval != 0)
+		if (retval != 0)
 		{
-		    host_update_stat (host, 0);
-		    return (0);
+			host_update_stat (host, 0);
+			return (0);
 		}
 
-	    /// update latency info 
-	    if (host->latency == 0.0)
+		/// update latency info
+		if (host->latency == 0.0)
 		{
-		    host->latency = dtime () - start;
+			host->latency = dtime () - start;
 		}
-	    else
+		else
 		{
-		    host->latency =
+			host->latency =
 			(0.9 * host->latency) + (0.1 * (dtime () - start));
 		}
 		*/
 	}
 
-    return (1);
+	return (1);
 }
 
 /**

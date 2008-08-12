@@ -44,6 +44,9 @@
 #define RETRANSMIT_INTERVAL 1
 #define MAX_RETRY 3
 
+class IMessageHandler;
+class ChimeraDHT;
+
 class Message
 {
     Key dest;
@@ -70,9 +73,6 @@ public:
 	const Key* GetDest() const { return &dest; }
 };
 
-class ChimeraDHT;
-
-typedef void (ChimeraDHT::*messagehandler_t) (Message *);
 
 class MessageGlobal : protected Mutex
 {
@@ -103,7 +103,7 @@ public:
 	 ** registers the handler function #func# with the message type #type#,
 	 ** it also defines the acknowledgment requirement for this type
 	 */
-	void message_handler (int type, messagehandler_t func,
+	void message_handler (int type, IMessageHandler* handler,
 			      int ack);
 
 	/**

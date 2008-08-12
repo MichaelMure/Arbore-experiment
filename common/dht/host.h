@@ -37,6 +37,7 @@
 #define BAD_LINK 0.3
 
 class ChimeraDHT;
+class ChimeraHost;
 
 class HostGlobal : public Mutex
 {

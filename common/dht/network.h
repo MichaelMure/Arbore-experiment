@@ -60,15 +60,34 @@ typedef struct AcknowledgEntry{
 	double acktime; // the time when the packet is acked
 }AckEntry;
 
+class NetworkGlobal : protected Mutex
+{
+	int sock;
+	JRB waiting;
+	unsigned long seqstart, seqend;
+	JRB retransmit;
+
+public:
+
+	/** network_init:
+	 ** initiates the networking layer by creating socket and bind it to #port#
+	 */
+	NetworkGlobal(int port);
+
+	/**
+	 ** network_send: host, data, size
+	 ** Sends a message to host, updating the measurement info.
+	 ** type are 1 or 2, 1 indicates that the data should be acknowledged by the
+	 ** receiver, and 2 indicates that no ack is necessary.
+	 */
+	int network_send (ChimeraHost * host, char *data, int size, unsigned long type);
+
+};
+
 /** network_address:
  ** returns the ip address of the #hostname#
  */
 unsigned long network_address (void *networkglobal, char *hostname);
-
-/** network_init:
- ** initiates the networking layer by creating socket and bind it to #port#
- */
-void *network_init (void *logs, int port);
 
 /**
  ** network_activate:
@@ -81,13 +100,5 @@ void *network_activate (void *state);
 // retransmit packets that are not acknowledged in a 1 sec window
 void *retransmit_packets(void *state);
 
-/**
- ** network_send: host, data, size
- ** Sends a message to host, updating the measurement info.
- ** type are 1 or 2, 1 indicates that the data should be acknowledged by the
- ** receiver, and 2 indicates that no ack is necessary.
- */
-int network_send (void *state, ChimeraHost * host, char *data, int size,
-		  unsigned long type);
 
 #endif /* _CHIMERA_NETWORK_H_ */
