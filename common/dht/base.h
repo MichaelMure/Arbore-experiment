@@ -12,7 +12,7 @@ void convert_base2 (unsigned char num, char *out)
 		sprintf (out, "1");
 	    else
 		sprintf (out, "0");
-	    mask = mask >> 1;
+	    mask = (unsigned char)(mask >> 1);
 	    out++;
 	}
     *out = '\0';
@@ -46,7 +46,7 @@ void convert_base16 (unsigned char num, char *out)
 
 void hex_to_base2 (char *hexstr, char *binstr)
 {
-    int i = 0;
+    size_t i = 0;
     memset (binstr, 0, sizeof (binstr));
     for (i = 0; i < strlen (hexstr); i++)
 	{
@@ -109,7 +109,7 @@ void hex_to_base2 (char *hexstr, char *binstr)
 
 void hex_to_base4 (char *hexstr, char *base4str)
 {
-    int i = 0;
+    size_t i = 0;
     memset (base4str, 0, sizeof (base4str));
     for (i = 0; i < strlen (hexstr); i++)
 	{
@@ -194,23 +194,23 @@ char *get_hex_digit_from_base4 (char *base4str)
 
 void base2_to_hex (char *binstr, char *hexstr)
 {
-    int i = 0;
-    int j = 0;
-    memset (hexstr, 0, sizeof (hexstr));
-    for (i = 0; i < strlen (binstr); i += 4, j++)
+	size_t i = 0;
+	int j = 0;
+	memset (hexstr, 0, sizeof (hexstr));
+	for (i = 0; i < strlen (binstr); i += 4, j++)
 	{
-	    char *temp = get_hex_digit_from_bin (binstr + i);
-	    strcat (hexstr, temp);
-	    free (temp);
+		char *temp = get_hex_digit_from_bin (binstr + i);
+		strcat (hexstr, temp);
+		free (temp);
 	}
-    hexstr[j] = '\0';
+	hexstr[j] = '\0';
 }
 
 void base4_to_hex (char *base4str, char *hexstr)
 {
     // assume that the hexstr is properly initialized
 //      memset(hexstr, 0, sizeof(hexstr));
-    int i = 0;
+    size_t i = 0;
     int j = 0;
     for (i = 0; i < strlen (base4str); i += 2, j++)
 	{

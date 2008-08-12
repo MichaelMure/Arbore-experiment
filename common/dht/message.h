@@ -72,7 +72,7 @@ public:
 
 class ChimeraDHT;
 
-typedef void (*messagehandler_t) (ChimeraDHT *, Message *);
+typedef void (ChimeraDHT::*messagehandler_t) (Message *);
 
 class MessageGlobal : protected Mutex
 {

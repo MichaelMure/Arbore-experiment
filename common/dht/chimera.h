@@ -70,6 +70,8 @@ class ChimeraDHT
 
 	void send_rowinfo(Message* message);
 	void route_message (Message * message);
+	void update_message (Message * message);
+	void piggy_message(Message* message);
 
 	void join_complete(ChimeraHost* host);
 

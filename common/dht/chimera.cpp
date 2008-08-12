@@ -517,17 +517,15 @@ void ChimeraDHT::Register(int type, int ack)
 		exit (1);
 	}
 
-	this->message->message_handler (type, route_message, ack);
+	this->message->message_handler (type, &ChimeraDHT::route_message, ack);
 }
 
-void chimera_update_message (ChimeraDHT * state, Message * message)
+void ChimeraDHT::update_message (Message * message)
 {
-
     ChimeraHost *host;
-    ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;
 
-    host = host_decode (state, message->GetPayload());
-    route_update (state, host, 1);
+    host = this->host->DecodeHost(this, message->GetPayload());
+    route_update (this, host, 1);
 
 }
 
@@ -539,13 +537,10 @@ void chimera_update_message (ChimeraDHT * state, Message * message)
  ** message type.
  */
 
-void chimera_piggy_message (ChimeraDHT * state, Message * message)
+void ChimeraDHT::piggy_message (Message * message)
 {
-
     ChimeraHost **piggy;
-    ChimeraHost **tmp;
     int i;
-    ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;
 
     piggy = decode_hosts(message->GetPayload());
 
@@ -554,13 +549,11 @@ void chimera_piggy_message (ChimeraDHT * state, Message * message)
 
 	    if ((dtime () - piggy[i]->GetFailureTime()) > GRACEPERIOD)
 		{
-		    route_update (state, piggy[i], 1);
+		    route_update (this, piggy[i], 1);
 		}
-
-	    else if (LOGS)
-		log_message (state->log, LOG_WARN,
-			     "refused to add:%s to routing table\n",
-			     get_key_string (&piggy[i]->GetKey()));
+		else
+			pf_log[W_WARNING] << "refused to add:" << get_key_string (&piggy[i]->GetKey())
+			                  << " to routing table";
 	}
     free (piggy);
 }
