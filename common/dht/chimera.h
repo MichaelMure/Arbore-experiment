@@ -34,6 +34,7 @@
 
 class Message;
 class HostGlobal;
+class MessageGlobal;
 
 typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost **);
 typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
@@ -54,7 +55,7 @@ typedef struct
 class ChimeraDHT
 {
 	void *network;
-	void *message;
+	MessageGlobal *message;
 	void *route;
 	HostGlobal *host;
 

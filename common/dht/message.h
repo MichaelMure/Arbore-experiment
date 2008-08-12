@@ -55,20 +55,30 @@ class Message
 
 public:
 
+	/**
+	 ** message_create:
+	 ** creates the message to the destination #dest# the message format would be like:
+	 **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
+	 **
+	 */
+	Message(Key dest, int type, size_t size, char *payload);
+
+	~Message();
+
 	const char* GetPayload() const { return payload; }
 	int GetType() const { return type; }
 	const Key* GetDest() const { return &dest; }
 };
 
+class ChimeraDHT;
 
 typedef void (*messagehandler_t) (ChimeraDHT *, Message *);
 
 class MessageGlobal : protected Mutex
 {
+	ChimeraDHT* chstate;
 	JRB handlers;
-	void *jobq;
 	pthread_attr_t attr;
-	pthread_mutex_t lock;
 
 public:
 
@@ -78,20 +88,22 @@ public:
 	 ** contains global state of message subsystem.
 	 ** message_init also initiate the network subsystem
 	 */
-	MessageGlobal(void *chstate, int port);
+	MessageGlobal(ChimeraDHT* state, int port);
 
 	/**
 	 ** message_received:
 	 ** is called by network_activate and will be passed received data and size from socket
 	 **
 	 */
-	void message_received (void *chstate, char *data, size_t size);
+	void message_received (char *data, size_t size);
+
+	void message_receiver(Message* msg);
 
 	/**
 	 ** registers the handler function #func# with the message type #type#,
 	 ** it also defines the acknowledgment requirement for this type
 	 */
-	void message_handler (void *chstate, int type, messagehandler_t func,
+	void message_handler (int type, messagehandler_t func,
 			      int ack);
 
 	/**
@@ -99,20 +111,10 @@ public:
 	 ** sendt the message to destination #host# the retry arg indicates to the network
 	 ** layer if this message should be ackd or not
 	 */
-	int message_send (void *chstate, ChimeraHost * host, Message * message,
+	int message_send (ChimeraHost * host, Message * message,
 			  bool retry);
 
-	/**
-	 ** message_create:
-	 ** creates the message to the destination #dest# the message format would be like:
-	 **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
-	 **
-	 */
-	Message *message_create (Key dest, int type, size_t size, char *payload);
-
-	void message_free(Message* msg);
 
 };
-
 
 #endif /* _CHIMERA_MESSAGE_H_ */
