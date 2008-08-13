@@ -69,7 +69,7 @@ HostGlobal::HostGlobal(int size)
  ** decodes a string into a chimera host structure. This acts as a
  ** host_get, and should be followed eventually by a host_release.
  */
-ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, const char *hostname)
+ChimeraHost* HostGlobal::DecodeHost(const char *hostname)
 {
 	char *key = NULL, *name = NULL, *port = NULL;
 	ChimeraHost *host;
@@ -94,7 +94,7 @@ ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, const char *hostname)
 
 	/* allocate space, do the network stuff, and return the host */
 	sscanf (port, "%d", &i);
-	host = GetHost(state, name, i);
+	host = GetHost(name, i);
 
 	str_to_key (key, &k);
 
@@ -111,7 +111,7 @@ ChimeraHost* HostGlobal::DecodeHost(ChimeraDHT * state, const char *hostname)
  ** gets a host entry for the given host, getting it from the cache if
  ** possible, or alocates memory for it
  */
-ChimeraHost* HostGlobal::GetHost(ChimeraDHT * state, char *hostname, int port)
+ChimeraHost* HostGlobal::GetHost(char *hostname, int port)
 {
 	JRB node;
 	Dllist dllnode;
@@ -123,7 +123,7 @@ ChimeraHost* HostGlobal::GetHost(ChimeraDHT * state, char *hostname, int port)
 
 	/* create an id of the form ip:port */
 	memset (id, 0, 256);
-	address = network_address (state->network, hostname);
+	address = network_address (hostname);
 	ip = (unsigned char *) &address;
 	for (i = 0; i < 4; i++)
 		sprintf (id + strlen (id), "%s%d", (i == 0) ? ("") : ("."),

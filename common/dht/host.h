@@ -36,7 +36,6 @@
 #define GOOD_LINK 0.8
 #define BAD_LINK 0.3
 
-class ChimeraDHT;
 class ChimeraHost;
 
 class HostGlobal : public Mutex
@@ -57,13 +56,13 @@ public:
 	 ** gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
-	ChimeraHost* GetHost(ChimeraDHT* dht, char* hn, int port);
+	ChimeraHost* GetHost(char* hn, int port);
 
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
-	ChimeraHost* DecodeHost (ChimeraDHT* state, const char *s);
+	ChimeraHost* DecodeHost (const char *s);
 
 	/** host_release:
 	 ** releases a host from the cache, declaring that the memory could be

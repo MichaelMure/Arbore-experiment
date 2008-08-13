@@ -74,7 +74,7 @@ AckEntry* get_new_ackentry()
 /** network_address:
  ** returns the ip address of the #hostname#
  */
-unsigned long network_address (void *networkglobal, char *hostname)
+unsigned long network_address (char *hostname)
 {
 
     int is_addr;
@@ -82,8 +82,6 @@ unsigned long network_address (void *networkglobal, char *hostname)
     unsigned long addr;
     unsigned long local;
     int i;
-    NetworkGlobal *netglob = (NetworkGlobal *) networkglobal;
-
 
     /* apparently gethostbyname does not portably recognize ip addys */
 
@@ -103,24 +101,19 @@ unsigned long network_address (void *networkglobal, char *hostname)
     inet_aton ("127.0.0.1", (struct in_addr *) &local);
 #endif
 
-    pthread_mutex_lock (&(netglob->lock));
     if (is_addr)
 	he = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
     else
 	he = gethostbyname (hostname);
 
     if (he == NULL)
-	{
-	    pthread_mutex_unlock (&(netglob->lock));
 	    return (0);
-	}
 
     /* make sure the machine is not returning localhost */
 
     addr = *(unsigned long *) he->h_addr_list[0];
     for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
 	addr = *(unsigned long *) he->h_addr_list[i];
-    pthread_mutex_unlock (&(netglob->lock));
 
     return (addr);
 
