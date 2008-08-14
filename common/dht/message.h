@@ -45,7 +45,6 @@
 #define MAX_RETRY 3
 
 class IMessageHandler;
-class ChimeraDHT;
 
 class Message
 {
@@ -76,19 +75,18 @@ public:
 
 class MessageGlobal : protected Mutex
 {
-	ChimeraDHT* chstate;
 	JRB handlers;
 	pthread_attr_t attr;
 
 public:
 
 	/**
-	 ** message_init: chstate, port
+	 ** message_init: port
 	 ** Initialize messaging subsystem on port and returns the MessageGlobal * which
 	 ** contains global state of message subsystem.
 	 ** message_init also initiate the network subsystem
 	 */
-	MessageGlobal(ChimeraDHT* state, int port);
+	MessageGlobal(int port);
 
 	/**
 	 ** message_received:

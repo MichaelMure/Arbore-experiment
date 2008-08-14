@@ -89,6 +89,8 @@ class ChimeraHost
 
 public:
 
+	ChimeraHost(const char* name, int port, unsigned long address);
+
 	/** host_encode:
 	 ** encodes the #host# into a string, putting it in #s#, which has
 	 ** #len# bytes in it.

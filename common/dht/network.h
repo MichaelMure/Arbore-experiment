@@ -87,7 +87,7 @@ public:
 /** network_address:
  ** returns the ip address of the #hostname#
  */
-unsigned long network_address (void *networkglobal, char *hostname);
+unsigned long network_address (char *hostname);
 
 /**
  ** network_activate:

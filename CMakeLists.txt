@@ -24,8 +24,9 @@ SET(SRC
 	common/files/file_entry_base.cpp
 
 	common/dht/key.cpp
-	common/dht/message.cpp
 	common/dht/host.cpp
+	common/dht/message.cpp
+	common/dht/network.cpp
 	common/dht/chimera.cpp
 
 	common/net/network_base.cpp

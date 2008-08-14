@@ -159,6 +159,15 @@ Key& Key::operator= (const char *strOrig)
 	return *this;
 }
 
+Key::Key(const Key& k2)
+{
+	size_t i;
+	for (i = 0; i < nlen; i++)
+		this->t[i] = k2.t[i];
+
+	key_to_str ();
+}
+
 Key& Key::operator=(const Key& k2)
 {
 	size_t i;
@@ -168,6 +177,15 @@ Key& Key::operator=(const Key& k2)
 	key_to_str ();
 
 	return *this;
+}
+
+Key::Key(uint32_t ul)
+{
+	size_t i;
+	for (i = 1; i < nlen; i++)
+		this->t[i] = 0;
+	this->t[0] = ul;
+	key_to_str ();
 }
 
 Key& Key::operator=(uint32_t ul)
@@ -200,7 +218,7 @@ bool Key::operator==(uint32_t ul) const
 	return true;
 }
 
-int Key::operator>(const Key& k2) const
+bool Key::operator>(const Key& k2) const
 {
 	for (int i = nlen-1; i >= 0; i--)
 	{
@@ -212,7 +230,7 @@ int Key::operator>(const Key& k2) const
 	return false;
 }
 
-int Key::operator<(const Key& k2) const
+bool Key::operator<(const Key& k2) const
 {
 	for (int i = nlen-1; i >= 0; i--)
 	{

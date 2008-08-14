@@ -25,33 +25,41 @@
 
 #include "host.h"
 
-typedef struct
+class CacheEntry
 {
 	ChimeraHost *host;
 	int refrence;
 	JRB node;
 	Dllist free;
-} CacheEntry;
 
-void cacheentry_free (CacheEntry * entry)
+public:
+
+	CacheEntry(ChimeraHost*);
+	~CacheEntry();
+
+};
+
+CacheEntry::CacheEntry(ChimeraHost* _host)
+	: host(_host),
+	  refrence(1)
 {
-	if (entry == NULL);
-	free (entry->host->name);
-	free (entry->host);
-	free (entry);
+
+}
+
+CacheEntry::~CacheEntry()
+{
+	delete host;
 }
 
 /** host_encode:
  ** encodes the #host# into a string, putting it in #s#, which has
  ** #len# bytes in it.
  */
-void ChimeraHost::host_encode (char *s, int len) const
+void ChimeraHost::Encode(char *s, size_t len) const
 {
-
 	snprintf (s, len, "%s:", get_key_string (&key));
 	snprintf (s + strlen (s), len - strlen (s), "%s:", host->name);
 	snprintf (s + strlen (s), len - strlen (s), "%d", host->port);
-
 }
 
 /** host_init:
@@ -107,6 +115,27 @@ ChimeraHost* HostGlobal::DecodeHost(const char *hostname)
 
 }
 
+ChimeraHost::ChimeraHost(const char* _name, int _port, unsigned long _address)
+	: name(strdup(_name)),
+	address(_address),
+	failed(0),
+	failuretime(0),
+	port(_port),
+	latency(0),
+	loss(0),
+	success(0),
+	success_win_index(0),
+	success_avg(0.5),
+	Key(0)
+{
+	size_t i;
+	for (i = 0; i < SUCCESS_WINDOW / 2; i++)
+		entry->host->success_win[i] = 0;
+	for (i = SUCCESS_WINDOW / 2; i < SUCCESS_WINDOW; i++)
+		entry->host->success_win[i] = 1;
+
+}
+
 /** host_get:
  ** gets a host entry for the given host, getting it from the cache if
  ** possible, or alocates memory for it
@@ -125,9 +154,7 @@ ChimeraHost* HostGlobal::GetHost(char *hostname, int port)
 	memset (id, 0, 256);
 	address = network_address (hostname);
 	ip = (unsigned char *) &address;
-	for (i = 0; i < 4; i++)
-		sprintf (id + strlen (id), "%s%d", (i == 0) ? ("") : ("."),
-		                                   (int) ip[i]);
+	snprintf(id, sizeof id - 1, "%d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], port);
 	sprintf (id + strlen (id), ":%d", port);
 
 	pthread_mutex_lock (&this->lock);
@@ -136,26 +163,12 @@ ChimeraHost* HostGlobal::GetHost(char *hostname, int port)
 	/* if the node is not in the cache, create an entry and allocate a host */
 	if (node == NULL)
 	{
-		entry = (CacheEntry *) malloc (sizeof (CacheEntry));
-		entry->host = (ChimeraHost *) malloc (sizeof (ChimeraHost));
-		entry->host->name = strdup (hostname);
-		entry->host->port = port;
-		entry->host->address = address;
-		entry->host->failed = 0;
-		entry->host->failuretime = 0;
+		ChimeraHost* host = new Chimerahost(hostname, port, address);
+		entry = new CacheEntry(host);
 
-		key_assign_ui (&(entry->host->key), 0);
-
-		entry->host->success_win_index = 0;
-		for (i = 0; i < SUCCESS_WINDOW / 2; i++)
-			entry->host->success_win[i] = 0;
-		for (i = SUCCESS_WINDOW / 2; i < SUCCESS_WINDOW; i++)
-			entry->host->success_win[i] = 1;
-		entry->host->success_avg = 0.5;
-		entry->refrence = 1;
 		jrb_insert_str (this->hosts, strdup (id), new_jval_v (entry));
 
-		entry->node = jrb_find_str (this->hosts, id);
+		entry->SetNode(jrb_find_str (this->hosts, id));
 		this->size++;
 	}
 

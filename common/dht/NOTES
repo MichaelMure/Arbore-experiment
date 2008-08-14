@@ -57,3 +57,6 @@ Notes:*
 - Chimera uses the UDP network layer to send and receive messages... Why?
 - Do we use the peerfuse scheduler (in only one thread), or keep all Chimera's threads?
   We can also extend the peerfuse scheduler to create several instances and queues..
+- Chimera has a (big) bug with 64bits architectures, because of use of unsigned longs to store key, which is
+  an uint32_t on 32bits arch, and uint64_t on 64bits based arch. Solution
+

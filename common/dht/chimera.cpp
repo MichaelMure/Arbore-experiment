@@ -635,7 +635,6 @@ ChimeraDHT::ChimeraDHT(int port)
 	//  mtrace();
 	this->chimera = cg;
 
-	this->log = log_init ();
 	key_init ();
 
 	this->message = message_init ((void *) this, port);
@@ -648,7 +647,7 @@ ChimeraDHT::ChimeraDHT(int port)
 
 	if (gethostname (name, 256) != 0)
 	{
-		pf_log[W_ERR] << "chimera_init: gethostname: " << strerro(errno);
+		pf_log[W_ERR] << "chimera_init: gethostname: " << strerror(errno);
 		return (NULL);
 	}
 	if ((he = gethostbyname (name)) == NULL)
@@ -658,7 +657,7 @@ ChimeraDHT::ChimeraDHT(int port)
 	}
 	strcpy (name, he->h_name);
 
-	cg->me = host->GetHost(this, name, port);
+	cg->me = host->GetHost(name, port);
 
 	sprintf (name + strlen (name), ":%d", port);
 	key_makehash (&(cg->me->GetKey()), name);

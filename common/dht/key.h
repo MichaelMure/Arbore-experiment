@@ -70,6 +70,17 @@ public:
 
 	static void Init();
 
+	Key(uint32_t ul = 0);
+	Key(const Key& k2);
+
+	Key& operator=(const char* str);
+	Key& operator=(const Key& k2);
+	Key& operator=(uint32_t ul);
+	bool operator==(const Key& k2) const;
+	bool operator==(uint32_t ul) const;
+	bool operator>(const Key& k2) const;
+	bool operator<(const Key& k2) const;
+
 	/* key_makehash: hashed, s
 	** assign sha1 hash of the string #s# to #hashed# */
 
@@ -104,34 +115,8 @@ public:
 	void key_print ();
 
 	void key_to_str ();
-	Key& operator=(const char* str);
 
 	const char *get_key_string ();	// always use this function to get the string representation of a key
-
-	/* key_assign: k1, k2
-	** copies value of #k2# to #k1# */
-
-	Key& operator=(const Key& k2);
-
-	/* key_assign_ui: k1, ul
-	** copies #ul# to the least significant 32 bits of #k# */
-
-	Key& operator=(uint32_t ul);
-
-	/* key_equal:k1, k2
-	** return 1 if #k1#==#k2# 0 otherwise*/
-	bool operator==(const Key& k2) const;
-
-	/* key_equal_ui:k1, ul
-	** return 1 if the least significat 32 bits of #k1#==#ul# 0 otherwise */
-
-	bool operator==(uint32_t ul) const;
-
-	/*key_comp: k1, k2
-	** returns >0 if k1>k2, <0 if k1<k2, and 0 if k1==k2 */
-
-	int operator>(const Key& k2) const;
-	int operator<(const Key& k2) const;
 };
 
 /* global variables!! that are set in key_init function */
