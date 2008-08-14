@@ -71,54 +71,6 @@ AckEntry* get_new_ackentry()
 	return entry;
 }
 
-/** network_address:
- ** returns the ip address of the #hostname#
- */
-unsigned long network_address (char *hostname)
-{
-
-    int is_addr;
-    struct hostent *he;
-    unsigned long addr;
-    unsigned long local;
-    int i;
-
-    /* apparently gethostbyname does not portably recognize ip addys */
-
-#ifdef SunOS
-    is_addr = inet_addr (hostname);
-    if (is_addr == -1)
-	is_addr = 0;
-    else
-	{
-	    memcpy (&addr, (struct in_addr *) &is_addr, sizeof (addr));
-	    is_addr = inet_addr ("127.0.0.1");
-	    memcpy (&local, (struct in_addr *) &is_addr, sizeof (addr));
-	    is_addr = 1;
-	}
-#else
-    is_addr = inet_aton (hostname, (struct in_addr *) &addr);
-    inet_aton ("127.0.0.1", (struct in_addr *) &local);
-#endif
-
-    if (is_addr)
-	he = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
-    else
-	he = gethostbyname (hostname);
-
-    if (he == NULL)
-	    return (0);
-
-    /* make sure the machine is not returning localhost */
-
-    addr = *(unsigned long *) he->h_addr_list[0];
-    for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
-	addr = *(unsigned long *) he->h_addr_list[i];
-
-    return (addr);
-
-}
-
 
 
 /** Never returns. Keep retransmitting the failed packets.

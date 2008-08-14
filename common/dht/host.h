@@ -41,9 +41,11 @@ class ChimeraHost;
 class HostGlobal : public Mutex
 {
 	JRB hosts;
-	Dllist free;
-	int size;
-	int max;
+	Dllist free_list;
+	size_t size;
+	size_t max;
+
+	unsigned long network_address(const char* hostname) const;
 
 public:
 
@@ -56,7 +58,7 @@ public:
 	 ** gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
-	ChimeraHost* GetHost(char* hn, int port);
+	ChimeraHost* GetHost(const char* hn, int port);
 
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
@@ -69,7 +71,7 @@ public:
 	 ** freed any time. returns NULL if the entry is deleted, otherwise it
 	 ** returns #host#
 	 */
-	void Release(ChimeraHost* host);
+	void ReleaseHost(ChimeraHost* host);
 };
 
 class ChimeraHost
@@ -91,11 +93,13 @@ public:
 
 	ChimeraHost(const char* name, int port, unsigned long address);
 
+	unsigned long GetAddress() const { return address; }
+
 	/** host_encode:
 	 ** encodes the #host# into a string, putting it in #s#, which has
 	 ** #len# bytes in it.
 	 */
-	void Encode(char *s, size_t len) const;
+	void Encode(char *s, size_t len);
 
 	/** host_update_stat:
 	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
@@ -103,6 +107,7 @@ public:
 	void UpdateStat (int success);
 
 	const Key& GetKey() const { return key; }
+	void SetKey(Key k) { key = k; }
 	const char* GetName() const { return name; }
 	int GetPort() const { return port; }
 	double GetFailureTime() const { return failuretime; }
