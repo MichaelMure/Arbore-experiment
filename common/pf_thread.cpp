@@ -18,19 +18,47 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
+#include <errno.h>
+#include <cstring>
 #include <pthread.h>
 #include "pf_thread.h"
 
 Thread::Thread() : running(false)
 {
+	if(pthread_attr_init(&attr) != 0)
+	{
+		log[W_ERR] << "pthread_attr_init: " << strerror(errno);
+		throw CantCreate();
+	}
+}
+
+Thread::Thread(int scope, int detachstate)
+	: running(false)
+{
+	if (pthread_attr_init (&attr) != 0)
+	{
+		log[W_ERR] << "pthread_attr_init: " << strerror(errno);
+		throw CantCreate();
+	}
+	if (pthread_attr_setscope (&attr, scope) != 0)
+	{
+		log[W_ERR] << "pthread_attr_setscope: " << strerror(errno);
+		throw CantCreate();
+	}
+	if (pthread_attr_setdetachstate (&attr, detachstate) != 0)
+	{
+		log[W_ERR] << "pthread_attr_setdetachstate: " << strerror(errno);
+		throw CantCreate();
+	}
 }
 
 Thread::~Thread()
 {
 	Stop();
+	pthread_attr_destroy(&attr);
 }
 
 void Thread::Start() throw(CantRun)
@@ -39,7 +67,7 @@ void Thread::Start() throw(CantRun)
 		return;
 	OnStart();
 	running = true;
-	int r = pthread_create(&thread_id, NULL, StartThread, (void*)this);
+	int r = pthread_create(&thread_id, &attr, StartThread, (void*)this);
 	if(r)
 		throw CantRun();
 }

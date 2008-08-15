@@ -18,11 +18,11 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef PF_THREAD_H
 #define PF_THREAD_H
+
 #include <pthread.h>
 #include <exception>
 #include "mutex.h"
@@ -33,11 +33,13 @@ private:
 	Mutex running_lock;
 	bool running;
 	pthread_t thread_id;
+	pthread_attr_t attr;
 
 	static void* StartThread(void*);
 	void DoLoop();
 protected:
 	virtual void Loop() = 0;
+
 	/* Called before the main loop starts */
 	virtual void OnStart() {};
 	/* Called after the main loop finished */
@@ -45,10 +47,16 @@ protected:
 	/* Use it to catch exceptions from the main loop */
 	virtual void ThrowHandler();
 public:
+	/* Constructors */
 	Thread();
+	Thread(int scope, int detachstate);
 	virtual ~Thread();
 
+	/* Exceptions */
 	class CantRun : std::exception {};
+	class CantCreate : std::exception {};
+
+	/* Methods */
 	void Start() throw(CantRun);
 	void Stop();
 	bool IsRunning();
