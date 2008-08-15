@@ -73,8 +73,6 @@ void Key::key_print ()
 
 void Key::key_to_str ()
 {
-	char temp[KEY_SIZE];
-
 	this->valid = 1;
 
 	if (IS_BASE_16)
@@ -87,6 +85,7 @@ void Key::key_to_str ()
 	}
 	else if (IS_BASE_4)
 	{
+		char temp[KEY_SIZE];
 		// if we need base4, then convert base16 to base4
 		sprintf (temp, "%08x%08x%08x%08x%08x", (unsigned int) this->t[4],
 			 (unsigned int) this->t[3], (unsigned int) this->t[2],

@@ -116,7 +116,7 @@ public:
 
 	void key_to_str ();
 
-	const char *get_key_string ();	// always use this function to get the string representation of a key
+	const char* get_key_string ();	// always use this function to get the string representation of a key
 };
 
 /* global variables!! that are set in key_init function */

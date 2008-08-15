@@ -37,7 +37,6 @@
 #include "host.h"
 #include "jrb.h"
 #include "mutex.h"
-#include "pf_thread.h"
 
 #define DEFAULT_SEQNUM 0
 #define RETRANSMIT_THREAD_SLEEP 1
@@ -49,11 +48,11 @@ class IMessageHandler;
 class Message
 {
     Key dest;
-    int type;			/* message type */
-    size_t size;
+    uint32_t type;			/* message type */
+    uint32_t size;
     char *payload;
     Key source;			/* for future security enhancement */
-    unsigned long seqNum;	/* for future security enhancement */
+    uint32_t seqNum;	/* for future security enhancement */
 
 public:
 
@@ -63,13 +62,15 @@ public:
 	 **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
 	 **
 	 */
-	Message(Key dest, int type, size_t size, char *payload);
+	Message(Key dest, uint32_t type, uint32_t size, char *payload);
 
 	~Message();
 
 	const char* GetPayload() const { return payload; }
-	int GetType() const { return type; }
+	uint32_t GetType() const { return type; }
 	const Key* GetDest() const { return &dest; }
+	const char* GetDestString() { return dest.get_key_string(); }
+	uint32_t GetSize() const { return size; }
 };
 
 
@@ -86,6 +87,8 @@ public:
 	 ** message_init also initiate the network subsystem
 	 */
 	MessageGlobal();
+
+	~MessageGlobal();
 
 	/**
 	 ** message_received:

@@ -39,13 +39,14 @@ public:
 
 class JobHandleMessage : public Job
 {
-	Message* message;
 	IMessageHandler* handler;
+	Message* message;
 
 public:
-	JobHandleMessage(Message* _message, IMessageHandler* _handler)
+	JobHandleMessage(IMessageHandler* _handler, Message* _message)
 		: Job(0, REPEAT_NONE),
-		   message(_message), handler(_handler)
+		   handler(_handler),
+		   message(_message)
 	{}
 
 	bool Start();

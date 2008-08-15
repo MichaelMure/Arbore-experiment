@@ -29,7 +29,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <pthread.h>
 #include <errno.h>
 #include <string.h>
 #include "message.h"
@@ -41,7 +40,7 @@
 /* message on the wire is encoded in the following way:
 ** [ type ] [ size ] [ key ] [ data ] */
 
-#define HEADER_SIZE (sizeof(unsigned long) + sizeof(unsigned long) + KEY_SIZE/BASE_B + 1)
+#define HEADER_SIZE (sizeof(uint32_t) + sizeof(uint32_t) + KEY_SIZE/BASE_B + 1)
 
 typedef struct
 {
@@ -57,7 +56,7 @@ typedef struct
  **  [ type ] [ size ] [ key ] [ data ]. It return the created message structure.
  **
  */
-Message::Message(Key dest, int type, size_t size, char *payload)
+Message::Message(Key dest, uint32_t type, uint32_t size, char *payload)
 {
     this->dest = dest;
     this->type = type;
@@ -83,15 +82,7 @@ Message::~Message()
  */
 MessageGlobal::MessageGlobal ()
 {
-	pthread_t tid;
-
 	this->handlers = make_jrb ();
-
-	if (pthread_create (&tid, &mg->attr, retransmit_packets, (void *) state) != 0)
-	{
-		log[W_ERR] << "pthread_create failed for retransmit_packets: " << strerror(errno);
-		return;
-	}
 }
 
 MessageGlobal::~MessageGlobal()
@@ -104,11 +95,10 @@ MessageGlobal::~MessageGlobal()
  ** is called by network_activate and will be passed received data and size from socket
  **
  */
-void MessageGlobal::message_received (char *data, int size)
+void MessageGlobal::message_received (char *data, size_t size)
 {
-
-	unsigned long msgtype;
-	unsigned long msgsize;
+	uint32_t msgtype;
+	uint32_t msgsize;
 	//  unsigned long msgdest;
 	Key msgdest;
 	Message *message;
@@ -123,7 +113,7 @@ void MessageGlobal::message_received (char *data, int size)
 	memcpy (&msgsize, data + sizeof (unsigned long), sizeof (unsigned long));
 	msgsize = ntohl (msgsize);
 
-	str_to_key (data + (2 * sizeof (unsigned long)), &msgdest);
+	msgdest = (data + (2 * sizeof (unsigned long)));
 
 	message = new Message(msgdest, (int) msgtype, (int) msgsize,
 			data + HEADER_SIZE);
@@ -136,14 +126,14 @@ void MessageGlobal::message_received (char *data, int size)
 	node = jrb_find_int (handlers, message->GetType());
 	if (node == NULL)
 	{
-		log[W_ERR] << "received unrecognized message type " << message->GetType();
+		pf_log[W_ERR] << "received unrecognized message type " << message->GetType();
 		delete message;
 		return;
 	}
-	msgprop = node->val.v;
+	msgprop = static_cast<MessageProperty*>(node->val.v);
 	if (!msgprop->handler)
 	{
-		log[W_ERR] << "no message handler has registered for type " << message->GetType();
+		pf_log[W_ERR] << "no message handler has registered for type " << message->GetType();
 		delete message;
 		return;
 	}
@@ -155,11 +145,10 @@ void MessageGlobal::message_received (char *data, int size)
  ** registers the handler function #func# with the message type #type#,
  ** it also defines the acknowledgment requirement for this type
  */
-void MessageGlobal::message_handler (int type, messagehandler_t func, int ack)
+void MessageGlobal::message_handler (int type, IMessageHandler* func, int ack)
 {
 	JRB node;
-	MessageProperty *msgprop =
-	(MessageProperty *) malloc (sizeof (MessageProperty));
+	MessageProperty *msgprop = (MessageProperty *) malloc (sizeof (MessageProperty));
 
 	msgprop->handler = func;
 	msgprop->ack = ack;
@@ -171,7 +160,7 @@ void MessageGlobal::message_handler (int type, messagehandler_t func, int ack)
 	/* don't allow duplicates */
 	if (node != NULL)
 	{
-		log[W_WARNING] << "message handler already registered with " << type;
+		pf_log[W_WARNING] << "message handler already registered with " << type;
 		return;
 	}
 	jrb_insert_int (handlers, type, new_jval_v (msgprop));
@@ -186,8 +175,8 @@ int MessageGlobal::message_send (ChimeraHost * host, Message * message,
 		  bool retry)
 {
 	char *data;
-	unsigned long size, type, ack;
-	int i, ret = 0;
+	uint32_t size, type;
+	int ret = 0;
 	JRB node;
 	MessageProperty *msgprop;
 
@@ -198,30 +187,30 @@ int MessageGlobal::message_send (ChimeraHost * host, Message * message,
 	if (host == NULL)
 		return (0);
 
-	size = HEADER_SIZE + message->size;
+	size = uint32_t(HEADER_SIZE) + message->GetSize();
 	data = (char *) malloc (sizeof (char) * size);
 
 	/* encode the message */
-	type = htonl ((unsigned long) message->type);
-	memcpy (data, &type, sizeof (unsigned long));
-	size = htonl ((unsigned long) message->size);
-	memcpy (data + sizeof (unsigned long), &size, sizeof (unsigned long));
-	memcpy (data + (2 * sizeof (unsigned long)),
-			get_key_string (&message->dest),
-			strlen (get_key_string (&message->dest)));
-	memcpy (data + HEADER_SIZE, message->payload, message->size);
-	size = HEADER_SIZE + message->size;	/*reset due to htonl */
+	type = htonl (message->GetType());
+	memcpy (data, &type, sizeof (uint32_t));
+	size = htonl (message->GetSize());
+	memcpy (data + sizeof (uint32_t), &size, sizeof (uint32_t));
+	memcpy (data + (2 * sizeof (uint32_t)),
+			message->GetDestString(),
+			strlen (message->GetDestString()));
+	memcpy (data + HEADER_SIZE, message->GetPayload(), message->GetSize());
+	size = uint32_t(HEADER_SIZE) + message->GetSize();	/*reset due to htonl */
 
 	/* get the message properties */
 	Lock();
 	node = jrb_find_int (handlers, message->GetType());
 	if (node == NULL)
 	{
-		log[W_ERR] << "fail to send unrecognized message type " << message->GetType();
+		pf_log[W_ERR] << "fail to send unrecognized message type " << message->GetType();
 		Unlock();
 		return 0;
 	}
-	msgprop = node->val.v;
+	msgprop = static_cast<MessageProperty*>(node->val.v);
 	Unlock();
 
 	/* WTF??? -romain */

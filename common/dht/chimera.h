@@ -34,6 +34,7 @@ class HostGlobal;
 class ChimeraHost;
 class MessageGlobal;
 class NetworkActivate;
+class NetworkRetransmit;
 class NetworkGlobal;
 
 typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost **);
@@ -55,6 +56,7 @@ class ChimeraDHT
 {
 	NetworkGlobal *network;
 	NetworkActivate* network_activate;
+	NetworkRetransmit* network_retransmit;
 	MessageGlobal *message;
 	void *route;
 	HostGlobal *host;

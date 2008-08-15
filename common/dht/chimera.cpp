@@ -644,6 +644,8 @@ ChimeraDHT::ChimeraDHT(int port)
 	this->network = new NetworkGlobal(port);
 	this->network_activate = new NetworkActivate(this->network);
 	this->network_activate->Start();
+	this->network_retransmit = new NetworkRetransmit(this->network);
+	this->network_retransmit->Start();
 
 	this->host = new HostGlobal(64);
 	if (this->host == NULL)
