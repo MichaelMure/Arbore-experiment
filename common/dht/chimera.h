@@ -27,6 +27,7 @@
 #define CHIMERA_H
 
 #include "key.h"
+#include "mutex.h"
 #include <pthread.h>
 
 class Message;
@@ -41,7 +42,7 @@ typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost 
 typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
 typedef void (*chimera_update_upcall_t) (const Key *, ChimeraHost *, int);
 
-typedef struct
+class ChimeraGlobal : protected Mutex
 {
     ChimeraHost *me;
     ChimeraHost *bootstrap;
@@ -50,7 +51,7 @@ typedef struct
     chimera_forward_upcall_t forward;
     chimera_deliver_upcall_t deliver;
     chimera_update_upcall_t update;
-} ChimeraGlobal;
+};
 
 class ChimeraDHT
 {
@@ -71,18 +72,12 @@ class ChimeraDHT
 	ChimeraHost** decode_hosts(const char* s);
 
 	void send_rowinfo(Message* message);
-	void route_message (Message * message);
-	void update_message (Message * message);
-	void piggy_message(Message* message);
 
 	void join_complete(ChimeraHost* host);
 
 	static void *check_leafset (void *chstate);
 
 	int check_leafset_init();
-
-	void join_denied(Message* m);
-	void join_acknowledged(Message* m);
 
 public:
 

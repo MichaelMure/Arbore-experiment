@@ -671,14 +671,14 @@ ChimeraDHT::ChimeraDHT(int port)
 	cg->forward = NULL;
 	cg->update = NULL;
 
-	this->route = route_init (cg->me);
+	this->route = new RouteGlobal(this->host, cg->me);
 
-	message_handler (this, CHIMERA_JOIN, chimera_message, 1);
-	message_handler (this, CHIMERA_JOIN_ACK, chimera_join_acknowledged, 1);
-	message_handler (this, CHIMERA_UPDATE, chimera_update_message, 1);
-	message_handler (this, CHIMERA_PIGGY, chimera_piggy_message, 1);
-	message_handler (this, CHIMERA_JOIN_NACK, chimera_join_denied, 1);
-	message_handler (this, CHIMERA_PING, chimera_ping_reply, 1);
+	this->message->message_handler (CHIMERA_JOIN, chimera_message, 1);
+	this->message->message_handler (CHIMERA_JOIN_ACK, chimera_join_acknowledged, 1);
+	this->message->message_handler (CHIMERA_UPDATE, chimera_update_message, 1);
+	this->message->message_handler (CHIMERA_PIGGY, chimera_piggy_message, 1);
+	this->message->message_handler (CHIMERA_JOIN_NACK, chimera_join_denied, 1);
+	this->message->message_handler (CHIMERA_PING, chimera_ping_reply, 1);
 
 	/* more message types can be defined here */
 

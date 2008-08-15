@@ -25,6 +25,7 @@ SET(SRC
 
 	common/dht/key.cpp
 	common/dht/host.cpp
+	common/dht/route.cpp
 	common/dht/message_handlers.cpp
 	common/dht/message.cpp
 	common/dht/network.cpp

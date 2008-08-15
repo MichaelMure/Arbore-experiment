@@ -76,7 +76,7 @@ public:
 
 class ChimeraHost
 {
-	char *name;
+	std::string name;
 	unsigned long address;
 	int failed;
 	double failuretime;
@@ -91,7 +91,7 @@ class ChimeraHost
 
 public:
 
-	ChimeraHost(const char* name, int port, unsigned long address);
+	ChimeraHost(const std::string& name, int port, unsigned long address);
 
 	unsigned long GetAddress() const { return address; }
 
@@ -99,7 +99,7 @@ public:
 	 ** encodes the #host# into a string, putting it in #s#, which has
 	 ** #len# bytes in it.
 	 */
-	void Encode(char *s, size_t len);
+	std::string Encode() const;
 
 	/** host_update_stat:
 	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
@@ -108,18 +108,21 @@ public:
 
 	const Key& GetKey() const { return key; }
 	void SetKey(Key k) { key = k; }
-	const char* GetName() const { return name; }
+
+	const std::string& GetName() const { return name; }
 	int GetPort() const { return port; }
 	double GetFailureTime() const { return failuretime; }
+	double GetLatency() const { return latency; }
+
 	void SetFailureTime(double f) { failuretime = f; }
 	float GetSuccessAvg() const { return success_avg; }
 
 };
 
 template<>
-inline Log::flux& Log::flux::operator<< <const ChimeraHost&> (const ChimeraHost& host)
+inline Log::flux& Log::flux::operator<< <ChimeraHost> (ChimeraHost host)
 {
-	str += std::string(host.GetName()) + ":" + TypToStr(host.GetPort());
+	str += host.GetName() + ":" + TypToStr(host.GetPort());
 	return *this;
 }
 

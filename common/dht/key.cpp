@@ -34,69 +34,15 @@
 Key Key_Max;
 Key Key_Half;
 
-extern int power(int, int);
-
-void Key::key_print ()
+void Key::set_key_str()
 {
-	char hexstr[KEY_SIZE];	// this is big just to be safe
-	char base4str[KEY_SIZE];	//
+	char keystr[KEY_SIZE / BASE_B + 1] = {0};
+	sprintf (keystr, "%08x%08x%08x%08x%08x",
+		    (unsigned int) this->t[4], (unsigned int) this->t[3],
+		    (unsigned int) this->t[2], (unsigned int) this->t[1],
+		    (unsigned int) this->t[0]);
 
-	for (int i = nlen-1; i >= 0; i--)
-		sprintf (hexstr, "%08x", (unsigned int) t[i]);
-
-	if (IS_BASE_16)
-	{
-		for (size_t i = 0; i < strlen (hexstr); i++)
-		{
-			if (i % 8 == 0)
-			printf (" ");
-			printf ("%c", hexstr[i]);
-		}
-	}
-	else if (IS_BASE_4)
-	{
-		hex_to_base4 (hexstr, base4str);
-
-		for (size_t i = 0; i < strlen (base4str); i++)
-		{
-			if (i % 16 == 0)
-			printf (" ");
-			printf ("%c", base4str[i]);
-		}
-	}
-	else
-	{
-		printf ("key.c: Unknown base \n");
-	}
-	printf ("\n");
-}
-
-void Key::key_to_str ()
-{
-	this->valid = 1;
-
-	if (IS_BASE_16)
-	{
-		memset (this->keystr, 0, KEY_SIZE / BASE_B + 1);
-		sprintf (this->keystr, "%08x%08x%08x%08x%08x",
-		            (unsigned int) this->t[4], (unsigned int) this->t[3],
-		            (unsigned int) this->t[2], (unsigned int) this->t[1],
-		            (unsigned int) this->t[0]);
-	}
-	else if (IS_BASE_4)
-	{
-		char temp[KEY_SIZE];
-		// if we need base4, then convert base16 to base4
-		sprintf (temp, "%08x%08x%08x%08x%08x", (unsigned int) this->t[4],
-			 (unsigned int) this->t[3], (unsigned int) this->t[2],
-			 (unsigned int) this->t[1], (unsigned int) this->t[0]);
-
-		hex_to_base4 (temp, this->keystr);
-	}
-	else
-	{
-		pf_log[W_ERR] << "key.c: Unknown base";
-	}
+	this->key_str = keystr;
 }
 
 Key& Key::operator= (const char *strOrig)
@@ -105,12 +51,10 @@ Key& Key::operator= (const char *strOrig)
 	char key_str[KEY_SIZE / BASE_B + 1];
 
 	char str[KEY_SIZE / BASE_B + 1];
-	char tempString[KEY_SIZE];
-
 
 	// This loop below is required, though Patrik L. from sparta recommended against it
 	for (i = 0; i < KEY_SIZE / BASE_B + 1; i++)
-	key_str[i] = '0';
+		key_str[i] = '0';
 	memset (str, 0, KEY_SIZE / BASE_B + 1);
 	if (strlen (strOrig) < KEY_SIZE / BASE_B)
 	{
@@ -120,14 +64,6 @@ Key& Key::operator= (const char *strOrig)
 	{
 		strncpy (str, strOrig, KEY_SIZE / BASE_B);
 		str[KEY_SIZE / BASE_B] = '\0';
-	}
-
-	// Now, if str is in a different base than hex, replace the str contents with corresponding hex contents
-	if (IS_BASE_4)
-	{
-		strcpy (tempString, str);
-		memset (str, 0, strlen (tempString));
-		base4_to_hex (tempString, str);
 	}
 
 	// By now, the string should be in base 16
@@ -150,10 +86,10 @@ Key& Key::operator= (const char *strOrig)
 
 	key_str[BASE_16_KEYLENGTH] = '\0';
 
-	for (i = 0; i < 5; i++)
-		sscanf (key_str + (i * 8 * sizeof (char)), "%08x", &(this->t[(4 - i)]));
+	for (i = 0; i < nlen; i++)
+		sscanf (key_str + (i * 8 * sizeof (char)), "%08x", &(this->t[(nlen-1 - i)]));
 
-	key_to_str ();
+	set_key_str();
 
 	return *this;
 }
@@ -164,7 +100,7 @@ Key::Key(const Key& k2)
 	for (i = 0; i < nlen; i++)
 		this->t[i] = k2.t[i];
 
-	key_to_str ();
+	set_key_str();
 }
 
 Key& Key::operator=(const Key& k2)
@@ -173,7 +109,7 @@ Key& Key::operator=(const Key& k2)
 	for (i = 0; i < nlen; i++)
 		this->t[i] = k2.t[i];
 
-	key_to_str ();
+	set_key_str();
 
 	return *this;
 }
@@ -184,7 +120,8 @@ Key::Key(uint32_t ul)
 	for (i = 1; i < nlen; i++)
 		this->t[i] = 0;
 	this->t[0] = ul;
-	key_to_str ();
+
+	set_key_str();
 }
 
 Key& Key::operator=(uint32_t ul)
@@ -193,7 +130,8 @@ Key& Key::operator=(uint32_t ul)
 	for (i = 1; i < nlen; i++)
 		this->t[i] = 0;
 	this->t[0] = ul;
-	key_to_str ();
+
+	set_key_str();
 
 	return *this;
 }
@@ -265,7 +203,6 @@ Key Key::operator+(const Key& op2) const
 			tmp = 0;
 		}
 	}
-	result.valid = 0;
 
 	return result;
 }
@@ -280,7 +217,7 @@ Key Key::operator-(const Key & op2) const
 
 	if (*this < op2)
 	{
-		pf_log[W_ERR] << "key_sub: Operation is not allowed " << this->keystr << " < " << op2.keystr;
+		pf_log[W_ERR] << "key_sub: Operation is not allowed " << this->key_str << " < " << op2.key_str;
 		return result;
 	}
 
@@ -302,8 +239,6 @@ Key Key::operator-(const Key & op2) const
 		}
 		result.t[i] = (uint32_t) tmp;
 	}
-
-	result.valid = 0;
 
 	return result;
 }
@@ -336,18 +271,7 @@ char *sha1_keygen (char *key, size_t digest_size, char *digest)
 	*tmp = '\0';
 	for (i = 0; i < md_len; i++)
 	{
-		if (power (2, BASE_B) == BASE_16)
-		{
-			convert_base16 (md_value[i], digit);
-		}
-		else if (power (2, BASE_B) == BASE_4)
-		{
-			convert_base4 (md_value[i], digit);
-		}
-		else if (power (2, BASE_B) == BASE_2)
-		{
-			convert_base2 (md_value[i], digit);
-		}
+		convert_base16 (md_value[i], digit);
 
 		strcat (tmp, digit);
 		tmp = tmp + strlen (digit);
@@ -359,12 +283,11 @@ char *sha1_keygen (char *key, size_t digest_size, char *digest)
 	return (digest);
 }
 
-void Key::key_makehash (char *s)
+void Key::key_make_hash (char *s)
 {
 	key_make_hash (s, strlen (s) * sizeof (char));
 
-	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = ["
-		     << get_key_string () << "]";
+	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = [" << *this << "]";
 }
 
 void Key::key_make_hash (char *s, size_t size)
@@ -374,7 +297,7 @@ void Key::key_make_hash (char *s, size_t size)
 	digest = sha1_keygen (s, size, NULL);
 	*this = digest;
 
-	//for(i=0; i <5; i++) sscanf(digest+(i*8*sizeof(char)),"%08x",&hashed->t[(4-i)]);
+	//for(i=0; i <nlen; i++) sscanf(digest+(i*8*sizeof(char)),"%08x",&hashed->t[(4-i)]);
 	//key_to_str(hashed->keystr,*hashed);
 
 	free (digest);
@@ -382,17 +305,15 @@ void Key::key_make_hash (char *s, size_t size)
 
 void Key::Init ()
 {
-	int i;
-	for (i = 0; i < 5; i++)
+	for (size_t i = 0; i < nlen; i++)
 	{
 		Key_Max.t[i] = UINT_MAX;
 		Key_Half.t[i] = UINT_MAX;
 	}
 	Key_Half.t[4] = Key_Half.t[4] / 2;
 
-	Key_Max.key_to_str ();
-	Key_Half.key_to_str ();
-
+	Key_Max.set_key_str();
+	Key_Half.set_key_str();
 }
 
 Key Key::distance(const Key& k2) const
@@ -406,8 +327,6 @@ Key Key::distance(const Key& k2) const
 
 	if (diff > Key_Half)
 		diff = Key_Max - diff;
-
-	diff.valid = 0;
 
 	return diff;
 }
@@ -444,16 +363,6 @@ int Key::between (const Key * const left, const Key * const right)
 	}
 }
 
-// Return the string representation of key
-// This function should be used instead of directly accessing the keystr field
-const char *Key::get_key_string ()
-{
-	if (!this->valid)
-		key_to_str ();
-
-	return this->keystr;
-}
-
 Key Key::midpoint () const
 {
 	Key mid;
@@ -462,20 +371,17 @@ Key Key::midpoint () const
 	else
 		mid = *this - Key_Half;
 
-	mid.valid = 0;
-
 	return mid;
 }
 
-size_t Key::key_index (Key k)
+size_t Key::key_index (Key k) const
 {
 	size_t max_len, i;
-	char mystr[KEY_SIZE / BASE_B + 1];
-	char kstr[KEY_SIZE / BASE_B + 1];
+	std::string mystr, kstr;
 
 	max_len = KEY_SIZE / BASE_B;
-	strcpy (mystr, this->get_key_string());
-	strcpy (kstr, k.get_key_string());
+	mystr = this->str();
+	kstr = k.str();
 
 	for (i = 0; (mystr[i] == kstr[i]) && (i < max_len); i++)
 		;
@@ -484,8 +390,8 @@ size_t Key::key_index (Key k)
 		i = max_len - 1;
 
 	pf_log[W_DEBUG] << "key_index:" << i;
-	pf_log[W_DEBUG] << "me:" << this->keystr;
-	pf_log[W_DEBUG] << "lookup_key:" << k.keystr;
+	pf_log[W_DEBUG] << "me:" << *this;
+	pf_log[W_DEBUG] << "lookup_key:" << k;
 
 	return (i);
 }

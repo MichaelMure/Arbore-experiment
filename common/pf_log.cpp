@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <iostream>
@@ -38,6 +38,7 @@ static struct
 {
 	{ W_DEBUG,      LOG_DEBUG,   "DEBUG"      },
 	{ W_PARSE,      LOG_DEBUG,   "PARSE"      },
+	{ W_ROUTING,    LOG_DEBUG,   "ROUTING"    },
 	{ W_DESYNCH,    LOG_WARNING, "DESYNCH"    },
 	{ W_WARNING,    LOG_WARNING, "WARNING"    },
 	{ W_BIGWARNING, LOG_WARNING, "BIGWARNING" },

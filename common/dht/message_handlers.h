@@ -37,6 +37,12 @@ public:
 	virtual void operator() (const Message* message) = 0;
 };
 
+class ChimeraMessageHandler : public IMessageHandler
+{
+	public:
+		void operator() (const Message* message);
+};
+
 class JobHandleMessage : public Job
 {
 	IMessageHandler* handler;

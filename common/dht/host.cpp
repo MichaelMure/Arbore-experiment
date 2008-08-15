@@ -75,9 +75,9 @@ CacheEntry::~CacheEntry()
  ** encodes the #host# into a string, putting it in #s#, which has
  ** #len# bytes in it.
  */
-void ChimeraHost::Encode(char *s, size_t len)
+std::string ChimeraHost::Encode() const
 {
-	snprintf (s, len, "%s:%s:%d", key.get_key_string(), name, port);
+	return key.str() + ":" + name + ":" + TypToStr(port);
 }
 
 /** host_init:
@@ -133,8 +133,8 @@ ChimeraHost* HostGlobal::DecodeHost(const char *hostname)
 
 }
 
-ChimeraHost::ChimeraHost(const char* _name, int _port, unsigned long _address)
-	: name(strdup(_name)),
+ChimeraHost::ChimeraHost(const std::string& _name, int _port, unsigned long _address)
+	: name(_name),
 	address(_address),
 	failed(0),
 	failuretime(0),

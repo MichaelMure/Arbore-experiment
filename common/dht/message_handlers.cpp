@@ -25,6 +25,14 @@
 
 #include "message_handlers.h"
 
+class ChimeraMessage : public IMessageHandler
+{
+public:
+	void operator()(Message*)
+	{
+	}
+};
+
 bool JobHandleMessage::Start()
 {
 	(*handler)(message);

@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PF_LOG_H
@@ -34,12 +34,13 @@ enum
 {
 	W_DEBUG      = 1 << 0,			  /* Debug */
 	W_PARSE      = 1 << 1,			  /* Show parsing */
-	W_DESYNCH    = 1 << 2,			  /* Desynchronization */
-	W_WARNING    = 1 << 3,			  /* Warnings */
-	W_BIGWARNING = 1 << 4,			  /* Big warnings */
-	W_ERR        = 1 << 5,			  /* Errors */
-	W_CONNEC     = 1 << 6,			  /* (Dis)connections */
-	W_INFO       = 1 << 7			  /* Info */
+	W_ROUTING    = 1 << 2,                    /* Routing information */
+	W_DESYNCH    = 1 << 3,			  /* Desynchronization */
+	W_WARNING    = 1 << 4,			  /* Warnings */
+	W_BIGWARNING = 1 << 5,			  /* Big warnings */
+	W_ERR        = 1 << 6,			  /* Errors */
+	W_CONNEC     = 1 << 7,			  /* (Dis)connections */
+	W_INFO       = 1 << 8			  /* Info */
 };
 
 #define DEFAULT_LOGGED_FLAGS (W_WARNING|W_BIGWARNING|W_ERR|W_INFO)

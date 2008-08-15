@@ -37,34 +37,27 @@
 #include <stdio.h>
 #include <openssl/evp.h>
 #include <string.h>
+#include <stdint.h>
 
-typedef unsigned int uint32_t;
+#include "pf_log.h"
 
 #define KEY_SIZE 160
 #define N_SIZE KEY_SIZE/sizeof(uint32_t)
 
-// Changed this to 2 for base4 and 4 to have keys in base 16; Only these two are supported right now
 #define BASE_B 4		/* Base representation of key digits */
 
 #define BASE_16_KEYLENGTH 40
-
-#define BASE_2 2
-#define BASE_4 4
-#define BASE_16 16
-
-#define IS_BASE_2 (power(2, BASE_B) == BASE_2)
-#define IS_BASE_4 (power(2, BASE_B) == BASE_4)
-#define IS_BASE_16 (power(2, BASE_B) == BASE_16)
 
 class Key
 {
 	static const size_t nlen = KEY_SIZE / (8 * sizeof(uint32_t));
 	uint32_t t[nlen];
-	char keystr[KEY_SIZE / BASE_B + 1];	/* string representation of key in hex */
-	short int valid;		// indicates if the keystr is most up to date with value in key
+	std::string key_str;
 
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;
+
+	void set_key_str ();
 
 public:
 
@@ -81,13 +74,11 @@ public:
 	bool operator>(const Key& k2) const;
 	bool operator<(const Key& k2) const;
 
-	/* key_makehash: hashed, s
-	** assign sha1 hash of the string #s# to #hashed# */
+	std::string str() const { return key_str; }
 
-	void key_makehash (char *s);
-
-
-	/* key_make_hash */
+	/** key_makehash: hashed, s
+	 * assign sha1 hash of the string #s# to #hashed# */
+	void key_make_hash (char *s);
 	void key_make_hash (char *s, size_t size);
 
 	/* key_distance:k1,k2
@@ -106,18 +97,18 @@ public:
 
 	Key midpoint () const;
 
-
 	/* key_index: mykey, key
 	** returns the lenght of the longest prefix match between #mykey# and #k# */
 
-	size_t key_index (Key k);
-
-	void key_print ();
-
-	void key_to_str ();
-
-	const char* get_key_string ();	// always use this function to get the string representation of a key
+	size_t key_index (Key k) const;
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <Key> (Key key)
+{
+	str += key.str();
+	return *this;
+}
 
 /* global variables!! that are set in key_init function */
 extern Key Key_Max;
