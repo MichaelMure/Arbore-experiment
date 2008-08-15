@@ -26,33 +26,22 @@
 #include <pthread.h>
 #include "pf_thread.h"
 
+
 Thread::Thread() : running(false)
 {
 	if(pthread_attr_init(&attr) != 0)
-	{
-		log[W_ERR] << "pthread_attr_init: " << strerror(errno);
 		throw CantCreate();
-	}
 }
 
 Thread::Thread(int scope, int detachstate)
 	: running(false)
 {
 	if (pthread_attr_init (&attr) != 0)
-	{
-		log[W_ERR] << "pthread_attr_init: " << strerror(errno);
 		throw CantCreate();
-	}
 	if (pthread_attr_setscope (&attr, scope) != 0)
-	{
-		log[W_ERR] << "pthread_attr_setscope: " << strerror(errno);
 		throw CantCreate();
-	}
 	if (pthread_attr_setdetachstate (&attr, detachstate) != 0)
-	{
-		log[W_ERR] << "pthread_attr_setdetachstate: " << strerror(errno);
 		throw CantCreate();
-	}
 }
 
 Thread::~Thread()

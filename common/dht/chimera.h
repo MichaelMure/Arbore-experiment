@@ -26,15 +26,15 @@
 #ifndef CHIMERA_H
 #define CHIMERA_H
 
-#include "host.h"
 #include "key.h"
-#include "log.h"
 #include <pthread.h>
-#include "semaphore.h"
 
 class Message;
 class HostGlobal;
+class ChimeraHost;
 class MessageGlobal;
+class NetworkActivate;
+class NetworkGlobal;
 
 typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost **);
 typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
@@ -49,12 +49,12 @@ typedef struct
     chimera_forward_upcall_t forward;
     chimera_deliver_upcall_t deliver;
     chimera_update_upcall_t update;
-    Sema globalSeqNum;		/* for future security enhancement */
 } ChimeraGlobal;
 
 class ChimeraDHT
 {
-	void *network;
+	NetworkGlobal *network;
+	NetworkActivate* network_activate;
 	MessageGlobal *message;
 	void *route;
 	HostGlobal *host;

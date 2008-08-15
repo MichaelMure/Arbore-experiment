@@ -84,21 +84,4 @@ public:
 
 };
 
-/** network_address:
- ** returns the ip address of the #hostname#
- */
-unsigned long network_address (char *hostname);
-
-/**
- ** network_activate:
- ** NEVER RETURNS. Puts the network layer into listen mode. This thread
- ** manages acknowledgements, delivers incomming messages to the message
- ** handler, and drives the network layer. It should only be called once.
- */
-void *network_activate (void *state);
-
-// retransmit packets that are not acknowledged in a 1 sec window
-void *retransmit_packets(void *state);
-
-
 #endif /* _CHIMERA_NETWORK_H_ */

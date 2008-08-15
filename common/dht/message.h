@@ -76,7 +76,6 @@ public:
 class MessageGlobal : protected Mutex
 {
 	JRB handlers;
-	pthread_attr_t attr;
 
 public:
 
@@ -86,7 +85,7 @@ public:
 	 ** contains global state of message subsystem.
 	 ** message_init also initiate the network subsystem
 	 */
-	MessageGlobal(int port);
+	MessageGlobal();
 
 	/**
 	 ** message_received:
@@ -94,8 +93,6 @@ public:
 	 **
 	 */
 	void message_received (char *data, size_t size);
-
-	void message_receiver(Message* msg);
 
 	/**
 	 ** registers the handler function #func# with the message type #type#,

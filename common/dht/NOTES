@@ -23,29 +23,29 @@ dllist.c      [ ]     :double linked list
 dllist.h      [ ]     :double linked list
 dtime.c       [C]     :some time related functions
 dtime.h       [C]     :some time related functions
-host.c        [M]     :the chimera representation of hosts
-host.h        [M]     :the chimera representation of hosts
-include.h     [ ]     :useless declaration of the Bool type
+host.c        [+]     :the chimera representation of hosts
+host.h        [+]     :the chimera representation of hosts
+include.h     [-]     :useless declaration of the Bool type
 job_queue.c   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
 job_queue.h   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
 jrb.c         [?]     :what is it?
 jrb.h         [?]     :what is it?
 jval.c        [?]     :what is it?
 jval.h        [?]     :what is it?
-key.c         [-]     :key used to represent a peer or a file
-key.h         [-]     :key used to represent a peer or a file
+key.c         [+]     :key used to represent a peer or a file
+key.h         [+]     :key used to represent a peer or a file
 log.c         [-]     :logging functions
 log.h         [-]     :logging functions
 message.c     [M]     :functions to send and receive a message
 message.h     [M]     :functions to send and receive a message
-network.c     [C]     :network functions
-network.h     [C]     :network functions
+network.c     [M]     :network functions
+network.h     [M]     :network functions
 priqueue.c    [-]     :priority queue (not used by chimera)
 priqueue.h    [-]     :priority queue (not used by chimera)
 route.c       [+]     :the routing protocol
 route.h       [+]     :the routing protocol
-semaphore.c   [C]     :semaphore implementation
-semaphore.h   [C]     :semaphore implementation
+semaphore.c   [-]     :semaphore implementation
+semaphore.h   [-]     :semaphore implementation
 test.c        [+]     :test program
 
 ******

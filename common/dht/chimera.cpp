@@ -637,11 +637,15 @@ ChimeraDHT::ChimeraDHT(int port)
 
 	key_init ();
 
-	this->message = message_init ((void *) this, port);
+	this->message = new MessageGlobal(port);
 	if (this->message == NULL)
 		return (NULL);
 
-	this->host = host_init (this->log, 64);
+	this->network = new NetworkGlobal(port);
+	this->network_activate = new NetworkActivate(this->network);
+	this->network_activate->Start();
+
+	this->host = new HostGlobal(64);
 	if (this->host == NULL)
 		return (NULL);
 
