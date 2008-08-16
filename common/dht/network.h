@@ -40,6 +40,7 @@
  ** NETWORK_PACK_SIZE is the maximum packet size that will be handled by chimera network layer
  */
 #define NETWORK_PACK_SIZE 65536
+#define SEND_SIZE NETWORK_PACK_SIZE
 /**
  ** TIMEOUT is the number of seconds to wait for receiving ack from the destination, if you want
  ** the sender to wait forever put 0 for TIMEOUT.
@@ -81,6 +82,8 @@ public:
 	 ** receiver, and 2 indicates that no ack is necessary.
 	 */
 	int network_send (ChimeraHost * host, char *data, size_t size, unsigned int type);
+
+	int GetSock() const { return sock; }
 
 };
 

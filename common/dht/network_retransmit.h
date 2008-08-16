@@ -33,6 +33,8 @@ class NetworkGlobal;
 // retransmit packets that are not acknowledged in a 1 sec window
 class NetworkRetransmit : public Thread
 {
+	NetworkGlobal* ng;
+
 	void Loop();
 
 public:

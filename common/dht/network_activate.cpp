@@ -26,6 +26,7 @@
 #include "network_activate.h"
 #include "network.h"
 #include "message.h"
+#include "dtime.h"
 
 NetworkActivate::NetworkActivate(NetworkGlobal* _ng)
 	: Thread(PTHREAD_SCOPE_SYSTEM, PTHREAD_CREATE_DETACHED),
@@ -37,21 +38,21 @@ NetworkActivate::NetworkActivate(NetworkGlobal* _ng)
 void NetworkActivate::Loop()
 {
     fd_set fds, thisfds;
-    int ret, retack;
+    ssize_t ret, retack;
     char data[SEND_SIZE];
     struct sockaddr_in from;
-    int socklen = sizeof (from);
+    socklen_t socklen = sizeof (from);
     unsigned long ack, seq;
     JRB node;
 
     FD_ZERO (&fds);
-    FD_SET (ng->sock, &fds);
+    FD_SET (ng->GetSock(), &fds);
 
     while (1)
 	{
 	    /* block until information becomes available */
 	    memcpy (&thisfds, &fds, sizeof (fd_set));
-	    ret = select (ng->sock + 1, &thisfds, NULL, NULL, NULL);
+	    ret = select (ng->GetSock() + 1, &thisfds, NULL, NULL, NULL);
 	    if (ret < 0)
 		{
 		  if (LOGS)
@@ -61,8 +62,7 @@ void NetworkActivate::Loop()
 		}
 
 	    /* receive the new data */
-	    ret =
-		recvfrom (ng->sock, data, SEND_SIZE, 0,
+	    ret = recvfrom (ng->GetSock(), data, SEND_SIZE, 0,
 			  (struct sockaddr *) &from, &socklen);
 	    if (ret < 0)
 		{
@@ -109,7 +109,7 @@ void NetworkActivate::Loop()
 		    ack = htonl (0);
 		    memcpy (data, &ack, sizeof (unsigned long));
 		    retack =
-			sendto (ng->sock, data, 2 * sizeof (unsigned long), 0,
+			sendto (ng->GetSock(), data, 2 * sizeof (unsigned long), 0,
 				(struct sockaddr *) &from, sizeof (from));
 		    if (retack < 0)
 			{

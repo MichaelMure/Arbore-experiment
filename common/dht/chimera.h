@@ -143,7 +143,7 @@ public:
 	 ** send data through the Chimera system and deliver it to the host closest to the
 	 ** key
 	 */
-	void Send (Key key, int type, int len,
+	void Send (Key key, int type, size_t len,
 			   char *data);
 
 	/**

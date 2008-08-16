@@ -38,6 +38,8 @@ class NetworkGlobal;
  */
 class NetworkActivate : public Thread
 {
+	NetworkGlobal* ng;
+
 	void Loop();
 public:
 

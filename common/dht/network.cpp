@@ -44,8 +44,6 @@
 #include "dtime.h"
 
 extern int errno;
-#define SEND_SIZE NETWORK_PACK_SIZE
-
 
 // allocate a new pointer and return it
 PQEntry* get_new_pqentry()
