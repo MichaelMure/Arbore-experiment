@@ -144,13 +144,14 @@ public:
 	}
 };
 
-// Method to get file from directory
+// Filler for the _BrowserReaddir class
 int _BrowserReaddir_filler(void *buf, const char *name, const struct stat *stbuf, off_t off)
 {
 	((std::list<std::string> *)buf)->push_back(std::string(name));
 	return 0;
 }
 
+// Method to get file from directory
 class _BrowserReaddir : public XmlRpcServerMethod
 {
 public:
@@ -170,6 +171,7 @@ public:
 		}
 		catch (...)
 		{
+			// TODO return an XMLRPC Exception
 			result = false;
 			return;
 		}
@@ -181,6 +183,43 @@ public:
 			data.pop_front();
 		}
 
+	}
+};
+
+// Method to get attr from a file
+class _BrowserGetattr : public XmlRpcServerMethod
+{
+public:
+	_BrowserGetattr(XmlRpcServer* s) : XmlRpcServerMethod("browser.getattr", s) {}
+
+	void execute(XmlRpcValue& params, XmlRpcValue& result)
+	{
+		// Check we have a valid string
+		std::string s_path = params[0];
+		if(s_path == "")
+			s_path = "/";
+
+		pf_stat stat;
+		try
+		{
+			stat = cache.GetAttr(s_path);
+		}
+		catch (...)
+		{
+			// TODO return an XMLRPC Exception
+			result = false;
+			return;
+		}
+
+		result["pf_mode"]		= (int)stat.pf_mode;
+		result["mode"]			= (int)stat.mode;
+		result["uid"]			= (int)stat.uid;
+		result["gid"]			= (int)stat.gid;
+		result["size"]			= (int)stat.size;
+		result["atime"]			= (int)stat.atime;
+		result["mtime"]			= (int)stat.mtime;
+		result["ctime"]			= (int)stat.ctime;
+		result["meta_mtime"]	= (int)stat.meta_mtime;
 	}
 };
 
@@ -210,6 +249,7 @@ void XmlRpcThread::OnStart()
 	methods.push_back(new _PeersList(&s));
 	methods.push_back(new _PeersInfo(&s));
 	methods.push_back(new _BrowserReaddir(&s));
+	methods.push_back(new _BrowserGetattr(&s));
 
 	// Bind
 	started = true;
