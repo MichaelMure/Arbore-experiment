@@ -27,10 +27,10 @@ SET(SRC
 	common/dht/host.cpp
 	common/dht/route.cpp
 	common/dht/message_handlers.cpp
-	common/dht/message.cpp
 	common/dht/network.cpp
 	common/dht/network_activate.cpp
 	common/dht/network_retransmit.cpp
+	common/dht/message.cpp
 	common/dht/chimera.cpp
 
 	common/net/network_base.cpp

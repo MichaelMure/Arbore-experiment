@@ -49,7 +49,7 @@
 typedef struct PriqueueEntry{
 	ChimeraHost *desthost; // who should this message be sent to?
 	char *data; // what to send?
-	int datasize; // how big is it?
+	size_t datasize; // how big is it?
 	int retry; // number of retries
 	unsigned long seqnum; // seqnum to identify the packet to be retransmitted
 	double transmittime; // this is the time the packet is transmitted (or retransmitted)
@@ -64,7 +64,7 @@ class NetworkGlobal : protected Mutex
 {
 	int sock;
 	JRB waiting;
-	unsigned long seqstart, seqend;
+	unsigned int seqstart, seqend;
 	JRB retransmit;
 
 public:
@@ -80,7 +80,7 @@ public:
 	 ** type are 1 or 2, 1 indicates that the data should be acknowledged by the
 	 ** receiver, and 2 indicates that no ack is necessary.
 	 */
-	int network_send (ChimeraHost * host, char *data, int size, unsigned long type);
+	int network_send (ChimeraHost * host, char *data, size_t size, unsigned int type);
 
 };
 

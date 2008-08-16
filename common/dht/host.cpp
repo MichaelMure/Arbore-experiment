@@ -133,7 +133,7 @@ ChimeraHost* HostGlobal::DecodeHost(const char *hostname)
 
 }
 
-ChimeraHost::ChimeraHost(const std::string& _name, int _port, unsigned long _address)
+ChimeraHost::ChimeraHost(const std::string& _name, int _port, in_addr_t _address)
 	: name(_name),
 	address(_address),
 	failed(0),
@@ -157,13 +157,13 @@ ChimeraHost::ChimeraHost(const std::string& _name, int _port, unsigned long _add
 /** network_address:
  ** returns the ip address of the #hostname#
  */
-unsigned long HostGlobal::network_address (const char *hostname) const
+in_addr_t HostGlobal::network_address (const char *hostname) const
 {
 
     int is_addr;
     struct hostent *he;
-    unsigned long addr;
-    unsigned long local;
+    in_addr_t addr;
+    in_addr_t local;
     int i;
 
     /* apparently gethostbyname does not portably recognize ip addys */
@@ -194,9 +194,10 @@ unsigned long HostGlobal::network_address (const char *hostname) const
 
     /* make sure the machine is not returning localhost */
 
-    addr = *(unsigned long *) he->h_addr_list[0];
+    /* TODO: check why he does that, because I don't understand... */
+    addr = *(in_addr_t *) he->h_addr_list[0];
     for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
-	addr = *(unsigned long *) he->h_addr_list[i];
+	addr = *(in_addr_t *) he->h_addr_list[i];
 
     return (addr);
 
@@ -210,7 +211,7 @@ ChimeraHost* HostGlobal::GetHost(const char *hostname, int port)
 {
 	JRB node;
 	Dllist dllnode;
-	unsigned long address;
+	in_addr_t address;
 	CacheEntry *tmp, *entry;
 	unsigned char *ip;
 	char id[256];

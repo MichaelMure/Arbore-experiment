@@ -26,6 +26,8 @@
 #ifndef _HOST_H_
 #define _HOST_H_
 
+#include <netinet/in.h>
+
 #include "key.h"
 #include "jrb.h"
 #include "mutex.h"
@@ -45,7 +47,7 @@ class HostGlobal : public Mutex
 	size_t size;
 	size_t max;
 
-	unsigned long network_address(const char* hostname) const;
+	in_addr_t network_address(const char* hostname) const;
 
 public:
 
@@ -77,7 +79,7 @@ public:
 class ChimeraHost
 {
 	std::string name;
-	unsigned long address;
+	in_addr_t address;
 	int failed;
 	double failuretime;
 	int port;
@@ -91,9 +93,9 @@ class ChimeraHost
 
 public:
 
-	ChimeraHost(const std::string& name, int port, unsigned long address);
+	ChimeraHost(const std::string& name, int port, in_addr_t address);
 
-	unsigned long GetAddress() const { return address; }
+	in_addr_t GetAddress() const { return address; }
 
 	/** host_encode:
 	 ** encodes the #host# into a string, putting it in #s#, which has
