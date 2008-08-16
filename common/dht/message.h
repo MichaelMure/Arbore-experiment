@@ -68,8 +68,7 @@ public:
 
 	const char* GetPayload() const { return payload; }
 	uint32_t GetType() const { return type; }
-	const Key* GetDest() const { return &dest; }
-	const char* GetDestString() { return dest.get_key_string(); }
+	const Key& GetDest() const { return dest; }
 	uint32_t GetSize() const { return size; }
 };
 

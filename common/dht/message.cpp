@@ -196,8 +196,8 @@ int MessageGlobal::message_send (ChimeraHost * host, Message * message,
 	size = htonl (message->GetSize());
 	memcpy (data + sizeof (uint32_t), &size, sizeof (uint32_t));
 	memcpy (data + (2 * sizeof (uint32_t)),
-			message->GetDestString(),
-			strlen (message->GetDestString()));
+			message->GetDest().str().c_str(),
+			message->GetDest().str().size());
 	memcpy (data + HEADER_SIZE, message->GetPayload(), message->GetSize());
 	size = uint32_t(HEADER_SIZE) + message->GetSize();	/*reset due to htonl */
 

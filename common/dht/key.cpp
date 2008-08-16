@@ -332,33 +332,33 @@ Key Key::distance(const Key& k2) const
 }
 
 
-int Key::between (const Key * const left, const Key * const right)
+bool Key::between (const Key& left, const Key& right) const
 {
 
-	int complr = *left < *right;
-	int complt = *left < *this;
-	int comptr = *this < *right;
+	int complr = left < right;
+	int complt = left < *this;
+	int comptr = *this < right;
 
 	/* it's on one of the edges */
 	if (complt == 0 || comptr == 0)
-		return (1);
+		return true;
 
 
 	if (complr < 0)
 	{
 		if (complt < 0 && comptr < 0)
-			return (1);
-		return (0);
+			return true;
+		return false;
 	}
 	else if (complr == 0)
 	{
-		return (0);
+		return false;
 	}
 	else
 	{
 		if (complt < 0 || comptr < 0)
-			return (1);
-		return (0);
+			return true;
+		return false;
 
 	}
 }

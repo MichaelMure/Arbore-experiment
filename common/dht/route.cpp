@@ -152,7 +152,7 @@ ChimeraHost** RouteGlobal::route_lookup (Key key, unsigned int count, int is_saf
 
 	/* if the key is in the leafset range route through leafset */
 	/* the additional 2 ChimeraHosts pointed by the #hosts# are to consider the node itself and NULL at the end */
-	if (count == 1 && key.between(&this->Lrange, &this->Rrange))
+	if (count == 1 && key.between(this->Lrange, this->Rrange))
 	{
 		pf_log[W_ROUTING] << "Routing through leafset";
 		hosts = (ChimeraHost **) malloc (sizeof (ChimeraHost *) * (LEAFSET_SIZE + 2));
@@ -458,102 +458,89 @@ void RouteGlobal::leafset_range_update (Key * rrange, Key * lrange) const
  ** is 1 if the node has joined and 0 if a node is leaving.
  **
  */
-void leafset_update (ChimeraState * state, ChimeraHost * host, int joined,
-		     ChimeraHost ** deleted, ChimeraHost ** added)
+void RouteGlobal::leafset_update (ChimeraHost * host, int joined, ChimeraHost ** deleted, ChimeraHost ** added) const
 {
+	int Lsize = 0;
+	int Rsize = 0;
+	Key midpoint;
 
-    int Lsize = 0;
-    int Rsize = 0;
-    Key midpoint;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
+	Lsize = leafset_size (this->leftleafset);
+	Rsize = leafset_size (this->rightleafset);
 
-    Lsize = leafset_size (routeglob->leftleafset);
-    Rsize = leafset_size (routeglob->rightleafset);
+	midpoint = this->me->GetKey().midpoint();
 
-    key_midpoint (state->log, &midpoint, routeglob->me->key);
-
-    if (joined)
+	if (joined)
 	{
 		/* key falls in the right side of node */
 		if (Rsize < LEAFSET_SIZE / 2
-				|| key_between (state->log, &host->key,
-					&routeglob->me->key,
-					&routeglob->rightleafset[Rsize -
-					1]->key))
+		    || host->GetKey().between(this->me->GetKey(), this->rightleafset[Rsize - 1]->GetKey()))
 		{
 			/* insert in Right leafset */
-			leafset_insert (state, host, 1, deleted, added);
+			leafset_insert (host, 1, deleted, added);
 		}
 		/* key falls in the left side of the node */
 		if (Lsize < LEAFSET_SIZE / 2
-				|| key_between (state->log, &host->key,
-					&routeglob->leftleafset[Lsize - 1]->key,
-					&routeglob->me->key))
+		    || host->GetKey().between(this->leftleafset[Lsize - 1]->GetKey(), this->me->GetKey()))
 		{
 			/* insert in Left leafset */
-			leafset_insert (state, host, 0, deleted, added);
+			leafset_insert (host, 0, deleted, added);
 		}
 	}
-    else
+	else
 	{
-	    if (key_between
-		(state->log, &host->key, &routeglob->me->key, &midpoint))
+		if (host->GetKey().between(this->me->GetKey(), midpoint))
 		{
-		    leafset_delete (state, host, 1, deleted);
+			leafset_delete (host, 1, deleted);
 		}
-	    else
-		leafset_delete (state, host, 0, deleted);
+		else
+			leafset_delete (host, 0, deleted);
 	}
 
 }
-
-extern void chimera_update_upcall (ChimeraState * state, Key * k,
-				   ChimeraHost * h, int joined);
 
 /**
  ** leafset_delete:
  ** removes the #deleted# node from leafset
  **
  */
-void leafset_delete (ChimeraState * state, ChimeraHost * host,
-		     int right_or_left, ChimeraHost ** deleted)
+void RouteGlobal::leafset_delete (ChimeraHost * host, int right_or_left, ChimeraHost ** deleted) const
 {
-    int i = 0, size;
-    int match = 0;
-    ChimeraHost **p;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
+	int i = 0, size;
+	int match = 0;
+	ChimeraHost **p;
 
-    /*insert in right leafset */
-    if (right_or_left == 1)
+	/*insert in right leafset */
+	if (right_or_left == 1)
 	{
-	    size = leafset_size (routeglob->rightleafset);
-	    p = routeglob->rightleafset;
+		size = leafset_size (this->rightleafset);
+		p = this->rightleafset;
 	}
-    /*insert in left leafset */
-    else
+	/*insert in left leafset */
+	else
 	{
-	    size = leafset_size (routeglob->leftleafset);
-	    p = routeglob->leftleafset;
-	}
-
-
-    for (i = 0; i < size && !(key_equal (p[i]->key, host->key)); i++);
-    if (i < size)
-	{
-	    *deleted = p[i];
-	    match = 1;
+		size = leafset_size (this->leftleafset);
+		p = this->leftleafset;
 	}
 
-    /* shift leafset members to not have a hole in the leafset */
-    if (match)
+	for (i = 0; i < size && p[i]->GetKey() != host->GetKey(); i++)
+		;
+
+	if (i < size)
 	{
-	    do
+		*deleted = p[i];
+		match = 1;
+	}
+
+	/* shift leafset members to not have a hole in the leafset */
+	if (match)
+	{
+		do
 		{
-		    p[i] = p[i + 1];
-		    i++;
+			p[i] = p[i + 1];
+			i++;
 		}
-	    while (i < size - 1);
-	    p[i] = NULL;
+		while (i < size - 1);
+		p[i] = NULL;
 	}
 
 
@@ -564,148 +551,142 @@ void leafset_delete (ChimeraState * state, ChimeraHost * host,
  ** inserts the added node tot the leafset and removes the deleted from the leafset
  ** the deleted node is NULL if the new added node will not cause a node to leave the leafset.
  */
-void leafset_insert (ChimeraState * state, ChimeraHost * host,
+void RouteGlobal::leafset_insert (ChimeraHost * host,
 		     int right_or_left, ChimeraHost ** deleted,
-		     ChimeraHost ** added)
+		     ChimeraHost ** added) const
 {
+	int i = 0, size;
+	ChimeraHost **p;
+	ChimeraHost *tmp1, *tmp2;
+	ChimeraHost *input = host;
+	Key dif1, dif2;
 
-    int i = 0, size;
-    ChimeraHost **p;
-    ChimeraHost *tmp1, *tmp2;
-    ChimeraHost *input = host;
-    Key dif1, dif2;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
-
-    /*inert in right leafset */
-    if (right_or_left == 1)
+	/*inert in right leafset */
+	if (right_or_left == 1)
 	{
-	    size = leafset_size (routeglob->rightleafset);
-	    p = routeglob->rightleafset;
+		size = leafset_size (this->rightleafset);
+		p = this->rightleafset;
 	}
-    /*insert in left leafset */
-    else
+	/*insert in left leafset */
+	else
 	{
-	    size = leafset_size (routeglob->leftleafset);
-	    p = routeglob->leftleafset;
+		size = leafset_size (this->leftleafset);
+		p = this->leftleafset;
 	}
 
-    if (size == 0)
+	if (size == 0)
 	{
-	    p[0] = input;
-	    *added = input;
+		p[0] = input;
+		*added = input;
 	}
 
-    else
+	else
 	{
 		// to avoid duplicate entries in the same leafset
-		if (key_equal (p[i]->key, input->key))
+		if (p[i]->GetKey() == input->GetKey())
 		{
-			host_release (state, input);
+			hg->ReleaseHost(input);
 			return;
 		}
 
-		int foundKeyPos = 0;
+		bool foundKeyPos = false;
 		if (right_or_left == 1)
 		{
-			foundKeyPos = key_between(state->log, &host->key, &routeglob->me->key, &p[i]->key);
+			foundKeyPos = host->GetKey().between(this->me->GetKey(), p[i]->GetKey());
 		}
 		else
 		{
-			foundKeyPos = key_between(state->log, &host->key, &p[i]->key, &routeglob->me->key);
+			foundKeyPos = host->GetKey().between(p[i]->GetKey(), this->me->GetKey());
 		}
 
 		while ((i < size) && !foundKeyPos)
 		{
-		    if (key_equal (p[i]->key, input->key))
+			if (p[i]->GetKey() == input->GetKey())
 			{
-			    host_release (state, input);
-			    return;
+				hg->ReleaseHost(input);
+				return;
 			}
-		    i++;
-		    if (i < size)
+			i++;
+			if (i < size)
 			{
 				if (right_or_left == 1)
 				{
-					foundKeyPos = key_between(state->log, &host->key, &routeglob->me->key, &p[i]->key);
+					foundKeyPos = host->GetKey().between(this->me->GetKey(), p[i]->GetKey());
 				}
 				else
 				{
-					foundKeyPos = key_between(state->log, &host->key, &p[i]->key, &routeglob->me->key);
+					foundKeyPos = host->GetKey().between(p[i]->GetKey(), this->me->GetKey());
 				}
 			}
 		}
 
-	    tmp1 = input;
-	    *added = input;
+		tmp1 = input;
+		*added = input;
 
-	    while (i < LEAFSET_SIZE / 2)
+		while (i < LEAFSET_SIZE / 2)
 		{
-		    tmp2 = p[i];
-		    p[i++] = tmp1;
-		    tmp1 = tmp2;
+			tmp2 = p[i];
+			p[i++] = tmp1;
+			tmp1 = tmp2;
 		}
 
-	    /* there is leftover */
-	    if (tmp2 != NULL && size == LEAFSET_SIZE / 2)
-		*deleted = tmp2;
+		/* there is leftover */
+		if (tmp2 != NULL && size == LEAFSET_SIZE / 2)
+			*deleted = tmp2;
 	}
 }
 
 /** route_neighbors:
 ** returns an array of #count# neighbor nodes with priority to closer nodes
 */
-ChimeraHost **route_neighbors (ChimeraState * state, int count)
+ChimeraHost **RouteGlobal::route_neighbors (int count) const
 {
-    int i = 0, j = 0, Rsize = 0, Lsize = 0, index = 0;
-    int ret_size;
-    ChimeraHost *tmp;
-    ChimeraHost **hosts =
-	(ChimeraHost **) malloc (sizeof (ChimeraHost *) * (LEAFSET_SIZE + 1));
-    ChimeraHost **ret =
-	(ChimeraHost **) malloc (sizeof (ChimeraHost *) * (count + 1));
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
+	int i = 0, Rsize = 0, Lsize = 0, index = 0;
+	int ret_size;
+	ChimeraHost *tmp;
+	ChimeraHost **hosts = (ChimeraHost **) malloc (sizeof (ChimeraHost *) * (LEAFSET_SIZE + 1));
+	ChimeraHost **ret = (ChimeraHost **) malloc (sizeof (ChimeraHost *) * (count + 1));
 
-    pthread_mutex_lock (&routeglob->lock);
+	BlockLockMutex lock(this);
 
-    Lsize = leafset_size (routeglob->leftleafset);
-    Rsize = leafset_size (routeglob->rightleafset);
+	Lsize = leafset_size (this->leftleafset);
+	Rsize = leafset_size (this->rightleafset);
 
-    if (count > Rsize + Lsize)
+	if (count > Rsize + Lsize)
 	{
-	    ret_size = Rsize + Lsize;
+		ret_size = Rsize + Lsize;
 	}
-    else
+	else
 	ret_size = count;
 
-    /* creat a jrb of leafset pointers sorted on distance */
-    for (i = 0; i < Lsize; i++)
+	/* creat a jrb of leafset pointers sorted on distance */
+	for (i = 0; i < Lsize; i++)
 	{
-	    tmp = routeglob->leftleafset[i];
-	    hosts[index++] = tmp;
+		tmp = this->leftleafset[i];
+		hosts[index++] = tmp;
 	}
 
-    for (i = 0; i < Rsize; i++)
+	for (i = 0; i < Rsize; i++)
 	{
-	    tmp = routeglob->rightleafset[i];
-	    hosts[index++] = tmp;
+		tmp = this->rightleafset[i];
+		hosts[index++] = tmp;
 	}
 
-    hosts[index] = NULL;
-    /* sort aux */
-    sort_hosts (state->log, hosts, routeglob->me->key, index);
+	hosts[index] = NULL;
+	/* sort aux */
+	sort_hosts (hosts, this->me->GetKey(), index);
 
-    for (i = 0; i < ret_size; i++)
+	for (i = 0; i < ret_size; i++)
 	{
-	    tmp = hosts[i];
-	    ret[i] = host_get (state, tmp->name, tmp->port);
+		tmp = hosts[i];
+		ret[i] = hg->GetHost(tmp->GetName().c_str(), tmp->GetPort());
 	}
 
-    ret[i] = NULL;
+	ret[i] = NULL;
 
-    free (hosts);
-    pthread_mutex_unlock (&routeglob->lock);
+	free (hosts);
 
-    return ret;
+	return ret;
 }
 
 
@@ -716,111 +697,86 @@ ChimeraHost **route_neighbors (ChimeraState * state, int count)
 ** then it is removed from the routing tables
 */
 
-void route_update (ChimeraState * state, ChimeraHost * host, int joined)
+void RouteGlobal::route_update (ChimeraHost * host, int joined)
 {
-    int i, j, k, found, pick;
-    ChimeraHost *tmp, *deleted = NULL, *added = NULL;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
+	size_t i, j, k, pick;
+	bool found;
+	ChimeraHost *deleted = NULL, *added = NULL;
+	BlockLockMutex p(this);
 
+	if(this->me->GetKey() == host->GetKey())
+		return;
 
-    pthread_mutex_lock (&routeglob->lock);
+	i = this->me->GetKey().key_index(host->GetKey());
+	j = hexalpha_to_int (host->GetKey().str()[i]);
 
-    if (key_equal (routeglob->me->key, host->key))
+	/*join */
+	if (joined)
 	{
-	    pthread_mutex_unlock (&routeglob->lock);
-	    return;
-	}
-
-    i = key_index (state->log, routeglob->me->key, host->key);
-    j = hexalpha_to_int (get_key_string (&host->key)[i]);
-
-
-    /*join */
-    if (joined)
-	{
-	    found = 0;
-	    for (k = 0; k < MAX_ENTRY; k++)
+		found = false;
+		for (k = 0; k < MAX_ENTRY; k++)
 		{
-		    if (routeglob->table[i][j][k] == NULL)
+			if (this->table[i][j][k] == NULL)
 			{
-			    routeglob->table[i][j][k] =
-				host_get (state, host->name, host->port);
-			    leafset_update (state, host, joined, &deleted,
-					    &added);
-			    found = 1;
-			    break;
+				this->table[i][j][k] = hg->GetHost(host->GetName().c_str(), host->GetPort());
+				leafset_update (host, joined, &deleted, &added);
+				found = true;
+				break;
 			}
-		    else if (routeglob->table[i][j][k] != NULL
-			     && key_equal (routeglob->table[i][j][k]->key,
-					   host->key))
+			else if (this->table[i][j][k] != NULL && this->table[i][j][k]->GetKey() == host->GetKey())
 			{
-			    pthread_mutex_unlock (&routeglob->lock);
-			    return;
-
+				return;
 			}
 		}
 
-	    /* the entry array is full we have to get rid of one */
-	    /* replace the new node with the node with the highest latncy in the entry array */
-	    if (!found)
+		/* the entry array is full we have to get rid of one */
+		/* replace the new node with the node with the highest latncy in the entry array */
+		if (!found)
 		{
-		    pick = 0;
-		    for (k = 1; k < MAX_ENTRY; k++)
+			pick = 0;
+			for (k = 1; k < MAX_ENTRY; k++)
 			{
-			    if (routeglob->table[i][j][pick]->success_avg >
-				routeglob->table[i][j][k]->success_avg)
-				pick = k;
+				if (this->table[i][j][pick]->GetSuccessAvg() > this->table[i][j][k]->GetSuccessAvg())
+					pick = k;
 			}
-		    host_release (state, routeglob->table[i][j][pick]);
-		    routeglob->table[i][j][pick] =
-			host_get (state, host->name, host->port);
-		    leafset_update (state, host, joined, &deleted, &added);
+			this->hg->ReleaseHost(this->table[i][j][pick]);
+			this->table[i][j][pick] = this->hg->GetHost(host->GetName().c_str(), host->GetPort());
+			leafset_update (host, joined, &deleted, &added);
 		}
 	}
 
-    /*delete */
-    else
+	/*delete */
+	else
 	{
-	    for (k = 0; k < MAX_ENTRY; k++)
-		if (routeglob->table[i][j][k] != NULL
-		    && key_equal (routeglob->table[i][j][k]->key, host->key))
-		    {
-			host_release (state, routeglob->table[i][j][k]);
-			routeglob->table[i][j][k] = NULL;
-			break;
-		    }
+		for (k = 0; k < MAX_ENTRY; k++)
+			if (this->table[i][j][k] != NULL && this->table[i][j][k]->GetKey() == host->GetKey())
+			{
+				this->hg->ReleaseHost(this->table[i][j][k]);
+				this->table[i][j][k] = NULL;
+				break;
+			}
 
-	    leafset_update (state, host, joined, &deleted, &added);
+		leafset_update (host, joined, &deleted, &added);
 
 	}
 
-    if (deleted != NULL)
+	if (deleted != NULL)
 	{
-	    leafset_range_update (routeglob, &(routeglob->Rrange),
-				  &(routeglob->Lrange));
-	    chimera_update_upcall (state, &(deleted->key), deleted, 0);
+		leafset_range_update (&this->Rrange, &this->Lrange);
+
+		/* TODO
+		chimera_update_upcall (&(deleted->key), deleted, 0);
+		*/
 	}
-    if (added != NULL)
+	if (added != NULL)
 	{
-	    leafset_range_update (routeglob, &(routeglob->Rrange),
-				  &(routeglob->Lrange));
-	    chimera_update_upcall (state, &(added->key), added, 1);
+		leafset_range_update (&this->Rrange, &this->Lrange);
+		/* TODO
+		chimera_update_upcall (&(added->key), added, 1);
+		*/
 	}
-    pthread_mutex_unlock (&routeglob->lock);
 
-    fflush (stderr);
-}
-
-void gethostinfo (ChimeraHost * CHost)
-{
-
-    char tmp[64];
-    CHost->name = (char *) malloc (sizeof (char) * 64);
-    printf ("Enter key: ");
-    scanf ("%s", tmp);
-    str_to_key (tmp, &(CHost->key));
-    printf ("Key :");
-    key_print (CHost->key);
+	fflush (stderr);
 }
 
 int hexalpha_to_int (int c)
@@ -840,51 +796,27 @@ int hexalpha_to_int (int c)
     return answer;
 }
 
-void leafset_print (ChimeraState * state)
+void RouteGlobal::printTable () const
 {
-    int i;
-    int Lsize, Rsize;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
+	size_t i, j, k;
 
-    Lsize = leafset_size (routeglob->leftleafset);
-    Rsize = leafset_size (routeglob->rightleafset);
+	/* print the table */
 
-    fprintf (stderr, "LEFT: ");
-    for (i = 0; i < Lsize; i++)
-	fprintf (stderr, "%s ",
-		 get_key_string (&routeglob->leftleafset[i]->key));
-    fprintf (stderr, "\nRIGHT: ");
-    for (i = 0; i < Rsize; i++)
-	fprintf (stderr, "%s ",
-		 get_key_string (&routeglob->rightleafset[i]->key));
-    fprintf (stderr, "\n");
-}
-
-void printTable (ChimeraState * state)
-{
-
-    int i, j, k;
-    RouteGlobal *routeglob = (RouteGlobal *) state->route;
-
-    /* print the table */
-
-    fprintf (stderr,
-	     "------------------------------- TABLE-------------------------------\n");
-    for (i = 0; i < MAX_ROW; i++)
+	fprintf (stderr,
+		 "------------------------------- TABLE-------------------------------\n");
+	for (i = 0; i < MAX_ROW; i++)
 	{
-	    for (j = 0; j < MAX_COL; j++)
+		for (j = 0; j < MAX_COL; j++)
 		{
-		    for (k = 0; k < MAX_ENTRY; k++)
-			if (routeglob->table[i][j][k] != NULL)
-			    fprintf (stderr, "%s ",
-				     get_key_string (&routeglob->
-						     table[i][j][k]->key));
-			else
-			    fprintf (stderr,
-				     "00000000 00000000 00000000 00000000 00000000");
+			for (k = 0; k < MAX_ENTRY; k++)
+				if (this->table[i][j][k] != NULL)
+					fprintf (stderr, "%s ", this->table[i][j][k]->GetKey().str().c_str());
+				else
+					fprintf (stderr,
+						 "00000000 00000000 00000000 00000000 00000000");
 		}
-	    fprintf (stderr, "\n");
+		fprintf (stderr, "\n");
 	}
-    fprintf (stderr,
-	     "----------------------------------------------------------------------\n");
+	fprintf (stderr,
+		 "----------------------------------------------------------------------\n");
 }

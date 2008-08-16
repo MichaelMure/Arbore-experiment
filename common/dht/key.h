@@ -71,6 +71,7 @@ public:
 	Key& operator=(uint32_t ul);
 	bool operator==(const Key& k2) const;
 	bool operator==(uint32_t ul) const;
+	bool operator!=(const Key& k2) const { return !(*this == k2); }
 	bool operator>(const Key& k2) const;
 	bool operator<(const Key& k2) const;
 
@@ -89,7 +90,7 @@ public:
 	** check to see if the value in #test# falls in the range from #left# clockwise
 	** around the ring to #right#. */
 
-	int between (const Key * const left, const Key * const right);
+	bool between (const Key& left, const Key& right) const;
 
 
 	/* key_midpoint: mid, key

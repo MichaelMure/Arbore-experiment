@@ -54,6 +54,11 @@ class RouteGlobal : protected Mutex
 	ChimeraHost* find_closest_key (ChimeraHost ** hosts, Key key, size_t size) const;
 	int leafset_size (ChimeraHost ** arr) const;
 	void leafset_range_update (Key * rrange, Key * lrange) const;
+	void leafset_update (ChimeraHost * host, int joined, ChimeraHost ** deleted, ChimeraHost ** added) const;
+	void leafset_delete (ChimeraHost * host, int right_or_left, ChimeraHost ** deleted) const;
+	void leafset_insert (ChimeraHost * host, int right_or_left, ChimeraHost ** deleted,
+			     ChimeraHost ** added) const;
+	ChimeraHost **route_neighbors (int count) const;
 
 public:
 
@@ -101,7 +106,7 @@ public:
 
 	/** prints routing table,
 	*/
-	void printTable ();
+	void printTable () const;
 
 };
 
