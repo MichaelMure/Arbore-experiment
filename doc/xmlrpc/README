@@ -5,9 +5,9 @@ Connection example with python
 ------------------------------
 
 >>> import xmlrpclib
->>> s = xmlrpclib.ServerProxy('http://localhost:9001')
+>>> s = xmlrpclib.ServerProxy('http://localhost:1778')
 >>> print "Peerfuse version: " + s.pf.version()
->>> [ s.peers.info(b) for b in s.peers.list() ]
+>>> [ a.peers.info(b) for b in a.peers.list() ]
 
 API version 0 (1 when it'll be stable)
 -------------------------------

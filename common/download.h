@@ -18,6 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
+ * 
  */
 
 #ifndef DOWNLOAD_H
