@@ -23,28 +23,28 @@
  *
  */
 
-/*
-** $Id: semaphore.h,v 1.8 2006/06/07 09:21:28 krishnap Exp $
-**
-** Matthew Allen
-** description:
-*/
+#ifndef _CHIMERA_NETWORK_ACTIVATE_H
+#define _CHIMERA_NETWORK_ACTIVATE_H
 
-#ifndef _CHIMERA_SEMAPHORE_H_
-#define _CHIMERA_SEMAPHORE_H_
+#include "pf_thread.h"
 
-#include <pthread.h>
+class NetworkGlobal;
 
-typedef struct
+/**
+ ** network_activate:
+ ** NEVER RETURNS. Puts the network layer into listen mode. This thread
+ ** manages acknowledgements, delivers incomming messages to the message
+ ** handler, and drives the network layer. It should only be called once.
+ */
+class NetworkActivate : public Thread
 {
-    int val;
-    pthread_mutex_t lock;
-    pthread_cond_t cond;
-} Sema;
+	NetworkGlobal* ng;
 
-void *sema_create (int val);
-void sema_destroy (void *v);
-int sema_p (void *v, double timeout);
-void sema_v (void *v);
+	void Loop();
+public:
 
-#endif /* _CHIMERA_SEMAPHORE_H_ */
+	NetworkActivate(NetworkGlobal* ng);
+	~NetworkActivate() {}
+};
+
+#endif /* _CHIMERA_NETWORK_ACTIVATE_H */

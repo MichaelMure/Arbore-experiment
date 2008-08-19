@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_TYPES_H
@@ -53,5 +53,7 @@ enum job_type
 	JOB_END_OF_LS,
 	/* Delay a send of a NET_MKFILE message */
 	JOB_SEND_MKFILE,
+	/* Used to handle a received message */
+	JOB_HANDLE_MESSAGE,
 };
 #endif

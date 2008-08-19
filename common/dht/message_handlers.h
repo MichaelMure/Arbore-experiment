@@ -23,28 +23,43 @@
  *
  */
 
-/*
-** $Id: semaphore.h,v 1.8 2006/06/07 09:21:28 krishnap Exp $
-**
-** Matthew Allen
-** description:
-*/
+#ifndef _CHIMERA_MESSAGE_HANDLERS_H
+#define _CHIMERA_MESSAGE_HANDLERS_H
 
-#ifndef _CHIMERA_SEMAPHORE_H_
-#define _CHIMERA_SEMAPHORE_H_
+#include "jobs/job.h"
 
-#include <pthread.h>
+class Message;
 
-typedef struct
+class IMessageHandler
 {
-    int val;
-    pthread_mutex_t lock;
-    pthread_cond_t cond;
-} Sema;
+public:
 
-void *sema_create (int val);
-void sema_destroy (void *v);
-int sema_p (void *v, double timeout);
-void sema_v (void *v);
+	virtual void operator() (const Message* message) = 0;
+};
 
-#endif /* _CHIMERA_SEMAPHORE_H_ */
+class ChimeraMessageHandler : public IMessageHandler
+{
+	public:
+		void operator() (const Message* message);
+};
+
+class JobHandleMessage : public Job
+{
+	IMessageHandler* handler;
+	Message* message;
+
+public:
+	JobHandleMessage(IMessageHandler* _handler, Message* _message)
+		: Job(0, REPEAT_NONE),
+		   handler(_handler),
+		   message(_message)
+	{}
+
+	bool Start();
+
+	job_type GetType() const { return JOB_HANDLE_MESSAGE; }
+	std::string GetName() const { return "JobHandleMessage"; }
+};
+
+
+#endif /* _CHIMERA_MESSAGE_HANDLERS_H */

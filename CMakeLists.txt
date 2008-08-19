@@ -23,6 +23,16 @@ SET(SRC
 	common/files/hdd.cpp
 	common/files/file_entry_base.cpp
 
+	common/dht/key.cpp
+	common/dht/host.cpp
+	common/dht/route.cpp
+	common/dht/message_handlers.cpp
+	common/dht/network_activate.cpp
+	common/dht/network_retransmit.cpp
+	common/dht/network.cpp
+	common/dht/message.cpp
+	common/dht/chimera.cpp
+
 	common/net/network_base.cpp
 	common/net/peer_base.cpp
 	common/net/peers_list_base.cpp

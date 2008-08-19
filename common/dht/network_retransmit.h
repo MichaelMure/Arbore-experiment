@@ -23,28 +23,25 @@
  *
  */
 
-/*
-** $Id: semaphore.h,v 1.8 2006/06/07 09:21:28 krishnap Exp $
-**
-** Matthew Allen
-** description:
-*/
+#ifndef _CHIMERA_NETWORK_RETRANSMIT_H
+#define _CHIMERA_NETWORK_RETRANSMIT_H
 
-#ifndef _CHIMERA_SEMAPHORE_H_
-#define _CHIMERA_SEMAPHORE_H_
+#include "pf_thread.h"
 
-#include <pthread.h>
+class NetworkGlobal;
 
-typedef struct
+// retransmit packets that are not acknowledged in a 1 sec window
+class NetworkRetransmit : public Thread
 {
-    int val;
-    pthread_mutex_t lock;
-    pthread_cond_t cond;
-} Sema;
+	NetworkGlobal* ng;
 
-void *sema_create (int val);
-void sema_destroy (void *v);
-int sema_p (void *v, double timeout);
-void sema_v (void *v);
+	void Loop();
 
-#endif /* _CHIMERA_SEMAPHORE_H_ */
+public:
+
+	NetworkRetransmit(NetworkGlobal* _ng);
+	~NetworkRetransmit() {}
+
+};
+
+#endif /* _CHIMERA_NETWORK_RETRANSMIT_H */

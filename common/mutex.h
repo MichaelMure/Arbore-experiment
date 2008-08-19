@@ -18,12 +18,14 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef MUTEX_H
 #define MUTEX_H
 #include <pthread.h>
+#include <exception>
+
 enum MutexType
 {
 	NORMAL_MUTEX,
@@ -34,10 +36,14 @@ class Mutex
 {
 private:
 	pthread_mutex_t* mutex;
+
 	MutexType type;
 
-	void Init(enum MutexType _type = NORMAL_MUTEX);
+	void Init(enum MutexType _type);
+
 public:
+
+	class MutexError : public std::exception {};
 
 	Mutex(enum MutexType _type = NORMAL_MUTEX);
 	Mutex(const Mutex &m);

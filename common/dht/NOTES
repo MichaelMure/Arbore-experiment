@@ -17,33 +17,51 @@ Flags:    +   port this file to a C++ implementation
 Filename     Flags    Description
 ---------------------------------
 base.h        [C]     :Some functions to integer base conversion
-chimera.c     [+]     :main functions of Chimera
-chimera.h     [+]     :main functions of Chimera
-dllist.c      [ ]     :double linked list
-dllist.h      [ ]     :double linked list
+chimera.c     [M]     :main functions of Chimera
+chimera.h     [M]     :main functions of Chimera
+dllist.c      [C]     :double linked list
+dllist.h      [C]     :double linked list
 dtime.c       [C]     :some time related functions
 dtime.h       [C]     :some time related functions
-host.c        [+]     :the chimera representation of hosts
-host.h        [+]     :the chimera representation of hosts
-include.h     [ ]     :useless declaration of the Bool type
+host.c        [*]     :the chimera representation of hosts
+host.h        [*]     :the chimera representation of hosts
+include.h     [-]     :useless declaration of the Bool type
 job_queue.c   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
 job_queue.h   [-]     :a scheduler (like peerfuse's) -- use common/scheduler*.h instead
 jrb.c         [?]     :what is it?
 jrb.h         [?]     :what is it?
 jval.c        [?]     :what is it?
 jval.h        [?]     :what is it?
-key.c         [-]     :key used to represent a peer or a file
-key.h         [-]     :key used to represent a peer or a file
+key.c         [*]     :key used to represent a peer or a file
+key.h         [*]     :key used to represent a peer or a file
 log.c         [-]     :logging functions
 log.h         [-]     :logging functions
-message.c     [+]     :functions to send and receive a message
-message.h     [+]     :functions to send and receive a message
-network.c     [C]     :network functions
-network.h     [C]     :network functions
-priqueue.c    [?]     :what is it?
-priqueue.h    [?]     :what is it?
-route.c       [+]     :the routing protocol
-route.h       [+]     :the routing protocol
-semaphore.c   [C]     :semaphore implementation
-semaphore.h   [C]     :semaphore implementation
+message.c     [M]     :functions to send and receive a message
+message.h     [M]     :functions to send and receive a message
+network.c     [M]     :network functions
+network.h     [M]     :network functions
+priqueue.c    [-]     :priority queue (not used by chimera)
+priqueue.h    [-]     :priority queue (not used by chimera)
+route.c       [M]     :the routing protocol
+route.h       [M]     :the routing protocol
+semaphore.c   [-]     :semaphore implementation (not used by chimera)
+semaphore.h   [-]     :semaphore implementation (not used by chimera)
 test.c        [+]     :test program
+
+******
+Notes:*
+******
+
+:::: Look for the "TODO" keyword in the chimera's code ::::
+
+- The ChimeraState class is now ChimeraDHT.
+
+- Chimera uses the UDP network layer to send and receive messages... Why?
+- Do we use the peerfuse scheduler (in only one thread), or keep all Chimera's threads?
+  We can also extend the peerfuse scheduler to create several instances and queues..
+- Chimera has a (big) bug with 64bits architectures, because of use of unsigned longs to store key, which is
+  an uint32_t on 32bits arch, and uint64_t on 64bits based arch. Solution
+
+-> Check the fucking compatibility of chimera with x86_64 processors, because of a
+   massive usage of the lamest type "unsigned long", which is size variant.
+
