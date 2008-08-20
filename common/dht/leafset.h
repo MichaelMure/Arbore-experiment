@@ -81,13 +81,8 @@ public :
 	* \param inLeafset the function sets it to true if the key falls into the leafset
 	*/
 	ChimeraHost* routeLookup(const Key* key , bool* inLeafset) const;
-//	bool isInRange(const Key* k) const;
-	//add responsibility interval and size
 
 private :
-//	bool clockwiseSideFull() const;
-//	bool counterclockwiseSideFull() const;
-
 	/*! \brief Clears the leafset
 	* Clears the leafset, all entries are removed
 	*/
@@ -120,10 +115,8 @@ private :
 	* \return the position of the peer, -1 if it is not present
 	*/
 	size_t getCounterclockwiseIndex(const ChimeraHost* entry) const;
-	//bool inLeftRange(const Key* key);
-	//bool inRightRange(const Key* key);
-#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
 
+#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
 	/*! \brief Updates the distance between the local peer and is most clockwise distant neighbour in the leafset.
 	* Updates the distance between the local peer and is most clockwise distant neighbour in the leafset. The choice of the clockwise side is arbitrary.
 	*/

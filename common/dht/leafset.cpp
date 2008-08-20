@@ -85,99 +85,107 @@ bool Leafset::remove(const ChimeraHost* entry)
 	//TODO some code copy, not very nice
 	bool removed = false;
 	//try to remove clockwise
-	size_t pos = this->getClockwiseIndex(entry);
-	if(pos >= 0)
+	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
+	if(this->nbLeavesClockwise > 0 && entry->GetKey().between(this->me->GetKey(), this->leavesClockwise[this->nbLeavesClockwise - 1]->GetKey()))
 	{
-		this->hg->ReleaseHost(this->leavesClockwise[pos]);
-		//TODO data copy could be faster
-		for(size_t i = pos; i < this->nbLeavesClockwise-1; i++)
+		size_t pos = this->getClockwiseIndex(entry);
+		if(pos >= 0)
 		{
-			this->leavesClockwise[i] = this->leavesClockwise[i+1];
+			this->hg->ReleaseHost(this->leavesClockwise[pos]);
+			//TODO data copy could be faster
+			for(size_t i = pos; i < this->nbLeavesClockwise-1; i++)
+			{
+				this->leavesClockwise[i] = this->leavesClockwise[i+1];
+			}
+			this->leavesClockwise[this->nbLeavesClockwise] = NULL;
+			this->nbLeavesClockwise--;
+			removed = true;
 		}
-		this->leavesClockwise[this->nbLeavesClockwise] = NULL;
-		this->nbLeavesClockwise--;
-		removed = true;
 	}
 	//try to remove counterclockwise
-	pos = this->getCounterclockwiseIndex(entry);
-	if(pos >= 0)
+	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
+	if(this->nbLeavesCounterclockwise > 0 && entry->GetKey().between(this->leavesCounterclockwise[this->nbLeavesCounterclockwise - 1]->GetKey(), this->me->GetKey()))
 	{
-		this->hg->ReleaseHost(this->leavesCounterclockwise[pos]);
-		//TODO data copy could be faster
-		for(size_t i = pos; i < this->nbLeavesCounterclockwise-1; i++)
+		size_t pos = this->getCounterclockwiseIndex(entry);
+		if(pos >= 0)
 		{
-			this->leavesCounterclockwise[i] = this->leavesCounterclockwise[i+1];
+			this->hg->ReleaseHost(this->leavesCounterclockwise[pos]);
+			//TODO data copy could be faster
+			for(size_t i = pos; i < this->nbLeavesCounterclockwise-1; i++)
+			{
+				this->leavesCounterclockwise[i] = this->leavesCounterclockwise[i+1];
+			}
+			this->leavesCounterclockwise[this->nbLeavesCounterclockwise] = NULL;
+			this->nbLeavesCounterclockwise--;
+			removed = true;
 		}
-		this->leavesCounterclockwise[this->nbLeavesCounterclockwise] = NULL;
-		this->nbLeavesCounterclockwise--;
-		removed = true;
 	}
 	return removed;
 }
 
-//bool Leafset::isInRange(const Key* k) const
-//{
-//	return true;
-//}
-
-//bool Leafset::clockwiseSideFull() const
-//{
-//	return this->nbLeavesClockwise == (ONE_SIDE_LEAFSET_SIZE);
-//}
-
-//bool Leafset::counterclockwiseSideFull() const
-//{
-//	return this->nbLeavesCounterclockwise == (ONE_SIDE_LEAFSET_SIZE);
-//}
-
 size_t Leafset::getClockwiseInsertIndex(const ChimeraHost* entry) const
 {
-	for(site_t i = 0; i < this->nbLeavesClockwise; i++)
+	//this part of the leafset is full and the entry doesn't fall into it
+	if(this->nbLeavesClockwise == ONE_SIDE_LEAFSET_SIZE && !entry->GetKey().between(this->me->GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1]->GetKey()))
 	{
-		if(entry->GetKey() == this->leavesClockwise[i]->GetKey())
+		return ONE_SIDE_LEAFSET_SIZE;
+	}
+	for(size_t i = 0; i < this->nbLeavesClockwise-1; i++)
+	{
+		if(entry->GetKey().between(this->leavesClockwise[i]->GetKey(), this->leavesClockwise[i+1]->GetKey()))
+		{
+			//we don't allow 2 entries with the same dht id
+			if((entry->GetKey() == this->leavesClockwise[i]->GetKey()) || (entry->GetKey() == this->leavesClockwise[i+1]->GetKey()))
+			{
+				return -1;
+			}
+			return i+1;
+		}
+	}
+	if(entry->GetKey().between(this->me->GetKey(), this->leavesClockwise[0]->GetKey()))
+	{
+		if(entry->GetKey() == this->leavesClockwise[0]->GetKey())
 		{
 			return -1;
 		}
-		if(i == 0)
-		{
-			if(entry->GetKey().between(this->me, this->leavesClockwise[i]->GetKey()))
-			{
-				return i;
-			}
-		}
-		else if(entry->GetKey().between(this->leavesClockwise[i-1]->GetKey(), this->leavesClockwise[i]->GetKey()))
-		{
-			return i;
-		}
+		return 0;
 	}
-	return ONE_SIDE_LEAFSET_SIZE;
+	return this->nbLeavesClockwise + 1;
 }
 
 size_t Leafset::getCounterclockwiseInsertIndex(const ChimeraHost* entry) const
 {
-	for(site_t i = 0; i < this->nbLeavesCounterclockwise; i++)
+	//this part of the leafset is full and the entry doesn't fall into it
+	if(this->nbLeavesCounterclockwise == ONE_SIDE_LEAFSET_SIZE && !entry->GetKey().between(this->leavesClockwise[this->nbLeavesCounterclockwise-1]->GetKey(),this->me->GetKey()))
 	{
-		if(entry->GetKey() == this->leavesCounterclockwise[i]->GetKey())
+		return ONE_SIDE_LEAFSET_SIZE;
+	}
+	for(size_t i = 0; i < this->nbLeavesCounterclockwise-1; i++)
+	{
+		if(entry->GetKey().between(this->leavesCounterclockwise[i+1]->GetKey(), this->leavesCounterclockwise[i]->GetKey()))
+		{
+			//we don't allow 2 entries with the same dht id
+			if((entry->GetKey() == this->leavesCounterclockwise[i]->GetKey()) || (entry->GetKey() == this->leavesCounterclockwise[i+1]->GetKey()))
+			{
+				return -1;
+			}
+			return i+1;
+		}
+	}
+	if(entry->GetKey().between(this->leavesCounterclockwise[0]->GetKey(), this->me->GetKey()))
+	{
+		if(entry->GetKey() == this->leavesClockwise[0]->GetKey())
 		{
 			return -1;
 		}
-		if(i == 0)
-		{
-			if(entry->GetKey().between(this->leavesClockwise[i]->GetKey(), this->me))
-			{
-				return i;
-			}
-		}
-		else if(entry->GetKey().between(this->leavesClockwise[i]->GetKey(), this->leavesClockwise[i-1]->GetKey()))
-		{
-			return i;
-		}
+		return 0;
 	}
-	return ONE_SIDE_LEAFSET_SIZE;
+	return this->nbLeavesClockwise + 1;
 }
 
 size_t Leafset::getClockwiseIndex(const ChimeraHost* entry) const
 {
+	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
 	for(size_t i = 0; i < this->nbLeavesClockwise; i++)
 	{
 		if(entry->GetKey() == this->leavesClockwise[i]->GetKey())
@@ -191,6 +199,7 @@ size_t Leafset::getClockwiseIndex(const ChimeraHost* entry) const
 //TODO some code copy again...
 size_t Leafset::getCounterclockwiseIndex(const ChimeraHost* entry) const
 {
+	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
 	for(size_t i = 0; i < this->nbLeavesCounterclockwise; i++)
 	{
 		if(entry->GetKey() == this->leavesCounterclockwise[i]->GetKey())
