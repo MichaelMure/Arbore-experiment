@@ -1,0 +1,348 @@
+/*
+ * Copyright(C) 2008 Romain Bignon
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This product includes cryptographic software written by Eric Young
+ * (eay@cryptsoft.com).  This product includes software written by Tim
+ * Hudson (tjh@cryptsoft.com).
+ *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
+ */
+
+#include "routing_table.h"
+
+RoutingTable::RoutingTable(HostGlobal* _hg, ChimeraHost * _me)
+	: hg(_hg),
+	  me(_me)
+{
+	this->clear();
+}
+
+void RoutingTable::clear()
+{
+	//set all the entries to null
+	//TODO use memset to go faster ?
+	for (int i = 0; i < MAX_ROW; i++)
+	{
+		for (int j = 0; j < MAX_COL; j++)
+		{
+			for (int k = 0; k < MAX_ENTRY; k++)
+			{
+				this->table[i][j][k] = NULL;
+			}
+		}
+	}
+
+}
+
+void RoutingTable::KeyUpdate(ChimeraHost* _me)
+{
+	this->me = _me;
+	//clear the routing table because when the key changes all the entries are at the wrong place
+	this->clear();
+}
+
+bool RoutingTable::add(const ChimeraHost* entry)
+{
+	//original code performs some leafset update... shoud not be needed anymore
+	//TODO see if we can remove this sanity check
+	//the entry has the same key as the local node, should never happen
+	if(this->me->GetKey() == entry->GetKey())
+	{
+		return false;
+	}
+	//get the coordinates where the entry should go
+	size_t i = this->me->GetKey().key_index(entry->GetKey());
+	size_t j = hexalphaToInt(entry->GetKey().str()[i]);
+	bool found = false;
+	for (size_t k = 0; !found && k < MAX_ENTRY; k++)
+	{
+		//we found an empty space, add the entry
+		if (this->table[i][j][k] == NULL)
+		{
+			this->table[i][j][k] = hg->GetHost(entry->GetName().c_str(), entry->GetPort());
+			found = true;
+		}
+		//entry is already in the routing table, simply return
+		else if (this->table[i][j][k] != NULL && this->table[i][j][k]->GetKey() == entry->GetKey())
+		{
+			return false;
+		}
+
+	}
+	//the entry array is full we have to get rid of one
+	//replace the new node with the node with the highest latency in the entry array
+	//TODO understand why we can't just sometimes keep the entries we have
+	if (!found)
+	{
+		size_t pick = this->findWorstEntry(i,j);
+		this->hg->ReleaseHost(this->table[i][j][pick]);
+		this->table[i][j][pick] = this->hg->GetHost(entry->GetName().c_str(), entry->GetPort());
+	}
+	return true;
+}
+
+bool RoutingTable::remove(const ChimeraHost* entry)
+{
+	//original code performs some leafset update... shoud not be needed anymore
+	//TODO see if we can remove this sanity check
+	//the entry has the same key as the local node, should never happen
+	if(this->me->GetKey() == entry->GetKey())
+	{
+		return false;
+	}
+	//get the coordinates where the entry should go
+	size_t i = this->me->GetKey().key_index(entry->GetKey());
+	size_t j = hexalphaToInt(entry->GetKey().str()[i]);
+	for (size_t k = 0; k < MAX_ENTRY; k++)
+	{
+		if (this->table[i][j][k] != NULL && this->table[i][j][k]->GetKey() == entry->GetKey())
+		{
+			//when we find it, set the entry to null so that we don't use it anymore
+			this->hg->ReleaseHost(this->table[i][j][k]);
+			this->table[i][j][k] = NULL;
+			return true;
+		}
+	}
+	return false;
+}
+
+size_t RoutingTable::findWorstEntry(size_t line, size_t column) const
+{
+	//TODO do a comparator for ChimeraHost instead ?
+	size_t worst = -1;
+	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != NULL; k++)
+	{
+		if(worst < 0)
+		{
+			worst = k;
+		}
+		//priority is SuccessAvg > Latency
+		else if (this->table[line][column][worst]->GetSuccessAvg() > this->table[line][column][k]->GetSuccessAvg()
+			||
+			(
+				this->table[line][column][worst]->GetSuccessAvg() == this->table[line][column][k]->GetSuccessAvg()
+				&&
+				this->table[line][column][worst]->GetLatency() < this->table[line][column][k]->GetLatency()
+			)
+		)
+		{
+			worst = k;
+		}
+	}
+	return worst;
+}
+
+size_t RoutingTable::findBestEntry(size_t line, size_t column) const
+{
+	//TODO do a comparator for ChimeraHost instead ?
+	size_t best = -1;
+	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != NULL; k++)
+	{
+		if(best < 0)
+		{
+			best = k;
+		}
+		//priority is SuccessAvg > Latency
+		else if (this->table[line][column][best]->GetSuccessAvg() < this->table[line][column][k]->GetSuccessAvg()
+			||
+			(
+				this->table[line][column][best]->GetSuccessAvg() == this->table[line][column][k]->GetSuccessAvg()
+				&&
+				this->table[line][column][best]->GetLatency() > this->table[line][column][k]->GetLatency()
+			)
+		)
+		{
+			best = k;
+		}
+	}
+	return best;
+}
+
+int RoutingTable::hexalphaToInt(int c)
+{
+	//ugly, see if we can change it or at least move it to Key class
+	char hexalpha[] = "0123456789abcdef";
+	int i;
+	int answer = 0;
+	for (i = 0; answer == 0 && hexalpha[i] != '\0'; i++)
+	{
+		if (hexalpha[i] == c)
+		{
+		    answer = i;
+		}
+	}
+	return answer;
+}
+
+ChimeraHost* RoutingTable::routeLookup(const Key* key , bool* perfectMatch) const
+{
+	if(this->me->GetKey() == *key)
+	{
+		return this->me;
+	}
+	//try perfect match
+	size_t matchLine = this->me->GetKey().key_index(*key);
+	size_t matchCol = hexalphaToInt(key->str()[matchLine]);
+	ChimeraHost* nextHop = NULL;
+	for (size_t k = 0; k < MAX_ENTRY; k++)
+	{
+		if (this->table[matchLine][matchCol][k] != NULL && this->table[matchLine][matchCol][k]->GetSuccessAvg() > BAD_LINK)
+		{
+			if(nextHop == NULL)
+			{
+				nextHop = this->table[matchLine][matchCol][k];
+			}
+			else
+			{
+				nextHop = bestEntry(nextHop, this->table[matchLine][matchCol][k], key);
+			}
+		}
+	}
+	if(nextHop != NULL)
+	{
+		//we got a perfect match, prefix matching got one step further, we route to that peer
+		*perfectMatch = true;
+		return nextHop;
+	}
+	//no perfect match, fin the closest entry
+	*perfectMatch = false;
+	ChimeraHost* clockwiseBest = NULL;
+	size_t i = matchLine;
+	size_t j = matchCol;
+	while(clockwiseBest == NULL)
+	{
+		j++;
+		//move to the next position in the routing table
+		//reached the end of the line without going into local node cell, local node is the best candidate
+		if(j >= MAX_COL)
+		{
+			clockwiseBest = this->me;
+		}
+		else
+		{
+			//reached local node cell, move down to the next line
+			if(hexalphaToInt(this->me->GetKey().str()[i]) == j)
+			{
+				i++;
+				//if we were at the last line, can't go down any more, local node is the best candidate
+				if(i == MAX_ROW)
+				{
+					clockwiseBest = this->me;
+				}
+				else
+				//we can go to the beginning of the next line
+				{
+					j = 0;
+				}
+			}
+		}
+		//if we have a new position to try, do it
+		if(clockwiseBest != NULL)
+		{
+			size_t index = this->findBestEntry(i,j);
+			if(index >= 0)
+			{
+				clockwiseBest = this->table[i][j][index];
+			}
+		}
+	}
+	ChimeraHost* counterClockwiseBest = NULL;
+	i = matchLine;
+	j = matchCol;
+	while(counterClockwiseBest == NULL)
+	{
+		j--;
+		//move to the next position in the routing table
+		//reached the beginning of the line without going into local node cell, local node is the best candidate
+		if(j < 0)
+		{
+			counterClockwiseBest = this->me;
+		}
+		else
+		{
+			//reached local node cell, move down to the next line
+			if(hexalphaToInt(this->me->GetKey().str()[i]) == j)
+			{
+				i++;
+				//if we were at the last line, can't go down any more, local node is the best candidate
+				if(i == MAX_ROW)
+				{
+					counterClockwiseBest = this->me;
+				}
+				else
+				//we can go to the beginning of the next line
+				{
+					j = MAX_COL - 1;
+				}
+			}
+		}
+		//if we have a new position to try, do it
+		if(clockwiseBest != NULL)
+		{
+			size_t index = this->findBestEntry(i,j);
+			if(index >= 0)
+			{
+				counterClockwiseBest = this->table[i][j][index];
+			}
+		}
+	}
+	Key distCW = clockwiseBest->GetKey().distance(*key);
+	Key distCCW = counterClockwiseBest->GetKey().distance(*key);
+	if(distCW < distCCW)
+	{
+		return clockwiseBest;
+	}
+	if(distCW > distCCW)
+	{
+		return counterClockwiseBest;
+	}
+	//distance is the same
+	if(clockwiseBest == this->me)
+	{
+		return clockwiseBest;
+	}
+}
+
+ChimeraHost* bestEntry(ChimeraHost* e1, ChimeraHost* e2)
+{
+	//priority : SuccessAvg > latency
+	if(e1->GetSuccessAvg() > e2->GetSuccessAvg() || ((e1->GetSuccessAvg() == e2->GetSuccessAvg()) && (e1->GetLatency() < e2->GetLatency())))
+	{
+		return e1;
+	}
+	else
+	{
+		return e2;
+	}
+}
+
+ChimeraHost* bestEntry(ChimeraHost* e1, ChimeraHost* e2, const Key* key)
+{
+	//priority : PrefixMatching > SuccessAvg > latency
+	size_t e1match = e1->GetKey().key_index(*key);
+	size_t e2match = e2->GetKey().key_index(*key);
+	if(e1match > e2match)
+	{
+		return e1;
+	}
+	if(e2match > e1match)
+	{
+		return e2;
+	}
+	return bestEntry(e1,e2);
+}
