@@ -139,6 +139,7 @@ void _Host::UpdateStat (int success)
 
 Host::Host(Mutex* mutex, const std::string& name, int port, in_addr_t address)
 {
+	BlockLockMutex(this->host->GetMutex());
 	this->host = new _Host(mutex, name, port, address);
 }
 
@@ -151,6 +152,7 @@ Host::Host(const Host& h)
 
 Host& Host::operator=(const Host& h)
 {
+	BlockLockMutex(this->host->GetMutex());
 	this->host = h.host;
 	this->host->reference++;
 
@@ -159,6 +161,7 @@ Host& Host::operator=(const Host& h)
 
 Host::~Host()
 {
+	BlockLockMutex(this->host->GetMutex());
 	this->host->reference--;
 	if(!this->host->reference)
 		delete this->host;
@@ -166,6 +169,7 @@ Host::~Host()
 
 in_addr_t Host::GetAddress() const
 {
+	BlockLockMutex(this->host->GetMutex());
 	return host->GetAddress();
 }
 
@@ -175,6 +179,7 @@ in_addr_t Host::GetAddress() const
  */
 std::string Host::Encode() const
 {
+	BlockLockMutex(this->host->GetMutex());
 	return host->Encode();
 }
 
@@ -183,19 +188,52 @@ std::string Host::Encode() const
  */
 void Host::UpdateStat (int success)
 {
+	BlockLockMutex(this->host->GetMutex());
 	host->UpdateStat(success);
 }
 
-const Key& Host::GetKey() const { return host->GetKey(); }
-void Host::SetKey(Key k) { host->SetKey(k); }
+const Key& Host::GetKey() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetKey();
+}
+void Host::SetKey(Key k)
+{
+	BlockLockMutex(this->host->GetMutex());
+	host->SetKey(k);
+}
 
-const std::string& Host::GetName() const { return host->GetName(); }
-int Host::GetPort() const { return host->GetPort(); }
-double Host::GetFailureTime() const { return host->GetFailureTime(); }
-double Host::GetLatency() const { return host->GetLatency(); }
+const std::string& Host::GetName() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetName();
+}
+int Host::GetPort() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetPort();
+}
+double Host::GetFailureTime() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetFailureTime();
+}
+double Host::GetLatency() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetLatency();
+}
 
-void Host::SetFailureTime(double f) { host->SetFailureTime(f); }
-float Host::GetSuccessAvg() const { return host->GetSuccessAvg(); }
+void Host::SetFailureTime(double f)
+{
+	BlockLockMutex(this->host->GetMutex());
+	host->SetFailureTime(f);
+}
+float Host::GetSuccessAvg() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->GetSuccessAvg();
+}
 
 /********************
  * OLD CODE

@@ -26,6 +26,10 @@
 #ifndef _HOSTS_LIST_H_
 #define _HOSTS_LIST_H_
 
+#include <netinet/in.h>
+#include "jrb.h"
+#include "dllist.h"
+
 class HostsList : public Mutex
 {
 	JRB hosts;
