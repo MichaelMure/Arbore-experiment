@@ -33,7 +33,7 @@
 #ifndef _CHIMERA_NETWORK_H_
 #define _CHIMERA_NETWORK_H_
 
-#include "host.h"
+#include "hosts_list.h"
 #include "jrb.h"
 
 /**

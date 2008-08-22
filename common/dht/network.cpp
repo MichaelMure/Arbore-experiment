@@ -37,7 +37,7 @@
 #include <pthread.h>
 #include <cassert>
 #include "network.h"
-#include "host.h"
+#include "hosts_list.h"
 #include "message.h"
 #include "jrb.h"
 #include "jval.h"

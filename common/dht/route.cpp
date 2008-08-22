@@ -28,7 +28,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include "route.h"
-#include "host.h"
+#include "hosts_list.h"
 #include "jrb.h"
 #include "jval.h"
 

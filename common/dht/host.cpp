@@ -29,112 +29,61 @@
 #include <netdb.h>
 
 #include "host.h"
+#include "jrb.h"
+#include "dllist.h"
 
-class CacheEntry
+class _Host
 {
-	ChimeraHost *host;
-	int refrence;
-	JRB node;
-	Dllist free_list;
+	Mutex* mutex;
+	std::string name;
+	in_addr_t address;
+	int failed;
+	double failuretime;
+	int port;
+	double latency;
+	double loss;
+	double success;
+	int success_win[SUCCESS_WINDOW];
+	int success_win_index;
+	float success_avg;
+	Key key;
 
 public:
+	unsigned int reference;
 
-	CacheEntry(ChimeraHost*);
-	~CacheEntry();
+	_Host(Mutex* mutex, const std::string& name, int port, in_addr_t address);
 
-	void SetNode(JRB n) { node = n; }
-	const Dllist& GetFreeList() const { return free_list; }
-	void SetFreeList(Dllist fl) { free_list = fl; }
+	in_addr_t GetAddress() const { return address; }
 
-	int GetRefrence() const { return refrence; }
-	void RefrenceUp() { refrence++; }
-	void RefrenceDown() { refrence--; }
-
-	const JRB& GetNode() const { return node; }
-
-	/* TODO: do NOT return ChimeraHost outside of the HostGlobal class,
-	 * because HostEntry is a strategic resource which can't be locked with mutex.
+	/** host_encode:
+	 ** encodes the #host# into a string, putting it in #s#, which has
+	 ** #len# bytes in it.
 	 */
-	ChimeraHost* GetHost() const { return host; }
+	std::string Encode() const;
+
+	Mutex* GetMutex() const { return mutex; }
+
+	/** host_update_stat:
+	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
+	 */
+	void UpdateStat (int success);
+
+	const Key& GetKey() const { return key; }
+	void SetKey(Key k) { key = k; }
+
+	const std::string& GetName() const { return name; }
+	int GetPort() const { return port; }
+	double GetFailureTime() const { return failuretime; }
+	double GetLatency() const { return latency; }
+
+	void SetFailureTime(double f) { failuretime = f; }
+	float GetSuccessAvg() const { return success_avg; }
 
 };
 
-CacheEntry::CacheEntry(ChimeraHost* _host)
-	: host(_host),
-	  refrence(1)
-{
-
-}
-
-CacheEntry::~CacheEntry()
-{
-	delete host;
-}
-
-/** host_encode:
- ** encodes the #host# into a string, putting it in #s#, which has
- ** #len# bytes in it.
- */
-std::string ChimeraHost::Encode() const
-{
-	return key.str() + ":" + name + ":" + TypToStr(port);
-}
-
-/** host_init:
- ** initialize a host struct with a #size# element cache.
- */
-HostGlobal::HostGlobal(size_t size)
-{
-	this->hosts = make_jrb ();
-	this->free_list = new_dllist ();
-	this->size = 0;
-	this->max = size;
-}
-
-/** host_decode:
- ** decodes a string into a chimera host structure. This acts as a
- ** host_get, and should be followed eventually by a host_release.
- */
-ChimeraHost* HostGlobal::DecodeHost(const char *hostname)
-{
-	char *key = NULL, *name = NULL, *port = NULL;
-	ChimeraHost *host;
-	int i;
-	Key k;
-	char* s = strdup(hostname);
-
-	/* hex representation of key in front bytes */
-	key = s;
-
-	/* next is the name of the host */
-	for (i = 0; s[i] != ':' && s[i] != 0; i++)
-		;
-	s[i] = 0;
-	name = s + (i + 1);
-
-	/* then a human readable integer of the port */
-	for (i++; s[i] != ':' && s[i] != 0; i++)
-		;
-	s[i] = 0;
-	port = s + (i + 1);
-
-	/* allocate space, do the network stuff, and return the host */
-	i = atoi(port);
-	host = GetHost(name, i);
-
-	k = key;
-
-	if (host->GetKey() == 0)
-		host->SetKey(k);
-
-	free(s);
-
-	return (host);
-
-}
-
-ChimeraHost::ChimeraHost(const std::string& _name, int _port, in_addr_t _address)
-	: name(_name),
+_Host::_Host(Mutex* _mutex, const std::string& _name, int _port, in_addr_t _address)
+	: mutex(_mutex),
+	name(_name),
 	address(_address),
 	failed(0),
 	failuretime(0),
@@ -154,171 +103,19 @@ ChimeraHost::ChimeraHost(const std::string& _name, int _port, in_addr_t _address
 
 }
 
-/** network_address:
- ** returns the ip address of the #hostname#
+/** host_encode:
+ ** encodes the #host# into a string, putting it in #s#, which has
+ ** #len# bytes in it.
  */
-in_addr_t HostGlobal::network_address (const char *hostname) const
+std::string _Host::Encode() const
 {
-
-    int is_addr;
-    struct hostent *he;
-    in_addr_t addr;
-    in_addr_t local;
-    int i;
-
-    /* apparently gethostbyname does not portably recognize ip addys */
-
-#ifdef SunOS
-    is_addr = inet_addr (hostname);
-    if (is_addr == -1)
-	is_addr = 0;
-    else
-	{
-	    memcpy (&addr, (struct in_addr *) &is_addr, sizeof (addr));
-	    is_addr = inet_addr ("127.0.0.1");
-	    memcpy (&local, (struct in_addr *) &is_addr, sizeof (addr));
-	    is_addr = 1;
-	}
-#else
-    is_addr = inet_aton (hostname, (struct in_addr *) &addr);
-    inet_aton ("127.0.0.1", (struct in_addr *) &local);
-#endif
-
-    if (is_addr)
-	he = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
-    else
-	he = gethostbyname (hostname);
-
-    if (he == NULL)
-	    return (0);
-
-    /* make sure the machine is not returning localhost */
-
-    /* TODO: check why he does that, because I don't understand... */
-    addr = *(in_addr_t *) he->h_addr_list[0];
-    for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
-	addr = *(in_addr_t *) he->h_addr_list[i];
-
-    return (addr);
-
+	return key.str() + ":" + name + ":" + TypToStr(port);
 }
-
-/** host_get:
- ** gets a host entry for the given host, getting it from the cache if
- ** possible, or alocates memory for it
- */
-ChimeraHost* HostGlobal::GetHost(const char *hostname, int port)
-{
-	JRB node;
-	Dllist dllnode;
-	in_addr_t address;
-	CacheEntry *tmp, *entry;
-	unsigned char *ip;
-	char id[256];
-	BlockLockMutex(this);
-
-	/* create an id of the form ip:port */
-	memset (id, 0, 256);
-	address = network_address (hostname);
-	ip = (unsigned char *) &address;
-	snprintf(id, sizeof id - 1, "%d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], port);
-
-	node = jrb_find_str (this->hosts, id);
-
-	/* if the node is not in the cache, create an entry and allocate a host */
-	if (node == NULL)
-	{
-		ChimeraHost* host = new ChimeraHost(hostname, port, address);
-		entry = new CacheEntry(host);
-
-		jrb_insert_str (this->hosts, strdup (id), new_jval_v (entry));
-
-		entry->SetNode(jrb_find_str (this->hosts, id));
-		this->size++;
-	}
-
-	/* otherwise, increase the refrence count */
-	else
-	{
-		entry = (CacheEntry *) node->val.v;
-		/* if it was in the free list, remove it */
-		if (entry->GetRefrence() == 0)
-		{
-			dll_delete_node (entry->GetFreeList());
-		}
-		entry->RefrenceUp();
-	}
-
-	/* if the cache was overfull, empty it as much as possible */
-	while (this->size > this->max && !jrb_empty (this->free_list))
-	{
-		dllnode = dll_first (this->free_list);
-		tmp = (CacheEntry *) dllnode->val.v;
-		dll_delete_node (dllnode);
-		jrb_delete_node (tmp->GetNode());
-		delete tmp;
-		this->size--;
-	}
-	return (entry->GetHost());
-}
-
-/** host_release:
- ** releases a host from the cache, declaring that the memory could be
- ** freed any time. returns NULL if the entry is deleted, otherwise it
- ** returns #host#
- */
-void HostGlobal::ReleaseHost(ChimeraHost * host)
-{
-
-	JRB node;
-	Dllist dllnode;
-	CacheEntry *entry, *tmp;
-	unsigned char *ip;
-	unsigned long ip_long;
-	char id[256];
-	int i;
-
-	/* create an id of the form ip:port */
-	memset (id, 0, 256);
-	ip_long = host->GetAddress();
-	ip = (unsigned char *) &ip_long;
-	for (i = 0; i < 4; i++)
-		sprintf (id + strlen (id), "%s%d", (i == 0) ? ("") : ("."),
-		                                   (int) ip[i]);
-	sprintf (id + strlen (id), ":%d", host->GetPort());
-
-	BlockLockMutex(this);
-	node = jrb_find_str (this->hosts, id);
-	if (node == NULL)
-		return;
-
-	entry = (CacheEntry *) node->val.v;
-	entry->RefrenceDown();
-
-	/* if we reduce the node to 0 refrences, put it in the cache */
-	if (entry->GetRefrence() == 0)
-	{
-		dll_append (this->free_list, new_jval_v (entry));
-		entry->SetFreeList(dll_last (this->free_list));
-	}
-
-	/* if the cache was overfull, empty it as much as possible */
-	while (this->size > this->max && !jrb_empty (this->free_list))
-	{
-		dllnode = dll_first (this->free_list);
-		tmp = (CacheEntry *) dllnode->val.v;
-		dll_delete_node (dllnode);
-		jrb_delete_node (tmp->GetNode());
-		delete tmp;
-		this->size--;
-	}
-}
-
 
 /** host_update_stat:
  ** updates the success rate to the host based on the SUCCESS_WINDOW average
  */
-void ChimeraHost::UpdateStat (int success)
+void _Host::UpdateStat (int success)
 {
 
 	int i;
@@ -339,4 +136,111 @@ void ChimeraHost::UpdateStat (int success)
 	//  printf("Total: %f, avg: %f\n",total,this->success_avg);
 
 }
+
+Host::Host(Mutex* mutex, const std::string& name, int port, in_addr_t address)
+{
+	this->host = new _Host(mutex, name, port, address);
+}
+
+Host::Host(const Host& h)
+{
+	BlockLockMutex(this->host->GetMutex());
+	this->host = h.host;
+	this->host->reference++;
+}
+
+Host& Host::operator=(const Host& h)
+{
+	this->host = h.host;
+	this->host->reference++;
+
+	return *this;
+}
+
+Host::~Host()
+{
+	this->host->reference--;
+	if(!this->host->reference)
+		delete this->host;
+}
+
+in_addr_t Host::GetAddress() const
+{
+	return host->GetAddress();
+}
+
+/** host_encode:
+ ** encodes the #host# into a string, putting it in #s#, which has
+ ** #len# bytes in it.
+ */
+std::string Host::Encode() const
+{
+	return host->Encode();
+}
+
+/** host_update_stat:
+ ** updates the success rate to the host based on the SUCCESS_WINDOW average
+ */
+void Host::UpdateStat (int success)
+{
+	host->UpdateStat(success);
+}
+
+const Key& Host::GetKey() const { return host->GetKey(); }
+void Host::SetKey(Key k) { host->SetKey(k); }
+
+const std::string& Host::GetName() const { return host->GetName(); }
+int Host::GetPort() const { return host->GetPort(); }
+double Host::GetFailureTime() const { return host->GetFailureTime(); }
+double Host::GetLatency() const { return host->GetLatency(); }
+
+void Host::SetFailureTime(double f) { host->SetFailureTime(f); }
+float Host::GetSuccessAvg() const { return host->GetSuccessAvg(); }
+
+/********************
+ * OLD CODE
+ ********************/
+
+class CacheEntry
+{
+	_Host *host;
+	int refrence;
+	JRB node;
+	Dllist free_list;
+
+public:
+
+	CacheEntry(_Host*);
+	~CacheEntry();
+
+	void SetNode(JRB n) { node = n; }
+	const Dllist& GetFreeList() const { return free_list; }
+	void SetFreeList(Dllist fl) { free_list = fl; }
+
+	int GetRefrence() const { return refrence; }
+	void RefrenceUp() { refrence++; }
+	void RefrenceDown() { refrence--; }
+
+	const JRB& GetNode() const { return node; }
+
+	/* TODO: do NOT return _Host outside of the HostGlobal class,
+	 * because HostEntry is a strategic resource which can't be locked with mutex.
+	 */
+	_Host* GetHost() const { return host; }
+
+};
+
+CacheEntry::CacheEntry(_Host* _host)
+	: host(_host),
+	  refrence(1)
+{
+
+}
+
+CacheEntry::~CacheEntry()
+{
+	delete host;
+}
+
+
 
