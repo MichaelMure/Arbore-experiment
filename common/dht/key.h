@@ -67,6 +67,7 @@ public:
 	Key(const Key& k2);
 
 	Key& operator=(const char* str);
+	Key& operator=(std::string str);
 	Key& operator=(const Key& k2);
 	Key& operator=(uint32_t ul);
 	bool operator==(const Key& k2) const;
