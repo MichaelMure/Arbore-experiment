@@ -23,8 +23,11 @@
  *
  */
 
+#include <arpa/inet.h>
+#include <netdb.h>
 #include "hosts_list.h"
 #include "host.h"
+#include "tools.h"
 
 /** host_init:
  ** initialize a host struct with a #size# element cache.
@@ -41,39 +44,22 @@ HostsList::HostsList(size_t size)
  ** decodes a string into a chimera host structure. This acts as a
  ** host_get, and should be followed eventually by a host_release.
  */
-ChimeraHost* HostsList::DecodeHost(const char *hostname)
+Host HostsList::DecodeHost(std::string hostname)
 {
-	char *key = NULL, *name = NULL, *port = NULL;
-	ChimeraHost *host;
-	int i;
+	std::string key, name;
+	uint16_t port = 0;
 	Key k;
-	char* s = strdup(hostname);
 
-	/* hex representation of key in front bytes */
-	key = s;
+	key = stringtok(hostname, ":");;
+	name = stringtok(hostname, ":");
+	port = StrToTyp<uint16_t>(hostname);
 
-	/* next is the name of the host */
-	for (i = 0; s[i] != ':' && s[i] != 0; i++)
-		;
-	s[i] = 0;
-	name = s + (i + 1);
-
-	/* then a human readable integer of the port */
-	for (i++; s[i] != ':' && s[i] != 0; i++)
-		;
-	s[i] = 0;
-	port = s + (i + 1);
-
-	/* allocate space, do the network stuff, and return the host */
-	i = atoi(port);
-	host = GetHost(name, i);
+	Host host = GetHost(name, port);
 
 	k = key;
 
-	if (host->GetKey() == 0)
-		host->SetKey(k);
-
-	free(s);
+	if (host.GetKey() == 0)
+		host.SetKey(k);
 
 	return (host);
 
@@ -132,7 +118,7 @@ in_addr_t HostsList::network_address (const char *hostname) const
  ** gets a host entry for the given host, getting it from the cache if
  ** possible, or alocates memory for it
  */
-ChimeraHost* HostsList::GetHost(const char *hostname, int port)
+Host HostsList::GetHost(std::string hostname, int port)
 {
 	JRB node;
 	Dllist dllnode;

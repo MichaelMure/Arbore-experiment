@@ -29,6 +29,7 @@
 #include <netinet/in.h>
 #include "jrb.h"
 #include "dllist.h"
+#include "host.h"
 
 class HostsList : public Mutex
 {
@@ -44,26 +45,26 @@ public:
 	/** host_init:
 	 ** initialize a host struct with a #size# element cache.
 	 */
-	HostGlobal(size_t size);
+	HostsList(size_t size);
 
 	/** host_get:
 	 ** gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
-	ChimeraHost* GetHost(const char* hn, int port);
+	Host GetHost(std::string hn, int port);
 
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
-	ChimeraHost* DecodeHost (const char *s);
+	Host DecodeHost (std::string s);
 
 	/** host_release:
 	 ** releases a host from the cache, declaring that the memory could be
 	 ** freed any time. returns NULL if the entry is deleted, otherwise it
 	 ** returns #host#
 	 */
-	void ReleaseHost(ChimeraHost* host);
+	void ReleaseHost(Host host);
 };
 
 #endif /* _HOSTS_LIST_H */
