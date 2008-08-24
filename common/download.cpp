@@ -59,6 +59,7 @@ bool Download::Get(const char* url, const char* save_as)
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Peerfuse");
+	curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1);
 	//	curl_easy_setopt(curl, CURLOPT_PROXY, "address");
 	//	curl_easy_setopt(curl, CURLOPT_PROXYPORT, 3128);
 
