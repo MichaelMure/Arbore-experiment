@@ -111,12 +111,5 @@ inline Log::flux& Log::flux::operator<< <std::string> (std::string s)
 	return *this;
 }
 
-template<>
-inline Log::flux& Log::flux::operator<< <pf_addr> (pf_addr addr)
-{
-	str += pf_addr2string(addr);
-	return *this;
-}
-
 extern Log pf_log;
 #endif						  /* PF_LOG_H */

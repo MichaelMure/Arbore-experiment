@@ -28,7 +28,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "pf_addr.h"
+#include "net/pf_addr.h"
 #include "host.h"
 
 class _Host

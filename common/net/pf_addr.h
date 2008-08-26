@@ -26,8 +26,9 @@
 #ifndef PF_ADDR_H
 #define PF_ADDR_H
 
-#include "key.h"
+#include "dht/key.h"
 #include "pf_types.h"
+#include "pf_log.h"
 
 class pf_addr
 {
@@ -41,6 +42,15 @@ public:
 
 	pf_addr pf_addr_ton() const;
 	pf_addr nto_pf_addr() const;
+
+	std::string str() const;
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <pf_addr> (pf_addr addr)
+{
+	str += addr.str();
+	return *this;
+}
 
 #endif /* PF_ADDR_H */
