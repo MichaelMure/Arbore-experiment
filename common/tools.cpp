@@ -82,16 +82,6 @@ uint64_t ntohll(uint64_t number)
 	return number;
 }
 
-pf_addr nto_pf_addr(pf_addr addr)
-{
-	return addr;
-}
-
-pf_addr pf_addr_ton(pf_addr addr)
-{
-	return addr;
-}
-
 #else						  /* WORDS_BIGENDIAN */
 
 uint64_t htonll(uint64_t number)
@@ -106,27 +96,4 @@ uint64_t ntohll(uint64_t number)
 		((uint64_t) (htonl((uint32_t)number & 0xFFFFFFFF))  << 32));
 }
 
-pf_addr nto_pf_addr(pf_addr addr)
-{
-	addr.ip[0] = ntohl(addr.ip[0]);
-	addr.ip[1] = ntohl(addr.ip[1]);
-	addr.ip[2] = ntohl(addr.ip[2]);
-	addr.ip[3] = ntohl(addr.ip[3]);
-	addr.port = ntohs(addr.port);
-	addr.id = ntohl(addr.id);
-
-	return addr;
-}
-
-pf_addr pf_addr_ton(pf_addr addr)
-{
-	addr.ip[0] = htonl(addr.ip[0]);
-	addr.ip[1] = htonl(addr.ip[1]);
-	addr.ip[2] = htonl(addr.ip[2]);
-	addr.ip[3] = htonl(addr.ip[3]);
-	addr.port = htons(addr.port);
-	addr.id = htonl(addr.id);
-
-	return addr;
-}
 #endif						  /* WORDS_BIGENDIAN */

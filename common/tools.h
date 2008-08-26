@@ -31,10 +31,6 @@
 bool is_ip(const char* ip);
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n");
 
-// Endian conversion functions
-pf_addr nto_pf_addr(pf_addr addr);
-pf_addr pf_addr_ton(pf_addr addr);
-
 uint64_t htonll(uint64_t number);
 uint64_t ntohll(uint64_t number);
 
