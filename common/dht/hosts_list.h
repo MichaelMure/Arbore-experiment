@@ -27,15 +27,12 @@
 #define _HOSTS_LIST_H_
 
 #include <netinet/in.h>
-#include "jrb.h"
-#include "dllist.h"
+#include "key.h"
 #include "host.h"
 
 class HostsList : public Mutex
 {
-	JRB hosts;
-	Dllist free_list;
-	size_t size;
+	std::map<Key, Host> hosts;
 	size_t max;
 
 	in_addr_t network_address(const char* hostname) const;
@@ -58,13 +55,6 @@ public:
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
 	Host DecodeHost (std::string s);
-
-	/** host_release:
-	 ** releases a host from the cache, declaring that the memory could be
-	 ** freed any time. returns NULL if the entry is deleted, otherwise it
-	 ** returns #host#
-	 */
-	void ReleaseHost(Host host);
 };
 
 #endif /* _HOSTS_LIST_H */

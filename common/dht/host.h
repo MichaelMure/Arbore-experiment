@@ -44,7 +44,7 @@ class Host
 
 public:
 
-	Host(Mutex* mutex, const std::string& name, int port, in_addr_t address);
+	Host(Mutex* mutex, const pf_addr& addr);
 	Host(const Host&);
 	Host& operator=(const Host&);
 	~Host();

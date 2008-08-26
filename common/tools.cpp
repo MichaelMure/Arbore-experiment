@@ -18,12 +18,12 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <arpa/inet.h>
 #include <string>
 #include <stdlib.h>
+#include <cstdint>
 #include "tools.h"
 #include "pf_types.h"
 
@@ -69,31 +69,6 @@ std::string stringtok(std::string &in, const char * const delimiters)
 	in = in.substr(j+1);
 
 	return s;
-}
-
-std::string pf_addr2string(const pf_addr addr)
-{
-	std::string ret = "";
-	if(addr.ip[0] == 0 &&
-		addr.ip[1] == 0 &&
-		addr.ip[2] == 0)
-	{
-		char str[16];
-		unsigned char* nbr = (unsigned char*) &(addr.ip[3]);
-		snprintf(str, 16, "%i.%i.%i.%i", nbr[0],
-			nbr[1],
-			nbr[2],
-			nbr[3]);
-		ret = std::string(str);
-	}
-	else
-	{
-		/* TODO: ipv6 */
-	}
-	ret += ":" + TypToStr(addr.port);
-	if(addr.id)
-		ret += "/" + TypToStr(addr.id);
-	return ret;
 }
 
 #ifdef WORDS_BIGENDIAN

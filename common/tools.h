@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef TOOLS_H
@@ -30,7 +30,6 @@
 
 bool is_ip(const char* ip);
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n");
-std::string pf_addr2string(const pf_addr addr);
 
 // Endian conversion functions
 pf_addr nto_pf_addr(pf_addr addr);

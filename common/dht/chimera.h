@@ -27,6 +27,7 @@
 #define CHIMERA_H
 
 #include "key.h"
+#include "host.h"
 #include "mutex.h"
 #include <pthread.h>
 
@@ -44,10 +45,9 @@ typedef void (*chimera_update_upcall_t) (const Key *, ChimeraHost *, int);
 
 class ChimeraGlobal : protected Mutex
 {
-    ChimeraHost *me;
-    ChimeraHost *bootstrap;
+    Host me;
+    Host bootstrap;
     void *join;			/* semaphore */
-    pthread_mutex_t lock;
     chimera_forward_upcall_t forward;
     chimera_deliver_upcall_t deliver;
     chimera_update_upcall_t update;

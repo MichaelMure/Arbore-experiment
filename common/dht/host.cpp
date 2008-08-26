@@ -28,18 +28,16 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include "pf_addr.h"
 #include "host.h"
-#include "jrb.h"
-#include "dllist.h"
 
 class _Host
 {
 	Mutex* mutex;
-	std::string name;
-	in_addr_t address;
+	pf_addr addr;
+
 	int failed;
 	double failuretime;
-	int port;
 	double latency;
 	double loss;
 	double success;
@@ -51,9 +49,9 @@ class _Host
 public:
 	unsigned int reference;
 
-	_Host(Mutex* mutex, const std::string& name, int port, in_addr_t address);
+	_Host(Mutex* mutex, const pf_add& addr);
 
-	in_addr_t GetAddress() const { return address; }
+	pf_addr GetAddr() const { return addr; }
 
 	/** host_encode:
 	 ** encodes the #host# into a string, putting it in #s#, which has
@@ -71,8 +69,6 @@ public:
 	const Key& GetKey() const { return key; }
 	void SetKey(Key k) { key = k; }
 
-	const std::string& GetName() const { return name; }
-	int GetPort() const { return port; }
 	double GetFailureTime() const { return failuretime; }
 	double GetLatency() const { return latency; }
 
@@ -81,13 +77,11 @@ public:
 
 };
 
-_Host::_Host(Mutex* _mutex, const std::string& _name, int _port, in_addr_t _address)
+_Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 	: mutex(_mutex),
-	name(_name),
-	address(_address),
+	addr(_addr),
 	failed(0),
 	failuretime(0),
-	port(_port),
 	latency(0),
 	loss(0),
 	success(0),
@@ -100,7 +94,6 @@ _Host::_Host(Mutex* _mutex, const std::string& _name, int _port, in_addr_t _addr
 		success_win[i] = 0;
 	for (i = SUCCESS_WINDOW / 2; i < SUCCESS_WINDOW; i++)
 		success_win[i] = 1;
-
 }
 
 /** host_encode:

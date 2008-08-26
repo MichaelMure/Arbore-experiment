@@ -18,50 +18,13 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PF_TYPES_H
 #define PF_TYPES_H
 
-#include <set>
-#include <vector>
 #include <stdint.h>
-
-typedef unsigned int uint32_t;
-typedef uint32_t pf_id;
-
-/* Result of 2^32 */
-#define ID_MAX 4294967295U
-
-class pf_addr
-{
-public:
-	uint32_t ip[4];
-	uint16_t port;
-	pf_id id;
-
-	pf_addr() : port(0), id(0)
-	{
-		ip[0] = 0;
-		ip[1] = 0;
-		ip[2] = 0;
-		ip[3] = 0;
-	}
-
-	bool operator ==(const pf_addr &other)
-	{
-		return ip[0] == other.ip[0]
-			&& ip[1] == other.ip[1]
-			&& ip[2] == other.ip[2]
-			&& ip[3] == other.ip[3]
-			&& port == other.port
-			&& id == other.id;
-	}
-};
-
-typedef std::vector<pf_addr> AddrList;
-typedef std::set<pf_id> IDList;
 
 /** Auto-deleter class for dynamical objects
  *
