@@ -49,7 +49,7 @@ class _Host
 public:
 	unsigned int reference;
 
-	_Host(Mutex* mutex, const pf_add& addr);
+	_Host(Mutex* mutex, const pf_addr& addr);
 
 	pf_addr GetAddr() const { return addr; }
 
@@ -102,7 +102,7 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
  */
 std::string _Host::Encode() const
 {
-	return key.str() + ":" + name + ":" + TypToStr(port);
+	return addr.str();
 }
 
 /** host_update_stat:
@@ -130,10 +130,10 @@ void _Host::UpdateStat (int success)
 
 }
 
-Host::Host(Mutex* mutex, const std::string& name, int port, in_addr_t address)
+Host::Host(Mutex* mutex, const pf_addr& addr)
 {
 	BlockLockMutex(this->host->GetMutex());
-	this->host = new _Host(mutex, name, port, address);
+	this->host = new _Host(mutex, addr);
 }
 
 Host::Host(const Host& h)
@@ -160,10 +160,10 @@ Host::~Host()
 		delete this->host;
 }
 
-in_addr_t Host::GetAddress() const
+pf_addr Host::GetAddr() const
 {
 	BlockLockMutex(this->host->GetMutex());
-	return host->GetAddress();
+	return host->GetAddr();
 }
 
 /** host_encode:
@@ -196,16 +196,6 @@ void Host::SetKey(Key k)
 	host->SetKey(k);
 }
 
-const std::string& Host::GetName() const
-{
-	BlockLockMutex(this->host->GetMutex());
-	return host->GetName();
-}
-int Host::GetPort() const
-{
-	BlockLockMutex(this->host->GetMutex());
-	return host->GetPort();
-}
 double Host::GetFailureTime() const
 {
 	BlockLockMutex(this->host->GetMutex());
@@ -227,51 +217,3 @@ float Host::GetSuccessAvg() const
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetSuccessAvg();
 }
-
-/********************
- * OLD CODE
- ********************/
-
-class CacheEntry
-{
-	_Host *host;
-	int refrence;
-	JRB node;
-	Dllist free_list;
-
-public:
-
-	CacheEntry(_Host*);
-	~CacheEntry();
-
-	void SetNode(JRB n) { node = n; }
-	const Dllist& GetFreeList() const { return free_list; }
-	void SetFreeList(Dllist fl) { free_list = fl; }
-
-	int GetRefrence() const { return refrence; }
-	void RefrenceUp() { refrence++; }
-	void RefrenceDown() { refrence--; }
-
-	const JRB& GetNode() const { return node; }
-
-	/* TODO: do NOT return _Host outside of the HostGlobal class,
-	 * because HostEntry is a strategic resource which can't be locked with mutex.
-	 */
-	_Host* GetHost() const { return host; }
-
-};
-
-CacheEntry::CacheEntry(_Host* _host)
-	: host(_host),
-	  refrence(1)
-{
-
-}
-
-CacheEntry::~CacheEntry()
-{
-	delete host;
-}
-
-
-

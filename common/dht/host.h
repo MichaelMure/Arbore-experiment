@@ -30,6 +30,7 @@
 
 #include "key.h"
 #include "pf_log.h"
+#include "net/pf_addr.h"
 
 #define SUCCESS_WINDOW 20
 #define GOOD_LINK 0.8
@@ -49,7 +50,7 @@ public:
 	Host& operator=(const Host&);
 	~Host();
 
-	in_addr_t GetAddress() const;
+	pf_addr GetAddr() const;
 
 	/** host_encode:
 	 ** encodes the #host# into a string, putting it in #s#, which has
@@ -65,8 +66,6 @@ public:
 	const Key& GetKey() const;
 	void SetKey(Key k);
 
-	const std::string& GetName() const;
-	int GetPort() const;
 	double GetFailureTime() const;
 	double GetLatency() const;
 
@@ -78,7 +77,7 @@ public:
 template<>
 inline Log::flux& Log::flux::operator<< <Host> (Host host)
 {
-	str += host.GetName() + ":" + TypToStr(host.GetPort());
+	str += host.GetAddr().str();
 	return *this;
 }
 
