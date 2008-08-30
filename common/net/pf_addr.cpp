@@ -26,7 +26,9 @@
 #include "pf_addr.h"
 #include "tools.h"
 
-pf_addr::pf_addr() : port(0), id(0)
+pf_addr::pf_addr()
+	: port(0),
+	key(0)
 {
 	ip[0] = 0;
 	ip[1] = 0;
@@ -34,25 +36,46 @@ pf_addr::pf_addr() : port(0), id(0)
 	ip[3] = 0;
 }
 
+pf_addr::pf_addr(in_addr_t address, uint16_t _port)
+	: port(_port),
+	key(0)
+{
+	ip[0] = 0;
+	ip[1] = 0;
+	ip[2] = 0;
+	ip[3] = address;
+}
+
 bool pf_addr::operator ==(const pf_addr &other) const
 {
-	return ip[0] == other.ip[0]
+	return (ip[0] == other.ip[0]
 		&& ip[1] == other.ip[1]
 		&& ip[2] == other.ip[2]
 		&& ip[3] == other.ip[3]
 		&& port == other.port
-		&& id == other.id;
+		&& (!key || !other.key || key == other.key));
+}
+
+bool pf_addr::operator<(const pf_addr &other) const
+{
+	for(size_t i = 0; i < 4; ++i)
+		if(ip[i] < other.ip[i])
+			return true;
+
+	if(!!key && !!other.key)
+		return key < other.key;
+	return false;
 }
 
 std::string pf_addr::str() const
 {
-	std::string ret = key + ":";
+	std::string ret = key.str() + ":";
 	if(ip[0] == 0 &&
 		ip[1] == 0 &&
 		ip[2] == 0)
 	{
 		char str[16];
-		unsigned char* nbr = (unsigned char*) &(addr.ip[3]);
+		unsigned char* nbr = (unsigned char*) &(ip[3]);
 		snprintf(str, 16, "%i.%i.%i.%i", nbr[0],
 			nbr[1],
 			nbr[2],
@@ -63,7 +86,7 @@ std::string pf_addr::str() const
 	{
 		/* TODO: ipv6 */
 	}
-	ret += ":" + TypToStr(addr.port);
+	ret += ":" + TypToStr(port);
 	return ret;
 }
 
@@ -99,7 +122,7 @@ pf_addr pf_addr::nto_pf_addr() const
 	return *this;
 }
 
-pf_addr pf_addr:pf_addr_ton() const
+pf_addr pf_addr::pf_addr_ton() const
 {
 	return *this;
 }

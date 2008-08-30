@@ -26,6 +26,7 @@
 #ifndef PF_ADDR_H
 #define PF_ADDR_H
 
+#include <netinet/in.h>
 #include "dht/key.h"
 #include "pf_types.h"
 #include "pf_log.h"
@@ -38,7 +39,26 @@ public:
 	Key key;
 
 	pf_addr();
+	pf_addr(in_addr_t address, uint16_t port);
+
+	/** Comparaison between two pf_addr
+	 *
+	 * @param other this is the other pf_addr which is compared to me
+	 * @return true if the two objects are equal.
+	 *
+	 * \note The key isn't compared if one of the two is 0.
+	 */
 	bool operator ==(const pf_addr &other) const;
+
+	/** Comparaison between two pf_addr
+	 *
+	 * @param other this is the other pf_addr which is compared to me
+	 * @return true if my address is before the other's.
+	 *
+	 * \note The key isn't compared if one of the two is 0.
+	 */
+
+	bool operator<(const pf_addr &other) const;
 
 	pf_addr pf_addr_ton() const;
 	pf_addr nto_pf_addr() const;
