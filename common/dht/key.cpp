@@ -212,6 +212,22 @@ Key Key::operator+(const Key& op2) const
 	return result;
 }
 
+bool Key::operator!() const
+{
+	for(size_t i = 0; i < nlen; ++i)
+		if(t[i] > 0)
+			return false;
+
+	return true;
+}
+
+Key::operator bool() const
+{
+	for(size_t i = 0; i < nlen; ++i)
+		if(t[i] > 0)
+			return true;
+	return false;
+}
 Key Key::operator-(const Key & op2) const
 {
 	Key result;
