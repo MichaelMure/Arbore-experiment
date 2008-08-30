@@ -217,3 +217,9 @@ float Host::GetSuccessAvg() const
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetSuccessAvg();
 }
+
+unsigned int Host::GetReference() const
+{
+	BlockLockMutex(this->host->GetMutex());
+	return host->reference;
+}

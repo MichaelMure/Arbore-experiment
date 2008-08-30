@@ -32,12 +32,10 @@
 /** host_init:
  ** initialize a host struct with a #size# element cache.
  */
-HostsList::HostsList(size_t size)
+HostsList::HostsList(size_t _size)
+	: max(_size)
 {
-	this->hosts = make_jrb ();
-	this->free_list = new_dllist ();
-	this->size = 0;
-	this->max = size;
+
 }
 
 /** host_decode:
@@ -58,7 +56,7 @@ Host HostsList::DecodeHost(std::string hostname)
 
 	k = key;
 
-	if (host.GetKey() == 0)
+	if (!host.GetKey())
 		host.SetKey(k);
 
 	return (host);
@@ -68,7 +66,7 @@ Host HostsList::DecodeHost(std::string hostname)
 /** network_address:
  ** returns the ip address of the #hostname#
  */
-in_addr_t HostsList::network_address (const char *hostname) const
+pf_addr HostsList::MakeAddr(std::string hostname, uint16_t port) const
 {
 	int is_addr;
 	struct hostent *he;
@@ -77,9 +75,8 @@ in_addr_t HostsList::network_address (const char *hostname) const
 	int i;
 
 	/* apparently gethostbyname does not portably recognize ip addys */
-
 #ifdef SunOS
-	is_addr = inet_addr (hostname);
+	is_addr = inet_addr (hostname.c_str());
 	if (is_addr == -1)
 		is_addr = 0;
 	else
@@ -90,137 +87,52 @@ in_addr_t HostsList::network_address (const char *hostname) const
 		is_addr = 1;
 	}
 #else
-	is_addr = inet_aton (hostname, (struct in_addr *) &addr);
+	is_addr = inet_aton (hostname.c_str(), (struct in_addr *) &addr);
 	inet_aton ("127.0.0.1", (struct in_addr *) &local);
 #endif
 
 	if (is_addr)
 		he = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
 	else
-		he = gethostbyname (hostname);
+		he = gethostbyname (hostname.c_str());
 
 	if (he == NULL)
-		return (0);
+		throw CantResolvHostname();
 
+	/* TODO: check why he does that, because I don't understand... --romain */
 	/* make sure the machine is not returning localhost */
-
-	/* TODO: check why he does that, because I don't understand... */
 	addr = *(in_addr_t *) he->h_addr_list[0];
 	for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
 		addr = *(in_addr_t *) he->h_addr_list[i];
 
-	return (addr);
-
+	return pf_addr(addr, port);
 }
 
 /** host_get:
  ** gets a host entry for the given host, getting it from the cache if
  ** possible, or alocates memory for it
  */
-Host HostsList::GetHost(std::string hostname, int port)
+Host HostsList::GetHost(std::string hostname, uint16_t port)
 {
-	JRB node;
-	Dllist dllnode;
-	in_addr_t address;
-	CacheEntry *tmp, *entry;
-	unsigned char *ip;
-	char id[256];
+	pf_addr address;
 	BlockLockMutex lock(this);
 
 	/* create an id of the form ip:port */
-	memset (id, 0, 256);
-	address = network_address (hostname);
-	ip = (unsigned char *) &address;
-	snprintf(id, sizeof id - 1, "%d.%d.%d.%d:%d", ip[0], ip[1], ip[2], ip[3], port);
+	address = MakeAddr(hostname, port);
 
-	node = jrb_find_str (this->hosts, id);
+	HostMap::iterator it = hosts.find(address);
 
 	/* if the node is not in the cache, create an entry and allocate a host */
-	if (node == NULL)
+	if (it == hosts.end())
+		it = hosts.insert(std::pair<pf_addr, Host>(address, Host(this, address))).first;
+
+	for(HostMap::iterator free_it = hosts.begin();
+	    hosts.size() > max && it != hosts.end();
+	    ++it)
 	{
-		ChimeraHost* host = new ChimeraHost(hostname, port, address);
-		entry = new CacheEntry(host);
-
-		jrb_insert_str (this->hosts, strdup (id), new_jval_v (entry));
-
-		entry->SetNode(jrb_find_str (this->hosts, id));
-		this->size++;
+		if(it->second.GetReference() == 1)
+			hosts.erase(it);
 	}
 
-	/* otherwise, increase the refrence count */
-	else
-	{
-		entry = (CacheEntry *) node->val.v;
-		/* if it was in the free list, remove it */
-		if (entry->GetRefrence() == 0)
-		{
-			dll_delete_node (entry->GetFreeList());
-		}
-		entry->RefrenceUp();
-	}
-
-	/* if the cache was overfull, empty it as much as possible */
-	while (this->size > this->max && !jrb_empty (this->free_list))
-	{
-		dllnode = dll_first (this->free_list);
-		tmp = (CacheEntry *) dllnode->val.v;
-		dll_delete_node (dllnode);
-		jrb_delete_node (tmp->GetNode());
-		delete tmp;
-		this->size--;
-	}
-	return (entry->GetHost());
+	return it->second;
 }
-
-/** host_release:
- ** releases a host from the cache, declaring that the memory could be
- ** freed any time. returns NULL if the entry is deleted, otherwise it
- ** returns #host#
- */
-void HostsList::ReleaseHost(ChimeraHost * host)
-{
-
-	JRB node;
-	Dllist dllnode;
-	CacheEntry *entry, *tmp;
-	unsigned char *ip;
-	unsigned long ip_long;
-	char id[256];
-	int i;
-
-	/* create an id of the form ip:port */
-	memset (id, 0, 256);
-	ip_long = host->GetAddress();
-	ip = (unsigned char *) &ip_long;
-	for (i = 0; i < 4; i++)
-		sprintf (id + strlen (id), "%s%d", (i == 0) ? ("") : ("."),
-		                                   (int) ip[i]);
-	sprintf (id + strlen (id), ":%d", host->GetPort());
-
-	BlockLockMutex lock(this);
-	node = jrb_find_str (this->hosts, id);
-	if (node == NULL)
-		return;
-
-	entry = (CacheEntry *) node->val.v;
-	entry->RefrenceDown();
-
-	/* if we reduce the node to 0 refrences, put it in the cache */
-	if (entry->GetRefrence() == 0)
-	{
-		dll_append (this->free_list, new_jval_v (entry));
-		entry->SetFreeList(dll_last (this->free_list));
-	}
-
-	/* if the cache was overfull, empty it as much as possible */
-	while (this->size > this->max && !jrb_empty (this->free_list))
-	{
-		dllnode = dll_first (this->free_list);
-		tmp = (CacheEntry *) dllnode->val.v;
-		dll_delete_node (dllnode);
-		jrb_delete_node (tmp->GetNode());
-		delete tmp;
-		this->size--;
-	}
-}
-

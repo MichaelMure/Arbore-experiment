@@ -71,6 +71,8 @@ public:
 
 	void SetFailureTime(double f);
 	float GetSuccessAvg() const;
+
+	unsigned int GetReference() const;
 };
 
 

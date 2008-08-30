@@ -27,17 +27,20 @@
 #define _HOSTS_LIST_H_
 
 #include <netinet/in.h>
+#include <exception>
+#include <map>
 #include "key.h"
 #include "host.h"
 
 class HostsList : public Mutex
 {
-	std::map<Key, Host> hosts;
+	typedef std::map<pf_addr, Host> HostMap;
+	HostMap hosts;
 	size_t max;
 
-	in_addr_t network_address(const char* hostname) const;
-
 public:
+
+	class CantResolvHostname : public std::exception {};
 
 	/** host_init:
 	 ** initialize a host struct with a #size# element cache.
@@ -48,13 +51,15 @@ public:
 	 ** gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
-	Host GetHost(std::string hn, int port);
+	Host GetHost(std::string hn, uint16_t port);
 
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.
 	 */
 	Host DecodeHost (std::string s);
+
+	pf_addr MakeAddr(std::string hostname, uint16_t port) const;
 };
 
 #endif /* _HOSTS_LIST_H */

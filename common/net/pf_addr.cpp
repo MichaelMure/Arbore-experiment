@@ -62,7 +62,7 @@ bool pf_addr::operator<(const pf_addr &other) const
 		if(ip[i] < other.ip[i])
 			return true;
 
-	if(!!key && !!other.key)
+	if(key && other.key)
 		return key < other.key;
 	return false;
 }
