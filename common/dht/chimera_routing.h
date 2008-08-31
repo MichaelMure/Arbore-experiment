@@ -24,7 +24,7 @@
  */
 #ifndef _CHIMERA_ROUTING_H_
 #define _CHIMERA_ROUTING_H_
-
+#include <vector>
 #include "routing_table.h"
 #include "leafset.h"
 
@@ -89,6 +89,24 @@ public :
 	 * \param key  routing destination
 	 */
 	Host routeLookup(const Key& key) const;
+
+	/** route_row_lookup:
+	** return the row in the routing table that matches the longest prefix with key.
+	*/
+
+	std::vector<Host>*  rowLookup(const Key& key) const;
+
+	/** route_neighbors:
+	** returns an array of count neighbor nodes with priority to closer nodes.
+	*/
+
+	std::vector<Host>*  getLeafset() const;
+
+	/** route_get_table:
+	** returns all the entries in the routing table in an array of ChimeraHost.
+	*/
+
+	std::vector<Host>*  getRoutingTable() const;
 
 	//Host* route_get_table();
 

@@ -116,7 +116,7 @@ NetworkGlobal::NetworkGlobal(int port)
  ** network_send: host, data, size
  ** Sends a message to host, updating the measurement info.
  */
-int NetworkGlobal::network_send (ChimeraHost * host, char *data, size_t size, unsigned int ack)
+int NetworkGlobal::network_send (Host * host, char *data, size_t size, unsigned int ack)
 {
 	struct sockaddr_in to;
 	ssize_t ret;
@@ -199,7 +199,7 @@ int NetworkGlobal::network_send (ChimeraHost * host, char *data, size_t size, un
 /**
  ** Resends a message to host
  */
-int network_resend (ChimeraHost *host, char *data, size_t size, int ack, unsigned int seqnum, double *transtime)
+int network_resend (Host *host, char *data, size_t size, int ack, unsigned int seqnum, double *transtime)
 {
 	struct sockaddr_in to;
 	int ret;

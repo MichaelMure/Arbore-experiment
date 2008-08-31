@@ -95,3 +95,19 @@ Host ChimeraRouting::routeLookup(const Key& key) const
 	}
 	return routingTableBest;
 }
+
+std::vector<Host>*  ChimeraRouting::rowLookup(const Key& key) const
+{
+	size_t lineNum = this->me.GetKey().key_index(key);
+	return this->routingTable.getRow(lineNum);
+}
+
+std::vector<Host>*  ChimeraRouting::getLeafset() const
+{
+	return this->leafset.getCopy();
+}
+
+std::vector<Host>* ChimeraRouting::getRoutingTable() const
+{
+	return this->routingTable.getCopy();
+}

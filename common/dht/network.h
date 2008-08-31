@@ -48,7 +48,7 @@
 #define TIMEOUT 1.0
 
 typedef struct PriqueueEntry{
-	ChimeraHost *desthost; // who should this message be sent to?
+	Host *desthost; // who should this message be sent to?
 	char *data; // what to send?
 	size_t datasize; // how big is it?
 	int retry; // number of retries
@@ -81,7 +81,7 @@ public:
 	 ** type are 1 or 2, 1 indicates that the data should be acknowledged by the
 	 ** receiver, and 2 indicates that no ack is necessary.
 	 */
-	int network_send (ChimeraHost * host, char *data, size_t size, unsigned int type);
+	int network_send (Host * host, char *data, size_t size, unsigned int type);
 
 	int GetSock() const { return sock; }
 

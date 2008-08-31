@@ -31,6 +31,7 @@
 #define LEAFSET_SIZE 8		/* (must be even) excluding node itself */
 #define ONE_SIDE_LEAFSET_SIZE LEAFSET_SIZE/2
 
+#include <vector>
 #include "key.h"
 #include "hosts_list.h"
 
@@ -95,6 +96,8 @@ public :
 	 * @param inLeafset  the function sets it to true if the key falls into the leafset
 	 */
 	Host routeLookup(const Key& key , bool* inLeafset) const;
+
+	std::vector<Host>* getCopy() const;
 
 private :
 	/*! \brief Clears the leafset

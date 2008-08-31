@@ -319,6 +319,49 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 	return InvalidHost;
 }
 
+std::vector<Host>* RoutingTable::getRow(size_t i) const
+{
+	std::vector<Host>* ret = new std::vector<Host>();
+	size_t j, l;
+	//BlockLockMutex(this);
+	for (j = 0; j < MAX_COL; j++)
+	{
+		for (l = 0; l < MAX_ENTRY; l++)
+		{
+			if (this->table[i][j][l] != InvalidHost)
+			{
+				ret->insert(ret->end(), this->table[i][j][l]);
+			}
+		}
+	}
+	ret->insert(ret->end(), this->me);
+	return ret;
+}
+
+std::vector<Host>* RoutingTable::getCopy() const
+{
+	std::vector<Host>* ret = new std::vector<Host>();
+	int i, j, l;
+
+	//BlockLockMutex(this);
+
+	for (i = 0; i < MAX_ROW; i++)
+	{
+		for (j = 0; j < MAX_COL; j++)
+		{
+			for (l = 0; l < MAX_ENTRY; l++)
+			{
+				if (this->table[i][j][l] != InvalidHost)
+				{
+					ret->insert(ret->end(), this->table[i][j][l]);
+				}
+			}
+		}
+	}
+	return ret;
+
+}
+
 Host bestEntry(Host e1, Host e2)
 {
 	//priority : SuccessAvg > latency

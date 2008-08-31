@@ -171,7 +171,7 @@ void MessageGlobal::message_handler (int type, IMessageHandler* func, int ack)
  ** send the message to destination #host# the retry arg indicates to the network
  ** layer if this message should be ackd or not
  */
-int MessageGlobal::message_send (ChimeraHost * host, Message * message,
+int MessageGlobal::message_send (Host * host, Message * message,
 		  bool retry)
 {
 	char *data;

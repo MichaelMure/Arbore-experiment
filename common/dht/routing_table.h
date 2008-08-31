@@ -33,6 +33,8 @@
 #define MAX_COL 16 /* 2^4 */
 #define MAX_ENTRY 3
 
+#include <vector>
+
 class RoutingTable
 {
 private:
@@ -88,6 +90,10 @@ public:
 	 *                      matching progressed, false otherwise
 	 */
 	Host routeLookup(const Key& key , bool* perfectMatch) const;
+
+	std::vector<Host>*  getRow(size_t rowNum) const;
+
+	std::vector<Host>*  getCopy() const;
 
 private:
 

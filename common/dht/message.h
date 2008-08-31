@@ -108,7 +108,7 @@ public:
 	 ** sendt the message to destination #host# the retry arg indicates to the network
 	 ** layer if this message should be ackd or not
 	 */
-	int message_send (ChimeraHost * host, Message * message,
+	int message_send (Host * host, Message * message,
 			  bool retry);
 
 

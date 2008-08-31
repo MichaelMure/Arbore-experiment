@@ -24,8 +24,8 @@
  */
 
 #include <errno.h>
+#include <vector>
 
-#include "route.h"
 #include "chimera.h"
 #include "pf_log.h"
 #include "network.h"
@@ -50,7 +50,7 @@
 #define GRACEPERIOD  30		/* seconds */
 
 
-size_t ChimeraDHT::encode_hosts (char *s, size_t size, ChimeraHost ** host) const
+size_t ChimeraDHT::encode_hosts (char *s, size_t size, Host ** host) const
 {
 
     size_t i, j;
@@ -69,10 +69,10 @@ size_t ChimeraDHT::encode_hosts (char *s, size_t size, ChimeraHost ** host) cons
 
 }
 
-ChimeraHost** ChimeraDHT::decode_hosts(const char *hostname)
+Host** ChimeraDHT::decode_hosts(const char *hostname)
 {
 
-    ChimeraHost **host;
+    Host **host;
     size_t hostnum;
     size_t i, j, k;
     char* s = strdup(hostname);
@@ -83,7 +83,7 @@ ChimeraHost** ChimeraDHT::decode_hosts(const char *hostname)
 		hostnum++;
 	}
 
-    host = (ChimeraHost **) malloc (sizeof (ChimeraHost *) * (hostnum + 1));
+    host = (Host **) malloc (sizeof (Host *) * (hostnum + 1));
     //memset(host, 0, (sizeof(ChimeraHost *) * (hostnum + 1)));
 
     /* gets the number of hosts in the lists and goes through them 1 by 1 */
@@ -116,21 +116,23 @@ ChimeraHost** ChimeraDHT::decode_hosts(const char *hostname)
 void ChimeraDHT::send_rowinfo (Message * message)
 {
     size_t size;
-    ChimeraHost **rowinfo;
+    std::vector<Host>* rowinfo;
     char s[NETWORK_PACK_SIZE];
-    ChimeraHost *host;
+    Host* host;
     Message *msg;
 
     host = this->host->DecodeHost(this, message->GetPayload());
 
     /* send one row of our routing table back to joiner #host# */
-    rowinfo = route_row_lookup (this, host->GetKey());
+    rowinfo = this->routingStructure->rowLookup(host->GetKey());
     size = encode_hosts (s, NETWORK_PACK_SIZE, rowinfo);
     msg = new Message (host->GetKey(), CHIMERA_PIGGY, size, s);
     if (!this->message->message_send (host, msg, true))
+    {
 	pf_log[W_ERR] << "Sending row information to node! " << host->GetName() << ":" << host->GetPort() << " failed";
-
-    free (rowinfo);
+    }
+    delete rowinfo;
+    //free (rowinfo);
     delete msg;
 }
 
@@ -139,11 +141,11 @@ void ChimeraDHT::send_rowinfo (Message * message)
 ** call encodes the leaf set of the current host and sends it to the joiner.
 **
 */
-void ChimeraDHT::join_complete(ChimeraHost * host)
+void ChimeraDHT::join_complete(Host * host)
 {
     char s[NETWORK_PACK_SIZE];
     Message *m;
-    ChimeraHost **leafset;
+    std::vector<Host>* leafset;
     ChimeraGlobal *chglob = (ChimeraGlobal *) (this->chimera);
 
     /* copy myself into the reply */
@@ -165,10 +167,12 @@ void ChimeraDHT::join_complete(ChimeraHost * host)
 	}
 
     /* copy my leaf set into the reply */
-    leafset = route_neighbors (this, LEAFSET_SIZE);
+    leafset = this->routingStructure->getLeafset();
+    //leafset = route_neighbors (this, LEAFSET_SIZE);
     encode_hosts (s + strlen (s),
 			 NETWORK_PACK_SIZE - strlen (s), leafset);
-    free (leafset);
+    delete leafset;
+    //free (leafset);
 
     m = new Message (host->GetKey(), CHIMERA_JOIN_ACK, strlen (s) + 1, s);
     if (!this->message->message_send (host, m, true))
@@ -189,9 +193,9 @@ void *ChimeraDHT::check_leafset (void *chstate)
 {
 	char s[NETWORK_PACK_SIZE];
 	Message *m;
-	ChimeraHost **leafset;
-	ChimeraHost **table;
-	int i, count = 0;
+	std::vector<Host>* leafset;
+	std::vector<Host>* table;
+	size_t i, count = 0;
 	ChimeraDHT *state = (ChimeraDHT *) chstate;
 	ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;
 
@@ -199,54 +203,61 @@ void *ChimeraDHT::check_leafset (void *chstate)
 	while (1)
 	{
 
-		leafset = route_neighbors (state, LEAFSET_SIZE);
-		for (i = 0; leafset[i] != NULL; i++)
+		leafset = this->routingStructure->getLeafset();
+		//leafset = route_neighbors (state, LEAFSET_SIZE);
+		//TODO use an iterator instead ?
+		for (i = 0; i < leafset->size(); i++)
 		{
 			if (state->Ping(leafset[i]) == 1)
 			{
-				leafset[i]->SetFailureTime(dtime ());
-				pf_log[W_WARNING] << "message send to host: " << leafset[i]->GetName() << ":" << leafset[i]->GetPort()
-			                          << " failed at time: " << leafset[i]->GetFailureTime() << "!";
-				if (leafset[i]->GetSuccessAvg() < BAD_LINK)
+				leafset[i].SetFailureTime(dtime ());
+				pf_log[W_WARNING] << "message send to host: " << leafset[i].GetName() << ":" << leafset[i].GetPort()
+			                          << " failed at time: " << leafset[i].GetFailureTime() << "!";
+				if (leafset[i].GetSuccessAvg() < BAD_LINK)
 				{
 					printf ("Deleting %s:%d \n",
-					    leafset[i]->GetName(),
-					    leafset[i]->GetPort());
-					route_update (state, leafset[i], 0);
+					    leafset[i].GetName(),
+					    leafset[i].GetPort());
+					this->routingStructure->remove(leafset[i]);
+					//route_update (state, leafset[i], 0);
 				}
 			}
 			state->host->Release(leafset[i]);
 		}
-		free (leafset);
-
-		table = route_get_table (state);
-		for (i = 0; table[i] != NULL; i++)
+		delete leafset;
+		//free (leafset);
+		table = this->routingStructure->getRoutingTable();
+		//table = route_get_table (state);
+		for (i = 0; i < table->size(); i++)
 		{
 			if (state->Ping(table[i]) == 1)
 			{
 				table[i]->SetFailureTime(dtime ());
-				pf_log[W_WARNING] << "message send to host: " << table[i]->GetName() << ":" << table[i]->GetPort()
-			                          << " failed at time: " << table[i]->GetFailureTime() << "!";
-				if (table[i]->GetSuccessAvg() < BAD_LINK)
+				pf_log[W_WARNING] << "message send to host: " << table[i].GetName() << ":" << table[i].GetPort()
+			                          << " failed at time: " << table[i].GetFailureTime() << "!";
+				if (table[i].GetSuccessAvg() < BAD_LINK)
 				{
-					route_update (state, table[i], 0);
+					this->routingStructure->remove(table[i]);
+					//route_update (state, table[i], 0);
 				}
 			}
 			state->host->Release(table[i]);
 		}
-		free (table);
+		delete table;
+		//free (table);
 
 		/* send leafset exchange data every  3 times that pings the leafset */
 		if (count == 2)
 		{
 			count = 0;
-			leafset = route_neighbors (state, LEAFSET_SIZE);
+			leafset = this->routingStructure->getLeafset();
+			//leafset = route_neighbors (state, LEAFSET_SIZE);
 			chglob->me->Encode(s, NETWORK_PACK_SIZE);
 			strcat (s, "\n");	/* add a spacer */
 			state->encode_hosts (s + strlen (s), NETWORK_PACK_SIZE - strlen (s),
 			                     leafset);
-
-			for (i = 0; leafset[i] != NULL; i++)
+			//TODO use iterator instead ?
+			for (i = 0; i < leafset->size(); i++)
 			{
 				m = new Message (leafset[i]->GetKey(),
 						CHIMERA_PIGGY, strlen (s) + 1,
@@ -258,14 +269,15 @@ void *ChimeraDHT::check_leafset (void *chstate)
 						          << leafset[i]->GetPort() << " failed!";
 					if (leafset[i]->GetSuccessAvg() < BAD_LINK)
 					{
-						route_update (state, leafset[i], 0);
+						this->routingStructure->remove(*leafset[i]);
+						//route_update (state, leafset[i], 0);
 					}
 				}
 				delete m;
 				state->host->Release(leafset[i]);
 			}
-
-			free (leafset);
+			delete leafset;
+			//free (leafset);
 
 		}
 		else
@@ -325,7 +337,7 @@ out:
 
 void ChimeraDHT::join_denied (Message * message)
 {
-    ChimeraHost *host = this->host->DecodeHost(this, message->GetPayload());
+    Host *host = this->host->DecodeHost(this, message->GetPayload());
 
     pf_log[W_WARNING] << "JOIN request rejected from " << host->GetName() << ":" << host->GetPort();
     sleep (GRACEPERIOD);
@@ -344,10 +356,12 @@ void ChimeraDHT::join_denied (Message * message)
  */
 
 void ChimeraDHT::Route(const Key * key, Message * message,
-		       ChimeraHost * host)
+		       Host * host)
 {
 
-    ChimeraHost **tmp;
+    Host* tmp;
+    //TODO quickfix, make this better
+    Host tmpBis;
     //ChimeraHost **piggy;
     Message *real;
     /* unused? -romain
@@ -358,24 +372,27 @@ void ChimeraDHT::Route(const Key * key, Message * message,
 
     real = message;
 
-    tmp = route_lookup (this, *key, 1, 0);
+    tmpBis = this->routingStructure->routeLookup(*key);
+    tmp = &tmpBis;
+    //tmp = route_lookup (this, *key, 1, 0);
 
     /* this is to avoid sending JOIN request to the node that
      ** its information is already in the routing table  ****/
 
-    if ((tmp[0] != NULL) && (message->GetType() == CHIMERA_JOIN)
-	&& (key_equal (tmp[0]->GetKey(), *key)))
+//TODO make sure this situation is avoided anyway
+    //if ((tmp != NULL) && (message->GetType() == CHIMERA_JOIN)
+//	&& (key_equal (tmp->GetKey(), *key)))
+//	{
+//	    free (tmp);
+//	    tmp = route_lookup (this, *key, 2, 0);
+//	    if (tmp[1] != NULL && key_equal (tmp[0]->GetKey(), *key))
+//		tmp[0] = tmp[1];
+//	}
+    if (host == NULL && *tmp != chglob->me)
 	{
-	    free (tmp);
-	    tmp = route_lookup (this, *key, 2, 0);
-	    if (tmp[1] != NULL && key_equal (tmp[0]->GetKey(), *key))
-		tmp[0] = tmp[1];
+	    host = tmp;
 	}
-    if (host == NULL && tmp[0] != chglob->me)
-	{
-	    host = tmp[0];
-	}
-    if (tmp[0] == chglob->me)
+    if (*tmp == chglob->me)
 	{
 	    host = NULL;
 	}
@@ -414,12 +431,15 @@ void ChimeraDHT::Route(const Key * key, Message * message,
 
 		    /* remove the faulty node from the routing table */
 		    if (host->GetSuccessAvg() < BAD_LINK)
-			route_update (this, host, 0);
+			this->routingStructure->remove(*host);
+			//route_update (this, host, 0);
 
 		    if (tmp != NULL)
 			free (tmp);
-		    tmp = route_lookup (this, *key, 1, 0);
-		    host = tmp[0];
+		    tmpBis = routingStructure->routeLookup(*key);
+		    tmp = &tmpBis;
+		    //tmp = route_lookup (this, *key, 1, 0);
+		    host = tmp;
 		    pf_log[W_WARNING] << "rerouting through " << host->GetName() << ":" << host->GetPort();
 		}
 
@@ -444,7 +464,7 @@ void ChimeraDHT::Route(const Key * key, Message * message,
 
 void ChimeraDHT::join_acknowledged (Message * message)
 {
-	ChimeraHost **host;
+	std::vector<Host>* host;
 	Message *m;
 	char s[256];
 	int i;
@@ -454,33 +474,37 @@ void ChimeraDHT::join_acknowledged (Message * message)
 	host = decode_hosts(message->GetPayload());
 
 	/* announce my arrival to the nodes in my leafset */
-	for (i = 0; host[i] != NULL; i++)
+	for (i = 0; i<host->size(); i++)
 	{
-		route_update (this, host[i], 1);
-		m = new Message (host[i]->GetKey(), CHIMERA_UPDATE, strlen (s) + 1,
+		this->routingStructure->add(host[i]);
+		//route_update (this, host[i], 1);
+// 		m = new Message (host[i].GetKey(), CHIMERA_UPDATE, strlen (s) + 1,
 				s);
 		if (!this->message->message_send (host[i], m, true))
 		{
 			pf_log[W_WARNING] << "chimera_join_acknowledge: failed to update "
-					  << host[i]->GetName() << ":" << host[i]->GetPort();
+					  << host[i].GetName() << ":" << host[i].GetPort();
 		}
 		delete m;
 	}
-	free (host);
+	delete host;
+	//free (host);
 
 	/* announce my arival to the nodes in my routing table */
-	host = route_get_table (this);
-	for (i = 0; host[i] != NULL; i++)
+	host = this->routingStructure->getRoutingTable();
+	//host = route_get_table (this);
+	for (i = 0; i<host->size(); i++)
 	{
-		m = new Message (host[i]->GetKey(), CHIMERA_UPDATE, strlen (s) + 1, s);
+		m = new Message (host[i].GetKey(), CHIMERA_UPDATE, strlen (s) + 1, s);
 		if (!this->message->message_send (host[i], m, true))
 		{
 			pf_log[W_WARNING] << "chimera_join_acknowledge: failed to update"
-					  << host[i]->GetName() << ":" << host[i]->GetPort();
+					  << host[i].GetName() << ":" << host[i].GetPort();
 		}
 		delete m;
 	}
-	free (host);
+	delete host;
+	//free (host);
 
 	/* signal the chimera_join function, which is blocked awaying completion */
 	sema_v (chglob->join);
@@ -522,10 +546,11 @@ void ChimeraDHT::Register(int type, int ack)
 
 void ChimeraDHT::update_message (Message * message)
 {
-    ChimeraHost *host;
+    Host *host;
 
     host = this->host->DecodeHost(this, message->GetPayload());
-    route_update (this, host, 1);
+    this->routingStructure->add(host);
+    //route_update (this, host, 1);
 
 }
 
@@ -539,7 +564,7 @@ void ChimeraDHT::update_message (Message * message)
 
 void ChimeraDHT::piggy_message (Message * message)
 {
-    ChimeraHost **piggy;
+    Host **piggy;
     int i;
 
     piggy = decode_hosts(message->GetPayload());
@@ -549,7 +574,8 @@ void ChimeraDHT::piggy_message (Message * message)
 
 	    if ((dtime () - piggy[i]->GetFailureTime()) > GRACEPERIOD)
 		{
-		    route_update (this, piggy[i], 1);
+		    this->routingStructure->add(*piggy[i]);
+		    //route_update (this, piggy[i], 1);
 		}
 		else
 			pf_log[W_WARNING] << "refused to add:" << get_key_string (&piggy[i]->GetKey())
@@ -568,7 +594,8 @@ void chimera_setkey (ChimeraDHT * state, Key key)
     ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;
 
     key_assign (&(chglob->me->GetKey()), key);
-    route_keyupdate (state->route, chglob->me);
+    this->routingStructure->KeyUpdate(chglob->me);
+    //route_keyupdate (state->route, chglob->me);
 
 }
 
@@ -576,7 +603,7 @@ void chimera_setkey (ChimeraDHT * state, Key key)
  ** chimera_ping:
  ** sends a PING message to the host. The message is acknowledged in network layer.
  */
-int chimera_ping (ChimeraDHT * state, ChimeraHost * host)
+int chimera_ping (ChimeraDHT * state, Host * host)
 {
 
     char name[256];
@@ -610,7 +637,7 @@ int chimera_ping (ChimeraDHT * state, ChimeraHost * host)
 void chimera_ping_reply (ChimeraDHT * state, Message * message)
 {
 
-    ChimeraHost *host;
+    Host *host;
     ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;
 
 
@@ -671,7 +698,8 @@ ChimeraDHT::ChimeraDHT(int port)
 	cg->forward = NULL;
 	cg->update = NULL;
 
-	this->route = new RouteGlobal(this->host, cg->me);
+	//this->route = new RouteGlobal(this->host, cg->me);
+	this->routingStructure = new ChimeraRouting(this->host, cg->me);
 
 	this->message->message_handler (CHIMERA_JOIN, chimera_message, 1);
 	this->message->message_handler (CHIMERA_JOIN_ACK, chimera_join_acknowledged, 1);
@@ -684,8 +712,6 @@ ChimeraDHT::ChimeraDHT(int port)
 
 	pthread_mutex_init (&cg->lock, NULL);
 	cg->join = sema_create (0);
-
-	return (this);
 }
 
 /**
@@ -693,7 +719,7 @@ ChimeraDHT::ChimeraDHT(int port)
  ** sends a JOIN message to bootstrap node and waits forever for the reply
  **
  */
-void chimera_join (ChimeraDHT * state, ChimeraHost * bootstrap)
+void chimera_join (ChimeraDHT * state, Host * bootstrap)
 {
 
     char name[256];
@@ -796,7 +822,7 @@ void chimera_update (ChimeraDHT * state, chimera_update_upcall_t func)
 /**
  ** called by route_update to upcall into the user's system
  */
-void chimera_update_upcall (ChimeraDHT * state, Key * k, ChimeraHost * h,
+void chimera_update_upcall (ChimeraDHT * state, Key * k, Host * h,
 			    int joined)
 {
     ChimeraGlobal *chglob = (ChimeraGlobal *) state->chimera;

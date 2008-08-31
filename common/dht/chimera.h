@@ -28,20 +28,20 @@
 
 #include "key.h"
 #include "host.h"
+#include "hosts_list.h"
 #include "mutex.h"
+#include "chimera_routing.h"
 #include <pthread.h>
 
 class Message;
-class HostGlobal;
-class ChimeraHost;
 class MessageGlobal;
 class NetworkActivate;
 class NetworkRetransmit;
 class NetworkGlobal;
 
-typedef void (*chimera_forward_upcall_t) (const Key **, Message **, ChimeraHost **);
+typedef void (*chimera_forward_upcall_t) (const Key **, Message **, Host **);
 typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
-typedef void (*chimera_update_upcall_t) (const Key *, ChimeraHost *, int);
+typedef void (*chimera_update_upcall_t) (const Key *, Host *, int);
 
 class ChimeraGlobal : protected Mutex
 {
@@ -60,22 +60,23 @@ class ChimeraDHT
 	NetworkRetransmit* network_retransmit;
 	MessageGlobal *message;
 	void *route;
-	HostGlobal *host;
+	HostsList *host;
+	ChimeraRouting* routingStructure;
 
-	JRB bootstrapMsgStore;	/* for future security enhancement */
+	//JRB bootstrapMsgStore;	/* for future security enhancement */
 	pthread_mutex_t bootstrapMutex;	/* for future security enhancement */
 	void *certificateStore;	/* for future security enhancement */
 	pthread_mutex_t certificateMutex;	/* for future security enhancement */
 
-	size_t encode_hosts(char* s, size_t size, ChimeraHost** host) const;
+	size_t encode_hosts(char* s, size_t size, Host** host) const;
 
-	ChimeraHost** decode_hosts(const char* s);
+	Host** decode_hosts(const char* s);
 
 	void send_rowinfo(Message* message);
 
-	void join_complete(ChimeraHost* host);
+	void join_complete(Host* host);
 
-	static void *check_leafset (void *chstate);
+	void *check_leafset (void *chstate);
 
 	int check_leafset_init();
 
@@ -93,7 +94,7 @@ public:
 	 ** join:
 	 ** Join the network that the bootstrap host is a part of
 	 */
-	void Join (ChimeraHost * bootstrap);
+	void Join (Host * bootstrap);
 
 	/**
 	 * route:
@@ -101,7 +102,7 @@ public:
 	 * ignored, but it will one day be the next hop
 	*/
 	void Route (const Key * key, Message * msg,
-			    ChimeraHost * hint);
+			    Host * hint);
 
 	/**
 	 ** forward:
@@ -150,7 +151,7 @@ public:
 	 ** ping:
 	 ** sends a ping message to the host. the message is acknowledged in network layer
 	 */
-	int Ping (ChimeraHost * host);
+	int Ping (Host * host);
 
 };
 

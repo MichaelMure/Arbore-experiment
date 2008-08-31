@@ -324,3 +324,16 @@ Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 		return counterclockwiseExtrem;
 	}
 }
+
+std::vector<Host>* Leafset::getCopy() const
+{
+	std::vector<Host>* ret = new std::vector<Host>();
+	for(size_t i = 0; i<this->nbLeavesClockwise; i++)
+	{
+		ret->insert(ret->end(),this->leavesClockwise[i]);
+	}
+	for(size_t i = 0; i<this->nbLeavesCounterclockwise; i++)
+	{
+		ret->insert(ret->end(),this->leavesCounterclockwise[i]);
+	}
+}
