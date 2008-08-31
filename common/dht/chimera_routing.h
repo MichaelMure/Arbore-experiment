@@ -31,47 +31,65 @@
 class ChimeraRouting
 {
 private :
-	HostsList* hg; /*!< Global peer manager */
-	Host me; /*!< Local host descriptor */
-	RoutingTable routingTable; /*!< DHT routing table */
-	Leafset	leafset; /*!< DHT leafset */
+	HostsList* hg;              /*!< Global peer manager */
+	Host me;                    /*!< Local host descriptor */
+	RoutingTable routingTable;  /*!< DHT routing table */
+	Leafset	leafset;            /*!< DHT leafset */
 
 public :
 	/*! \brief Constructor
-	* Constructor, a new chimera routing system
-	* \param hg the global host
-	* \param me the local node
-	*/
+	 *
+	 * Constructor, a new chimera routing system
+	 *
+	 * \param hg the global host
+	 * \param me the local node
+	 */
 	ChimeraRouting(HostsList* hg, Host me);
 	void KeyUpdate(Host me);
 
 	/*! \brief Updates the routing information by adding or removing a peer.
-	* When a peer joins or leaves the network, this function can add it or remove it from the DHT neighbours that are used for routing.
-	* \deprecated use add and remove instead
-	* \param host the peer whose status is updated
-	* \param joined 1 if the peer joined, 0 if he left
-	*/
+	 *
+	 * When a peer joins or leaves the network, this function can add it
+	 * or remove it from the DHT neighbours that are used for routing.
+	 *
+	 * \deprecated use add and remove instead
+	 * \param host  the peer whose status is updated
+	 * \param joined  1 if the peer joined, 0 if he left
+	 */
 	void route_update(const Host& host, int joined);
 
 	/*! \brief Updates the routing information by adding a peer.
-	* When a peer joins the network, this function can add it or remove it from the DHT neighbours that are used for routing.
-	* \param entry the peer that can be added
-	* \return true if it was added, false if it wasn't
-	*/
+	 *
+	 * When a peer joins the network, this function can add it or remove
+	 * it from the DHT neighbours that are used for routing.
+	 *
+	 * \param entry  the peer that can be added
+	 * \return  true if it was added, false if it wasn't
+	 */
 	bool add(const Host& entry);
 
 	/*! \brief Updates the routing information by removing a peer.
-	* When a peer leaves the network, this function removes it from the DHT neighbours that are used for routing.
-	* \param entry the peer that should be removed
-	* \return true if it was added, false if it wasn't part of the neighbours
-	*/
+	 *
+	 * When a peer leaves the network, this function removes it from the
+	 * DHT neighbours that are used for routing.
+	 *
+	 * \param entry  the peer that should be removed
+	 * \return  true if it was added, false if it wasn't part of the neighbours
+	 */
 	bool remove(const Host& entry);
 
 	/*! \brief Finds the next routing destination
-	* Finds the best destination for the next step of routing to key. First we look for a final destination in the leafset, then for a prefix match in the routing table, and finally we take the node from the routing table or the leafset which is the closest to the destination.
-	* \param key routing destination
-	*/
+	 *
+	 * Finds the best destination for the next step of routing to key.
+	 * First we look for a final destination in the leafset, then for a
+	 * prefix match in the routing table, and finally we take the node
+	 * from the routing table or the leafset which is the closest to the
+	 * destination.
+	 *
+	 * \param key  routing destination
+	 */
 	Host routeLookup(const Key& key) const;
+
 	//Host* route_get_table();
 
 	//Host* route_get_leafset();
