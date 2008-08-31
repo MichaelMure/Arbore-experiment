@@ -27,7 +27,7 @@
 #define _CHIMERA_ROUTINGTABLE_H_
 
 #include "key.h"
-#include "host.h"
+#include "hosts_list.h"
 
 #define MAX_ROW KEY_SIZE/BASE_B
 #define MAX_COL 16 /* 2^4 */
@@ -35,11 +35,10 @@
 
 class RoutingTable
 {
-private :
-	HostGlobal* hg; /*!< Global peer manager */
-	ChimeraHost* me; /*!< Local host descriptor */
-	ChimeraHost* table[MAX_ROW][MAX_COL][MAX_ENTRY]; /*!< Routing table */
-
+private:
+	HostsList* hg;
+	Host me; /*!< Local host descriptor */
+	Host table[MAX_ROW][MAX_COL][MAX_ENTRY]; /*!< Routing table */
 
 public:
 	/*! \brief Constructor
@@ -47,34 +46,34 @@ public:
 	* \param hg the global host
 	* \param me the local node
 	*/
-	RoutingTable(HostGlobal* hg = NULL, ChimeraHost* me = NULL);
+	RoutingTable(HostsList* hg, Host me);
 
 	/*! \brief Perfoms maintenance caused by a change in DHT key
 	* When the DHT key is changed, the routing table has to be invalidated.
 	* \param me a descriptor of the local peer that contains his dht key
 	*/
-	void KeyUpdate(ChimeraHost* me);
+	void KeyUpdate(Host me);
 
 	/*! \brief Add an entry to the routing table
 	* Adds en entry to the routing table
 	* \param entry the entry that should be added
 	* \return true if it was added, false if it wasn't
 	*/
-	bool add(const ChimeraHost* entry);
+	bool add(const Host& entry);
 
 	/*! \brief Remove an entry from the routing table
 	* Remove an entry from the routing table
 	* \param entry the entry that should be removed
 	* \return true if it was removed, false if it wasn't
 	*/
-	bool remove(const ChimeraHost* entry);
+	bool remove(const Host& entry);
 
 	/*! \brief Finds the next routing destination
 	* Finds the best destination for the next step of routing to key. First we look for an entry that would solve on extra digit in the key, if we don't find any we get the entry closest to the key in the whole routing table.
 	* \param key routing destination
 	* \param perfectMatch the function sets it to true if key prefix matching progressed, false otherwise
 	*/
-	ChimeraHost* routeLookup(const Key* key , bool* perfectMatch) const;
+	Host routeLookup(const Key& key , bool* perfectMatch) const;
 
 private:
 
@@ -89,7 +88,7 @@ private:
 	* \param column routing table column index
 	* \return the index of the worst entry, -1 if all entries where NULL
 	*/
-	size_t findWorstEntry(size_t line, size_t column) const;
+	long findWorstEntry(size_t line, size_t column) const;
 
 	/*! \brief Get the index of the best entry for a routing table position
 	* Gets the index of the best entry for a routing table position. The choice is made based first on success average and and then on latency.
@@ -97,14 +96,14 @@ private:
 	* \param column routing table column index
 	* \return the index of the best entry, -1 if all entries where NULL
 	*/
-	size_t findBestEntry(size_t line, size_t column) const;
+	long findBestEntry(size_t line, size_t column) const;
 
 	/*! \brief Transform a character from a dht key into an int
 	* The dht key is stored as a string, this function transforms a character into an int in order to match an index in the routing table.
 	* \param c the character to translate
 	* \return the integer representation of the character
 	*/
-	static int hexalphaToInt(int c);
+	static size_t hexalphaToInt(int c);
 
 	/*! \brief Compares 2 routing table entries and returns the best
 	* Compares 2 routing table entries and returns the best based on success average and latency
@@ -112,7 +111,7 @@ private:
 	* \param e2 the second entry to be compared
 	* \return the best entry between e1 and e2
 	*/
-	static ChimeraHost* bestEntry(const ChimeraHost* e1, const ChimeraHost* e2);
+	static Host bestEntry(const Host e1, const Host e2);
 
 	/*! \brief Compares 2 routing table entries to route to a destination and returns the best
 	* Compares 2 routing table entries and returns the best based on prefix matching with the key, success average and latency
@@ -121,7 +120,7 @@ private:
 	* \param key routing destination
 	* \return the best entry between e1 and e2
 	*/
-	static ChimeraHost* bestEntry(const ChimeraHost* e1, const ChimeraHost* e2, const Key* key);
+	static Host bestEntry(const Host e1, const Host e2, const Key& key);
 
 };
 #endif /* _CHIMERA_ROUTINGTABLE_H_ */

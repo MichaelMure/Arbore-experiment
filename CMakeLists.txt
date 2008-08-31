@@ -6,7 +6,9 @@ SET(SRC
 	common/dht/key.cpp
 	common/dht/host.cpp
 	common/dht/hosts_list.cpp
-	common/dht/route.cpp
+	common/dht/chimera_routing.cpp
+	common/dht/routing_table.cpp
+	common/dht/leafset.cpp
 	common/dht/message_handlers.cpp
 	common/dht/network_activate.cpp
 	common/dht/network_retransmit.cpp

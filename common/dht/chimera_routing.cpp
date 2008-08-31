@@ -25,19 +25,21 @@
 
 #include "chimera_routing.h"
 
-ChimeraRouting::ChimeraRouting(HostGlobal* _hg, ChimeraHost* _me) : hg(_hg), me(_me)
+ChimeraRouting::ChimeraRouting(HostsList* _hg, Host _me)
+	: hg(_hg),
+	me(_me),
+	routingTable(_hg, _me),
+	leafset(_hg, _me)
 {
-	this->leafset = Leafset(_hg, _me);
-	this->routingTable = RoutingTable(_hg, _me);
 }
 
-void ChimeraRouting::KeyUpdate(ChimeraHost* me)
+void ChimeraRouting::KeyUpdate(Host me)
 {
 	this->leafset.KeyUpdate(me);
 	this->routingTable.KeyUpdate(me);
 }
 
-void ChimeraRouting::route_update(const ChimeraHost* host, int joined)
+void ChimeraRouting::route_update(const Host& host, int joined)
 {
 	if(joined == 1)
 	{
@@ -49,35 +51,35 @@ void ChimeraRouting::route_update(const ChimeraHost* host, int joined)
 	}
 }
 
-bool ChimeraRouting::add(const ChimeraHost* host)
+bool ChimeraRouting::add(const Host& host)
 {
 	bool added = this->leafset.add(host);
 	added = added || this->routingTable.add(host);
 	return added;
 }
 
-bool ChimeraRouting::remove(const ChimeraHost* host)
+bool ChimeraRouting::remove(const Host& host)
 {
 	bool removed = this->leafset.remove(host);
 	removed = removed || this->routingTable.remove(host);
 	return removed;
 }
 
-ChimeraHost* ChimeraRouting::routeLookup(const Key* key) const
+Host ChimeraRouting::routeLookup(const Key& key) const
 {
 	bool b;
-	ChimeraHost* leafsetBest = this->leafset.routeLookup(key , &b);
+	Host leafsetBest = this->leafset.routeLookup(key , &b);
 	if(b)
 	{
 		return leafsetBest;
 	}
-	ChimeraHost* routingTableBest = this->routingTable.routeLookup(key , &b);
+	Host routingTableBest = this->routingTable.routeLookup(key , &b);
 	if(b)
 	{
 		return routingTableBest;
 	}
-	Key distLB = leafsetBest->GetKey().distance(*key);
-	Key distRB = routingTableBest->GetKey().distance(*key);
+	Key distLB = leafsetBest.GetKey().distance(key);
+	Key distRB = routingTableBest.GetKey().distance(key);
 	if(distLB < distRB)
 	{
 		return leafsetBest;
