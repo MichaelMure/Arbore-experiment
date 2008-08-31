@@ -31,8 +31,13 @@
 #include "net/pf_addr.h"
 #include "host.h"
 
+/** The invalid Host value */
 const Host InvalidHost;
 
+/** \brief This is the private class for Host.
+ *
+ * It is shared by Host objects.
+ */
 class _Host
 {
 	Mutex* mutex;

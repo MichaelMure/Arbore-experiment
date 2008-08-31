@@ -336,4 +336,5 @@ std::vector<Host>* Leafset::getCopy() const
 	{
 		ret->insert(ret->end(),this->leavesCounterclockwise[i]);
 	}
+	return ret;
 }
