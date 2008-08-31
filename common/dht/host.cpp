@@ -31,6 +31,8 @@
 #include "net/pf_addr.h"
 #include "host.h"
 
+const Host InvalidHost;
+
 class _Host
 {
 	Mutex* mutex;
@@ -96,18 +98,11 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 		success_win[i] = 1;
 }
 
-/** host_encode:
- ** encodes the #host# into a string, putting it in #s#, which has
- ** #len# bytes in it.
- */
 std::string _Host::Encode() const
 {
 	return addr.str();
 }
 
-/** host_update_stat:
- ** updates the success rate to the host based on the SUCCESS_WINDOW average
- */
 void _Host::UpdateStat (int success)
 {
 
@@ -130,23 +125,38 @@ void _Host::UpdateStat (int success)
 
 }
 
+/*************************
+ *
+ *     THE WRAPPER
+ *
+ *************************/
+
+Host::Host()
+	: host(NULL)
+{
+
+}
+
 Host::Host(Mutex* mutex, const pf_addr& addr)
 {
-	BlockLockMutex(this->host->GetMutex());
 	this->host = new _Host(mutex, addr);
 }
 
 Host::Host(const Host& h)
 {
-	BlockLockMutex(this->host->GetMutex());
 	this->host = h.host;
+	if(this->host == NULL) return;
+
+	BlockLockMutex(this->host->GetMutex());
 	this->host->reference++;
 }
 
 Host& Host::operator=(const Host& h)
 {
-	BlockLockMutex(this->host->GetMutex());
 	this->host = h.host;
+	if(this->host == NULL) return *this;
+
+	BlockLockMutex(this->host->GetMutex());
 	this->host->reference++;
 
 	return *this;
@@ -154,72 +164,103 @@ Host& Host::operator=(const Host& h)
 
 Host::~Host()
 {
+	if(this->host == NULL) return;
+
 	BlockLockMutex(this->host->GetMutex());
 	this->host->reference--;
 	if(!this->host->reference)
 		delete this->host;
 }
 
+bool Host::operator==(const Host& h2)
+{
+	return this->host == h2.host;
+}
+
+bool Host::operator!() const
+{
+	return (!host);
+}
+
+Host::operator bool() const
+{
+	return (!!host);
+}
+
 pf_addr Host::GetAddr() const
 {
+	if(this->host == NULL) return pf_addr();
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetAddr();
 }
 
-/** host_encode:
- ** encodes the #host# into a string, putting it in #s#, which has
- ** #len# bytes in it.
- */
 std::string Host::Encode() const
 {
+	if(this->host == NULL) return "";
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->Encode();
 }
 
-/** host_update_stat:
- ** updates the success rate to the host based on the SUCCESS_WINDOW average
- */
 void Host::UpdateStat (int success)
 {
+	if(this->host == NULL) return;
+
 	BlockLockMutex(this->host->GetMutex());
 	host->UpdateStat(success);
 }
 
-const Key& Host::GetKey() const
+Key Host::GetKey() const
 {
+	if(this->host == NULL) return Key();
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetKey();
 }
+
 void Host::SetKey(Key k)
 {
+	if(this->host == NULL) return;
+
 	BlockLockMutex(this->host->GetMutex());
 	host->SetKey(k);
 }
 
 double Host::GetFailureTime() const
 {
+	if(this->host == NULL) return 0.0;
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetFailureTime();
 }
 double Host::GetLatency() const
 {
+	if(this->host == NULL) return 0.0;
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetLatency();
 }
 
 void Host::SetFailureTime(double f)
 {
+	if(this->host == NULL) return;
+
 	BlockLockMutex(this->host->GetMutex());
 	host->SetFailureTime(f);
 }
 float Host::GetSuccessAvg() const
 {
+	if(this->host == NULL) return 0.0;
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetSuccessAvg();
 }
 
 unsigned int Host::GetReference() const
 {
+	if(this->host == NULL) return 0;
+
 	BlockLockMutex(this->host->GetMutex());
 	return host->reference;
 }

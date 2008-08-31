@@ -41,37 +41,91 @@ class Mutex;
 
 class Host
 {
-	_Host* host;
+	_Host* host;  /**< This is the private _Host object contained in all Host copied from it. */
 
 public:
 
+	/** Empty constructor */
+	Host();
+
+	/** Constructor of Host.
+	 *
+	 * @param mutex  to be thread-safe, we have to lock a mutex while doing something.
+	 * @param addr  this is the address representation of this host.
+	 */
 	Host(Mutex* mutex, const pf_addr& addr);
-	Host(const Host&);
+
+	/** \brief The copy constructor.
+	 *
+	 * @param host  this is Host object which is copied from.
+	 *
+	 * \note when you copy two Host objects, the same _Host contained object
+	 * will be referenced.
+	 */
+	Host(const Host& host);
+
+	/** \brief The copy constructor.
+	 *
+	 * @param host  this is Host object which is copied from.
+	 *
+	 * \note when you copy two Host objects, the same _Host contained object
+	 * will be referenced.
+	 */
 	Host& operator=(const Host&);
+
+	/** \brief Destructor.
+	 *
+	 * If the _Host contained object is only referenced by me, I delete it.
+	 * In other case, we do nothing.
+	 */
 	~Host();
 
+	/** \brief Comparaison operator
+	 *
+	 * @param host  host compared to.
+	 *
+	 * Check if two Host objects contains same _Host object.
+	 */
+	bool operator==(const Host& host);
+
+	/** \brief The ! operator
+	 *
+	 * @return  true if the host isn't valid (without any _Host object).
+	 */
+	bool operator!() const;
+
+	/** \brief The bool convertion.
+	 *
+	 * @return  true if the host is valid (contains a _Host object).
+	 */
+	operator bool() const;
+
+	/** \brief Get the address.
+	 *
+	 * @return a pf_addr object.
+	 */
 	pf_addr GetAddr() const;
 
-	/** host_encode:
-	 ** encodes the #host# into a string, putting it in #s#, which has
-	 ** #len# bytes in it.
-	 */
+	/** \brief Encodes me into a string. */
 	std::string Encode() const;
 
-	/** host_update_stat:
-	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
-	 */
+	 /** \brief updates the success rate to the host based on the SUCCESS_WINDOW average */
 	void UpdateStat (int success);
 
-	const Key& GetKey() const;
-	void SetKey(Key k);
+	Key GetKey() const;            /**< Get the key */
+	void SetKey(Key k);                   /**< Set the key */
 
-	double GetFailureTime() const;
-	double GetLatency() const;
+	double GetFailureTime() const;        /**< Get the failure time */
+	void SetFailureTime(double f);        /**< Set the failure time */
 
-	void SetFailureTime(double f);
-	float GetSuccessAvg() const;
+	double GetLatency() const;            /**< Get the latency */
+	float GetSuccessAvg() const;          /**< Get the success average */
 
+	/** \brief Get the reference count.
+	 *
+	 * @return  an unsigned int which represents the reference count
+	 *          for the _Host object.
+	 */
 	unsigned int GetReference() const;
 };
 
@@ -83,5 +137,6 @@ inline Log::flux& Log::flux::operator<< <Host> (Host host)
 	return *this;
 }
 
+extern const Host InvalidHost;
 
 #endif /* _HOST_H_ */
