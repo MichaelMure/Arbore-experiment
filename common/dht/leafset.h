@@ -116,7 +116,7 @@ private :
 	 * \param entry the peer we're trying to insert
 	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
 	 */
-	long getClockwiseInsertIndex(const Host& entry) const;
+	size_t getClockwiseInsertIndex(const Host& entry) const;
 
 	/*! \brief Find the index to insert a peer in counterclockwise part of the leafset.
 	 *
@@ -128,7 +128,7 @@ private :
 	 * \param entry the peer we're trying to insert
 	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
 	 */
-	long getCounterclockwiseInsertIndex(const Host& entry) const;
+	size_t getCounterclockwiseInsertIndex(const Host& entry) const;
 
 	/*! \brief Find the index of the peer if it is present in the clockwise part of the leafset.
 	 *
@@ -138,7 +138,7 @@ private :
 	 * \param entry the peer we're looking for
 	 * \return the position of the peer, -1 if it is not present
 	 */
-	long getClockwiseIndex(const Host& entry) const;
+	size_t getClockwiseIndex(const Host& entry) const;
 
 	/*! \brief Find the index of the peer if it is present in the counterclockwise part of the leafset.
 	 *
@@ -148,7 +148,7 @@ private :
 	 * \param entry the peer we're looking for
 	 * \return the position of the peer, -1 if it is not present
 	 */
-	long getCounterclockwiseIndex(const Host& entry) const;
+	size_t getCounterclockwiseIndex(const Host& entry) const;
 
 #if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
 	/*! \brief Updates the distance between the local peer and is most clockwise distant neighbour in the leafset.

@@ -119,13 +119,13 @@ bool RoutingTable::remove(const Host& entry)
 	return false;
 }
 
-long RoutingTable::findWorstEntry(size_t line, size_t column) const
+size_t RoutingTable::findWorstEntry(size_t line, size_t column) const
 {
 	//TODO do a comparator for ChimeraHost instead ?
-	long worst = -1;
+	size_t worst = MAX_ENTRY;
 	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != InvalidHost; k++)
 	{
-		if(worst < 0)
+		if(worst == MAX_ENTRY)
 		{
 			worst = k;
 		}
@@ -145,13 +145,13 @@ long RoutingTable::findWorstEntry(size_t line, size_t column) const
 	return worst;
 }
 
-long RoutingTable::findBestEntry(size_t line, size_t column) const
+size_t RoutingTable::findBestEntry(size_t line, size_t column) const
 {
 	//TODO do a comparator for ChimeraHost instead ?
-	long best = -1;
+	size_t best = MAX_ENTRY;
 	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != InvalidHost; k++)
 	{
-		if(best < 0)
+		if(best == MAX_ENTRY)
 		{
 			best = k;
 		}
@@ -252,8 +252,8 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 		//if we have a new position to try, do it
 		if(clockwiseBest != InvalidHost)
 		{
-			long index = this->findBestEntry(i,j);
-			if(index >= 0)
+			size_t index = this->findBestEntry(i,j);
+			if(index < MAX_ENTRY)
 			{
 				clockwiseBest = this->table[i][j][index];
 			}
@@ -292,8 +292,8 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 		//if we have a new position to try, do it
 		if(clockwiseBest != InvalidHost)
 		{
-			long index = this->findBestEntry(i,j);
-			if(index >= 0)
+			size_t index = this->findBestEntry(i,j);
+			if(index < MAX_ENTRY)
 			{
 				counterClockwiseBest = this->table[i][j][index];
 			}

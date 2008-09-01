@@ -40,9 +40,9 @@ bool Leafset::add(const Host& entry)
 	//get the index where the leaf should be
 	bool added = false;
 	//TODO some code copy, not very nice
-	long index = this->getClockwiseInsertIndex(entry);
+	size_t index = this->getClockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index >= 0 && index < ONE_SIDE_LEAFSET_SIZE)
+	if(index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
@@ -58,7 +58,7 @@ bool Leafset::add(const Host& entry)
 	//get the index where the leaf should be
 	index = this->getCounterclockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index >= 0 && index < ONE_SIDE_LEAFSET_SIZE)
+	if(index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
@@ -88,8 +88,8 @@ bool Leafset::remove(const Host& entry)
 	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
 	if(this->nbLeavesClockwise > 0 && entry.GetKey().between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise - 1].GetKey()))
 	{
-		long pos = this->getClockwiseIndex(entry);
-		if(pos >= 0)
+		size_t pos = this->getClockwiseIndex(entry);
+		if(pos < ONE_SIDE_LEAFSET_SIZE)
 		{
 			//TODO data copy could be faster
 			for(size_t i = pos; i < this->nbLeavesClockwise-1; i++)
@@ -105,8 +105,8 @@ bool Leafset::remove(const Host& entry)
 	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
 	if(this->nbLeavesCounterclockwise > 0 && entry.GetKey().between(this->leavesCounterclockwise[this->nbLeavesCounterclockwise - 1].GetKey(), this->me.GetKey()))
 	{
-		long pos = this->getCounterclockwiseIndex(entry);
-		if(pos >= 0)
+		size_t pos = this->getCounterclockwiseIndex(entry);
+		if(pos < ONE_SIDE_LEAFSET_SIZE)
 		{
 			//TODO data copy could be faster
 			for(size_t i = pos; i < this->nbLeavesCounterclockwise-1; i++)
@@ -121,7 +121,7 @@ bool Leafset::remove(const Host& entry)
 	return removed;
 }
 
-long Leafset::getClockwiseInsertIndex(const Host& entry) const
+size_t Leafset::getClockwiseInsertIndex(const Host& entry) const
 {
 	//this part of the leafset is full and the entry doesn't fall into it
 	if(this->nbLeavesClockwise == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1].GetKey()))
@@ -135,7 +135,7 @@ long Leafset::getClockwiseInsertIndex(const Host& entry) const
 			//we don't allow 2 entries with the same dht id
 			if((entry.GetKey() == this->leavesClockwise[i].GetKey()) || (entry.GetKey() == this->leavesClockwise[i+1].GetKey()))
 			{
-				return -1;
+				return ONE_SIDE_LEAFSET_SIZE;
 			}
 			return i+1;
 		}
@@ -144,14 +144,14 @@ long Leafset::getClockwiseInsertIndex(const Host& entry) const
 	{
 		if(entry.GetKey() == this->leavesClockwise[0].GetKey())
 		{
-			return -1;
+			return ONE_SIDE_LEAFSET_SIZE;
 		}
 		return 0;
 	}
 	return this->nbLeavesClockwise + 1;
 }
 
-long Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
+size_t Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
 {
 	//this part of the leafset is full and the entry doesn't fall into it
 	if(this->nbLeavesCounterclockwise == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->leavesClockwise[this->nbLeavesCounterclockwise-1].GetKey(),this->me.GetKey()))
@@ -165,7 +165,7 @@ long Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
 			//we don't allow 2 entries with the same dht id
 			if((entry.GetKey() == this->leavesCounterclockwise[i].GetKey()) || (entry.GetKey() == this->leavesCounterclockwise[i+1].GetKey()))
 			{
-				return -1;
+				return ONE_SIDE_LEAFSET_SIZE;
 			}
 			return i+1;
 		}
@@ -174,14 +174,14 @@ long Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
 	{
 		if(entry.GetKey() == this->leavesClockwise[0].GetKey())
 		{
-			return -1;
+			return ONE_SIDE_LEAFSET_SIZE;
 		}
 		return 0;
 	}
 	return this->nbLeavesClockwise + 1;
 }
 
-long Leafset::getClockwiseIndex(const Host& entry) const
+size_t Leafset::getClockwiseIndex(const Host& entry) const
 {
 	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
 	for(size_t i = 0; i < this->nbLeavesClockwise; i++)
@@ -191,11 +191,11 @@ long Leafset::getClockwiseIndex(const Host& entry) const
 			return i;
 		}
 	}
-	return -1;
+	return ONE_SIDE_LEAFSET_SIZE;
 }
 
 //TODO some code copy again...
-long Leafset::getCounterclockwiseIndex(const Host& entry) const
+size_t Leafset::getCounterclockwiseIndex(const Host& entry) const
 {
 	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
 	for(size_t i = 0; i < this->nbLeavesCounterclockwise; i++)
@@ -205,7 +205,7 @@ long Leafset::getCounterclockwiseIndex(const Host& entry) const
 			return i;
 		}
 	}
-	return -1;
+	return ONE_SIDE_LEAFSET_SIZE;
 }
 
 void Leafset::clear()

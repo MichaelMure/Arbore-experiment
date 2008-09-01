@@ -113,7 +113,7 @@ private:
 	 * \param column  routing table column index
 	 * \return  the index of the worst entry, -1 if all entries where NULL
 	 */
-	long findWorstEntry(size_t line, size_t column) const;
+	size_t findWorstEntry(size_t line, size_t column) const;
 
 	/*! \brief Get the index of the best entry for a routing table position
 	 *
@@ -125,7 +125,7 @@ private:
 	 * \param column routing table column index
 	 * \return the index of the best entry, -1 if all entries where NULL
 	 */
-	long findBestEntry(size_t line, size_t column) const;
+	size_t findBestEntry(size_t line, size_t column) const;
 
 	/*! \brief Transform a character from a dht key into an int
 	 *
