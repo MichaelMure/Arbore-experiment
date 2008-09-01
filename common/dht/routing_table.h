@@ -91,9 +91,9 @@ public:
 	 */
 	Host routeLookup(const Key& key , bool* perfectMatch) const;
 
-	std::vector<Host>*  getRow(size_t rowNum) const;
+	std::vector<Host>  getRow(size_t rowNum) const;
 
-	std::vector<Host>*  getCopy() const;
+	std::vector<Host>  getCopy() const;
 
 private:
 

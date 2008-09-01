@@ -94,19 +94,29 @@ public :
 	** return the row in the routing table that matches the longest prefix with key.
 	*/
 
-	std::vector<Host>*  rowLookup(const Key& key) const;
+	inline std::vector<Host>  rowLookup(const Key& key) const
+	{
+		size_t lineNum = this->me.GetKey().key_index(key);
+		return this->routingTable.getRow(lineNum);
+	}
 
 	/** route_neighbors:
 	** returns an array of count neighbor nodes with priority to closer nodes.
 	*/
 
-	std::vector<Host>*  getLeafset() const;
+	inline std::vector<Host> getLeafset() const
+	{
+		return this->leafset.getCopy();
+	}
 
 	/** route_get_table:
 	** returns all the entries in the routing table in an array of ChimeraHost.
 	*/
 
-	std::vector<Host>*  getRoutingTable() const;
+	inline std::vector<Host> getRoutingTable() const
+	{
+		return this->routingTable.getCopy();
+	}
 
 	//Host* route_get_table();
 

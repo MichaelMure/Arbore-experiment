@@ -325,16 +325,16 @@ Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 	}
 }
 
-std::vector<Host>* Leafset::getCopy() const
+std::vector<Host> Leafset::getCopy() const
 {
-	std::vector<Host>* ret = new std::vector<Host>();
+	std::vector<Host> ret;
 	for(size_t i = 0; i<this->nbLeavesClockwise; i++)
 	{
-		ret->insert(ret->end(),this->leavesClockwise[i]);
+		ret.insert(ret.end(),this->leavesClockwise[i]);
 	}
 	for(size_t i = 0; i<this->nbLeavesCounterclockwise; i++)
 	{
-		ret->insert(ret->end(),this->leavesCounterclockwise[i]);
+		ret.insert(ret.end(),this->leavesCounterclockwise[i]);
 	}
 	return ret;
 }
