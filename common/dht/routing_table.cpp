@@ -319,9 +319,9 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 	return InvalidHost;
 }
 
-std::vector<Host>* RoutingTable::getRow(size_t i) const
+std::vector<Host> RoutingTable::getRow(size_t i) const
 {
-	std::vector<Host>* ret = new std::vector<Host>();
+	std::vector<Host> ret;
 	size_t j, l;
 	//BlockLockMutex(this);
 	for (j = 0; j < MAX_COL; j++)
@@ -330,17 +330,17 @@ std::vector<Host>* RoutingTable::getRow(size_t i) const
 		{
 			if (this->table[i][j][l] != InvalidHost)
 			{
-				ret->insert(ret->end(), this->table[i][j][l]);
+				ret.insert(ret.end(), this->table[i][j][l]);
 			}
 		}
 	}
-	ret->insert(ret->end(), this->me);
+	ret.insert(ret.end(), this->me);
 	return ret;
 }
 
-std::vector<Host>* RoutingTable::getCopy() const
+std::vector<Host> RoutingTable::getCopy() const
 {
-	std::vector<Host>* ret = new std::vector<Host>();
+	std::vector<Host> ret;
 	int i, j, l;
 
 	//BlockLockMutex(this);
@@ -353,7 +353,7 @@ std::vector<Host>* RoutingTable::getCopy() const
 			{
 				if (this->table[i][j][l] != InvalidHost)
 				{
-					ret->insert(ret->end(), this->table[i][j][l]);
+					ret.insert(ret.end(), this->table[i][j][l]);
 				}
 			}
 		}

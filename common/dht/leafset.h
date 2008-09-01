@@ -97,7 +97,7 @@ public :
 	 */
 	Host routeLookup(const Key& key , bool* inLeafset) const;
 
-	std::vector<Host>* getCopy() const;
+	std::vector<Host> getCopy() const;
 
 private :
 	/*! \brief Clears the leafset

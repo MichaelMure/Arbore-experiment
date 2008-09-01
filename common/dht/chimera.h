@@ -101,8 +101,7 @@ public:
 	 * Send a message msg through the system to key. hint is currently
 	 * ignored, but it will one day be the next hop
 	*/
-	void Route (const Key * key, Message * msg,
-			    Host * hint);
+	void Route (const Key * key, Message * msg);
 
 	/**
 	 ** forward:
