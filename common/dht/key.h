@@ -50,7 +50,10 @@
 
 class Key
 {
+public:
 	static const size_t nlen = KEY_SIZE / (8 * sizeof(uint32_t));
+
+private:
 	uint32_t t[nlen];
 	std::string key_str;
 
@@ -69,6 +72,9 @@ public:
 	 * @param ul this is the last 32 bits of the key
 	 */
 	Key(uint32_t ul = 0);
+
+	/** Create a Key from a uint32_t[nlen] */
+	Key(uint32_t key[nlen]);
 
 	/** The copy constructor.
 	 *

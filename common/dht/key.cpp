@@ -129,6 +129,15 @@ Key::Key(uint32_t ul)
 	set_key_str();
 }
 
+Key::Key(uint32_t key[Key::nlen])
+{
+	size_t i;
+	for(i = 0; i < nlen; ++i)
+		this->t[i] = key[i];
+
+	set_key_str();
+}
+
 Key& Key::operator=(uint32_t ul)
 {
 	size_t i;
