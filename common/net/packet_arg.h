@@ -30,6 +30,7 @@ enum PacketArgType
 {
 	T_UINT32,
 	T_UINT64,
+	T_KEY,
 	T_STR,
 	T_ADDR,
 	T_ADDRLIST,

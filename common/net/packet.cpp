@@ -21,7 +21,7 @@
  *
  */
 
-#include <assert.h>
+#include <cassert>
 #include <stdio.h>
 #include <netinet/in.h>				  // htonl, ntohl
 #include <sys/types.h>
@@ -67,11 +67,19 @@ Packet::Packet(char* header)
 			size(0),
 			datas(NULL)
 {
-	uint32_t* h = (uint32_t*)header;
-	src = ntohl(h[0]);
-	dst = ntohl(h[1]);
-	type = (msg_type)ntohl(h[2]);
-	size = ntohl(h[3]);
+	uint32_t* p = (uint32_t*)header;
+	uint32_t* s = p;
+
+	while((size_t)(s - p) < Key::nlen) *s = ntohl(*s), s++;
+	src = Key(p);
+	p = s;
+
+	while(size_t(s - p) < Key::nlen) *s = ntohl(*s), s++;
+	dst = Key(p);
+	p = s;
+
+	type = (msg_type)ntohl(*p++);
+	size = ntohl(*p);
 
 	datas = new char [size];
 }
@@ -79,15 +87,24 @@ Packet::Packet(char* header)
 char* Packet::DumpBuffer() const
 {
 	char* dump = new char [GetSize()];
-	pf_id _src = htonl(src);
-	pf_id _dst = htonl(dst);
 	uint32_t _type = htonl(type);
 	uint32_t _size = htonl(size);
 	char* ptr = dump;
-	memcpy(ptr, &_src, sizeof(_src));
-	ptr += sizeof _src;
-	memcpy(ptr, &_dst, sizeof(_dst));
-	ptr += sizeof _dst;
+
+	const uint32_t* key = src.GetArray();
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		memcpy(ptr, key+i, sizeof(key[i]));
+		ptr++;
+	}
+	key = dst.GetArray();
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		memcpy(ptr, key+i, sizeof(key[i]));
+		ptr++;
+	}
+
+
 	memcpy(ptr, &_type, sizeof(_type));
 	ptr += sizeof _type;
 	memcpy(ptr, &_size, sizeof(_size));
@@ -98,10 +115,10 @@ char* Packet::DumpBuffer() const
 
 uint32_t Packet::GetHeaderSize()
 {
-	return    sizeof(Key::nlen * sizeof(uint32_t))	// src
-		+ sizeof(Key::nlen * sizeof(uint32_t))	// dst
-		+ sizeof(uint32_t)		        // size of the packet
-		+ sizeof(uint32_t);		        // size of the type
+	return    sizeof(Key::size)        // src
+		+ sizeof(Key::size)        // dst
+		+ sizeof(uint32_t)         // size of the packet
+		+ sizeof(uint32_t);        // size of the type
 }
 
 uint32_t Packet::GetSize() const
@@ -172,6 +189,7 @@ void Packet::BuildArgsFromData()
 		{
 			case T_UINT32: SetArg(arg_no, ReadInt32()); break;
 			case T_UINT64: SetArg(arg_no, ReadInt64()); break;
+			case T_KEY: SetArg(arg_no, ReadKey()); break;
 			case T_STR: SetArg(arg_no, ReadStr()); break;
 			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
@@ -187,6 +205,7 @@ void Packet::BuildDataFromArgs()
 		{
 			case T_UINT32: Write(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: Write(GetArg<uint64_t>(arg_no)); break;
+			case T_KEY: Write(GetArg<Key>(arg_no)); break;
 			case T_STR: Write(GetArg<std::string>(arg_no)); break;
 			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
@@ -212,6 +231,7 @@ std::string Packet::GetPacketInfo() const
 		{
 			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
+			case T_KEY: s += GetArg<Key>(arg_no).str(); break;
 			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
 			case T_ADDRLIST:
 			{
@@ -222,12 +242,12 @@ std::string Packet::GetPacketInfo() const
 					++it)
 				{
 					if(!list.empty()) list += ",";
-					list += pf_addr2string(*it);
+					list += (*it).str();
 				}
 				s += "[" + list + "]";
 				break;
 			}
-			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
+			case T_ADDR: s += GetArg<pf_addr>(arg_no).str(); break;
 			case T_CHUNK:
 				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
 					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
@@ -239,6 +259,7 @@ std::string Packet::GetPacketInfo() const
 	info += s;
 	return info;
 }
+
 /* T_UINT32 */
 uint32_t Packet::ReadInt32()
 {
@@ -307,6 +328,48 @@ uint64_t Packet::ReadInt64()
 }
 
 Packet& Packet::Write(uint64_t nbr)
+{
+	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+
+	char* new_datas = new char [size + sizeof nbr];
+
+	nbr = htonll(nbr);
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+	memcpy(new_datas + size, &nbr, sizeof(nbr));
+	size += (uint32_t)sizeof(nbr);
+	datas = new_datas;
+
+	return *this;
+}
+
+/* T_UINT64 */
+Key Packet::ReadKey()
+{
+	ASSERT(size >= (sizeof(uint64_t)));
+	uint64_t val = ntohll(*(uint64_t*)datas);
+
+	char* new_datas;
+	size -= (uint32_t)sizeof(uint64_t);
+	if(size > 0)
+	{
+		new_datas = new char [size];
+		memcpy(new_datas, datas + sizeof(uint64_t), size);
+	}
+
+	delete []datas;
+
+	if(size > 0)
+		datas = new_datas;
+	else
+		datas = NULL;
+
+	return val;
+}
+
+Packet& Packet::Write(Key nbr)
 {
 	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
 
@@ -524,6 +587,3 @@ Packet& Packet::Write(FileChunk chunk)
 
 	return *this;
 }
-
-
-
