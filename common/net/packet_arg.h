@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PACKET_ARG_H
@@ -33,9 +33,7 @@ enum PacketArgType
 	T_STR,
 	T_ADDR,
 	T_ADDRLIST,
-	T_IDLIST,
 	T_CHUNK,
-	T_CERTIFICATE,
 	T_NONE
 };
 
