@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <assert.h>
@@ -27,9 +27,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
-#include "packet_base.h"
+#include "packet.h"
 #include "packet_arg.h"
-#include "pf_types.h"
+#include "dht/key.h"
 #include "net_proto.h"
 #include "tools.h"
 
@@ -39,14 +39,16 @@
 #define ASSERT(x) if(!(x)) throw Malformated();
 #endif
 
-PacketBase::PacketBase(msg_type _type)
+Packet::Packet(msg_type _type, const Key& _src, const Key& _dst)
 			: type(_type),
 			size(0),
+			src(_src),
+			dst(_dst),
 			datas(NULL)
 {
 }
 
-PacketBase::PacketBase(const PacketBase& p)
+Packet::Packet(const Packet& p)
 			: type(p.type),
 			size(p.size),
 			datas(NULL)
@@ -60,7 +62,55 @@ PacketBase::PacketBase(const PacketBase& p)
 		arg_lst.push_back((*it)->clone());
 }
 
-PacketBase& PacketBase::operator=(const PacketBase& p)
+Packet::Packet(char* header)
+			: type(NET_NONE),
+			size(0),
+			datas(NULL)
+{
+	uint32_t* h = (uint32_t*)header;
+	src = ntohl(h[0]);
+	dst = ntohl(h[1]);
+	type = (msg_type)ntohl(h[2]);
+	size = ntohl(h[3]);
+
+	datas = new char [size];
+}
+
+char* Packet::DumpBuffer() const
+{
+	char* dump = new char [GetSize()];
+	pf_id _src = htonl(src);
+	pf_id _dst = htonl(dst);
+	uint32_t _type = htonl(type);
+	uint32_t _size = htonl(size);
+	char* ptr = dump;
+	memcpy(ptr, &_src, sizeof(_src));
+	ptr += sizeof _src;
+	memcpy(ptr, &_dst, sizeof(_dst));
+	ptr += sizeof _dst;
+	memcpy(ptr, &_type, sizeof(_type));
+	ptr += sizeof _type;
+	memcpy(ptr, &_size, sizeof(_size));
+	ptr += sizeof _size;
+	memcpy(ptr, datas, GetDataSize());
+	return dump;
+}
+
+uint32_t Packet::GetHeaderSize()
+{
+	return    sizeof(Key::nlen * sizeof(uint32_t))	// src
+		+ sizeof(Key::nlen * sizeof(uint32_t))	// dst
+		+ sizeof(uint32_t)		        // size of the packet
+		+ sizeof(uint32_t);		        // size of the type
+}
+
+uint32_t Packet::GetSize() const
+{
+	return size + GetHeaderSize();
+}
+
+
+Packet& Packet::operator=(const Packet& p)
 {
 	type = p.type;
 	size = p.size;
@@ -82,7 +132,7 @@ PacketBase& PacketBase::operator=(const PacketBase& p)
 	return *this;
 }
 
-PacketBase::~PacketBase()
+Packet::~Packet()
 {
 	if(datas)
 		delete []datas;
@@ -91,7 +141,8 @@ PacketBase::~PacketBase()
 		delete *it;
 }
 
-bool PacketBase::ReceiveContent(Connection* conn)
+#if 0
+bool Packet::ReceiveContent(Connection* conn)
 {
 	char* buf;
 	if(!conn->Read(&buf, GetDataSize()))
@@ -104,201 +155,7 @@ bool PacketBase::ReceiveContent(Connection* conn)
 	return true;
 }
 
-uint32_t PacketBase::GetHeaderSize()
-{
-	#if defined(PF_NET)
-	return sizeof(pf_id)			  // id_src
-		+ sizeof(pf_id)			  // id_dst
-		+ sizeof(uint32_t)		  // size of the packet
-		+ sizeof(uint32_t);		  // size of the type
-	#elif defined(PF_LAN)
-	return sizeof(uint32_t)			  // size of the packet
-		+ sizeof(uint32_t);		  // size of the type
-	#else
-	#error "Hu ?"
-	#endif
-}
-
-uint32_t PacketBase::GetSize() const
-{
-	return size + GetHeaderSize();
-}
-
-PacketBase& PacketBase::Write(uint32_t nbr)
-{
-	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
-
-	char* new_datas = new char [size + sizeof nbr];
-
-	nbr = htonl(nbr);
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-	memcpy(new_datas + size, &nbr, sizeof(nbr));
-	size += (uint32_t)sizeof(nbr);
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(uint64_t nbr)
-{
-	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
-
-	char* new_datas = new char [size + sizeof nbr];
-
-	nbr = htonll(nbr);
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-	memcpy(new_datas + size, &nbr, sizeof(nbr));
-	size += (uint32_t)sizeof(nbr);
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(pf_addr addr)
-{
-	ASSERT(((uint32_t)sizeof(addr)) + size >= size);
-	char* new_datas = new char [size + sizeof addr];
-
-	addr = pf_addr_ton(addr);
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-	memcpy(new_datas + size, &addr, sizeof(addr));
-	size += (uint32_t)sizeof(addr);
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(const std::string& str)
-{
-	ASSERT(str.size() <= UINT_MAX);
-
-	uint32_t str_len = (uint32_t)str.size();
-	ASSERT(str_len + size >= size);
-
-	Write(str_len);
-
-	char* new_datas = new char [size + str_len];
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	memcpy(new_datas + size, str.c_str(), str_len);
-	size += str_len;
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(const AddrList& addr_list)
-{
-	ASSERT(addr_list.size() <= UINT_MAX);
-	Write((uint32_t)addr_list.size());
-
-	ASSERT((addr_list.size() * sizeof(pf_addr)) + size >= size);
-	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
-
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	char* ptr = new_datas + size;
-
-	for(AddrList::const_iterator it = addr_list.begin(); it != addr_list.end(); ++it)
-	{
-		pf_addr addr = pf_addr_ton(*it);
-		memcpy(ptr, &addr, sizeof(pf_addr));
-		ptr += sizeof(pf_addr);
-	}
-	size += (uint32_t)(addr_list.size() * sizeof(pf_addr));
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(const IDList& id_list)
-{
-	ASSERT(id_list.size() <= UINT_MAX);
-	Write((uint32_t)id_list.size());
-
-	ASSERT((id_list.size() * sizeof(pf_id)) + size >= size);
-	char* new_datas = new char [size + (id_list.size() * sizeof(pf_id))];
-
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	char* ptr = new_datas + size;
-
-	for(IDList::const_iterator it = id_list.begin(); it != id_list.end(); ++it)
-	{
-		pf_id id = htonl(*it);
-		memcpy(ptr, &id, sizeof(pf_id));
-		ptr += sizeof(pf_id);
-	}
-	size += (uint32_t)(id_list.size() * sizeof(pf_id));
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(FileChunk chunk)
-{
-	ASSERT(chunk.GetSize() <= UINT_MAX);
-	ASSERT(((uint32_t)sizeof(chunk.GetOffset()) + ((uint32_t)sizeof(chunk.GetSize())) + chunk.GetSize()) + size >= size);
-	Write((uint64_t)chunk.GetOffset());
-	Write((uint32_t)chunk.GetSize());
-
-	char* new_datas = new char [size + chunk.GetSize()];
-
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	char* ptr = new_datas + size;
-	memcpy(ptr, chunk.GetData(), chunk.GetSize());
-
-	size += (uint32_t)chunk.GetSize();
-	datas = new_datas;
-
-	return *this;
-}
-
-PacketBase& PacketBase::Write(const Certificate& cert)
-{
-	unsigned char *buf;
-	size_t str_len;
-	cert.GetRaw(&buf, &str_len);
-
-	ASSERT(str_len <= UINT_MAX);
-
-	Write((uint32_t)str_len);
-	char* new_datas = new char [size + str_len];
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	memcpy(new_datas + size, buf, str_len);
-	size += (uint32_t)str_len;
-	datas = new_datas;
-
-	return *this;
-}
-
-void PacketBase::Send(Connection* conn)
+void Packet::Send(Connection* conn)
 {
 	BuildDataFromArgs();
 	char* buf = DumpBuffer();
@@ -306,7 +163,84 @@ void PacketBase::Send(Connection* conn)
 	delete []buf;
 }
 
-uint32_t PacketBase::ReadInt32()
+#endif
+
+void Packet::BuildArgsFromData()
+{
+	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
+		switch(packet_args[type][arg_no])
+		{
+			case T_UINT32: SetArg(arg_no, ReadInt32()); break;
+			case T_UINT64: SetArg(arg_no, ReadInt64()); break;
+			case T_STR: SetArg(arg_no, ReadStr()); break;
+			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
+			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
+			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
+			default: throw Malformated();
+	}
+}
+
+void Packet::BuildDataFromArgs()
+{
+	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
+		switch(packet_args[type][arg_no])
+		{
+			case T_UINT32: Write(GetArg<uint32_t>(arg_no)); break;
+			case T_UINT64: Write(GetArg<uint64_t>(arg_no)); break;
+			case T_STR: Write(GetArg<std::string>(arg_no)); break;
+			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
+			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
+			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
+			default: throw Malformated();
+	}
+}
+
+std::string Packet::GetPacketInfo() const
+{
+	std::string s, info;
+
+	info = "[" + GetSrc().str();
+	info += "->" + GetDst().str() + "] ";
+
+	info = "<" + std::string(type2str[GetType()]) + "> ";
+
+	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
+	{
+		if(s.empty() == false)
+			s += ", ";
+		switch(packet_args[type][arg_no])
+		{
+			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
+			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
+			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
+			case T_ADDRLIST:
+			{
+				AddrList v = GetArg<AddrList>(arg_no);
+				std::string list;
+				for(AddrList::const_iterator it = v.begin();
+					it != v.end();
+					++it)
+				{
+					if(!list.empty()) list += ",";
+					list += pf_addr2string(*it);
+				}
+				s += "[" + list + "]";
+				break;
+			}
+			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
+			case T_CHUNK:
+				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
+					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
+				break;
+			default: throw Malformated();
+		}
+	}
+
+	info += s;
+	return info;
+}
+/* T_UINT32 */
+uint32_t Packet::ReadInt32()
 {
 	ASSERT(size >= sizeof(uint32_t));
 	uint32_t val = ntohl(*(uint32_t*)datas);
@@ -329,7 +263,27 @@ uint32_t PacketBase::ReadInt32()
 	return val;
 }
 
-uint64_t PacketBase::ReadInt64()
+
+Packet& Packet::Write(uint32_t nbr)
+{
+	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+
+	char* new_datas = new char [size + sizeof nbr];
+
+	nbr = htonl(nbr);
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+	memcpy(new_datas + size, &nbr, sizeof(nbr));
+	size += (uint32_t)sizeof(nbr);
+	datas = new_datas;
+
+	return *this;
+}
+
+/* T_UINT64 */
+uint64_t Packet::ReadInt64()
 {
 	ASSERT(size >= sizeof(uint64_t));
 	uint64_t val = ntohll(*(uint64_t*)datas);
@@ -352,7 +306,26 @@ uint64_t PacketBase::ReadInt64()
 	return val;
 }
 
-pf_addr PacketBase::ReadAddr()
+Packet& Packet::Write(uint64_t nbr)
+{
+	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+
+	char* new_datas = new char [size + sizeof nbr];
+
+	nbr = htonll(nbr);
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+	memcpy(new_datas + size, &nbr, sizeof(nbr));
+	size += (uint32_t)sizeof(nbr);
+	datas = new_datas;
+
+	return *this;
+}
+
+/* T_ADDR */
+pf_addr Packet::ReadAddr()
 {
 	ASSERT(size >= sizeof(pf_addr));
 	pf_addr val = nto_pf_addr(*(pf_addr*)datas);
@@ -375,36 +348,25 @@ pf_addr PacketBase::ReadAddr()
 	return val;
 }
 
-std::string PacketBase::ReadStr()
+Packet& Packet::Write(pf_addr addr)
 {
-	uint32_t str_size = ReadInt32();
-	ASSERT(size >= str_size);
-	char* str = new char [str_size+1];
+	ASSERT(((uint32_t)sizeof(addr)) + size >= size);
+	char* new_datas = new char [size + sizeof addr];
 
-	memcpy(str, datas, str_size);
-	str[str_size] = '\0';
-	std::string val = std::string(str);
+	addr = pf_addr_ton(addr);
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+	memcpy(new_datas + size, &addr, sizeof(addr));
+	size += (uint32_t)sizeof(addr);
+	datas = new_datas;
 
-	char* new_datas;
-	size -= str_size;
-	if(size > 0)
-	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + str_size, size);
-	}
-
-	delete []datas;
-	delete []str;
-
-	if(size > 0)
-		datas = new_datas;
-	else
-		datas = NULL;
-
-	return val;
+	return *this;
 }
 
-AddrList PacketBase::ReadAddrList()
+/* T_ADDRLIST */
+AddrList Packet::ReadAddrList()
 {
 	AddrList addr_list;
 	uint32_t list_size = ReadInt32();
@@ -435,37 +397,87 @@ AddrList PacketBase::ReadAddrList()
 	return addr_list;
 }
 
-IDList PacketBase::ReadIDList()
+Packet& Packet::Write(const AddrList& addr_list)
 {
-	IDList id_list;
-	uint32_t list_size = ReadInt32();
-	ASSERT((size * sizeof(pf_id)) >= list_size);
+	ASSERT(addr_list.size() <= UINT_MAX);
+	Write((uint32_t)addr_list.size());
 
-	for(uint32_t i = 0; i < list_size; ++i)
+	ASSERT((addr_list.size() * sizeof(pf_addr)) + size >= size);
+	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
+
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+
+	char* ptr = new_datas + size;
+
+	for(AddrList::const_iterator it = addr_list.begin(); it != addr_list.end(); ++it)
 	{
-		pf_id id = ntohl(*(pf_id*)(datas+(i * sizeof(pf_id))));
-		id_list.insert(id);
+		pf_addr addr = pf_addr_ton(*it);
+		memcpy(ptr, &addr, sizeof(pf_addr));
+		ptr += sizeof(pf_addr);
 	}
+	size += (uint32_t)(addr_list.size() * sizeof(pf_addr));
+	datas = new_datas;
+
+	return *this;
+}
+
+/* T_STR */
+std::string Packet::ReadStr()
+{
+	uint32_t str_size = ReadInt32();
+	ASSERT(size >= str_size);
+	char* str = new char [str_size+1];
+
+	memcpy(str, datas, str_size);
+	str[str_size] = '\0';
+	std::string val = std::string(str);
 
 	char* new_datas;
-	size -= list_size * (uint32_t)sizeof(pf_id);
+	size -= str_size;
 	if(size > 0)
 	{
 		new_datas = new char [size];
-		memcpy(new_datas, datas + (list_size * sizeof(pf_id)), size);
+		memcpy(new_datas, datas + str_size, size);
 	}
 
 	delete []datas;
+	delete []str;
 
 	if(size > 0)
 		datas = new_datas;
 	else
 		datas = NULL;
 
-	return id_list;
+	return val;
 }
 
-FileChunk PacketBase::ReadChunk()
+Packet& Packet::Write(const std::string& str)
+{
+	ASSERT(str.size() <= UINT_MAX);
+
+	uint32_t str_len = (uint32_t)str.size();
+	ASSERT(str_len + size >= size);
+
+	Write(str_len);
+
+	char* new_datas = new char [size + str_len];
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
+
+	memcpy(new_datas + size, str.c_str(), str_len);
+	size += str_len;
+	datas = new_datas;
+
+	return *this;
+}
+
+/* T_CHUNK */
+FileChunk Packet::ReadChunk()
 {
 	off_t c_offset = ReadInt64();
 	uint32_t c_size = ReadInt32();
@@ -490,133 +502,28 @@ FileChunk PacketBase::ReadChunk()
 	return chunk;
 }
 
-Certificate PacketBase::ReadCertificate()
+Packet& Packet::Write(FileChunk chunk)
 {
-	uint32_t str_size = ReadInt32();
-	ASSERT(size >= str_size);
-	unsigned char* str = new unsigned char [str_size+1];
+	ASSERT(chunk.GetSize() <= UINT_MAX);
+	ASSERT(((uint32_t)sizeof(chunk.GetOffset()) + ((uint32_t)sizeof(chunk.GetSize())) + chunk.GetSize()) + size >= size);
+	Write((uint64_t)chunk.GetOffset());
+	Write((uint32_t)chunk.GetSize());
 
-	memcpy(str, datas, str_size);
+	char* new_datas = new char [size + chunk.GetSize()];
 
-	Certificate cert;
+	if(datas)
+		memcpy(new_datas, datas, size);
+	if(datas)
+		delete []datas;
 
-	try
-	{
-		cert.LoadRaw(str, str_size);
-	}
-	catch(Certificate::BadCertificate &e)
-	{
-		throw Malformated();
-	}
+	char* ptr = new_datas + size;
+	memcpy(ptr, chunk.GetData(), chunk.GetSize());
 
-	char* new_datas;
-	size -= str_size;
-	if(size > 0)
-	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + str_size, size);
-	}
+	size += (uint32_t)chunk.GetSize();
+	datas = new_datas;
 
-	delete []datas;
-	delete []str;
-
-	if(size > 0)
-		datas = new_datas;
-	else
-		datas = NULL;
-
-	return cert;
+	return *this;
 }
 
-void PacketBase::BuildArgsFromData()
-{
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
-		switch(packet_args[type][arg_no])
-		{
-			case T_UINT32: SetArg(arg_no, ReadInt32()); break;
-			case T_UINT64: SetArg(arg_no, ReadInt64()); break;
-			case T_STR: SetArg(arg_no, ReadStr()); break;
-			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
-			case T_IDLIST: SetArg(arg_no, ReadIDList()); break;
-			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
-			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
-			case T_CERTIFICATE: SetArg(arg_no, ReadCertificate()); break;
-			default: throw Malformated();
-	}
-}
 
-void PacketBase::BuildDataFromArgs()
-{
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
-		switch(packet_args[type][arg_no])
-		{
-			case T_UINT32: Write(GetArg<uint32_t>(arg_no)); break;
-			case T_UINT64: Write(GetArg<uint64_t>(arg_no)); break;
-			case T_STR: Write(GetArg<std::string>(arg_no)); break;
-			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
-			case T_IDLIST: Write(GetArg<IDList>(arg_no)); break;
-			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
-			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
-			case T_CERTIFICATE: Write(GetArg<Certificate>(arg_no)); break;
-			default: throw Malformated();
-	}
-}
 
-std::string PacketBase::GetPacketInfo() const
-{
-	std::string s, info;
-
-	info = "<" + std::string(type2str[GetType()]) + "> ";
-
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
-	{
-		if(s.empty() == false)
-			s += ", ";
-		switch(packet_args[type][arg_no])
-		{
-			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
-			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
-			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
-			case T_ADDRLIST:
-			{
-				AddrList v = GetArg<AddrList>(arg_no);
-				std::string list;
-				for(AddrList::const_iterator it = v.begin();
-					it != v.end();
-					++it)
-				{
-					if(!list.empty()) list += ",";
-					list += pf_addr2string(*it);
-				}
-				s += "[" + list + "]";
-				break;
-			}
-			case T_IDLIST:
-			{
-				IDList v = GetArg<IDList>(arg_no);
-				std::string list;
-				for(IDList::const_iterator it = v.begin();
-					it != v.end();
-					++it)
-				{
-					if(!list.empty()) list += ",";
-					list += TypToStr(*it);
-				}
-				s += "[" + list + "]";
-				break;
-			}
-			case T_ADDR: s += pf_addr2string(GetArg<pf_addr>(arg_no)); break;
-			case T_CHUNK:
-				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
-					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
-				break;
-			case T_CERTIFICATE:
-				s += "cert(" + GetArg<Certificate>(arg_no).GetCommonName() + ")";
-				break;
-			default: throw Malformated();
-		}
-	}
-
-	info += s;
-	return info;
-}

@@ -18,23 +18,24 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
-#ifndef PACKET_BASE_H
-#define PACKET_BASE_H
+#ifndef PACKET_H
+#define PACKET_H
 
 #include <vector>
 #include <cassert>
 #include <string>
-#include "ssl/connection.h"
-#include "ssl/certificate.h"
 #include "pf_types.h"
-#include "net_proto.h"
 #include "packet_arg.h"
 #include "files/file_chunk.h"
+#include "pf_addr.h"
+#include "net_proto.h"
 
-class PacketBase
+typedef std::vector<pf_addr> AddrList;
+
+class Packet
 {
 	std::vector<PacketArgBase*> arg_lst;
 
@@ -44,14 +45,12 @@ class PacketBase
 	void BuildDataFromArgs();
 
 	// Writing to buffer functions
-	PacketBase& Write(uint32_t nbr);
-	PacketBase& Write(uint64_t nbr);
-	PacketBase& Write(pf_addr addr);
-	PacketBase& Write(const std::string& str);
-	PacketBase& Write(const AddrList& addr_list);
-	PacketBase& Write(const IDList& id_list);
-	PacketBase& Write(FileChunk chunk);
-	PacketBase& Write(const Certificate& certif);
+	Packet& Write(uint32_t nbr);
+	Packet& Write(uint64_t nbr);
+	Packet& Write(pf_addr addr);
+	Packet& Write(const std::string& str);
+	Packet& Write(const AddrList& addr_list);
+	Packet& Write(FileChunk chunk);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();
@@ -59,13 +58,13 @@ class PacketBase
 	pf_addr ReadAddr();
 	std::string ReadStr();
 	AddrList ReadAddrList();
-	IDList ReadIDList();
 	FileChunk ReadChunk();
-	Certificate ReadCertificate();
 
 protected:
 	msg_type type;
 	uint32_t size;			  // size of the msg (excluding header)
+	Key src;
+	Key dst;
 	char* datas;
 
 public:
@@ -74,27 +73,21 @@ public:
 	class Malformated : public std::exception {};
 
 	/* Constructors */
-	PacketBase(msg_type _type);
-	PacketBase(const PacketBase& packet);
-	PacketBase& operator=(const PacketBase& packet);
-	virtual ~PacketBase();
+	Packet(msg_type _type, const Key& src = Key(), const Key& dst = Key());
+	Packet(const Packet& packet);
+	Packet(char* data);
+	Packet& operator=(const Packet& packet);
+	virtual ~Packet();
 
 	static uint32_t GetHeaderSize();
 	uint32_t GetSize() const;
 	uint32_t GetDataSize() const { return size; }
 	msg_type GetType() const { return type; }
 
-	/** Send packet to a peer.
-	 *
-	 * @param fd file descriptor of socket
-	 */
-	virtual void Send(Connection* conn);
-
-	/** Receive content of packet from a peer.
-	 *
-	 * @param fd file descriptor of socket
-	 */
-	bool ReceiveContent(Connection* conn);
+	Key GetSrc() const { return src; }
+	Key GetDst() const { return dst; }
+	Packet& SetSrc(Key id) { src = id; return *this; }
+	Packet& SetDst(Key id) { dst = id; return *this; }
 
 	template<typename T>
 		void SetArg(size_t arg, T val)
@@ -119,4 +112,4 @@ public:
 		return (dynamic_cast< PacketArg<T>* >(arg_lst[arg]))->val;
 	}
 };
-#endif						  /* PACKET_BASE_H */
+#endif						  /* PACKET_H */
