@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(SRC
 
+	common/net/pf_addr.cpp
+	common/net/packet.cpp
+	common/net/network.cpp
+
 	common/dht/key.cpp
 	common/dht/host.cpp
 	common/dht/hosts_list.cpp
@@ -21,7 +25,6 @@ SET(SRC
 	common/pf_log.cpp
 	common/mutex.cpp
 	common/pf_thread.cpp
-	common/net/packet_base.cpp
 	common/session_config.cpp
 	common/scheduler.cpp
 	common/scheduler_queue.cpp
@@ -37,10 +40,6 @@ SET(SRC
 	common/files/hdd.cpp
 	common/files/file_entry_base.cpp
 
-	common/net/pf_addr.cpp
-	common/net/network_base.cpp
-	common/net/peer_base.cpp
-	common/net/peers_list_base.cpp
 
 	common/jobs/job.cpp
 	common/jobs/job_new_connection.cpp
