@@ -27,8 +27,7 @@
 #include "tools.h"
 
 pf_addr::pf_addr()
-	: port(0),
-	key(0)
+	: port(0)
 {
 	ip[0] = 0;
 	ip[1] = 0;
@@ -36,9 +35,9 @@ pf_addr::pf_addr()
 	ip[3] = 0;
 }
 
-pf_addr::pf_addr(in_addr_t address, uint16_t _port)
+pf_addr::pf_addr(in_addr_t address, uint16_t _port, Key _key)
 	: port(_port),
-	key(0)
+	  key(_key)
 {
 	ip[0] = 0;
 	ip[1] = 0;

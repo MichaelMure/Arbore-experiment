@@ -39,7 +39,7 @@ public:
 	Key key;
 
 	pf_addr();
-	pf_addr(in_addr_t address, uint16_t port);
+	pf_addr(in_addr_t address, uint16_t port, Key key = 0);
 
 	/** Comparaison between two pf_addr
 	 *
