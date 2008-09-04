@@ -31,15 +31,23 @@
 #include "pf_types.h"
 #include "pf_log.h"
 
-class pf_addr
+const size_t ip_t_len = 4;
+typedef uint32_t ip_t[4];
+
+struct pf_addr
 {
-public:
-	uint32_t ip[4];
+	static const size_t size = sizeof(ip_t) +       /* ip */
+	                           sizeof(uint16_t) +   /* port */
+				   Key::size;           /* key */
+	ip_t ip;
 	uint16_t port;
 	Key key;
 
 	pf_addr();
 	pf_addr(in_addr_t address, uint16_t port, Key key = 0);
+	pf_addr(const char* buf);
+
+	void dump(char* buf);
 
 	/** Comparaison between two pf_addr
 	 *
@@ -59,9 +67,6 @@ public:
 	 */
 
 	bool operator<(const pf_addr &other) const;
-
-	pf_addr pf_addr_ton() const;
-	pf_addr nto_pf_addr() const;
 
 	std::string str() const;
 };

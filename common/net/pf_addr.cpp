@@ -89,40 +89,44 @@ std::string pf_addr::str() const
 	return ret;
 }
 
-#ifdef WORDS_BIGENDIAN
-pf_addr pf_addr::nto_pf_addr() const
+pf_addr::pf_addr(const char* p)
 {
-	pf_addr addr;
-	addr.ip[0] = ntohl(ip[0]);
-	addr.ip[1] = ntohl(ip[1]);
-	addr.ip[2] = ntohl(ip[2]);
-	addr.ip[3] = ntohl(ip[3]);
-	addr.port = ntohs(port);
-	addr.key = key.nto_key();
+	for(size_t i = 0; i < ip_t_len; ++i)
+	{
+		ip[i] = ntohl(*(uint32_t*)p);
+		p += sizeof(ip[i]);
+	}
 
-	return addr;
+	port = ntohs(*(uint16_t*)p);
+	p += sizeof(port);
+
+	uint32_t array[Key::nlen];
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		array[i] = ntohl(*(uint32_t*)p);
+		p += sizeof(array[i]);
+	}
+	key = Key(array);
 }
 
-pf_addr pf_addr::pf_addr_ton() const
+void pf_addr::dump(char* p)
 {
-	pf_addr addr;
-	addr.ip[0] = htonl(ip[0]);
-	addr.ip[1] = htonl(ip[1]);
-	addr.ip[2] = htonl(ip[2]);
-	addr.ip[3] = htonl(ip[3]);
-	addr.port = htons(port);
-	addr.key = key.key_ton();
+	for(size_t i = 0; i < ip_t_len; ++i)
+	{
+		uint32_t nbr = htonl(ip[i]);
+		memcpy(p, &nbr, sizeof(nbr));
+		p += sizeof(nbr);
+	}
 
-	return addr;
-}
-#else
-pf_addr pf_addr::nto_pf_addr() const
-{
-	return *this;
-}
+	uint16_t nport = htons(port);
+	memcpy(p, &nport, sizeof(nport));
+	p += sizeof(nport);
 
-pf_addr pf_addr::pf_addr_ton() const
-{
-	return *this;
+	const uint32_t* array = key.GetArray();
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		uint32_t nbr = htonl(array[i]);
+		memcpy(p, &nbr, sizeof(nbr));
+		p += sizeof(nbr);
+	}
 }
-#endif
