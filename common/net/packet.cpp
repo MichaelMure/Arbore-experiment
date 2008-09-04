@@ -345,18 +345,24 @@ Packet& Packet::Write(uint64_t nbr)
 	return *this;
 }
 
-/* T_UINT64 */
+/* T_KEY */
 Key Packet::ReadKey()
 {
-	ASSERT(size >= (sizeof(uint64_t)));
-	uint64_t val = ntohll(*(uint64_t*)datas);
+	ASSERT(size >= Key::size);
+
+	uint32_t val[Key::nlen];
+
+	for(size_t i = 0; i < Key::nlen; ++i)
+		val[i] = ntohl(((uint32_t*)datas)[i]);
 
 	char* new_datas;
-	size -= (uint32_t)sizeof(uint64_t);
+	Key key(val);
+
+	size -= (uint32_t)Key::size;
 	if(size > 0)
 	{
 		new_datas = new char [size];
-		memcpy(new_datas, datas + sizeof(uint64_t), size);
+		memcpy(new_datas, datas + Key::size, size);
 	}
 
 	delete []datas;
@@ -366,22 +372,27 @@ Key Packet::ReadKey()
 	else
 		datas = NULL;
 
-	return val;
+	return key;
 }
 
-Packet& Packet::Write(Key nbr)
+Packet& Packet::Write(Key key)
 {
-	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
+	ASSERT(((uint32_t)Key::size) + size >= size);
 
-	char* new_datas = new char [size + sizeof nbr];
+	char* new_datas = new char [size + Key::size];
 
-	nbr = htonll(nbr);
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
 		delete []datas;
-	memcpy(new_datas + size, &nbr, sizeof(nbr));
-	size += (uint32_t)sizeof(nbr);
+
+	const uint32_t* val = src.GetArray();
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		memcpy(new_datas + size, val+i, sizeof(val[i]));
+		size += (uint32_t)sizeof(val[i]);
+	}
+
 	datas = new_datas;
 
 	return *this;
@@ -390,15 +401,16 @@ Packet& Packet::Write(Key nbr)
 /* T_ADDR */
 pf_addr Packet::ReadAddr()
 {
-	ASSERT(size >= sizeof(pf_addr));
-	pf_addr val = nto_pf_addr(*(pf_addr*)datas);
+	ASSERT(size >= pf_addr::size);
+
+	pf_addr val(datas);
 
 	char* new_datas;
-	size -= (uint32_t)sizeof(pf_addr);
+	size -= (uint32_t)pf_addr::size;
 	if(size > 0)
 	{
 		new_datas = new char [size];
-		memcpy(new_datas, datas + sizeof(pf_addr), size);
+		memcpy(new_datas, datas + pf_addr::size, size);
 	}
 
 	delete []datas;
@@ -413,16 +425,16 @@ pf_addr Packet::ReadAddr()
 
 Packet& Packet::Write(pf_addr addr)
 {
-	ASSERT(((uint32_t)sizeof(addr)) + size >= size);
-	char* new_datas = new char [size + sizeof addr];
+	ASSERT(((uint32_t)pf_addr::size) + size >= size);
+	char* new_datas = new char [size + pf_addr::size];
 
-	addr = pf_addr_ton(addr);
 	if(datas)
 		memcpy(new_datas, datas, size);
 	if(datas)
 		delete []datas;
-	memcpy(new_datas + size, &addr, sizeof(addr));
-	size += (uint32_t)sizeof(addr);
+
+	addr.dump(new_datas + size);
+	size += (uint32_t)pf_addr::size;
 	datas = new_datas;
 
 	return *this;
@@ -433,29 +445,11 @@ AddrList Packet::ReadAddrList()
 {
 	AddrList addr_list;
 	uint32_t list_size = ReadInt32();
-	ASSERT((size * sizeof(pf_addr)) >= list_size);
+
+	ASSERT((size * pf_addr::size) >= list_size);
 
 	for(uint32_t i = 0; i < list_size; ++i)
-	{
-		pf_addr addr;
-		memcpy(&addr, datas, sizeof(pf_addr));
-		addr_list.push_back(nto_pf_addr(addr));
-	}
-
-	char* new_datas;
-	size -= list_size * (uint32_t)sizeof(pf_addr);
-	if(size > 0)
-	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + (list_size * sizeof(pf_addr)), size);
-	}
-
-	delete []datas;
-
-	if(size > 0)
-		datas = new_datas;
-	else
-		datas = NULL;
+		addr_list.push_back(ReadAddr());
 
 	return addr_list;
 }
@@ -465,24 +459,10 @@ Packet& Packet::Write(const AddrList& addr_list)
 	ASSERT(addr_list.size() <= UINT_MAX);
 	Write((uint32_t)addr_list.size());
 
-	ASSERT((addr_list.size() * sizeof(pf_addr)) + size >= size);
-	char* new_datas = new char [size + (addr_list.size() * sizeof(pf_addr))];
-
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-
-	char* ptr = new_datas + size;
+	ASSERT((addr_list.size() * pf_addr::size) + size >= size);
 
 	for(AddrList::const_iterator it = addr_list.begin(); it != addr_list.end(); ++it)
-	{
-		pf_addr addr = pf_addr_ton(*it);
-		memcpy(ptr, &addr, sizeof(pf_addr));
-		ptr += sizeof(pf_addr);
-	}
-	size += (uint32_t)(addr_list.size() * sizeof(pf_addr));
-	datas = new_datas;
+		Write(*it);
 
 	return *this;
 }
