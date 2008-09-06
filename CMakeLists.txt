@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 2.6)
 SET(SRC
 
 	common/net/pf_addr.cpp
+	common/net/packet_type.cpp
+	common/net/packet_type_list.cpp
 	common/net/packet.cpp
 	common/net/network.cpp
 
