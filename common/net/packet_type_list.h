@@ -36,7 +36,9 @@ public:
 
 	void RegisterType(PacketType type);
 
-	const PacketType& GetPacketType(uint32_t type) { return at(type); }
+	const PacketType& GetPacketType(uint32_t type) const { return at(type); }
+
+	const PacketType& operator[](uint32_t s) const { return at(s); }
 };
 
 #endif /* PACKET_TYPE_LIST_H */
