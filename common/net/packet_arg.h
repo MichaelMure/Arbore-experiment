@@ -18,13 +18,10 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef PACKET_ARG_H
 #define PACKET_ARG_H
-
-#include <string>
 
 enum PacketArgType
 {
@@ -35,7 +32,7 @@ enum PacketArgType
 	T_ADDR,
 	T_ADDRLIST,
 	T_CHUNK,
-	T_NONE
+	T_END
 };
 
 #define MAX_PACKET_ARGS 16
