@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef SCHEDULER_H
@@ -29,12 +28,14 @@
 
 class Scheduler : public Thread
 {
-protected:
+	static std::vector<Scheduler*> schedulers;
+
 	void Loop();
 public:
 	Scheduler() {}
 	~Scheduler() {}
-};
 
-extern Scheduler scheduler;
+	static void StartSchedulers(size_t nb);
+	static void StopSchedulers();
+};
 #endif

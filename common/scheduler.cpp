@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <list>
@@ -29,7 +29,30 @@
 #include "scheduler_queue.h"
 #include "pf_log.h"
 
-Scheduler scheduler;
+std::vector<Scheduler*> Scheduler::schedulers;
+
+void Scheduler::StartSchedulers(size_t nb)
+{
+	for(size_t i = 0; i < nb; ++i)
+	{
+		Scheduler* scheduler = new Scheduler;
+		scheduler->Start();
+		schedulers.push_back(scheduler);
+	}
+}
+
+void Scheduler::StopSchedulers()
+{
+	for(std::vector<Scheduler*>::iterator it = schedulers.begin();
+	    it != schedulers.end();
+	    ++it)
+	{
+		(*it)->Stop();
+		delete *it;
+	}
+
+	schedulers.stop();
+}
 
 // Check if a queued job needs to be started
 void Scheduler::Loop()
