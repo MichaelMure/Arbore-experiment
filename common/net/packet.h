@@ -37,7 +37,7 @@ typedef std::vector<pf_addr> AddrList;
 
 class PacketTypeList;
 
-/** \brief the Packet's class.
+/** \brief the Packet's representation class.
  *
  * This class can be used to represent a packet which
  * can be sent or received to/from an other peer.
@@ -66,35 +66,16 @@ class PacketTypeList;
  */
 class Packet
 {
+	/** all arguments */
 	std::vector<PacketArgBase*> arg_lst;
 
-	void BuildArgsFromData();
-	void BuildDataFromArgs();
-
-	// Writing to buffer functions
-	Packet& Write(uint32_t nbr);
-	Packet& Write(uint64_t nbr);
-	Packet& Write(Key nbr);
-	Packet& Write(pf_addr addr);
-	Packet& Write(const std::string& str);
-	Packet& Write(const AddrList& addr_list);
-	Packet& Write(FileChunk chunk);
-
-	// Reading from buffer functions
-	uint32_t ReadInt32();
-	uint64_t ReadInt64();
-	Key ReadKey();
-	pf_addr ReadAddr();
-	std::string ReadStr();
-	AddrList ReadAddrList();
-	FileChunk ReadChunk();
-
-protected:
-	PacketType type;
-	uint32_t size;			  // size of the msg (excluding header)
-	Key src;
-	Key dst;
-	char* data;
+	PacketType type;                  /**< packet type */
+	uint32_t size;			  /**< size of the msg (excluding header) */
+	Key src;                          /**< sender's key */
+	Key dst;                          /**< destination's key */
+	uint32_t flags;                   /**< flags */
+	uint32_t nseq;                    /**< sequence number */
+	char* data;                       /**< data buffer */
 
 public:
 
@@ -145,7 +126,7 @@ public:
 	/** Set content of packet.
 	 *
 	 * It *must* be used after use of the constructor which
-	 * ask a header buffer.
+	 * asks a header buffer.
 	 *
 	 * @param buf  content buffer of packet.
 	 * @param _size  size of buffer. It *must* be GetDataSize().
@@ -170,17 +151,20 @@ public:
 	/** Get the integer type of packet */
 	uint32_t GetType() const { return type.GetType(); }
 
-	/** Returns the sender's key. */
-	Key GetSrc() const { return src; }
+	uint32_t GetNSeq() const { return nseq; }        /**< Get the sequence number */
+	void SetNSeq(uint32_t _nseq) { nseq = _nseq; }   /**< Set the sequence number */
 
-	/** Returns the destination's key. */
-	Key GetDst() const { return dst; }
+	uint32_t GetFlags() const { return flags; }             /**< Get flags */
+	void SetFlags(uint32_t _flags) { flags = _flags; }      /**< Set flags */
+	bool HasFlag(uint32_t i) const { return (flags & i); }  /**< @return  true if i is set in flags */
+	void SetFlag(uint32_t i) { flags |= i; }                /**< Set the flag i. */
+	void ClrFlag(uint32_t i) { flags &= ~i; }               /**< Clear the flag i. */
 
-	/** Set the sender's key. */
-	Packet& SetSrc(Key id) { src = id; return *this; }
+	Key GetSrc() const { return src; }    /**< Returns the sender's key. */
+	Key GetDst() const { return dst; }    /**< Returns the destination's key. */
 
-	/** Set the destination's key. */
-	Packet& SetDst(Key id) { dst = id; return *this; }
+	Packet& SetSrc(Key id) { src = id; return *this; } /**< Set the sender's key. */
+	Packet& SetDst(Key id) { dst = id; return *this; } /**< Set the destination's key. */
 
 	/** Get a string which represents the packet info.
 	 *
@@ -225,5 +209,30 @@ public:
 
 		return (dynamic_cast< PacketArg<T>* >(arg_lst[arg]))->val;
 	}
+
+private:
+
+	void BuildArgsFromData();
+	void BuildDataFromArgs();
+
+	// Writing to buffer functions
+	Packet& Write(uint32_t nbr);
+	Packet& Write(uint64_t nbr);
+	Packet& Write(Key nbr);
+	Packet& Write(pf_addr addr);
+	Packet& Write(const std::string& str);
+	Packet& Write(const AddrList& addr_list);
+	Packet& Write(FileChunk chunk);
+
+	// Reading from buffer functions
+	uint32_t ReadInt32();
+	uint64_t ReadInt64();
+	Key ReadKey();
+	pf_addr ReadAddr();
+	std::string ReadStr();
+	AddrList ReadAddrList();
+	FileChunk ReadChunk();
+
+
 };
 #endif						  /* PACKET_H */

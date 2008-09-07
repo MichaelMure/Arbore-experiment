@@ -20,12 +20,6 @@
  *
  */
 
-#include <cassert>
-#include <stdio.h>
-#include <netinet/in.h>				  // htonl, ntohl
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <string.h>
 #include "packet.h"
 #include "packet_arg.h"
 #include "packet_type_list.h"
@@ -86,7 +80,13 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header)
 	type = pckt_type_list->GetPacketType(type_i);
 
 	/* Size */
-	size = ntohl(*p);
+	size = ntohl(*p++);
+
+	/* Sequence number */
+	nseq = ntohl(*p++);
+
+	/* Flags */
+	flags = ntohl(*p);
 }
 
 char* Packet::DumpBuffer()
@@ -94,6 +94,8 @@ char* Packet::DumpBuffer()
 	char* dump = new char [GetSize()];
 	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
+	uint32_t _nseq = htonl(nseq);
+	uint32_t _flags = htonl(flags);
 	char* ptr = dump;
 
 	/* Src key */
@@ -119,6 +121,14 @@ char* Packet::DumpBuffer()
 	memcpy(ptr, &_size, sizeof(_size));
 	ptr += sizeof _size;
 
+	/* Sequence number */
+	memcpy(ptr, &_nseq, sizeof(_nseq));
+	ptr += sizeof _nseq;
+
+	/* Flags */
+	memcpy(ptr, &_flags, sizeof(_flags));
+	ptr += sizeof _flags;
+
 	/* Data */
 	BuildDataFromArgs();
 	memcpy(ptr, data, GetDataSize());
@@ -131,7 +141,9 @@ uint32_t Packet::GetHeaderSize()
 	return    sizeof(Key::size)        // src
 		+ sizeof(Key::size)        // dst
 		+ sizeof(uint32_t)         // size of the packet
-		+ sizeof(uint32_t);        // size of the type
+		+ sizeof(uint32_t)         // size of the type
+		+ sizeof(uint32_t)         // sequence number
+		+ sizeof(uint32_t);        // flags
 }
 
 uint32_t Packet::GetSize() const
@@ -181,19 +193,10 @@ void Packet::SetContent(const char* buf, size_t _size)
 	BuildArgsFromData();
 }
 
-#if 0
-void Packet::Send(Connection* conn)
-{
-	BuildDataFromArgs();
-	char* buf = DumpBuffer();
-	conn->Write(buf, GetSize());
-	delete []buf;
-}
-
-#endif
-
 void Packet::BuildArgsFromData()
 {
+	if(!data)
+		return;
 	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
 	{
 		size_t arg_no = it - type.begin();
@@ -209,10 +212,14 @@ void Packet::BuildArgsFromData()
 			default: throw Malformated();
 		}
 	}
+	if(data)
+		pf_log[W_WARNING] << "There are some unread data in packet: " << GetPacketInfo();
 }
 
 void Packet::BuildDataFromArgs()
 {
+	if(data)
+		return;
 	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
 	{
 		size_t arg_no = it - type.begin();
@@ -266,7 +273,7 @@ std::string Packet::GetPacketInfo() const
 			}
 			case T_ADDR: s += GetArg<pf_addr>(arg_no).str(); break;
 			case T_CHUNK:
-				s += "ch(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
+				s += "chunk(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
 					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
 				break;
 			default: throw Malformated();
