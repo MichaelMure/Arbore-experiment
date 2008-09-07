@@ -37,6 +37,33 @@ typedef std::vector<pf_addr> AddrList;
 
 class PacketTypeList;
 
+/** \brief the Packet's class.
+ *
+ * This class can be used to represent a packet which
+ * can be sent or received to/from an other peer.
+ *
+ * The physical structure of a packet is:
+ *
+ * .----------.----------.----------.
+ * |    src   |    dst   |   type   |
+ * |  uint32  |  uint32  |  uint32  |
+ * |----------+----------+----------|
+ * |   size   |   nseq   |  flags   |
+ * |  uint32  |  uint32  |  uint32  |
+ * |----------'----------'----------|
+ * |                                |
+ * |             data ...           |
+ * |                                |
+ * '--------------------------------'
+ *
+ * All arguments are not separated. To read a
+ * packet content you have to know what
+ * are arguments of this packet type.
+ *
+ * This is why you have to give a PacketType object,
+ * or a pointer to a PacketTypeList object in
+ * the constructor which gets data buffer.
+ */
 class Packet
 {
 	std::vector<PacketArgBase*> arg_lst;
