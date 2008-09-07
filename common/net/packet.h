@@ -71,30 +71,105 @@ protected:
 
 public:
 
-	/* Exceptions */
+	/** Exception raised when the packet is malformated */
 	class Malformated : public std::exception {};
 
-	/* Constructors */
+	/** Constructor to build a new packet.
+	 *
+	 * @param type  this is the PacketType object which described the type of packet.
+	 * @param src  sender's key of the packet.
+	 * @param dst  receiver's key of the packet.
+	 */
 	Packet(PacketType type, const Key& src = Key(), const Key& dst = Key());
+
+	/** Copy constructor.
+	 *
+	 * @param packet  the Packet object which is copied.
+	 */
 	Packet(const Packet& packet);
-	Packet(PacketTypeList* pckt_type_list, char* data);
+
+	/** Constructor to build the Packet object from data.
+	 *
+	 * It gets the packet's header, find the type and wait for
+	 * the \b SetContent method call to fill args.
+	 *
+	 * @param pckt_type_list  This is the PacketTypeList object pointer which
+	 *                        is used to get the PacketType object from type
+	 *                        contained in header.
+	 * @param header  the header data (size must be GetHeaderSize()).
+	 */
+	Packet(PacketTypeList* pckt_type_list, char* header);
+
+	/** Copy operator.
+	 *
+	 * @param packet  the Packet object which is copied.
+	 */
 	Packet& operator=(const Packet& packet);
+
+	/** Packet destructor */
 	~Packet();
 
+	/** Get the data of the packet.
+	 *
+	 * You *must* free memory.
+	 */
 	char* DumpBuffer();
 
+	/** Set content of packet.
+	 *
+	 * It *must* be used after use of the constructor which
+	 * ask a header buffer.
+	 *
+	 * @param buf  content buffer of packet.
+	 * @param _size  size of buffer. It *must* be GetDataSize().
+	 */
 	void SetContent(const char* buf, size_t _size);
 
+	/** Returns the header's size.
+	 *
+	 * The header's size is constant, so this is a static method.
+	 */
 	static uint32_t GetHeaderSize();
+
+	/** Get total size of packet.
+	 *
+	 * @return  GetDataSize() + GetHeaderSize().
+	 */
 	uint32_t GetSize() const;
+
+	/** Get the data size. */
 	uint32_t GetDataSize() const { return size; }
+
+	/** Get the integer type of packet */
 	uint32_t GetType() const { return type.GetType(); }
 
+	/** Returns the sender's key. */
 	Key GetSrc() const { return src; }
+
+	/** Returns the destination's key. */
 	Key GetDst() const { return dst; }
+
+	/** Set the sender's key. */
 	Packet& SetSrc(Key id) { src = id; return *this; }
+
+	/** Set the destination's key. */
 	Packet& SetDst(Key id) { dst = id; return *this; }
 
+	/** Get a string which represents the packet info.
+	 *
+	 * @return  a string in form:
+	 *          [src->dst] <type's string> arg1, arg2, arg3, ...
+	 */
+	virtual std::string GetPacketInfo() const;
+
+	/** Set the argument's value.
+	 *
+	 * This template function msut be used to set the argument's value
+	 * at any position.
+	 *
+	 * @param arg  the argument's position.
+	 * @param val  value
+	 */
 	template<typename T>
 	void SetArg(size_t arg, T val)
 	{
@@ -106,8 +181,14 @@ public:
 		arg_lst[arg] = new PacketArg<T>(val);
 	}
 
-	virtual std::string GetPacketInfo() const;
-
+	/** Get an argument value.
+	 *
+	 * This template method can be used to get the value
+	 * of any argument.
+	 *
+	 * @param arg  the argument's position.
+	 * @return  the value
+	 */
 	template<typename T>
 	T GetArg(size_t arg) const
 	{
