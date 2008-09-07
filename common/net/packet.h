@@ -48,7 +48,7 @@ class PacketTypeList;
  * |    src   |    dst   |   type   |
  * |  uint32  |  uint32  |  uint32  |
  * |----------+----------+----------|
- * |   size   |   nseq   |  flags   |
+ * |   size   |  seqnum  |  flags   |
  * |  uint32  |  uint32  |  uint32  |
  * |----------'----------'----------|
  * |                                |
@@ -74,10 +74,15 @@ class Packet
 	Key src;                          /**< sender's key */
 	Key dst;                          /**< destination's key */
 	uint32_t flags;                   /**< flags */
-	uint32_t nseq;                    /**< sequence number */
+	uint32_t seqnum;                    /**< sequence number */
 	char* data;                       /**< data buffer */
 
 public:
+
+	enum flags_t
+	{
+		ACK    = 1 << 0,         /**< This packet request an acknoledge answer. */
+	};
 
 	/** Exception raised when the packet is malformated */
 	class Malformated : public std::exception {};
@@ -151,8 +156,8 @@ public:
 	/** Get the integer type of packet */
 	uint32_t GetType() const { return type.GetType(); }
 
-	uint32_t GetNSeq() const { return nseq; }        /**< Get the sequence number */
-	void SetNSeq(uint32_t _nseq) { nseq = _nseq; }   /**< Set the sequence number */
+	uint32_t GetSeqNum() const { return seqnum; }           /**< Get the sequence number */
+	void SetSeqNum(uint32_t _seqnum) { seqnum = _seqnum; }  /**< Set the sequence number */
 
 	uint32_t GetFlags() const { return flags; }             /**< Get flags */
 	void SetFlags(uint32_t _flags) { flags = _flags; }      /**< Set flags */

@@ -83,7 +83,7 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header)
 	size = ntohl(*p++);
 
 	/* Sequence number */
-	nseq = ntohl(*p++);
+	seqnum = ntohl(*p++);
 
 	/* Flags */
 	flags = ntohl(*p);
@@ -94,7 +94,7 @@ char* Packet::DumpBuffer()
 	char* dump = new char [GetSize()];
 	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
-	uint32_t _nseq = htonl(nseq);
+	uint32_t _seqnum = htonl(seqnum);
 	uint32_t _flags = htonl(flags);
 	char* ptr = dump;
 
@@ -122,8 +122,8 @@ char* Packet::DumpBuffer()
 	ptr += sizeof _size;
 
 	/* Sequence number */
-	memcpy(ptr, &_nseq, sizeof(_nseq));
-	ptr += sizeof _nseq;
+	memcpy(ptr, &_seqnum, sizeof(_seqnum));
+	ptr += sizeof _seqnum;
 
 	/* Flags */
 	memcpy(ptr, &_flags, sizeof(_flags));
