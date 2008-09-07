@@ -18,13 +18,12 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef ENVIRONMENT_BASE_H
 #define ENVIRONMENT_BASE_H
 #include "mutex.h"
-#include "pf_types.h"
+#include "dht/key.h"
 
 class EnvironmentBase
 {
@@ -48,8 +47,8 @@ protected:
 			}
 	};
 public:
-	EnvironmentBase() : my_id(0), listening_port(0) {}
-	SharedVar<pf_id> my_id;
+	EnvironmentBase() : my_key(Key()), listening_port(0) {}
+	SharedVar<Key> my_key;
 	SharedVar<uint16_t> listening_port;
 };
 #endif						  /* ENVIRONMENT_BASE_H */
