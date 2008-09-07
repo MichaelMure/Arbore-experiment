@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #include <cassert>
@@ -29,9 +28,8 @@
 #include <string.h>
 #include "packet.h"
 #include "packet_arg.h"
+#include "packet_type_list.h"
 #include "dht/key.h"
-#include "net_proto.h"
-#include "tools.h"
 
 #ifdef DEBUG
 #define ASSERT assert
@@ -39,64 +37,73 @@
 #define ASSERT(x) if(!(x)) throw Malformated();
 #endif
 
-Packet::Packet(msg_type _type, const Key& _src, const Key& _dst)
+Packet::Packet(PacketType _type, const Key& _src, const Key& _dst)
 			: type(_type),
 			size(0),
 			src(_src),
 			dst(_dst),
-			datas(NULL)
+			data(NULL)
 {
 }
 
 Packet::Packet(const Packet& p)
 			: type(p.type),
 			size(p.size),
-			datas(NULL)
+			data(NULL)
 {
 	if(size)
 	{
-		datas = new char [size];
-		memcpy(datas, p.datas, size);
+		data = new char [size];
+		memcpy(data, p.data, size);
 	}
 	for(std::vector<PacketArgBase*>::const_iterator it = p.arg_lst.begin(); it != p.arg_lst.end(); ++it)
 		arg_lst.push_back((*it)->clone());
 }
 
-Packet::Packet(char* header)
-			: type(NET_NONE),
+Packet::Packet(PacketTypeList* pckt_type_list, char* header)
+			: type(0, "NONE", T_END),
 			size(0),
-			datas(NULL)
+			data(NULL)
 {
 	uint32_t* p = (uint32_t*)header;
 	uint32_t* s = p;
 
+	/* Src key */
 	while((size_t)(s - p) < Key::nlen) *s = ntohl(*s), s++;
 	src = Key(p);
 	p = s;
 
+	/* Dst key */
 	while(size_t(s - p) < Key::nlen) *s = ntohl(*s), s++;
 	dst = Key(p);
 	p = s;
 
-	type = (msg_type)ntohl(*p++);
-	size = ntohl(*p);
+	/* Type */
+	uint32_t type_i = ntohl(*p++);
 
-	datas = new char [size];
+	ASSERT(type_i < pckt_type_list->size());
+
+	type = pckt_type_list->GetPacketType(type_i);
+
+	/* Size */
+	size = ntohl(*p);
 }
 
-char* Packet::DumpBuffer() const
+char* Packet::DumpBuffer()
 {
 	char* dump = new char [GetSize()];
-	uint32_t _type = htonl(type);
+	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
 	char* ptr = dump;
 
+	/* Src key */
 	const uint32_t* key = src.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
 		memcpy(ptr, key+i, sizeof(key[i]));
 		ptr++;
 	}
+	/* Dst key */
 	key = dst.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
@@ -104,12 +111,18 @@ char* Packet::DumpBuffer() const
 		ptr++;
 	}
 
-
+	/* Type */
 	memcpy(ptr, &_type, sizeof(_type));
 	ptr += sizeof _type;
+
+	/* Size */
 	memcpy(ptr, &_size, sizeof(_size));
 	ptr += sizeof _size;
-	memcpy(ptr, datas, GetDataSize());
+
+	/* Data */
+	BuildDataFromArgs();
+	memcpy(ptr, data, GetDataSize());
+
 	return dump;
 }
 
@@ -132,16 +145,16 @@ Packet& Packet::operator=(const Packet& p)
 	type = p.type;
 	size = p.size;
 
-	if(datas)
-		delete []datas;
+	if(data)
+		delete []data;
 
 	if(size)
 	{
-		datas = new char [size];
-		memcpy(datas, p.datas, size);
+		data = new char [size];
+		memcpy(data, p.data, size);
 	}
 	else
-		datas = NULL;
+		data = NULL;
 
 	for(std::vector<PacketArgBase*>::const_iterator it = p.arg_lst.begin(); it != p.arg_lst.end(); ++it)
 		arg_lst.push_back((*it)->clone());
@@ -151,27 +164,24 @@ Packet& Packet::operator=(const Packet& p)
 
 Packet::~Packet()
 {
-	if(datas)
-		delete []datas;
+	if(data)
+		delete []data;
 
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
 }
 
-#if 0
-bool Packet::ReceiveContent(Connection* conn)
+void Packet::SetContent(const char* buf, size_t _size)
 {
-	char* buf;
-	if(!conn->Read(&buf, GetDataSize()))
-		return false;
+	ASSERT(GetDataSize() == _size);
 
-	memcpy(datas, buf, GetDataSize());
-	free(buf);				  // Don't use delete[]
+	data = new char [GetDataSize()];
+	memcpy(data, buf, GetDataSize());
 
 	BuildArgsFromData();
-	return true;
 }
 
+#if 0
 void Packet::Send(Connection* conn)
 {
 	BuildDataFromArgs();
@@ -184,8 +194,10 @@ void Packet::Send(Connection* conn)
 
 void Packet::BuildArgsFromData()
 {
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
-		switch(packet_args[type][arg_no])
+	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
+	{
+		size_t arg_no = it - type.begin();
+		switch(*it)
 		{
 			case T_UINT32: SetArg(arg_no, ReadInt32()); break;
 			case T_UINT64: SetArg(arg_no, ReadInt64()); break;
@@ -195,13 +207,16 @@ void Packet::BuildArgsFromData()
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
 			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
 			default: throw Malformated();
+		}
 	}
 }
 
 void Packet::BuildDataFromArgs()
 {
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
-		switch(packet_args[type][arg_no])
+	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
+	{
+		size_t arg_no = it - type.begin();
+		switch(*it)
 		{
 			case T_UINT32: Write(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: Write(GetArg<uint64_t>(arg_no)); break;
@@ -211,6 +226,7 @@ void Packet::BuildDataFromArgs()
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
 			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
 			default: throw Malformated();
+		}
 	}
 }
 
@@ -221,13 +237,14 @@ std::string Packet::GetPacketInfo() const
 	info = "[" + GetSrc().str();
 	info += "->" + GetDst().str() + "] ";
 
-	info = "<" + std::string(type2str[GetType()]) + "> ";
+	info = "<" + std::string(type.GetName()) + "> ";
 
-	for(size_t arg_no = 0; packet_args[type][arg_no] != T_NONE; ++arg_no)
+	for(PacketType::const_iterator it = type.begin(); it != type.end(); ++it)
 	{
+		size_t arg_no = it - type.begin();
 		if(s.empty() == false)
 			s += ", ";
-		switch(packet_args[type][arg_no])
+		switch(*it)
 		{
 			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
@@ -264,22 +281,22 @@ std::string Packet::GetPacketInfo() const
 uint32_t Packet::ReadInt32()
 {
 	ASSERT(size >= sizeof(uint32_t));
-	uint32_t val = ntohl(*(uint32_t*)datas);
+	uint32_t val = ntohl(*(uint32_t*)data);
 
-	char* new_datas = NULL;
+	char* new_data = NULL;
 	size -= (uint32_t)sizeof(uint32_t);
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + sizeof(uint32_t), size);
+		new_data = new char [size];
+		memcpy(new_data, data + sizeof(uint32_t), size);
 	}
 
-	delete []datas;
+	delete []data;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return val;
 }
@@ -289,16 +306,16 @@ Packet& Packet::Write(uint32_t nbr)
 {
 	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
 
-	char* new_datas = new char [size + sizeof nbr];
+	char* new_data = new char [size + sizeof nbr];
 
 	nbr = htonl(nbr);
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-	memcpy(new_datas + size, &nbr, sizeof(nbr));
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
+	memcpy(new_data + size, &nbr, sizeof(nbr));
 	size += (uint32_t)sizeof(nbr);
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }
@@ -307,22 +324,22 @@ Packet& Packet::Write(uint32_t nbr)
 uint64_t Packet::ReadInt64()
 {
 	ASSERT(size >= sizeof(uint64_t));
-	uint64_t val = ntohll(*(uint64_t*)datas);
+	uint64_t val = ntohll(*(uint64_t*)data);
 
-	char* new_datas;
+	char* new_data;
 	size -= (uint32_t)sizeof(uint64_t);
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + sizeof(uint64_t), size);
+		new_data = new char [size];
+		memcpy(new_data, data + sizeof(uint64_t), size);
 	}
 
-	delete []datas;
+	delete []data;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return val;
 }
@@ -331,16 +348,16 @@ Packet& Packet::Write(uint64_t nbr)
 {
 	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
 
-	char* new_datas = new char [size + sizeof nbr];
+	char* new_data = new char [size + sizeof nbr];
 
 	nbr = htonll(nbr);
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
-	memcpy(new_datas + size, &nbr, sizeof(nbr));
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
+	memcpy(new_data + size, &nbr, sizeof(nbr));
 	size += (uint32_t)sizeof(nbr);
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }
@@ -353,24 +370,24 @@ Key Packet::ReadKey()
 	uint32_t val[Key::nlen];
 
 	for(size_t i = 0; i < Key::nlen; ++i)
-		val[i] = ntohl(((uint32_t*)datas)[i]);
+		val[i] = ntohl(((uint32_t*)data)[i]);
 
-	char* new_datas;
+	char* new_data;
 	Key key(val);
 
 	size -= (uint32_t)Key::size;
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + Key::size, size);
+		new_data = new char [size];
+		memcpy(new_data, data + Key::size, size);
 	}
 
-	delete []datas;
+	delete []data;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return key;
 }
@@ -379,21 +396,21 @@ Packet& Packet::Write(Key key)
 {
 	ASSERT(((uint32_t)Key::size) + size >= size);
 
-	char* new_datas = new char [size + Key::size];
+	char* new_data = new char [size + Key::size];
 
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
 
 	const uint32_t* val = src.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
-		memcpy(new_datas + size, val+i, sizeof(val[i]));
+		memcpy(new_data + size, val+i, sizeof(val[i]));
 		size += (uint32_t)sizeof(val[i]);
 	}
 
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }
@@ -403,22 +420,22 @@ pf_addr Packet::ReadAddr()
 {
 	ASSERT(size >= pf_addr::size);
 
-	pf_addr val(datas);
+	pf_addr val(data);
 
-	char* new_datas;
+	char* new_data;
 	size -= (uint32_t)pf_addr::size;
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + pf_addr::size, size);
+		new_data = new char [size];
+		memcpy(new_data, data + pf_addr::size, size);
 	}
 
-	delete []datas;
+	delete []data;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return val;
 }
@@ -426,16 +443,16 @@ pf_addr Packet::ReadAddr()
 Packet& Packet::Write(pf_addr addr)
 {
 	ASSERT(((uint32_t)pf_addr::size) + size >= size);
-	char* new_datas = new char [size + pf_addr::size];
+	char* new_data = new char [size + pf_addr::size];
 
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
 
-	addr.dump(new_datas + size);
+	addr.dump(new_data + size);
 	size += (uint32_t)pf_addr::size;
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }
@@ -474,25 +491,25 @@ std::string Packet::ReadStr()
 	ASSERT(size >= str_size);
 	char* str = new char [str_size+1];
 
-	memcpy(str, datas, str_size);
+	memcpy(str, data, str_size);
 	str[str_size] = '\0';
 	std::string val = std::string(str);
 
-	char* new_datas;
+	char* new_data;
 	size -= str_size;
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + str_size, size);
+		new_data = new char [size];
+		memcpy(new_data, data + str_size, size);
 	}
 
-	delete []datas;
+	delete []data;
 	delete []str;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return val;
 }
@@ -506,15 +523,15 @@ Packet& Packet::Write(const std::string& str)
 
 	Write(str_len);
 
-	char* new_datas = new char [size + str_len];
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
+	char* new_data = new char [size + str_len];
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
 
-	memcpy(new_datas + size, str.c_str(), str_len);
+	memcpy(new_data + size, str.c_str(), str_len);
 	size += str_len;
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }
@@ -525,22 +542,22 @@ FileChunk Packet::ReadChunk()
 	off_t c_offset = ReadInt64();
 	uint32_t c_size = ReadInt32();
 
-	FileChunk chunk(datas, c_offset, c_size);
+	FileChunk chunk(data, c_offset, c_size);
 
-	char* new_datas;
+	char* new_data;
 	size -= c_size;
 	if(size > 0)
 	{
-		new_datas = new char [size];
-		memcpy(new_datas, datas + c_size, size);
+		new_data = new char [size];
+		memcpy(new_data, data + c_size, size);
 	}
 
-	delete []datas;
+	delete []data;
 
 	if(size > 0)
-		datas = new_datas;
+		data = new_data;
 	else
-		datas = NULL;
+		data = NULL;
 
 	return chunk;
 }
@@ -552,18 +569,18 @@ Packet& Packet::Write(FileChunk chunk)
 	Write((uint64_t)chunk.GetOffset());
 	Write((uint32_t)chunk.GetSize());
 
-	char* new_datas = new char [size + chunk.GetSize()];
+	char* new_data = new char [size + chunk.GetSize()];
 
-	if(datas)
-		memcpy(new_datas, datas, size);
-	if(datas)
-		delete []datas;
+	if(data)
+		memcpy(new_data, data, size);
+	if(data)
+		delete []data;
 
-	char* ptr = new_datas + size;
+	char* ptr = new_data + size;
 	memcpy(ptr, chunk.GetData(), chunk.GetSize());
 
 	size += (uint32_t)chunk.GetSize();
-	datas = new_datas;
+	data = new_data;
 
 	return *this;
 }

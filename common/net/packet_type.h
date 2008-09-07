@@ -24,12 +24,14 @@
 #define PACKET_TYPE_H
 
 #include <vector>
+#include <string>
 #include <stdint.h>
 #include "packet_arg.h"
 
 class PacketType : public std::vector<PacketArgType>
 {
 	uint32_t type;
+	std::string name;
 
 public:
 
@@ -41,9 +43,12 @@ public:
 	 * For example:
 	 *        PacketType(10, T_STR, T_UINT32, T_CHUNK, T_END);
 	 */
-	PacketType(uint32_t type, ...);
+	PacketType(uint32_t type, std::string name, ...);
+
+	PacketType& operator=(const PacketType& pckt_type);
 
 	uint32_t GetType() const { return type; }
+	std::string GetName() const { return name; }
 };
 
 #endif /* PACKET_TYPE_H */

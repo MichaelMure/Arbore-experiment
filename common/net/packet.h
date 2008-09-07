@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef PACKET_H
@@ -29,17 +28,18 @@
 #include <string>
 #include "pf_types.h"
 #include "packet_arg.h"
+#include "packet_type.h"
+#include "packet_type_list.h"
 #include "files/file_chunk.h"
 #include "pf_addr.h"
-#include "net_proto.h"
 
 typedef std::vector<pf_addr> AddrList;
+
+class PacketTypeList;
 
 class Packet
 {
 	std::vector<PacketArgBase*> arg_lst;
-
-	virtual char* DumpBuffer() const = 0;
 
 	void BuildArgsFromData();
 	void BuildDataFromArgs();
@@ -63,11 +63,11 @@ class Packet
 	FileChunk ReadChunk();
 
 protected:
-	msg_type type;
+	PacketType type;
 	uint32_t size;			  // size of the msg (excluding header)
 	Key src;
 	Key dst;
-	char* datas;
+	char* data;
 
 public:
 
@@ -75,16 +75,20 @@ public:
 	class Malformated : public std::exception {};
 
 	/* Constructors */
-	Packet(msg_type _type, const Key& src = Key(), const Key& dst = Key());
+	Packet(PacketType type, const Key& src = Key(), const Key& dst = Key());
 	Packet(const Packet& packet);
-	Packet(char* data);
+	Packet(PacketTypeList* pckt_type_list, char* data);
 	Packet& operator=(const Packet& packet);
-	virtual ~Packet();
+	~Packet();
+
+	char* DumpBuffer();
+
+	void SetContent(const char* buf, size_t _size);
 
 	static uint32_t GetHeaderSize();
 	uint32_t GetSize() const;
 	uint32_t GetDataSize() const { return size; }
-	msg_type GetType() const { return type; }
+	uint32_t GetType() const { return type.GetType(); }
 
 	Key GetSrc() const { return src; }
 	Key GetDst() const { return dst; }
@@ -92,7 +96,7 @@ public:
 	Packet& SetDst(Key id) { dst = id; return *this; }
 
 	template<typename T>
-		void SetArg(size_t arg, T val)
+	void SetArg(size_t arg, T val)
 	{
 		if(arg_lst.size() <= arg)
 			arg_lst.resize(arg + 1, NULL);
@@ -105,7 +109,7 @@ public:
 	virtual std::string GetPacketInfo() const;
 
 	template<typename T>
-		T GetArg(size_t arg) const
+	T GetArg(size_t arg) const
 	{
 		assert(arg_lst.size() > arg);
 		assert(arg_lst[arg] != NULL);

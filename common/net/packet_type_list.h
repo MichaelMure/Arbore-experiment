@@ -36,6 +36,8 @@ public:
 
 	void RegisterType(PacketType type);
 
+	ssize_t size() const { return std::map<uint32_t, PacketType>::size(); }
+
 	const PacketType& GetPacketType(uint32_t type) const { return at(type); }
 
 	const PacketType& operator[](uint32_t s) const { return at(s); }

@@ -23,13 +23,14 @@
 #include <cstdarg>
 #include "packet_type.h"
 
-PacketType::PacketType(uint32_t _type, ...)
-	: type(_type)
+PacketType::PacketType(uint32_t _type, std::string _name, ...)
+	: type(_type),
+	  name(_name)
 {
 	va_list ap;
 	PacketArgType t;
 
-	va_start(ap, _type);
+	va_start(ap, _name);
 
 	for(t = (PacketArgType)va_arg(ap, uint32_t); t != T_END; t = (PacketArgType)va_arg(ap, uint32_t))
 	{
@@ -39,3 +40,13 @@ PacketType::PacketType(uint32_t _type, ...)
 	va_end(ap);
 }
 
+PacketType& PacketType::operator=(const PacketType& pckt_type)
+{
+	type = pckt_type.type;
+	name = pckt_type.name;
+
+	for(const_iterator it = pckt_type.begin(); it != pckt_type.end(); ++it)
+		push_back(*it);
+
+	return *this;
+}
