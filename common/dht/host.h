@@ -106,13 +106,16 @@ public:
 	 */
 	pf_addr GetAddr() const;
 
-	/** \brief Encodes me into a string. */
+	/** \brief Encodes me into a string.
+	 *
+	 * TODO: probably useless
+	 */
 	std::string Encode() const;
 
 	 /** \brief updates the success rate to the host based on the SUCCESS_WINDOW average */
 	void UpdateStat (int success);
 
-	Key GetKey() const;            /**< Get the key */
+	Key GetKey() const;                   /**< Get the key */
 	void SetKey(Key k);                   /**< Set the key */
 
 	double GetFailureTime() const;        /**< Get the failure time */

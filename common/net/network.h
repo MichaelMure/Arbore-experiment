@@ -18,11 +18,10 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
-#ifndef NETWORK_BASE_H
-#define NETWORK_BASE_H
+#ifndef _NETWORK_H_
+#define _NETWORK_H_
 
 #include <exception>
 #include <vector>
@@ -32,16 +31,15 @@
 #include <time.h>
 
 #include "pf_thread.h"
-#include "pf_ssl.h"
-#include "peer.h"
-#include "pf_types.h"
+#include "pf_addr.h"
+#include "dht/host.h"
+#include "packet.h"
 
 class MyConfig;
 
-class NetworkBase : public Thread, protected Mutex
+class Network : public Thread, protected Mutex
 {
 public:
-
 	/* Exceptions */
 	class CantOpenSock : public std::exception {};
 	class CantListen : public std::exception
@@ -60,43 +58,23 @@ public:
 	};
 
 private:
-	fd_set global_read_set;
 	int serv_sock;
+	uint32_t seqend;
 
-	std::list<pf_addr> disconnected_list;
+	void Listen(uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
+public:
 
-protected:
-	Ssl *ssl;
+	Network();
+	~Network();
 
-	void Listen(uint16_t port, const char* bind) throw (CantOpenSock, CantListen);
 	void CloseAll();
 	void Loop();
 	void OnStop();
 
-	/** Add a peer on network */
-	virtual Peer* AddPeer(Peer* peer);
-	void RemovePeer(int fd, bool try_reconnect = true);
-
-	void AddDisconnected(const pf_addr& addr);
-	void DelDisconnected(const pf_addr& addr);
-
-public:
-	/* Constructors */
-	NetworkBase();
-	virtual ~NetworkBase();
-
-	/** Virtual method called when a peer is removed. */
-	virtual void OnRemovePeer(Peer* peer) {}
-
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);
 
-	/* Make a pf_addr from a hostname/port
-	 */
-	pf_addr MakeAddr(const std::string& hostname, uint16_t port);
-
-	/* Connect to a pf_addr.
-	 */
-	virtual void Connect(pf_addr addr);
+	int Send(Host host, Packet pckt);
 };
-#endif
+
+#endif /* NETWORK_H */
