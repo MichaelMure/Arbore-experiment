@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_NEW_CONNECTION_QUEUE_H
@@ -40,7 +40,5 @@ public:
 		{}
 
 	bool Start();
-	job_type GetType() const {return JOB_NEW_CONN_QUEUE; }
-	std::string GetName() const {return "JobNewConnQueue"; }
 };
 #endif

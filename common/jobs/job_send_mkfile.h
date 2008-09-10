@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_SEND_MKFILE_H
@@ -40,8 +40,6 @@ public:
 
 	bool Start();
 
-	job_type GetType() const { return JOB_SEND_MKFILE; }
-	std::string GetName() const { return "JobSendMkFile"; }
 };
 
 #endif						  /* JOB_SEND_MKFILE_H */

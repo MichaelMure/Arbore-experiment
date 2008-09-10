@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_NEW_CONN_REQ_BASE_H
@@ -32,10 +32,8 @@ public:
 	JobNewConnReqBase(pf_addr addr) : Job(0 , REPEAT_NONE), pf_addr(addr) {}
 
 	bool Start();
-	job_type GetType() const {return JOB_NEW_CONN_REQ; }
 	virtual void OnSuccess() = 0;
 	virtual void OnFailure() = 0;
 	pf_addr GetAddr() const { return (pf_addr)*this; }
-	std::string GetName() const { return "JobNewConnReq"; }
 };
 #endif						  /* NEW_CONN_REQ_BASE_H */

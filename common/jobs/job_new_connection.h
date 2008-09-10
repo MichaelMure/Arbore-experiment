@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_NEW_CONNECTION_H
@@ -34,7 +34,5 @@ public:
 
 	bool Start();
 	bool IsMe(const pf_addr&);
-	job_type GetType() const {return JOB_NEW_CONNECT; }
-	std::string GetName() const {return "JobNewConnection"; }
 };
 #endif

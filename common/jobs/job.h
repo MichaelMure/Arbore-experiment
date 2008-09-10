@@ -26,7 +26,6 @@
 #include <list>
 #include <time.h>
 #include <string>
-#include "job_types.h"
 
 class Job
 {
