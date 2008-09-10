@@ -18,14 +18,13 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_MKFILE_H
 #define JOB_MKFILE_H
 #include "job.h"
 #include "file_entry.h"
-#include "pf_types.h"
 
 class JobMkFile : public Job
 {
@@ -35,6 +34,8 @@ class JobMkFile : public Job
 	IDList sharers;
 	bool keep_newest;
 	bool erase_on_modification;
+
+	bool Start();
 public:
 	JobMkFile(std::string _file, pf_stat _stat, IDList _sharers, pf_id _sender, bool _keep_newest, bool _erase_on_modification)
 		: Job(0, REPEAT_NONE),
@@ -47,9 +48,5 @@ public:
 		{}
 	~JobMkFile() {}
 
-	bool Start();
-
-	job_type GetType() const { return JOB_MKFILE; }
-	std::string GetName() const { return "JobMkFile"; }
 };
 #endif						  /* JOB_MKFILE_H */

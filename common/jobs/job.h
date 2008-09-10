@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef JOB_H
@@ -53,7 +53,5 @@ public:
 	// Start the job, returns true if the job needs to be restarted later
 	bool DoStart();
 	time_t GetStartTime() const { return start_time; }
-	virtual job_type GetType() const = 0;
-	virtual std::string GetName() const = 0;
 };
 #endif						  /* JOB_H */
