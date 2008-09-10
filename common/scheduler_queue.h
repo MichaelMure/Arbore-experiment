@@ -18,14 +18,14 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef SCHEDULER_QUEUE_H
 #define SCHEDULER_QUEUE_H
 #include <list>
+#include <typeinfo>
 #include "mutex.h"
-#include "job_types.h"
 
 class Job;
 						  /* TODO: Make me private */
@@ -45,7 +45,7 @@ public:
 	void Cancel(Job* job);
 
 	// Remove all jobs of a specific type from the queue
-	void CancelType(enum job_type jtype);
+	void CancelType(std::type_info type);
 
 	// Return the date of the next scheduled job
 	time_t NextJobTime();

@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <algorithm>
@@ -72,14 +71,14 @@ void SchedulerQueue::Cancel(Job* job)
 	delete job;
 }
 
-void SchedulerQueue::CancelType(enum job_type jtype)
+void SchedulerQueue::CancelType(std::type_info type)
 {
 	BlockLockMutex lock(this);
 
 	iterator it = begin();
 	while(it != end())
 	{
-		if((*it)->GetType() == jtype)
+		if(typeid(*it) == type)
 		{
 			delete *it;
 			it = erase(it);
