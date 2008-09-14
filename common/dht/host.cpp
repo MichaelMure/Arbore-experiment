@@ -77,6 +77,8 @@ public:
 	void SetKey(Key k) { key = k; }
 
 	double GetFailureTime() const { return failuretime; }
+
+	void SetLatency(double l) { latency = l; }
 	double GetLatency() const { return latency; }
 
 	void SetFailureTime(double f) { failuretime = f; }
@@ -238,6 +240,15 @@ double Host::GetFailureTime() const
 	BlockLockMutex(this->host->GetMutex());
 	return host->GetFailureTime();
 }
+
+void Host::SetLatency(double f)
+{
+	if(this->host == NULL) return;
+
+	BlockLockMutex(this->host->GetMutex());
+	host->SetLatency(f);
+}
+
 double Host::GetLatency() const
 {
 	if(this->host == NULL) return 0.0;

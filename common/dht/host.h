@@ -122,6 +122,8 @@ public:
 	void SetFailureTime(double f);        /**< Set the failure time */
 
 	double GetLatency() const;            /**< Get the latency */
+	void SetLatency(double l);            /**< Set the latency */
+
 	float GetSuccessAvg() const;          /**< Get the success average */
 
 	/** \brief Get the reference count.
