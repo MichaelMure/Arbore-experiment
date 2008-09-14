@@ -82,6 +82,7 @@ public:
 
 Network::Network()
 	: Mutex(RECURSIVE_MUTEX),
+	hosts_list(64), /* TODO: magic number, change it. */
 	serv_sock(-1),
 	seqend(0)
 {
@@ -168,6 +169,8 @@ void Network::Loop()
 		try
 		{
 			Packet pckt(data);
+			pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
+			Host sender = hosts_list.GetHost(address);
 
 			if(size != pckt.GetSize())
 			{
@@ -192,7 +195,7 @@ void Network::Loop()
 				}
 
 				job = *it;
-				sender.UpdateState(1);
+				sender.UpdateStat(1);
 				double latency = dtime() - job->GetTransmitTime();
 				if(latency > 0)
 				{
@@ -268,7 +271,7 @@ bool Network::Send(Host host, Packet pckt)
 
 	memset (&to, 0, sizeof (to));
 	to.sin_family = AF_INET;
-	to.sin_addr.s_addr = host.GetAddr().ip[3]; /* TODO: ipv6! */
+	to.sin_addr.s_addr = htonl(host.GetAddr().ip[3]); /* TODO: ipv6! */
 	to.sin_port = htons (host.GetAddr().port);
 
 	start = dtime ();

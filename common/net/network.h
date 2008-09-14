@@ -32,11 +32,12 @@
 
 #include "pf_thread.h"
 #include "pf_addr.h"
-#include "host.h"
+#include "hosts_list.h"
 #include "packet.h"
 
 class MyConfig;
 class ResendPacketJob;
+class PacketTypeList;
 
 class Network : public Thread, protected Mutex
 {
@@ -64,6 +65,8 @@ public:
 
 private:
 
+	HostsList hosts_list;
+	PacketTypeList* packet_type_list;
 	std::vector<ResendPacketJob*> resend_list;
 	int serv_sock;
 	uint32_t seqend;
