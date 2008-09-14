@@ -44,6 +44,11 @@
 #include "net/packet.h"
 #include "net/host.h"
 
+/** Resend a packet after a waited time.
+ *
+ * This job resend frequently a packet until
+ * it receives an ACK message.
+ */
 class ResendPacketJob : public Job
 {
 	Host desthost;
@@ -80,12 +85,42 @@ public:
 	Host GetDestHost() const { return desthost; }
 };
 
+/** Call the packet handler.
+ *
+ * Because we don't want to monopolize the Network thread,
+ * this job is used to ask a scheduler thread to call the
+ * packet handler.
+ */
+class HandlePacketJob : public Job
+{
+	Host sender;
+	Packet pckt;
+
+	bool Start()
+	{
+		pckt.Handle(sender);
+		return false;
+	}
+
+public:
+	HandlePacketJob(const Host& _sender, const Packet& _pckt)
+		: Job(0.0, REPEAT_NONE),
+		  sender(_sender),
+		  pckt(_pckt)
+	{}
+};
+
+/*******************
+ *    NETWORK      *
+ *******************/
+
 Network::Network()
 	: Mutex(RECURSIVE_MUTEX),
+	highsock(-1),
 	hosts_list(64), /* TODO: magic number, change it. */
-	serv_sock(-1),
 	seqend(0)
 {
+	FD_ZERO(&socks_fd_set);
 }
 
 Network::~Network()
@@ -97,11 +132,12 @@ Network::~Network()
 	}
 }
 
-void Network::Listen(uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen)
+void Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen)
 {
 	BlockLockMutex lock(this);
 	struct sockaddr_in saddr;
 	int one;
+	int serv_sock;
 
 	/* create socket */
 	serv_sock = socket (AF_INET, SOCK_DGRAM, 0);
@@ -124,6 +160,11 @@ void Network::Listen(uint16_t port, const char* bind_addr) throw(CantOpenSock, C
 		throw CantListen(port);
 	}
 
+	socks[serv_sock] = packet_type_list;
+	FD_SET(serv_sock, &socks_fd_set);
+	if(serv_sock > highsock)
+		highsock = serv_sock;
+
 	environment.listening_port.Set(port);
 }
 
@@ -132,13 +173,15 @@ void Network::Loop()
 	fd_set tmp_read_set;
 	int events;
 
+	if(highsock < 0)
+		return;
+
 	Lock();
-	FD_ZERO(&tmp_read_set);
-	FD_SET(serv_sock, &tmp_read_set);
+	tmp_read_set = socks_fd_set;
 	Unlock();
 
 	/* TODO: this is useless to use select() here, because now there is only one fd (server sock) */
-	if((events = select(serv_sock + 1, &tmp_read_set, NULL, NULL, NULL)) < 0)
+	if((events = select(highsock + 1, &tmp_read_set, NULL, NULL, NULL)) < 0)
 	{
 		if(errno != EINTR)
 		{
@@ -148,80 +191,95 @@ void Network::Loop()
 	}
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
-		static char data[PACKET_MAX_SIZE];
-		struct sockaddr_in from;
-		ssize_t size;
-		socklen_t socklen = sizeof(from);
-
-		size = recvfrom(serv_sock, data, sizeof(data), 0,
-		                (struct sockaddr *) &from, &socklen);
-
-		if(size < 0)
+		BlockLockMutex lock(this);
+		for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
-			pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
-			return;
-		}
-		if(size < Packet::GetHeaderSize())
-		{
-			pf_log[W_ERR] << "Received a packet too light (size: " << size << " < " << Packet::GetHeaderSize() << ")";
-			return;
-		}
-		try
-		{
-			Packet pckt(data);
-			pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
-			Host sender = hosts_list.GetHost(address);
+			if(!FD_ISSET(it->first, &tmp_read_set))
+				continue;
 
-			if(size != pckt.GetSize())
+			PacketTypeList* packet_type_list = it->second;
+			static char data[PACKET_MAX_SIZE];
+			struct sockaddr_in from;
+			ssize_t size;
+			socklen_t socklen = sizeof(from);
+
+			size = recvfrom(serv_sock, data, sizeof(data), 0,
+					(struct sockaddr *) &from, &socklen);
+
+			if(size < 0)
 			{
-				pf_log[W_ERR] << "There isn't exacly the same length of data that header says."
-				              << "(" << size << " vs " << pckt.GetSize() << ")";
+				pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
 				return;
 			}
-
-			if(pckt.HasFlag(Packet::ACK))
+			if(size < Packet::GetHeaderSize())
 			{
-				ResendPacketJob* job;
-				std::vector<ResendPacketJob*>::iterator it;
-				for(it = resend_list.begin();
-				    it != resend_list.end() && (*it)->GetPacket().GetSeqNum() != pckt.GetSeqNum();
-				    ++it)
-					;
+				pf_log[W_ERR] << "Received a packet too light "
+				              << "(size: " << size << " < " << Packet::GetHeaderSize() << ")";
+				return;
+			}
+			try
+			{
+				Packet pckt(packet_type_list, data);
+				pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
+				Host sender = hosts_list.GetHost(address);
 
-				if(it == resend_list.end())
+				if(size != pckt.GetSize())
 				{
-					pf_log[W_WARNING] << "Received an ACK for an unknown sent ack request";
+					pf_log[W_ERR] << "There isn't exacly the same length of data that header says."
+						      << "(" << size << " vs " << pckt.GetSize() << ")";
 					return;
 				}
 
-				job = *it;
-				sender.UpdateStat(1);
-				double latency = dtime() - job->GetTransmitTime();
-				if(latency > 0)
+				if(pckt.HasFlag(Packet::ACK))
 				{
-					if(job->GetDestHost().GetLatency() == 0.0)
-						job->GetDestHost().SetLatency(latency);
-					else
-						job->GetDestHost().SetLatency((0.9 * job->GetDestHost().GetLatency())
-						                            + (0.1 * latency));
+					/* We got an ACK message, so we remove the ResendPacketJob, update
+					 * the latency information and mark this host as up.
+					 */
+					ResendPacketJob* job;
+					std::vector<ResendPacketJob*>::iterator it;
+					for(it = resend_list.begin();
+					    it != resend_list.end() && (*it)->GetPacket().GetSeqNum() != pckt.GetSeqNum();
+					    ++it)
+						;
+
+					if(it == resend_list.end())
+					{
+						pf_log[W_WARNING] << "Received an ACK for an unknown sent ack request";
+						return;
+					}
+
+					job = *it;
+					sender.UpdateStat(1);
+					double latency = dtime() - job->GetTransmitTime();
+					if(latency > 0)
+					{
+						if(job->GetDestHost().GetLatency() == 0.0)
+							job->GetDestHost().SetLatency(latency);
+						else
+							job->GetDestHost().SetLatency((0.9 * job->GetDestHost().GetLatency())
+										    + (0.1 * latency));
+					}
+
+					resend_list.erase(it);
+					scheduler_queue.Cancel(job);
+					return;
+				}
+				if(pckt.HasFlag(Packet::REQUESTACK))
+				{
+					/* It request an ACK, so we send it. */
+					Packet ack(pckt.GetPacketType(), pckt.GetSrc(), pckt.GetDst());
+					ack.SetFlag(Packet::ACK);
+					ack.SetSeqNum(pckt.GetSeqNum());
+					Send(sender, ack);
 				}
 
-				resend_list.erase(it);
-				scheduler_queue.Cancel(job);
+				pckt.Handle(sender);
+			}
+			catch(Packet::Malformated &e)
+			{
+				pf_log[W_ERR] << "Received malformed message!";
 				return;
 			}
-			if(pckt.HasFlag(Packet::REQUESTACK))
-			{
-				Packet ack(pckt.GetPacketType(), pckt.GetSrc(), pckt.GetDst());
-				ack.SetFlag(Packet::ACK);
-				ack.SetSeqNum(pckt.GetSeqNum());
-				Send(sender, ack);
-			}
-		}
-		catch(Packet::Malformated &e)
-		{
-			pf_log[W_ERR] << "Received malformed message!";
-			return;
 		}
 	}
 }
@@ -246,13 +304,13 @@ void Network::CloseAll()
 
 void Network::StartNetwork(MyConfig* conf)
 {
+#if 0
 	/* Listen a TCP port */
 	ConfigSection* section = conf->GetSection("listen");
 
 	Listen(static_cast<uint16_t>(section->GetItem("port")->Integer()),
 		section->GetItem("bind")->String().c_str());
 
-#if 0
 	/* Connect to other servers */
 	std::vector<ConfigSection*> sections = conf->GetSectionClones("connection");
 	for(std::vector<ConfigSection*>::iterator it = sections.begin(); it != sections.end(); ++it)

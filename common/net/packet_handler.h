@@ -28,6 +28,7 @@ class Packet;
 
 class PacketHandlerBase
 {
+public:
 	virtual void operator()(const Host& sender, const Packet& packet) = 0;
 };
 

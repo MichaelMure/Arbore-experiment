@@ -36,6 +36,7 @@
 typedef std::vector<pf_addr> AddrList;
 
 class PacketTypeList;
+class Host;
 
 /** \brief the Packet's representation class.
  *
@@ -138,6 +139,12 @@ public:
 	 * @param _size  size of buffer. It *must* be GetDataSize().
 	 */
 	void SetContent(const char* buf, size_t _size);
+
+	/** Call the handler method.
+	 *
+	 * @param sender  this is the sender's Host object
+	 */
+	void Handle(const Host& sender) const;
 
 	/** Returns the header's size.
 	 *

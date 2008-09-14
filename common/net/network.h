@@ -65,17 +65,22 @@ public:
 
 private:
 
+	typedef std::map<int, PacketTypeList*> SockMap;
+	SockMap socks;    /**< contains all socks listened and the related packettypelist */
+	fd_set socks_fd_set;
+	int highsock;
+
 	HostsList hosts_list;
-	PacketTypeList* packet_type_list;
 	std::vector<ResendPacketJob*> resend_list;
 	int serv_sock;
 	uint32_t seqend;
 
-	void Listen(uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
 public:
 
 	Network();
 	~Network();
+
+	void Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
 
 	void CloseAll();
 	void Loop();

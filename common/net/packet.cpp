@@ -23,6 +23,7 @@
 #include "packet.h"
 #include "packet_arg.h"
 #include "packet_type_list.h"
+#include "packet_handler.h"
 #include "dht/key.h"
 
 #ifdef DEBUG
@@ -191,6 +192,11 @@ void Packet::SetContent(const char* buf, size_t _size)
 	memcpy(data, buf, GetDataSize());
 
 	BuildArgsFromData();
+}
+
+void Packet::Handle(const Host& sender) const
+{
+	(*type.GetHandler()) (sender, *this);
 }
 
 void Packet::BuildArgsFromData()
