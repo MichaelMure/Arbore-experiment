@@ -156,6 +156,7 @@ public:
 
 	/** Get the integer type of packet */
 	uint32_t GetType() const { return type.GetType(); }
+	PacketType GetPacketType() const { return type; }
 
 	uint32_t GetSeqNum() const { return seqnum; }           /**< Get the sequence number */
 	void SetSeqNum(uint32_t _seqnum) { seqnum = _seqnum; }  /**< Set the sequence number */

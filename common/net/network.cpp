@@ -176,7 +176,7 @@ void Network::Loop()
 				return;
 			}
 
-			if(pckt.HasFlag(Packet::REQUESTACK))
+			if(pckt.HasFlag(Packet::ACK))
 			{
 				ResendPacketJob* job;
 				std::vector<ResendPacketJob*>::iterator it;
@@ -192,7 +192,7 @@ void Network::Loop()
 				}
 
 				job = *it;
-				host.UpdateState(1);
+				sender.UpdateState(1);
 				double latency = dtime() - job->GetTransmitTime();
 				if(latency > 0)
 				{
@@ -207,10 +207,18 @@ void Network::Loop()
 				scheduler_queue.Cancel(job);
 				return;
 			}
+			if(pckt.HasFlag(Packet::REQUESTACK))
+			{
+				Packet ack(pckt.GetPacketType(), pckt.GetSrc(), pckt.GetDst());
+				ack.SetFlag(Packet::ACK);
+				ack.SetSeqNum(pckt.GetSeqNum());
+				Send(sender, ack);
+			}
 		}
 		catch(Packet::Malformated &e)
 		{
 			pf_log[W_ERR] << "Received malformed message!";
+			return;
 		}
 	}
 }
