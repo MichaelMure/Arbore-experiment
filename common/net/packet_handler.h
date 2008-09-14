@@ -20,40 +20,15 @@
  *
  */
 
-#include <cstdarg>
-#include "packet_type.h"
-#include "packet_handler.h"
+#ifndef PACKET_HANDLER_H
+#define PACKET_HANDLER_H
 
-PacketType::PacketType(uint32_t _type, PacketHandlerBase* _handler, std::string _name, ...)
-	: type(_type),
-	  name(_name),
-	  handler(_handler)
+class Host;
+class Packet;
+
+class PacketHandlerBase
 {
-	va_list ap;
-	PacketArgType t;
+	virtual void operator()(const Host& sender, const Packet& packet) = 0;
+};
 
-	va_start(ap, _name);
-
-	for(t = (PacketArgType)va_arg(ap, uint32_t); t != T_END; t = (PacketArgType)va_arg(ap, uint32_t))
-	{
-		push_back(t);
-	}
-
-	va_end(ap);
-}
-
-PacketType::~PacketType()
-{
-	delete handler;
-}
-
-PacketType& PacketType::operator=(const PacketType& pckt_type)
-{
-	type = pckt_type.type;
-	name = pckt_type.name;
-
-	for(const_iterator it = pckt_type.begin(); it != pckt_type.end(); ++it)
-		push_back(*it);
-
-	return *this;
-}
+#endif /* PACKET_HANDLER_H */

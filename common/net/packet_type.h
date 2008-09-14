@@ -28,27 +28,38 @@
 #include <stdint.h>
 #include "packet_arg.h"
 
+class PacketHandlerBase;
+
 class PacketType : public std::vector<PacketArgType>
 {
 	uint32_t type;
 	std::string name;
+	PacketHandlerBase* handler;
 
 public:
 
 	/** PacketType constructor.
 	 *
-	 * @param type this is the type number.
-	 * @param ... put here a list of PacketArgType finished by a T_END.
+	 * @param type  this is the type number.
+	 * @param handler  the handler object.
+	 * @param ...  put here a list of PacketArgType finished by a T_END.
 	 *
 	 * For example:
-	 *        PacketType(10, T_STR, T_UINT32, T_CHUNK, T_END);
+	 *        PacketType(10, MyHandler, T_STR, T_UINT32, T_CHUNK, T_END);
 	 */
-	PacketType(uint32_t type, std::string name, ...);
+	PacketType(uint32_t type, PacketHandlerBase* handler, std::string name, ...);
+
+	/** Destructor.
+	 *
+	 * Delete the handler object.
+	 */
+	~PacketType();
 
 	PacketType& operator=(const PacketType& pckt_type);
 
 	uint32_t GetType() const { return type; }
 	std::string GetName() const { return name; }
+	PacketHandlerBase* GetHandler() const { return handler; }
 };
 
 #endif /* PACKET_TYPE_H */

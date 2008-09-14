@@ -55,7 +55,7 @@ Packet::Packet(const Packet& p)
 }
 
 Packet::Packet(PacketTypeList* pckt_type_list, char* header)
-			: type(0, "NONE", T_END),
+			: type(0, NULL, "NONE", T_END),
 			size(0),
 			data(NULL)
 {
