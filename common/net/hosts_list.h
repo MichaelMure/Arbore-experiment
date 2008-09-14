@@ -53,6 +53,13 @@ public:
 	 */
 	Host GetHost(std::string hn, uint16_t port);
 
+	/** Get an host from a pf_addr.
+	 *
+	 * @param address  the pf_addr object which describes host
+	 * @return  the Host object.
+	 */
+	Host GetHost(const pf_addr& address);
+
 	/** host_decode:
 	 ** decodes a string into a chimera host structure. This acts as a
 	 ** host_get, and should be followed eventually by a host_release.

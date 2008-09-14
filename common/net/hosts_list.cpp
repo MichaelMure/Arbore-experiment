@@ -120,6 +120,12 @@ Host HostsList::GetHost(std::string hostname, uint16_t port)
 	/* create an id of the form ip:port */
 	address = MakeAddr(hostname, port);
 
+	return GetHost(address);
+}
+
+Host HostsList::GetHost(const pf_addr& address)
+{
+	BlockLockMutex lock(this);
 	HostMap::iterator it = hosts.find(address);
 
 	/* if the node is not in the cache, create an entry and allocate a host */
