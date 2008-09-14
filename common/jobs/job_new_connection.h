@@ -25,12 +25,13 @@
 #define JOB_NEW_CONNECTION_H
 #include <string>
 #include "job.h"
+#include "dtime.h"
 #include "pf_types.h"
 
 class JobNewConnection : public Job, private pf_addr
 {
 public:
-	JobNewConnection(pf_addr addr) : Job(time(NULL), REPEAT_LESS_AND_LESS, 1), pf_addr(addr) {}
+	JobNewConnection(pf_addr addr) : Job(dtime(), REPEAT_LESS_AND_LESS, 1.0), pf_addr(addr) {}
 
 	bool Start();
 	bool IsMe(const pf_addr&);

@@ -48,7 +48,7 @@ public:
 	void CancelType(std::type_info type);
 
 	// Return the date of the next scheduled job
-	time_t NextJobTime();
+	double NextJobTime();
 
 	size_t GetQueueSize();
 

@@ -22,7 +22,7 @@
  */
 
 #include <list>
-#include <time.h>
+#include "dtime.h"
 #include <algorithm>
 #include "job.h"
 #include "scheduler.h"
@@ -59,7 +59,7 @@ void Scheduler::Loop()
 {
 	usleep(100000);				  // every 0.1 sec
 
-	time_t now = time(NULL);
+	double now = dtime();
 
 	while(scheduler_queue.GetQueueSize() != 0 && scheduler_queue.NextJobTime() < now)
 	{

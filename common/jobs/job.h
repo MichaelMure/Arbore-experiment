@@ -38,19 +38,19 @@ protected:
 	} repeat_type_t;
 
 private:
-	time_t start_time;
+	double start_time;
 	repeat_type_t repeat_type;
-	int repeat_delta;
+	double repeat_delta;
 
 protected:
 	// Start the job, returns true if the job needs to be restarted later
 	virtual bool Start() = 0;
 public:
-	Job(time_t start_at, repeat_type_t _repeat_type, int _repeat_delta = 0) : start_time(start_at), repeat_type(_repeat_type), repeat_delta(_repeat_delta) {}
+	Job(double start_at, repeat_type_t _repeat_type, double _repeat_delta = 0.0) : start_time(start_at), repeat_type(_repeat_type), repeat_delta(_repeat_delta) {}
 	virtual ~Job() {}
 
 	// Start the job, returns true if the job needs to be restarted later
 	bool DoStart();
-	time_t GetStartTime() const { return start_time; }
+	double GetStartTime() const { return start_time; }
 };
 #endif						  /* JOB_H */

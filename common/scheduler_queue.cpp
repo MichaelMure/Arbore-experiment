@@ -88,7 +88,7 @@ void SchedulerQueue::CancelType(std::type_info type)
 	}
 }
 
-time_t SchedulerQueue::NextJobTime()
+double SchedulerQueue::NextJobTime()
 {
 	BlockLockMutex lock(this);
 	if(size() == 0)
