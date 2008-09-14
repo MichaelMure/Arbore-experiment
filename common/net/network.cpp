@@ -42,7 +42,7 @@
 #include "environment.h"
 //#include "content_list.h"
 #include "net/packet.h"
-#include "dht/host.h"
+#include "net/host.h"
 
 class ResendPacketJob : public Job
 {

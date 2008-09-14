@@ -28,7 +28,7 @@
 
 #include <netinet/in.h>
 
-#include "key.h"
+#include "dht/key.h"
 #include "pf_log.h"
 #include "net/pf_addr.h"
 

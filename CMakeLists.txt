@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 2.6)
 SET(SRC
 
 	common/net/pf_addr.cpp
+	common/net/host.cpp
+	common/net/hosts_list.cpp
 	common/net/packet_type.cpp
 	common/net/packet_type_list.cpp
 	common/net/packet.cpp
 	common/net/network.cpp
 
 	common/dht/key.cpp
-	common/dht/host.cpp
-	common/dht/hosts_list.cpp
 	common/dht/chimera_routing.cpp
 	common/dht/routing_table.cpp
 	common/dht/leafset.cpp

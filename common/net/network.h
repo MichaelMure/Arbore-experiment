@@ -32,7 +32,7 @@
 
 #include "pf_thread.h"
 #include "pf_addr.h"
-#include "dht/host.h"
+#include "host.h"
 #include "packet.h"
 
 class MyConfig;
