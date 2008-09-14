@@ -34,7 +34,7 @@
 Key Key_Max;
 Key Key_Half;
 
-void Key::set_key_str()
+void Key::set_key_str() throw()
 {
 	char keystr[KEY_SIZE / BASE_B + 1] = {0};
 	sprintf (keystr, "%08x%08x%08x%08x%08x",
@@ -99,7 +99,7 @@ Key& Key::operator= (const char *strOrig)
 	return *this;
 }
 
-Key::Key(const Key& k2)
+Key::Key(const Key& k2) throw()
 {
 	size_t i;
 	for (i = 0; i < nlen; i++)
@@ -119,7 +119,7 @@ Key& Key::operator=(const Key& k2)
 	return *this;
 }
 
-Key::Key(uint32_t ul)
+Key::Key(uint32_t ul) throw()
 {
 	size_t i;
 	for (i = 1; i < nlen; i++)
@@ -129,7 +129,7 @@ Key::Key(uint32_t ul)
 	set_key_str();
 }
 
-Key::Key(uint32_t key[Key::nlen])
+Key::Key(uint32_t key[Key::nlen]) throw()
 {
 	size_t i;
 	for(i = 0; i < nlen; ++i)

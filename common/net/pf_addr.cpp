@@ -26,7 +26,7 @@
 #include "pf_addr.h"
 #include "tools.h"
 
-pf_addr::pf_addr()
+pf_addr::pf_addr() throw()
 	: port(0)
 {
 	ip[0] = 0;
@@ -35,7 +35,7 @@ pf_addr::pf_addr()
 	ip[3] = 0;
 }
 
-pf_addr::pf_addr(in_addr_t address, uint16_t _port, Key _key)
+pf_addr::pf_addr(in_addr_t address, uint16_t _port, Key _key) throw()
 	: port(_port),
 	  key(_key)
 {
@@ -89,7 +89,7 @@ std::string pf_addr::str() const
 	return ret;
 }
 
-pf_addr::pf_addr(const char* p)
+pf_addr::pf_addr(const char* p) throw()
 {
 	for(size_t i = 0; i < ip_t_len; ++i)
 	{

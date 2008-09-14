@@ -61,7 +61,7 @@ private:
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;
 
-	void set_key_str ();
+	void set_key_str () throw();
 
 public:
 
@@ -72,16 +72,16 @@ public:
 	 *
 	 * @param ul this is the last 32 bits of the key
 	 */
-	Key(uint32_t ul = 0);
+	Key(uint32_t ul = 0) throw();
 
 	/** Create a Key from a uint32_t[nlen] */
-	Key(uint32_t key[nlen]);
+	explicit Key(uint32_t key[nlen]) throw();
 
 	/** The copy constructor.
 	 *
 	 * @param k2 copy key from the other key
 	 */
-	Key(const Key& k2);
+	Key(const Key& k2) throw();
 
 	/** Copy a key from a string
 	 *

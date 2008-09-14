@@ -93,8 +93,7 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 	loss(0),
 	success(0),
 	success_win_index(0),
-	success_avg(0.5),
-	key(0)
+	success_avg(0.5)
 {
 	size_t i;
 	for (i = 0; i < SUCCESS_WINDOW / 2; i++)

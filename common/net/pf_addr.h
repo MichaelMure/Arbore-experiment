@@ -43,9 +43,10 @@ struct pf_addr
 	uint16_t port;
 	Key key;
 
-	pf_addr();
-	pf_addr(in_addr_t address, uint16_t port, Key key = 0);
-	pf_addr(const char* buf);
+	pf_addr() throw();
+	pf_addr(in_addr_t address, uint16_t port, Key key = Key()) throw();
+	pf_addr(const char* buf) throw();
+	~pf_addr() throw() {}
 
 	void dump(char* buf);
 

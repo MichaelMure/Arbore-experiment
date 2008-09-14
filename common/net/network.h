@@ -56,7 +56,7 @@ public:
 		public:
 			int err;
 			pf_addr addr;
-			CantConnectTo(int _errno, const pf_addr _addr) : err(_errno),addr(_addr) {}
+			CantConnectTo(int _errno, const pf_addr _addr) : err(_errno), addr(_addr) {}
 	};
 
 private:
