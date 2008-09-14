@@ -72,7 +72,6 @@ private:
 
 	HostsList hosts_list;
 	std::vector<ResendPacketJob*> resend_list;
-	int serv_sock;
 	uint32_t seqend;
 
 public:
@@ -80,7 +79,15 @@ public:
 	Network();
 	~Network();
 
-	void Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
+	/** Listen an UDP port.
+	 *
+	 * @param packet_type_list  this is the object which describes the packet types and
+	 *                          them handlers.
+	 * @param port  the listened port
+	 * @param bind_addr  the listened address
+	 * @return  the file descriptor
+	 */
+	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
 
 	void CloseAll();
 	void Loop();
@@ -89,7 +96,7 @@ public:
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);
 
-	bool Send(Host host, Packet pckt);
+	bool Send(int sock, Host host, Packet pckt);
 };
 
 #endif /* NETWORK_H */

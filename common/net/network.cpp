@@ -51,6 +51,7 @@
  */
 class ResendPacketJob : public Job
 {
+	int sock;
 	Host desthost;
 	Packet packet;
 	unsigned int retry;
@@ -59,7 +60,7 @@ class ResendPacketJob : public Job
 
 	bool Start()
 	{
-		if(!network->Send(desthost, packet))
+		if(!network->Send(sock, desthost, packet))
 			return false;
 		retry++;
 		if(retry < Network::MAX_RETRY)
@@ -71,8 +72,9 @@ class ResendPacketJob : public Job
 
 public:
 
-	ResendPacketJob(Network* _network, const Host& _desthost, const Packet& _packet, double transmit_time)
+	ResendPacketJob(Network* _network, int _sock, const Host& _desthost, const Packet& _packet, double transmit_time)
 		: Job(dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
+		  sock(_sock),
 		  desthost(_desthost),
 		  packet(_packet),
 		  retry(0),
@@ -125,14 +127,10 @@ Network::Network()
 
 Network::~Network()
 {
-	if(serv_sock != -1)
-	{
-		shutdown(serv_sock, SHUT_RDWR);
-		close(serv_sock);
-	}
+	CloseAll();
 }
 
-void Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen)
+int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen)
 {
 	BlockLockMutex lock(this);
 	struct sockaddr_in saddr;
@@ -166,6 +164,8 @@ void Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char
 		highsock = serv_sock;
 
 	environment.listening_port.Set(port);
+
+	return serv_sock;
 }
 
 void Network::Loop()
@@ -197,13 +197,14 @@ void Network::Loop()
 			if(!FD_ISSET(it->first, &tmp_read_set))
 				continue;
 
+			int sock = it->first;
 			PacketTypeList* packet_type_list = it->second;
 			static char data[PACKET_MAX_SIZE];
 			struct sockaddr_in from;
 			ssize_t size;
 			socklen_t socklen = sizeof(from);
 
-			size = recvfrom(serv_sock, data, sizeof(data), 0,
+			size = recvfrom(sock, data, sizeof(data), 0,
 					(struct sockaddr *) &from, &socklen);
 
 			if(size < 0)
@@ -270,7 +271,7 @@ void Network::Loop()
 					Packet ack(pckt.GetPacketType(), pckt.GetSrc(), pckt.GetDst());
 					ack.SetFlag(Packet::ACK);
 					ack.SetSeqNum(pckt.GetSeqNum());
-					Send(sender, ack);
+					Send(sock, sender, ack);
 				}
 
 				scheduler_queue.Queue(new HandlePacketJob(sender, pckt));
@@ -294,12 +295,12 @@ void Network::CloseAll()
 {
 	BlockLockMutex lock(this);
 
-	if(serv_sock >= 0)
+	for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
 	{
-		shutdown(serv_sock, SHUT_RDWR);
-		close(serv_sock);
-		serv_sock = -1;
+		shutdown(it->first, SHUT_RDWR);
+		close(it->first);
 	}
+	socks.clear();
 }
 
 void Network::StartNetwork(MyConfig* conf)
@@ -321,7 +322,7 @@ void Network::StartNetwork(MyConfig* conf)
 #endif
 }
 
-bool Network::Send(Host host, Packet pckt)
+bool Network::Send(int sock, Host host, Packet pckt)
 {
 	struct sockaddr_in to;
 	ssize_t ret;
@@ -336,11 +337,15 @@ bool Network::Send(Host host, Packet pckt)
 
 	BlockLockMutex lock(this);
 
+	/* Check if this sock is opened. */
+	if(socks.find(sock) == socks.end())
+		return false;
+
 	if(!pckt.GetSeqNum())
 		pckt.SetSeqNum(this->seqend++);
 
 	const char* s = pckt.DumpBuffer();
-	ret = sendto (this->serv_sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
+	ret = sendto (sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
 
 	if (ret < 0)
 	{
@@ -351,7 +356,7 @@ bool Network::Send(Host host, Packet pckt)
 
 	if (pckt.HasFlag(Packet::REQUESTACK))
 	{
-		ResendPacketJob* job = new ResendPacketJob(this, host, pckt, start);
+		ResendPacketJob* job = new ResendPacketJob(this, sock, host, pckt, start);
 		resend_list.push_back(job);
 		scheduler_queue.Queue(job);
 	}
