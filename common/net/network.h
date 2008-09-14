@@ -40,6 +40,8 @@ class MyConfig;
 class Network : public Thread, protected Mutex
 {
 public:
+	static const double RETRANSMIT_INTERVAL = 1.0;
+
 	/* Exceptions */
 	class CantOpenSock : public std::exception {};
 	class CantListen : public std::exception
@@ -58,6 +60,8 @@ public:
 	};
 
 private:
+
+	/** Seconds before we try to retransmit a packet */
 	int serv_sock;
 	uint32_t seqend;
 

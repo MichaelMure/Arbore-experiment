@@ -38,6 +38,7 @@
 #include "job_new_connection.h"
 #include "scheduler_queue.h"
 #include "pf_thread.h"
+#include "jobs/job.h"
 #include "environment.h"
 //#include "content_list.h"
 #include "net/packet.h"
@@ -122,7 +123,6 @@ void Network::Loop()
 		}
 		try
 		{
-
 		}
 		catch(Packet::Malformated &e)
 		{
@@ -168,14 +168,36 @@ void Network::StartNetwork(MyConfig* conf)
 #endif
 }
 
+class ResendPacketJob : public Job
+{
+	Host desthost;
+	Packet packet;
+	unsigned int retry;
+	time_t transmittime;
+	Network* network;
+
+	bool Start()
+	{
+		return true;
+	}
+
+public:
+
+	ResendPacketJob(Network* _network, const Host& _desthost, const Packet& _packet)
+		: Job(dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
+		  desthost(_desthost),
+		  packet(_packet),
+		  retry(0),
+		  transmittime(time(NULL)),
+		  network(_network)
+	{}
+
+};
+
 int Network::Send(Host host, Packet pckt)
 {
 	struct sockaddr_in to;
 	ssize_t ret;
-	unsigned int seq, seqnumbackup, ntype;
-	size_t sizebackup;
-	JRB node;
-	JRB priqueue;
 	double start;
 
 	memset (&to, 0, sizeof (to));
@@ -183,17 +205,11 @@ int Network::Send(Host host, Packet pckt)
 	to.sin_addr.s_addr = host.GetAddr().ip[3];
 	to.sin_port = htons (host.GetAddr().port);
 
-	AckEntry *ackentry = get_new_ackentry();
-	sizebackup = size;
-	/* get sequence number and initialize acknowledgement indicator*/
-	Lock();
-	node = jrb_insert_int (this->waiting, this->seqend, new_jval_v(ackentry));
-	seqnumbackup = this->seqend;
-	seq = htonl (this->seqend);
-	this->seqend++;		/* needs to be fixed to modplus */
-	Unlock();
-
 	start = dtime ();
+
+	BlockLockMutex lock(this);
+
+	pckt.SetSeqNum(this->seqend++);
 
 	const char* s = pckt.DumpBuffer();
 	ret = sendto (this->serv_sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
@@ -206,21 +222,7 @@ int Network::Send(Host host, Packet pckt)
 	}
 
 	if (pckt.HasFlag(Packet::ACK))
-	{
-		// insert a record into the priority queue with the following information:
-		// key: starttime + next retransmit time
-		// other info: destination host, seq num, data, data size
-		PQEntry *pqrecord = get_new_pqentry();
-		pqrecord->desthost = host;
-		pqrecord->data = data;
-		pqrecord->datasize = sizebackup;
-		pqrecord->retry = 0;
-		pqrecord->seqnum = seqnumbackup;
-		pqrecord->transmittime = start;
-
-		BlockLockMutex p(this);
-		priqueue = jrb_insert_dbl (this->retransmit, (start+RETRANSMIT_INTERVAL), new_jval_v (pqrecord));
-	}
+		scheduler_queue.Queue(new ResendPacketJob(this, host, pckt));
 
 	return (1);
 }
