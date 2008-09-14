@@ -18,10 +18,9 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
-#include <time.h>
+#include "dtime.h"
 #include "job.h"
 
 bool Job::DoStart()
@@ -36,10 +35,10 @@ bool Job::DoStart()
 			case REPEAT_NONE:
 				return false;
 			case REPEAT_PERIODIC:
-				start_time = time(NULL) + repeat_delta;
+				start_time = dtime() + repeat_delta;
 				break;
 			case REPEAT_LESS_AND_LESS:
-				start_time = time(NULL) + repeat_delta;
+				start_time = dtime() + repeat_delta;
 				repeat_delta *= 2;
 				break;
 			default:
