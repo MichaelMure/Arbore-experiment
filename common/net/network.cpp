@@ -273,7 +273,7 @@ void Network::Loop()
 					Send(sender, ack);
 				}
 
-				pckt.Handle(sender);
+				scheduler_queue.Queue(new HandlePacketJob(sender, pckt));
 			}
 			catch(Packet::Malformated &e)
 			{
