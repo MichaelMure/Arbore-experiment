@@ -178,7 +178,14 @@ class ResendPacketJob : public Job
 
 	bool Start()
 	{
-		return true;
+		if(!network->Send(desthost, packet))
+			return false;
+		retry++;
+		if(retry < Network::MAX_RETRY)
+			return true;
+
+		desthost.UpdateStat(0);
+		return false;
 	}
 
 public:
@@ -194,7 +201,7 @@ public:
 
 };
 
-int Network::Send(Host host, Packet pckt)
+bool Network::Send(Host host, Packet pckt)
 {
 	struct sockaddr_in to;
 	ssize_t ret;
@@ -209,7 +216,8 @@ int Network::Send(Host host, Packet pckt)
 
 	BlockLockMutex lock(this);
 
-	pckt.SetSeqNum(this->seqend++);
+	if(!pckt.GetSeqNum())
+		pckt.SetSeqNum(this->seqend++);
 
 	const char* s = pckt.DumpBuffer();
 	ret = sendto (this->serv_sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
@@ -218,12 +226,12 @@ int Network::Send(Host host, Packet pckt)
 	{
 		pf_log[W_ERR] << "network_send: sendto: " << strerror (errno);
 		host.UpdateStat(0);
-		return (0);
+		return false;
 	}
 
 	if (pckt.HasFlag(Packet::ACK))
 		scheduler_queue.Queue(new ResendPacketJob(this, host, pckt));
 
-	return (1);
+	return true;
 }
 

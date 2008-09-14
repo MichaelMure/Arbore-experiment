@@ -41,6 +41,7 @@ class Network : public Thread, protected Mutex
 {
 public:
 	static const double RETRANSMIT_INTERVAL = 1.0;
+	static const int MAX_RETRY = 3;
 
 	/* Exceptions */
 	class CantOpenSock : public std::exception {};
@@ -78,7 +79,7 @@ public:
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);
 
-	int Send(Host host, Packet pckt);
+	bool Send(Host host, Packet pckt);
 };
 
 #endif /* NETWORK_H */
