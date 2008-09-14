@@ -36,12 +36,14 @@
 #include "packet.h"
 
 class MyConfig;
+class ResendPacketJob;
 
 class Network : public Thread, protected Mutex
 {
 public:
-	static const double RETRANSMIT_INTERVAL = 1.0;
-	static const int MAX_RETRY = 3;
+	static const double RETRANSMIT_INTERVAL = 1.0; /**< Seconds before we try to retransmit a packet */
+	static const unsigned int MAX_RETRY = 3;       /**< Maximum tries before abording resend a packet */
+	static const size_t PACKET_MAX_SIZE = 1024;    /**< Maximum size for packets */
 
 	/* Exceptions */
 	class CantOpenSock : public std::exception {};
@@ -62,7 +64,7 @@ public:
 
 private:
 
-	/** Seconds before we try to retransmit a packet */
+	std::vector<ResendPacketJob*> resend_list;
 	int serv_sock;
 	uint32_t seqend;
 

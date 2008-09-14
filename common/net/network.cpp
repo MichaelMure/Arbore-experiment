@@ -44,6 +44,42 @@
 #include "net/packet.h"
 #include "dht/host.h"
 
+class ResendPacketJob : public Job
+{
+	Host desthost;
+	Packet packet;
+	unsigned int retry;
+	double transmittime;
+	Network* network;
+
+	bool Start()
+	{
+		if(!network->Send(desthost, packet))
+			return false;
+		retry++;
+		if(retry < Network::MAX_RETRY)
+			return true;
+
+		desthost.UpdateStat(0);
+		return false;
+	}
+
+public:
+
+	ResendPacketJob(Network* _network, const Host& _desthost, const Packet& _packet, double transmit_time)
+		: Job(dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
+		  desthost(_desthost),
+		  packet(_packet),
+		  retry(0),
+		  transmittime(transmit_time),
+		  network(_network)
+	{}
+
+	const Packet& GetPacket() const { return packet; }
+	double GetTransmitTime() const { return transmittime; }
+	Host GetDestHost() const { return desthost; }
+};
+
 Network::Network()
 	: Mutex(RECURSIVE_MUTEX),
 	serv_sock(-1),
@@ -111,18 +147,66 @@ void Network::Loop()
 	}
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
-		char data[Packet::GetHeaderSize()];
+		static char data[PACKET_MAX_SIZE];
 		struct sockaddr_in from;
+		ssize_t size;
 		socklen_t socklen = sizeof(from);
 
-		if(recvfrom(serv_sock, data, sizeof(data), 0,
-		            (struct sockaddr *) &from, &socklen) < 0)
+		size = recvfrom(serv_sock, data, sizeof(data), 0,
+		                (struct sockaddr *) &from, &socklen);
+
+		if(size < 0)
 		{
 			pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
 			return;
 		}
+		if(size < Packet::GetHeaderSize())
+		{
+			pf_log[W_ERR] << "Received a packet too light (size: " << size << " < " << Packet::GetHeaderSize() << ")";
+			return;
+		}
 		try
 		{
+			Packet pckt(data);
+
+			if(size != pckt.GetSize())
+			{
+				pf_log[W_ERR] << "There isn't exacly the same length of data that header says."
+				              << "(" << size << " vs " << pckt.GetSize() << ")";
+				return;
+			}
+
+			if(pckt.HasFlag(Packet::REQUESTACK))
+			{
+				ResendPacketJob* job;
+				std::vector<ResendPacketJob*>::iterator it;
+				for(it = resend_list.begin();
+				    it != resend_list.end() && (*it)->GetPacket().GetSeqNum() != pckt.GetSeqNum();
+				    ++it)
+					;
+
+				if(it == resend_list.end())
+				{
+					pf_log[W_WARNING] << "Received an ACK for an unknown sent ack request";
+					return;
+				}
+
+				job = *it;
+				host.UpdateState(1);
+				double latency = dtime() - job->GetTransmitTime();
+				if(latency > 0)
+				{
+					if(job->GetDestHost().GetLatency() == 0.0)
+						job->GetDestHost().SetLatency(latency);
+					else
+						job->GetDestHost().SetLatency((0.9 * job->GetDestHost().GetLatency())
+						                            + (0.1 * latency));
+				}
+
+				resend_list.erase(it);
+				scheduler_queue.Cancel(job);
+				return;
+			}
 		}
 		catch(Packet::Malformated &e)
 		{
@@ -168,39 +252,6 @@ void Network::StartNetwork(MyConfig* conf)
 #endif
 }
 
-class ResendPacketJob : public Job
-{
-	Host desthost;
-	Packet packet;
-	unsigned int retry;
-	time_t transmittime;
-	Network* network;
-
-	bool Start()
-	{
-		if(!network->Send(desthost, packet))
-			return false;
-		retry++;
-		if(retry < Network::MAX_RETRY)
-			return true;
-
-		desthost.UpdateStat(0);
-		return false;
-	}
-
-public:
-
-	ResendPacketJob(Network* _network, const Host& _desthost, const Packet& _packet)
-		: Job(dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
-		  desthost(_desthost),
-		  packet(_packet),
-		  retry(0),
-		  transmittime(time(NULL)),
-		  network(_network)
-	{}
-
-};
-
 bool Network::Send(Host host, Packet pckt)
 {
 	struct sockaddr_in to;
@@ -209,7 +260,7 @@ bool Network::Send(Host host, Packet pckt)
 
 	memset (&to, 0, sizeof (to));
 	to.sin_family = AF_INET;
-	to.sin_addr.s_addr = host.GetAddr().ip[3];
+	to.sin_addr.s_addr = host.GetAddr().ip[3]; /* TODO: ipv6! */
 	to.sin_port = htons (host.GetAddr().port);
 
 	start = dtime ();
@@ -229,8 +280,12 @@ bool Network::Send(Host host, Packet pckt)
 		return false;
 	}
 
-	if (pckt.HasFlag(Packet::ACK))
-		scheduler_queue.Queue(new ResendPacketJob(this, host, pckt));
+	if (pckt.HasFlag(Packet::REQUESTACK))
+	{
+		ResendPacketJob* job = new ResendPacketJob(this, host, pckt, start);
+		resend_list.push_back(job);
+		scheduler_queue.Queue(job);
+	}
 
 	return true;
 }

@@ -81,7 +81,8 @@ public:
 
 	enum flags_t
 	{
-		ACK    = 1 << 0,         /**< This packet request an acknoledge answer. */
+		REQUESTACK    = 1 << 0,         /**< This packet request an acknoledge answer. */
+		ACK           = 1 << 1,         /**< This is an acknowledge answer. */
 	};
 
 	/** Exception raised when the packet is malformated */
