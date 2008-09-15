@@ -27,17 +27,11 @@
 #define CHIMERA_H
 
 #include "key.h"
-#include "host.h"
-#include "hosts_list.h"
+#include "net/host.h"
+#include "net/hosts_list.h"
 #include "mutex.h"
 #include "chimera_routing.h"
 #include <pthread.h>
-
-class Message;
-class MessageGlobal;
-class NetworkActivate;
-class NetworkRetransmit;
-class NetworkGlobal;
 
 typedef void (*chimera_forward_upcall_t) (const Key **, Message **, Host **);
 typedef void (*chimera_deliver_upcall_t) (const Key *, Message *);
