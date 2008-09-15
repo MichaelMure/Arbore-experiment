@@ -15,13 +15,9 @@ SET(SRC
 	common/dht/chimera_routing.cpp
 	common/dht/routing_table.cpp
 	common/dht/leafset.cpp
-	common/dht/message_handlers.cpp
-	common/dht/network_activate.cpp
-	common/dht/network_retransmit.cpp
-	common/dht/network.cpp
-	common/dht/message.cpp
 	common/dht/chimera.cpp
 
+	common/dtime.c
 	common/download.cpp
 	common/pf_config.cpp
 	common/pf_log.cpp
