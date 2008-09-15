@@ -44,6 +44,14 @@ PacketType::PacketType(uint32_t _type, PacketHandlerBase* _handler, std::string 
 
 PacketType::~PacketType()
 {
+	/* TODO if we delete handler one time, other copies of PacketType
+	 * will have an invalid pointer. But if we don't delete handler here,
+	 * it will never be free'd.
+	 * So there are two solutions:
+	 *   1) Never delete handler
+	 *   2) Implement an ugly clone() copy method in each
+	 *      PacketHandlerBase classes (see packet_arg.h)
+	 */
 	delete handler;
 }
 
