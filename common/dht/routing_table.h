@@ -27,7 +27,7 @@
 #define _CHIMERA_ROUTINGTABLE_H_
 
 #include "key.h"
-#include "hosts_list.h"
+#include "net/hosts_list.h"
 
 #define MAX_ROW KEY_SIZE/BASE_B
 #define MAX_COL 16 /* 2^4 */

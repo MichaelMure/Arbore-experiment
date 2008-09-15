@@ -33,7 +33,7 @@
 
 #include <vector>
 #include "key.h"
-#include "hosts_list.h"
+#include "net/hosts_list.h"
 
 class Leafset
 {

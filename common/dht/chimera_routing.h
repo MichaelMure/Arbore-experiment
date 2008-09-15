@@ -27,6 +27,9 @@
 #include <vector>
 #include "routing_table.h"
 #include "leafset.h"
+#include "net/host.h"
+
+class HostsList;
 
 class ChimeraRouting
 {
