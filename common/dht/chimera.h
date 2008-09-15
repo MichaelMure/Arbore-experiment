@@ -26,6 +26,18 @@
 #ifndef CHIMERA_H
 #define CHIMERA_H
 
+#include "net/packet_type_list.h"
+
+class ChimeraDHT : public PacketTypeList
+{
+
+};
+
+#endif /* CHIMERA_H */
+
+#ifndef CHIMERA_H
+#define CHIMERA_H
+
 #include "key.h"
 #include "net/host.h"
 #include "net/hosts_list.h"

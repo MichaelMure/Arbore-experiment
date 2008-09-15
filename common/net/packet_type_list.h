@@ -32,8 +32,8 @@ class PacketTypeList : protected std::map<uint32_t, PacketType>, protected Mutex
 {
 public:
 
-	PacketTypeList();
-	virtual ~PacketTypeList();
+	PacketTypeList() {}
+	virtual ~PacketTypeList() {}
 
 	/** Register a new type.
 	 *

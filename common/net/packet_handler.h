@@ -30,6 +30,7 @@ class PacketTypeList;
 class PacketHandlerBase
 {
 public:
+	virtual ~PacketHandlerBase() {}
 	virtual void operator()(PacketTypeList& pckt_type_list, const Host& sender, const Packet& packet) = 0;
 };
 

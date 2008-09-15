@@ -23,6 +23,8 @@
  *
  */
 
+#if 1 == 0
+
 #include <errno.h>
 #include <vector>
 
@@ -779,3 +781,5 @@ void chimera_update_upcall (ChimeraDHT * state, Key * k, Host * h,
 	    chglob->update (k, h, joined);
 	}
 }
+
+#endif

@@ -35,9 +35,6 @@ enum PacketArgType
 	T_END
 };
 
-#define MAX_PACKET_ARGS 16
-extern const PacketArgType packet_args[][MAX_PACKET_ARGS];
-
 /* This is base class used to stock pointers */
 class PacketArgBase
 {
