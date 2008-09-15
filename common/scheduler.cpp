@@ -51,7 +51,7 @@ void Scheduler::StopSchedulers()
 		delete *it;
 	}
 
-	schedulers.stop();
+	schedulers.clear();
 }
 
 // Check if a queued job needs to be started
@@ -70,7 +70,7 @@ void Scheduler::Loop()
 
 		if(job)				  /* The queue may have been emptied externaly */
 		{
-			pf_log[W_DEBUG] << "Begining handling job \"" << job->GetName() << "\". Queue_size:" <<scheduler_queue.GetQueueSize();
+			pf_log[W_DEBUG] << "Begining handling job \"" << typeid(job).name() << "\". Queue_size:" <<scheduler_queue.GetQueueSize();
 			if(job->DoStart())
 				scheduler_queue.Queue(job);
 			else

@@ -23,7 +23,7 @@
 #include <arpa/inet.h>
 #include <string>
 #include <stdlib.h>
-#include <cstdint>
+#include <stdint.h>
 #include "tools.h"
 #include "pf_types.h"
 

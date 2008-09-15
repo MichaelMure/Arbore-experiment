@@ -33,7 +33,7 @@ SchedulerQueue scheduler_queue;
 void SchedulerQueue::Queue(Job* job)
 {
 	BlockLockMutex lock(this);
-	pf_log[W_DEBUG] << "Queueing job \"" << job->GetName() << "\"";
+	pf_log[W_DEBUG] << "Queueing job \"" << typeid(job).name() << "\"";
 
 	for(iterator it = begin();
 		it != end();

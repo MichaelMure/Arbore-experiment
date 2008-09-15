@@ -22,8 +22,8 @@
 
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
-#include <list>
-#include <time.h>
+
+#include <vector>
 #include "pf_thread.h"
 
 class Scheduler : public Thread
