@@ -25,11 +25,12 @@
 
 class Host;
 class Packet;
+class PacketTypeList;
 
 class PacketHandlerBase
 {
 public:
-	virtual void operator()(const Host& sender, const Packet& packet) = 0;
+	virtual void operator()(PacketTypeList& pckt_type_list, const Host& sender, const Packet& packet) = 0;
 };
 
 #endif /* PACKET_HANDLER_H */

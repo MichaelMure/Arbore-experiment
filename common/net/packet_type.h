@@ -56,6 +56,7 @@ public:
 	~PacketType();
 
 	PacketType& operator=(const PacketType& pckt_type);
+	PacketType(const PacketType& pckt_type);
 
 	uint32_t GetType() const { return type; }
 	std::string GetName() const { return name; }

@@ -194,9 +194,9 @@ void Packet::SetContent(const char* buf, size_t _size)
 	BuildArgsFromData();
 }
 
-void Packet::Handle(const Host& sender) const
+void Packet::Handle(PacketTypeList& pckt_type_list, const Host& sender) const
 {
-	(*type.GetHandler()) (sender, *this);
+	(*type.GetHandler()) (pckt_type_list, sender, *this);
 }
 
 void Packet::BuildArgsFromData()

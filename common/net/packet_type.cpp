@@ -51,9 +51,18 @@ PacketType& PacketType::operator=(const PacketType& pckt_type)
 {
 	type = pckt_type.type;
 	name = pckt_type.name;
+	handler = pckt_type.handler;
 
 	for(const_iterator it = pckt_type.begin(); it != pckt_type.end(); ++it)
 		push_back(*it);
 
 	return *this;
+}
+
+PacketType::PacketType(const PacketType& pckt_type)
+	: std::vector<PacketArgType>(pckt_type),
+	  type(pckt_type.type),
+	  name(pckt_type.name),
+	  handler(pckt_type.handler)
+{
 }

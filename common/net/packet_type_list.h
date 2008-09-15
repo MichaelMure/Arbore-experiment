@@ -26,21 +26,30 @@
 #include <map>
 
 #include "packet_type.h"
+#include "mutex.h"
 
-class PacketTypeList : protected std::map<uint32_t, PacketType>
+class PacketTypeList : protected std::map<uint32_t, PacketType>, protected Mutex
 {
 public:
 
 	PacketTypeList();
 	virtual ~PacketTypeList();
 
+	/** Register a new type.
+	 *
+	 * @param type  the PacketType object which describes the packet type,
+	 *              the handler, and all of his arguments.
+	 */
 	void RegisterType(PacketType type);
 
-	ssize_t size() const { return std::map<uint32_t, PacketType>::size(); }
+	/** @return  number of packet types */
+	ssize_t size() const;
 
-	const PacketType& GetPacketType(uint32_t type) const { return at(type); }
+	/** @return  the PacketType of the type id */
+	PacketType GetPacketType(uint32_t type) const;
 
-	const PacketType& operator[](uint32_t s) const { return at(s); }
+	/** @return  the PacketType of the type id */
+	PacketType operator[](uint32_t s) const;
 };
 
 #endif /* PACKET_TYPE_LIST_H */

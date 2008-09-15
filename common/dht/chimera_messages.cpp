@@ -29,7 +29,7 @@
 class ChimeraJoinMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}
@@ -38,7 +38,7 @@ public:
 class ChimeraJoinAckMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}
@@ -47,7 +47,7 @@ public:
 class ChimeraJoinNAckMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}
@@ -56,7 +56,7 @@ public:
 class ChimeraUpdateMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}
@@ -65,7 +65,7 @@ public:
 class ChimeraPiggyMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}
@@ -74,7 +74,7 @@ public:
 class ChimeraPingMessage : public PacketHandlerBase
 {
 public:
-	void operator() (const Host& sender, const Packet& pckt)
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 
 	}

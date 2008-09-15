@@ -97,18 +97,20 @@ class HandlePacketJob : public Job
 {
 	Host sender;
 	Packet pckt;
+	PacketTypeList& pckt_type_list;
 
 	bool Start()
 	{
-		pckt.Handle(sender);
+		pckt.Handle(pckt_type_list, sender);
 		return false;
 	}
 
 public:
-	HandlePacketJob(const Host& _sender, const Packet& _pckt)
+	HandlePacketJob(PacketTypeList& _pckt_type_list, const Host& _sender, const Packet& _pckt)
 		: Job(0.0, REPEAT_NONE),
 		  sender(_sender),
-		  pckt(_pckt)
+		  pckt(_pckt),
+		  pckt_type_list(_pckt_type_list)
 	{}
 };
 
@@ -274,7 +276,7 @@ void Network::Loop()
 					Send(sock, sender, ack);
 				}
 
-				scheduler_queue.Queue(new HandlePacketJob(sender, pckt));
+				scheduler_queue.Queue(new HandlePacketJob(*packet_type_list, sender, pckt));
 			}
 			catch(Packet::Malformated &e)
 			{

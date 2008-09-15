@@ -22,8 +22,27 @@
 
 #include "packet_type_list.h"
 
-
 void PacketTypeList::RegisterType(PacketType type)
 {
+	BlockLockMutex lock(this);
 	insert(std::pair<uint32_t, PacketType>(type.GetType(), type));
 }
+
+ssize_t PacketTypeList::size() const
+{
+	BlockLockMutex lock(this);
+	return std::map<uint32_t, PacketType>::size();
+}
+
+PacketType PacketTypeList::GetPacketType(uint32_t type) const
+{
+	BlockLockMutex lock(this);
+	return at(type);
+}
+
+PacketType PacketTypeList::operator[](uint32_t s) const
+{
+	BlockLockMutex lock(this);
+	return at(s);
+}
+

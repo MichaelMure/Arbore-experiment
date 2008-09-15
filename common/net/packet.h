@@ -142,9 +142,10 @@ public:
 
 	/** Call the handler method.
 	 *
+	 * @param pckt_type_list  the PacketTypeList or derived object.
 	 * @param sender  this is the sender's Host object
 	 */
-	void Handle(const Host& sender) const;
+	void Handle(PacketTypeList& pckt_type_list, const Host& sender) const;
 
 	/** Returns the header's size.
 	 *

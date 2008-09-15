@@ -28,9 +28,8 @@
 
 #include "chimera.h"
 #include "pf_log.h"
-#include "network.h"
+#include "net/network.h"
 #include "dtime.h"
-#include "message.h"
 
 #define CHIMERA_JOIN       1
 #define CHIMERA_JOIN_ACK   2
