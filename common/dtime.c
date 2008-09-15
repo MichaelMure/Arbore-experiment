@@ -16,7 +16,7 @@ double dtime ()
 }
 
 /**
- ** dalarm: 
+ ** dalarm:
  **  generates a SIGALRM signal in #time# seconds
  */
 void dalarm (double time)
@@ -40,7 +40,7 @@ void dsleep (double time)
 }
 
 /**
- ** dtotv: 
+ ** dtotv:
  **  returns the struct timeval representation of double #d#
  **
  */
@@ -58,5 +58,5 @@ struct timeval dtotv (double d)
  */
 double tvtod (struct timeval tv)
 {
-    return (tv.tv_sec + ((double) tv.tv_usec / 1000000.0));
+    return ((double)tv.tv_sec + ((double) tv.tv_usec / 1000000.0));
 }
