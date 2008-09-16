@@ -51,7 +51,6 @@ class _Host
 	int success_win[SUCCESS_WINDOW];
 	int success_win_index;
 	float success_avg;
-	Key key;
 
 public:
 	unsigned int reference;
@@ -73,8 +72,8 @@ public:
 	 */
 	void UpdateStat (int success);
 
-	const Key& GetKey() const { return key; }
-	void SetKey(Key k) { key = k; }
+	const Key& GetKey() const { return addr.key; }
+	void SetKey(Key k) { addr.key = k; }
 
 	double GetFailureTime() const { return failuretime; }
 
