@@ -333,18 +333,6 @@ void Key::key_make_hash (char *s, size_t size)
 	free (digest);
 }
 
-void Key::Init ()
-{
-	for (size_t i = 0; i < nlen; i++)
-	{
-		Key_Max.t[i] = UINT_MAX;
-		Key_Half.t[i] = UINT_MAX;
-	}
-	Key_Half.t[4] = Key_Half.t[4] / 2;
-
-	Key_Max.set_key_str();
-	Key_Half.set_key_str();
-}
 
 Key Key::distance(const Key& k2) const
 {
@@ -435,3 +423,17 @@ size_t Key::key_index (Key k) const
 
 	return (i);
 }
+
+void Key::Init ()
+{
+	for (size_t i = 0; i < nlen; i++)
+	{
+		Key_Max.t[i] = UINT_MAX;
+		Key_Half.t[i] = UINT_MAX;
+	}
+	Key_Half.t[4] = Key_Half.t[4] / 2;
+
+	Key_Max.set_key_str();
+	Key_Half.set_key_str();
+}
+

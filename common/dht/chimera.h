@@ -27,10 +27,22 @@
 #define CHIMERA_H
 
 #include "net/packet_type_list.h"
+#include "net/host.h"
+
+class Network;
+class ChimeraRouting;
 
 class ChimeraDHT : public PacketTypeList
 {
+	Network* network;
+	ChimeraRouting* routing;
+	Host me;
 
+	void InitMessages();
+
+public:
+
+	ChimeraDHT(Network* network, uint16_t port, Key my_key);
 };
 
 #endif /* CHIMERA_H */

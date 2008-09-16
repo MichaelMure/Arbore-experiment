@@ -93,6 +93,8 @@ public:
 	void Loop();
 	void OnStop();
 
+	HostsList* GetHostsList() { return &hosts_list; }
+
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);
 

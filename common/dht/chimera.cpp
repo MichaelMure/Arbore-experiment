@@ -23,6 +23,48 @@
  *
  */
 
+#include <unistd.h>
+#include <netdb.h>
+
+#include "chimera.h"
+#include "net/network.h"
+#include "chimera_routing.h"
+#include "key.h"
+#include "chimera_messages.h"
+#include "check_leafset_job.h"
+
+ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
+	: network(_network),
+	routing(NULL)
+
+{
+	char name[256];
+	struct hostent* he;
+	Key::Init();
+
+	if(gethostname(name, sizeof(name)) != 0)
+	{
+		return;
+	}
+	if((he = gethostbyname(name)) == NULL)
+	{
+		return;
+	}
+	me = network->GetHostsList()->GetHost(he->h_name, port);
+	me.SetKey(my_key);
+
+	routing = new ChimeraRouting(network->GetHostsList(), me);
+
+	RegisterType(ChimeraJoinType);
+	RegisterType(ChimeraJoinAckType);
+	RegisterType(ChimeraUpdateType);
+	RegisterType(ChimeraPiggyType);
+	RegisterType(ChimeraJoinNAckType);
+	RegisterType(ChimeraPingType);
+
+	scheduler_queue.Queue(new CheckLeafsetJob(this));
+}
+
 #if 1 == 0
 
 #include <errno.h>
