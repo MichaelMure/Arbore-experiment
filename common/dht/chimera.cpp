@@ -32,6 +32,7 @@
 #include "key.h"
 #include "chimera_messages.h"
 #include "check_leafset_job.h"
+#include "scheduler_queue.h"
 
 ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	: network(_network),
@@ -62,7 +63,14 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	RegisterType(ChimeraJoinNAckType);
 	RegisterType(ChimeraPingType);
 
-	scheduler_queue.Queue(new CheckLeafsetJob(this));
+	fd = network->Listen(this, port, "0.0.0.0");
+
+	scheduler_queue.Queue(new CheckLeafsetJob(this, routing));
+}
+
+bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
+{
+	return network->Send(fd, dest, pckt);
 }
 
 #if 1 == 0

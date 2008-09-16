@@ -31,18 +31,26 @@
 
 class Network;
 class ChimeraRouting;
+class Packet;
 
 class ChimeraDHT : public PacketTypeList
 {
 	Network* network;
 	ChimeraRouting* routing;
 	Host me;
+	int fd;
 
 	void InitMessages();
 
 public:
 
 	ChimeraDHT(Network* network, uint16_t port, Key my_key);
+
+	Host GetMe() const { return me; }
+
+	bool Send(const Host& destination, const Packet& pckt);
+
+	bool Ping(const Host& dest);
 };
 
 #endif /* CHIMERA_H */

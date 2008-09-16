@@ -27,17 +27,23 @@
 #include "dtime.h"
 
 class ChimeraDHT;
+class ChimeraRouting;
 
 class CheckLeafsetJob : public Job
 {
 	ChimeraDHT* chimera;
+	ChimeraRouting* routing;
+	size_t count;
+
 	bool Start();
 
 public:
 
-	CheckLeafsetJob(ChimeraDHT* _chimera)
+	CheckLeafsetJob(ChimeraDHT* _chimera, ChimeraRouting* _routing)
 		: Job(dtime(), REPEAT_PERIODIC, 20.0),
-		  chimera(_chimera)
+		  chimera(_chimera),
+		  routing(_routing),
+		  count(0)
 	{}
 };
 

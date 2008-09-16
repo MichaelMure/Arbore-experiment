@@ -33,6 +33,11 @@
 extern PacketType ChimeraJoinType;
 extern PacketType ChimeraJoinAckType;
 extern PacketType ChimeraUpdateType;
+
+enum
+{
+	NET_PIGGY_ADDRESSES
+};
 extern PacketType ChimeraPiggyType;
 extern PacketType ChimeraJoinNAckType;
 extern PacketType ChimeraPingType;

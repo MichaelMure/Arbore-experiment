@@ -27,75 +27,71 @@
 #include "chimera_routing.h"
 #include "pf_log.h"
 #include "chimera.h"
+#include "chimera_messages.h"
+#include "net/packet.h"
 
 bool CheckLeafsetJob::Start()
 {
 	std::string s;
-	size_t i, count = 0;
+	size_t i;
 
-	std::vector<Host> leafset = chimera->routing->getLeafset();
-	//TODO (eld) use an iterator instead ?
-	for (i = 0; i < leafset.size(); i++)
+	std::vector<Host> leafset = routing->getLeafset();
+	for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 	{
-		if (state->Ping(leafset[i]) == 1)
+		if (chimera->Ping(*it) == 1)
 		{
 			leafset[i].SetFailureTime(dtime ());
-			pf_log[W_WARNING] << "message send to host: " << leafset[i].GetName() << ":" << leafset[i].GetPort()
-					  << " failed at time: " << leafset[i].GetFailureTime() << "!";
-			if (leafset[i].GetSuccessAvg() < BAD_LINK)
+			pf_log[W_WARNING] << "message send to host: " << *it
+					  << " failed at time: " << it->GetFailureTime() << "!";
+			if (it->GetSuccessAvg() < BAD_LINK)
 			{
-				printf ("Deleting %s:%d \n",
-				    leafset[i].GetName(),
-				    leafset[i].GetPort());
-				chimera->routing->remove(leafset[i]);
+				pf_log[W_DEBUG] << "Deleting " << *it;
+				routing->remove(*it);
 			}
 		}
-		state->host->Release(leafset[i]);
 	}
-	std::vector<Host> table = chimera->routing->getRoutingTable();
-	for (i = 0; i < table.size(); i++)
+	std::vector<Host> table = routing->getRoutingTable();
+	for (std::vector<Host>::iterator it = table.begin(); it != table.end(); ++it)
 	{
-		if (state->Ping(table[i]) == 1)
+		if (chimera->Ping(*it) == 1)
 		{
-			table[i]->SetFailureTime(dtime ());
-			pf_log[W_WARNING] << "message send to host: " << table[i].GetName() << ":" << table[i].GetPort()
-					  << " failed at time: " << table[i].GetFailureTime() << "!";
-			if (table[i].GetSuccessAvg() < BAD_LINK)
+			table[i].SetFailureTime(dtime ());
+			pf_log[W_WARNING] << "message send to host: " << *it
+					  << " failed at time: " << it->GetFailureTime() << "!";
+			if (it->GetSuccessAvg() < BAD_LINK)
 			{
-				chimera->routing->remove(table[i]);
-				//route_update (state, table[i], 0);
+				pf_log[W_DEBUG] << "Deleting " << *it;
+				routing->remove(*it);
 			}
 		}
-		state->host->Release(table[i]);
 	}
 
 	/* send leafset exchange data every  3 times that pings the leafset */
 	if (count == 2)
 	{
+		Packet pckt(ChimeraPiggyType, chimera->GetMe().GetKey());
+		std::vector<Host> leafset = routing->getLeafset();
+
+		leafset.push_back(chimera->GetMe());
 		count = 0;
-		std::vector<Host> leafset = chimera->routing->getLeafset();
-		chglob->me->Encode(s, NETWORK_PACK_SIZE);
-		strcat (s, "\n");	/* add a spacer */
-		state->encode_hosts (s + strlen (s), NETWORK_PACK_SIZE - strlen (s),
-				     leafset);
-		//TODO (eld) use iterator instead ?
-		for (i = 0; i < leafset.size(); i++)
+
+		AddrList addrlist;
+		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
+			addrlist.push_back(it->GetAddr());
+
+		pckt.SetArg(NET_PIGGY_ADDRESSES, addrlist);
+
+		for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 		{
-			m = new Message (leafset[i].GetKey(),
-					CHIMERA_PIGGY, strlen (s) + 1,
-					s);
-			if (!state->message->message_send (leafset[i], m, true))
+			pckt.SetDst(it->GetKey());
+			if(!chimera->Send(*it, pckt))
 			{
-				pf_log[W_WARNING] << "sending leafset update to "
-						  << leafset[i].GetName() << ":"
-						  << leafset[i].GetPort() << " failed!";
-				if (leafset[i].GetSuccessAvg() < BAD_LINK)
+				pf_log[W_WARNING] << "sending leafset update to " << *it << " failed!";
+				if (it->GetSuccessAvg() < BAD_LINK)
 				{
-					chimera->routing->remove(leafset[i]);
+					routing->remove(*it);
 				}
 			}
-			delete m;
-			state->host->Release(leafset[i]);
 		}
 	}
 	else
