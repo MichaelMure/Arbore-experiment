@@ -28,58 +28,75 @@
 #include "net/packet_handler.h"
 #include "chimera.h"
 
-class ChimeraJoinMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-	{
-
-	}
-};
-
-class ChimeraJoinAckMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-	{
-
-	}
-};
-
-class ChimeraJoinNAckMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-	{
-
-	}
-};
-
-class ChimeraUpdateMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-	{
-
-	}
-};
-
-class ChimeraPiggyMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-	{
-
-	}
-};
-
-class ChimeraPingMessage : public PacketHandlerBase
+class ChimeraBaseMessage : public PacketHandlerBase
 {
 public:
 	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
 		ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
 
+		if(pckt.HasFlag(Packet::MUSTROUTE))
+		{
+			chimera.Route(pckt);
+			return;
+		}
+
+		Handle(chimera, sender, pckt);
+	}
+
+	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
+};
+
+class ChimeraJoinMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+
+	}
+};
+
+class ChimeraJoinAckMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+
+	}
+};
+
+class ChimeraJoinNAckMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+
+	}
+};
+
+class ChimeraUpdateMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+
+	}
+};
+
+class ChimeraPiggyMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+
+	}
+};
+
+class ChimeraPingMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
 		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(NET_PING_ME));
 	}
 };

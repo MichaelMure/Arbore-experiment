@@ -84,6 +84,7 @@ public:
 	{
 		REQUESTACK    = 1 << 0,         /**< This packet request an acknoledge answer. */
 		ACK           = 1 << 1,         /**< This is an acknowledge answer. */
+		MUSTROUTE     = 1 << 2,         /**< This packet must be routed. */
 	};
 
 	/** Exception raised when the packet is malformated */
