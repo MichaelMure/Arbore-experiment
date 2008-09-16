@@ -75,7 +75,7 @@ bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
 
 bool ChimeraDHT::Ping(const Host& dest)
 {
-	Packet pckt(ChimeraPingPacket, me, dest);
+	Packet pckt(ChimeraPingType, me.GetKey(), dest.GetKey());
 	pckt.SetArg(NET_PING_ME, me.GetAddr());
 
 	return Send(dest, pckt);

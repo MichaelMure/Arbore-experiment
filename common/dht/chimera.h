@@ -48,6 +48,8 @@ public:
 
 	Host GetMe() const { return me; }
 
+	Network* GetNetwork() const { return network; }
+
 	bool Send(const Host& destination, const Packet& pckt);
 
 	bool Ping(const Host& dest);

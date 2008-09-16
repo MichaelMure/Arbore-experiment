@@ -40,6 +40,11 @@ enum
 };
 extern PacketType ChimeraPiggyType;
 extern PacketType ChimeraJoinNAckType;
+
+enum
+{
+	NET_PING_ME,
+};
 extern PacketType ChimeraPingType;
 
 #endif /* CHIMERA_MESSAGES_H */

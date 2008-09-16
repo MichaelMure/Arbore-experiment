@@ -24,7 +24,9 @@
  */
 
 #include "chimera_messages.h"
+#include "net/network.h"
 #include "net/packet_handler.h"
+#include "chimera.h"
 
 class ChimeraJoinMessage : public PacketHandlerBase
 {
@@ -76,7 +78,9 @@ class ChimeraPingMessage : public PacketHandlerBase
 public:
 	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 	{
+		ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
 
+		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(NET_PING_ME));
 	}
 };
 
@@ -86,5 +90,6 @@ PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    T_END
 PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* NET_PIGGY_ADDRESSES */ T_ADDRLIST,
                                                                                                      T_END);
 PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", T_END);
-PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      T_END);
+PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      /* NET_PING_ME */ T_ADDR,
+                                                                                             T_END);
 
