@@ -3,6 +3,9 @@
 network_base.cpp->peer.h
 network_base.h->peer.h
 
+# DHT
+chimera.cpp->check_leafset_job.h
+
 # NetworkBase instantiate a JobNewConnection before passing it to SchedulerQueue
 network_base.cpp->job_new_connection.h
 network.cpp->job_new_connection_queue.h

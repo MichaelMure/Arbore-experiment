@@ -15,6 +15,7 @@ SET(SRC
 	common/dht/chimera_routing.cpp
 	common/dht/routing_table.cpp
 	common/dht/leafset.cpp
+	common/dht/check_leafset_job.cpp
 	common/dht/chimera_messages.cpp
 	common/dht/chimera.cpp
 
