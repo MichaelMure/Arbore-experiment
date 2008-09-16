@@ -32,9 +32,9 @@
 
 extern PacketType ChimeraJoinType;
 extern PacketType ChimeraJoinAckType;
-extern PacketType ChimeraUpdateMessage;
-extern PacketType ChimeraPiggyMessage;
-extern PacketType ChimeraJoinNAckMessage;
-extern PacketType ChimeraPingMessage;
+extern PacketType ChimeraUpdateType;
+extern PacketType ChimeraPiggyType;
+extern PacketType ChimeraJoinNAckType;
+extern PacketType ChimeraPingType;
 
 #endif /* CHIMERA_MESSAGES_H */

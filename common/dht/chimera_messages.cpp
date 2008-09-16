@@ -79,3 +79,11 @@ public:
 
 	}
 };
+
+PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      T_END);
+PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  T_END);
+PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    T_END);
+PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     T_END);
+PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", T_END);
+PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      T_END);
+
