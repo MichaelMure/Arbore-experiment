@@ -73,6 +73,14 @@ bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
 	return network->Send(fd, dest, pckt);
 }
 
+bool ChimeraDHT::Ping(const Host& dest)
+{
+	Packet pckt(ChimeraPingPacket, me, dest);
+	pckt.SetArg(NET_PING_ME, me.GetAddr());
+
+	return Send(dest, pckt);
+}
+
 #if 1 == 0
 
 #include <errno.h>

@@ -38,7 +38,7 @@ bool CheckLeafsetJob::Start()
 	std::vector<Host> leafset = routing->getLeafset();
 	for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 	{
-		if (chimera->Ping(*it) == 1)
+		if (!chimera->Ping(*it) == 1)
 		{
 			leafset[i].SetFailureTime(dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
@@ -53,7 +53,7 @@ bool CheckLeafsetJob::Start()
 	std::vector<Host> table = routing->getRoutingTable();
 	for (std::vector<Host>::iterator it = table.begin(); it != table.end(); ++it)
 	{
-		if (chimera->Ping(*it) == 1)
+		if (!chimera->Ping(*it))
 		{
 			table[i].SetFailureTime(dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
