@@ -40,7 +40,7 @@ class ChimeraDHT : public PacketTypeList
 	Host me;
 	int fd;
 
-	void InitMessages();
+	void sendRowInfo(const Packet& pckt);
 
 public:
 	/** GRACEPERIOD is the time that has to be elapsed before a node

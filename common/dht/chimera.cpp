@@ -96,6 +96,63 @@ void ChimeraDHT::Join(const Host& bootstrap)
 	/* TODO: lock here until join is done. */
 }
 
+bool ChimeraDHT::Route(const Packet& pckt)
+{
+	Key key = pckt.GetDst();
+	Host nextDest = GetRouting()->routeLookup(key);
+
+	/* this is to avoid sending JOIN request to the node that
+	 * its information is already in the routing table
+	 */
+	if(nextDest.GetKey() == key)
+	{
+		GetRouting()->remove(nextDest);
+		nextDest = GetRouting()->routeLookup(key);
+	}
+
+	/* if I am the only host or the closest host is me, deliver the message */
+	if(nextDest == GetMe())
+		return false;
+
+	/* XXX possibily an infinite loop? */
+	while(!Send(nextDest, pckt))
+	{
+		nextDest.SetFailureTime(dtime());
+		pf_log[W_WARNING] << "message sent to host: " << nextDest
+		                  << " at time: " << nextDest.GetFailureTime()
+		                  << " failed!";
+
+		/* remove the faulty node from the routing table */
+		if(nextDest.GetSuccessAvg() < BAD_LINK)
+			GetRouting()->remove(nextDest);
+
+		nextDest = GetRouting()->routeLookup(key);
+		pf_log[W_WARNING] << "rerouting through " << nextDest;
+	}
+
+	/* in each hop in the way to the key root nodes
+	 * send their routing info to the joining node. */
+	if(pckt.GetPacketType() == ChimeraJoinType)
+		sendRowInfo(pckt);
+
+	return true;
+}
+
+void ChimeraDHT::sendRowInfo(const Packet& pckt)
+{
+	Host host = GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(NET_JOIN_ADDRESS));
+
+	std::vector<Host> rowset = GetRouting()->rowLookup(host.GetKey());
+	std::vector<pf_addr> addresses;
+	for(std::vector<Host>::iterator it = rowset.begin(); it != rowset.end(); ++it)
+		addresses.push_back(it->GetAddr());
+
+	Packet rowinfo(ChimeraPiggyType, GetMe().GetKey(), host.GetKey());
+	rowinfo.SetArg(NET_PIGGY_ADDRESSES, addresses);
+	if(!Send(host, rowinfo))
+		pf_log[W_ERR] << "Sending row information to node " << host << " failed";
+}
+
 #if 1 == 0
 
 #include <errno.h>
