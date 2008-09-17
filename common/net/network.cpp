@@ -165,6 +165,8 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char*
 	if(serv_sock > highsock)
 		highsock = serv_sock;
 
+	pf_log[W_INFO] << "Listening on port " << port;
+
 	//TODO environment.listening_port.Set(port);
 
 	return serv_sock;
@@ -232,6 +234,8 @@ void Network::Loop()
 						      << "(" << size << " vs " << pckt.GetSize() << ")";
 					return;
 				}
+
+				pf_log[W_PARSE] << "R - " << pckt.GetPacketInfo();
 
 				if(pckt.HasFlag(Packet::ACK))
 				{
@@ -345,6 +349,9 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	if(!pckt.GetSeqNum())
 		pckt.SetSeqNum(this->seqend++);
+
+
+	pf_log[W_PARSE] << "S - " << pckt.GetPacketInfo();
 
 	const char* s = pckt.DumpBuffer();
 	ret = sendto (sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
