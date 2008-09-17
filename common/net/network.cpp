@@ -164,7 +164,7 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char*
 	if(serv_sock > highsock)
 		highsock = serv_sock;
 
-	pf_log[W_INFO] << "Listening on port " << port;
+	pf_log[W_INFO] << "Listening on " << bind_addr << ":" << port;
 
 	//TODO environment.listening_port.Set(port);
 
@@ -195,7 +195,6 @@ void Network::Loop()
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		BlockLockMutex lock(this);
-		pf_log[W_DEBUG] << "Activity!";
 		for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
 			if(!FD_ISSET(it->first, &tmp_read_set))
@@ -228,12 +227,12 @@ void Network::Loop()
 				pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
-				if(size != pckt.GetSize())
+/*				if(size != pckt.GetSize())
 				{
 					pf_log[W_ERR] << "There isn't exacly the same length of data that header says."
 						      << "(" << size << " vs " << pckt.GetSize() << ")";
 					return;
-				}
+				}*/
 
 				pf_log[W_PARSE] << "R - " << pckt.GetPacketInfo();
 
@@ -336,7 +335,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	memset (&to, 0, sizeof (to));
 	to.sin_family = AF_INET;
-	to.sin_addr.s_addr = htonl(host.GetAddr().ip[3]); /* TODO: ipv6! */
+	to.sin_addr.s_addr = host.GetAddr().ip[3]; /* TODO: ipv6! */
 	to.sin_port = htons(host.GetAddr().port);
 
 	start = dtime ();
@@ -363,7 +362,6 @@ bool Network::Send(int sock, Host host, Packet pckt)
 		host.UpdateStat(0);
 		return false;
 	}
-	pf_log[W_DEBUG] << "sent!";
 
 	if (pckt.HasFlag(Packet::REQUESTACK))
 	{
