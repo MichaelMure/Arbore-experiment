@@ -51,8 +51,8 @@
 class Key
 {
 public:
-	static const size_t size = KEY_SIZE / sizeof(char);
-	static const size_t nlen = KEY_SIZE / (sizeof(char) * sizeof(uint32_t));
+	static const size_t size = (KEY_SIZE / 8);
+	static const size_t nlen = (KEY_SIZE / (8 * sizeof(uint32_t)));
 
 private:
 	uint32_t t[nlen];
