@@ -81,7 +81,6 @@ public:
 
 		if(!chimera.Send(host, join_ack))
 			pf_log[W_WARNING] << "Send join ACK message failed!";
-
 	}
 };
 

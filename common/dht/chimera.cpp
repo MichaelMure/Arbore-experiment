@@ -31,6 +31,8 @@
 #include "chimera_routing.h"
 #include "key.h"
 #include "chimera_messages.h"
+#include "scheduler_queue.h"
+#include "check_leafset_job.h"
 
 ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	: network(_network),
@@ -75,6 +77,21 @@ bool ChimeraDHT::Ping(const Host& dest)
 	pckt.SetArg(NET_PING_ME, me.GetAddr());
 
 	return Send(dest, pckt);
+}
+
+void ChimeraDHT::Join(const Host& bootstrap)
+{
+	if(bootstrap == InvalidHost)
+	{
+		/* We are the first peer here */
+		scheduler_queue.Queue(new CheckLeafsetJob(this, GetRouting()));
+		return;
+	}
+
+	Packet pckt(ChimeraJoinType, GetMe().GetKey(), bootstrap.GetKey());
+	pckt.SetArg(NET_JOIN_ADDRESS, GetMe().GetAddr());
+	if(!Send(bootstrap, pckt))
+		pf_log[W_WARNING] << "ChimeraDHT::Join: failed to contact bootstrap host " << bootstrap;
 }
 
 #if 1 == 0
