@@ -116,7 +116,7 @@ public:
 				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
 		}
 
-
+		/* Start the check of leafset repeated job. */
 		scheduler_queue.Queue(new CheckLeafsetJob(&chimera, chimera.GetRouting()));
 	}
 };
@@ -126,7 +126,14 @@ class ChimeraJoinNAckMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
+		pf_addr addr = pckt.GetArg<pf_addr>(NET_JOIN_NACK_ADDRESS);
+		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
+		pf_log[W_WARNING] << "JOIN request rejected from " << host;
+		sleep(ChimeraDHT::GRACEPERIOD);
+		pf_log[W_WARNING] << "Re-sending JOIN message to " << host;
+
+		chimera.Join(host);
 	}
 };
 
@@ -174,7 +181,8 @@ PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* NE
                                                                                                      T_END);
 PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* NET_PIGGY_ADDRESSES */ T_ADDRLIST,
                                                                                                      T_END);
-PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", T_END);
+PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", /* NET_JOIN_NACK_ADDRESS */ T_ADDR,
+                                                                                                       T_END);
 PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      /* NET_PING_ME */ T_ADDR,
                                                                                              T_END);
 

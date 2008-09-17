@@ -59,6 +59,8 @@ public:
 
 	bool Send(const Host& destination, const Packet& pckt);
 
+	void Join(const Host& dest);
+
 	bool Route(const Packet& pckt);
 
 	bool Ping(const Host& dest);
