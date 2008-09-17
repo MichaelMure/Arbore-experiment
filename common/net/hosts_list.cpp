@@ -33,7 +33,8 @@
  ** initialize a host struct with a #size# element cache.
  */
 HostsList::HostsList(size_t _size)
-	: max(_size)
+	: Mutex(RECURSIVE_MUTEX),
+	  max(_size)
 {
 
 }
@@ -44,20 +45,13 @@ HostsList::HostsList(size_t _size)
  */
 Host HostsList::DecodeHost(std::string hostname)
 {
-	std::string key, name;
+	std::string name;
 	uint16_t port = 0;
-	Key k;
 
-	key = stringtok(hostname, ":");;
 	name = stringtok(hostname, ":");
 	port = StrToTyp<uint16_t>(hostname);
 
 	Host host = GetHost(name, port);
-
-	k = key;
-
-	if (!host.GetKey())
-		host.SetKey(k);
 
 	return (host);
 
