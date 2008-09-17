@@ -94,7 +94,8 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 	loss(0),
 	success(0),
 	success_win_index(0),
-	success_avg(0.5)
+	success_avg(0.5),
+	reference(1)
 {
 	size_t i;
 	for (i = 0; i < SUCCESS_WINDOW / 2; i++)
@@ -145,6 +146,7 @@ Host::Host()
 Host::Host(Mutex* mutex, const pf_addr& addr)
 {
 	this->host = new _Host(mutex, addr);
+	this->host->reference = 1;
 }
 
 Host::Host(const Host& h)
