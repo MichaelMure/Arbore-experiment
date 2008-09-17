@@ -28,10 +28,11 @@
 #include "routing_table.h"
 #include "leafset.h"
 #include "net/host.h"
+#include "mutex.h"
 
 class HostsList;
 
-class ChimeraRouting
+class ChimeraRouting : protected Mutex
 {
 private :
 	HostsList* hg;              /*!< Global peer manager */
@@ -99,6 +100,7 @@ public :
 
 	inline std::vector<Host>  rowLookup(const Key& key) const
 	{
+		BlockLockMutex lock(this);
 		size_t lineNum = this->me.GetKey().key_index(key);
 		return this->routingTable.getRow(lineNum);
 	}
@@ -109,6 +111,7 @@ public :
 
 	inline std::vector<Host> getLeafset() const
 	{
+		BlockLockMutex lock(this);
 		return this->leafset.getCopy();
 	}
 
@@ -118,6 +121,7 @@ public :
 
 	inline std::vector<Host> getRoutingTable() const
 	{
+		BlockLockMutex lock(this);
 		return this->routingTable.getCopy();
 	}
 

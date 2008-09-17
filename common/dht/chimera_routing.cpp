@@ -35,12 +35,14 @@ ChimeraRouting::ChimeraRouting(HostsList* _hg, Host _me)
 
 void ChimeraRouting::KeyUpdate(Host me)
 {
+	BlockLockMutex lock(this);
 	this->leafset.KeyUpdate(me);
 	this->routingTable.KeyUpdate(me);
 }
 
 void ChimeraRouting::route_update(const Host& host, int joined)
 {
+	BlockLockMutex lock(this);
 	if(joined == 1)
 	{
 		this->add(host);
@@ -53,6 +55,7 @@ void ChimeraRouting::route_update(const Host& host, int joined)
 
 bool ChimeraRouting::add(const Host& host)
 {
+	BlockLockMutex lock(this);
 	bool added = this->leafset.add(host);
 	added = added || this->routingTable.add(host);
 	return added;
@@ -60,6 +63,7 @@ bool ChimeraRouting::add(const Host& host)
 
 bool ChimeraRouting::remove(const Host& host)
 {
+	BlockLockMutex lock(this);
 	bool removed = this->leafset.remove(host);
 	removed = removed || this->routingTable.remove(host);
 	return removed;
@@ -67,6 +71,7 @@ bool ChimeraRouting::remove(const Host& host)
 
 Host ChimeraRouting::routeLookup(const Key& key) const
 {
+	BlockLockMutex lock(this);
 	bool b;
 	Host leafsetBest = this->leafset.routeLookup(key , &b);
 	if(b)
