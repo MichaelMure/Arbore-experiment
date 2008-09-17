@@ -43,12 +43,19 @@ class ChimeraDHT : public PacketTypeList
 	void InitMessages();
 
 public:
+	/** GRACEPERIOD is the time that has to be elapsed before a node
+	 ** can be accepted to the network again after last send to it failed
+	 */
+	static const unsigned int GRACEPERIOD = 30;		/* seconds */
+
 
 	ChimeraDHT(Network* network, uint16_t port, Key my_key);
 
 	Host GetMe() const { return me; }
 
 	Network* GetNetwork() const { return network; }
+
+	ChimeraRouting* GetRouting() const { return routing; }
 
 	bool Send(const Host& destination, const Packet& pckt);
 

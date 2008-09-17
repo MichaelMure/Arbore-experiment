@@ -23,7 +23,10 @@
  *
  */
 
+#include "dtime.h"
 #include "chimera_messages.h"
+#include "chimera_routing.h"
+#include "pf_log.h"
 #include "net/network.h"
 #include "net/packet_handler.h"
 #include "chimera.h"
@@ -88,7 +91,15 @@ class ChimeraPiggyMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-
+		AddrList address = pckt.GetArg<AddrList>(NET_PIGGY_ADDRESSES);
+		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
+		{
+			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
+			if(dtime() - host.GetFailureTime() > ChimeraDHT::GRACEPERIOD)
+				chimera.GetRouting()->add(host);
+			else
+				pf_log[W_WARNING] << "Refused to add " << host << " to routing table";
+		}
 	}
 };
 
