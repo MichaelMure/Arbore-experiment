@@ -48,21 +48,65 @@ public:
 	 */
 	static const unsigned int GRACEPERIOD = 30;		/* seconds */
 
-
+	/** Create the ChimeraDHT.
+	 *
+	 * Create a new ChimeraDHT object to build all of the Distributed
+	 * Hash Table which is used by Peerfuse to send messages to other
+	 * peers.
+	 *
+	 * @param network  the Network object used to create a new UDP
+	 *                 socket, send and receive messages.
+	 * @param port  listened port
+	 * @param my_key  key used on the DHT network.
+	 */
 	ChimeraDHT(Network* network, uint16_t port, Key my_key);
 
+	/** @return  the Host object which represents me on network. */
 	Host GetMe() const { return me; }
 
+	/** @return  the Network object. */
 	Network* GetNetwork() const { return network; }
 
+	/** Get the ChimeraRouting object.
+	 *
+	 * TODO: it MUST be private!!
+	 *
+	 * @return  the ChimeraRouting pointer.
+	 */
 	ChimeraRouting* GetRouting() const { return routing; }
 
+	/** Join the DHT network.
+	 *
+	 * It tries to connect to a peer to join a
+	 * DHT network.
+	 *
+	 * @param bootstrap  the peer I try to contact.
+	 */
+	void Join(const Host& bootstrap);
+
+	/** Send a message to a peer.
+	 *
+	 * @param destination  this is peer which will receive message.
+	 * @param pckt  the Packet which describes all of the message.
+	 * @return  true if it success, false if it fails.
+	 */
 	bool Send(const Host& destination, const Packet& pckt);
 
-	void Join(const Host& dest);
-
+	/** Route a packet on the DHT.
+	 *
+	 * It looks for the destination Key in Packet header,
+	 * find a peer in his routing table to route the packet.
+	 *
+	 * @param pckt  Packet I try to route.
+	 * @return  \b true if it success, \b false if it fails.
+	 */
 	bool Route(const Packet& pckt);
 
+	/** Ping a peer.
+	 *
+	 * @param dest  the destination host.
+	 * @return  true if the host is up.
+	 */
 	bool Ping(const Host& dest);
 };
 
