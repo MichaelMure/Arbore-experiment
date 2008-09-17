@@ -30,7 +30,16 @@
 
 #include "net/packet_type.h"
 
+enum
+{
+	NET_JOIN_ADDRESS,
+};
 extern PacketType ChimeraJoinType;
+
+enum
+{
+	NET_JOIN_ACK_ADDRESSES,
+};
 extern PacketType ChimeraJoinAckType;
 
 enum
@@ -43,7 +52,13 @@ enum
 {
 	NET_PIGGY_ADDRESSES
 };
+
 extern PacketType ChimeraPiggyType;
+
+enum
+{
+	NET_JOIN_NACK_ADDRESS,
+};
 extern PacketType ChimeraJoinNAckType;
 
 enum

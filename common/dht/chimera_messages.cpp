@@ -40,8 +40,8 @@ public:
 
 		if(pckt.HasFlag(Packet::MUSTROUTE))
 		{
-			chimera.Route(pckt);
-			return;
+			if(chimera.Route(pckt))
+				return;
 		}
 
 		Handle(chimera, sender, pckt);
@@ -55,6 +55,30 @@ class ChimeraJoinMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
+		pf_addr addr = pckt.GetArg<pf_addr>(NET_JOIN_ADDRESS);
+		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
+
+		if((dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
+		{
+			Packet pckt(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
+			pckt.SetArg(NET_JOIN_NACK_ADDRESS, addr);
+			chimera.Send(host, pckt);
+
+			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
+			                  << "elapsed time since failure = " << dtime() - host.GetFailureTime() << " sec";
+			return;
+		}
+
+		std::vector<Host> leafset = chimera.GetRouting()->getLeafset();
+		AddrList addresses;
+		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
+			addresses.push_back(it->GetAddr());
+
+		Packet join_ack(ChimeraJoinAckType, chimera.GetMe().GetKey(), host.GetKey());
+		join_ack.SetArg(NET_JOIN_ACK_ADDRESSES, addresses);
+
+		if(!chimera.Send(host, join_ack))
+			pf_log[W_WARNING] << "Send join ACK message failed!";
 
 	}
 };
@@ -114,7 +138,8 @@ public:
 	}
 };
 
-PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      T_END);
+PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      /* NET_JOIN_ADDRESS */    T_ADDR,
+                                                                                                     T_END);
 PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  T_END);
 PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* NET_UPDATE_ADDRESS */  T_ADDR,
                                                                                                      T_END);

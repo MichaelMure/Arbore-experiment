@@ -59,7 +59,7 @@ public:
 
 	bool Send(const Host& destination, const Packet& pckt);
 
-	void Route(const Packet& pckt);
+	bool Route(const Packet& pckt);
 
 	bool Ping(const Host& dest);
 };
