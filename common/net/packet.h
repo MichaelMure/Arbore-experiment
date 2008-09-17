@@ -114,7 +114,7 @@ public:
 	 *                        contained in header.
 	 * @param header  the header data (size must be GetHeaderSize()).
 	 */
-	Packet(PacketTypeList* pckt_type_list, char* header);
+	Packet(PacketTypeList* pckt_type_list, char* header, size_t size);
 
 	/** Copy operator.
 	 *

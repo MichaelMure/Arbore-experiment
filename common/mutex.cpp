@@ -97,7 +97,7 @@ void Mutex::Lock() const
 	//assert(res == 0);
 	/* Don't use pf_log, because it locks the stdout mutex. */
 	if(res)
-		std::cerr << "Failed to lock " << this;
+		std::cerr << "Failed to lock " << this << std::endl;
 }
 
 void Mutex::Unlock() const
@@ -106,5 +106,5 @@ void Mutex::Unlock() const
 	//assert(res == 0);
 	/* Don't use pf_log, because it locks the stdout mutex. */
 	if(res)
-		std::cerr << "Failed to unlock " << this;
+		std::cerr << "Failed to unlock " << this << std::endl;
 }

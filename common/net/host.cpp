@@ -27,6 +27,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <cassert>
 
 #include "net/pf_addr.h"
 #include "host.h"
@@ -97,6 +98,7 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 	success_avg(0.5),
 	reference(1)
 {
+	assert(mutex != NULL);
 	size_t i;
 	for (i = 0; i < SUCCESS_WINDOW / 2; i++)
 		success_win[i] = 0;

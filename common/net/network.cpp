@@ -136,11 +136,10 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char*
 {
 	BlockLockMutex lock(this);
 	struct sockaddr_in saddr;
-	int one;
-	int serv_sock;
+	int one = 0;
 
 	/* create socket */
-	serv_sock = socket (AF_INET, SOCK_DGRAM, 0);
+	int serv_sock = socket (AF_INET, SOCK_DGRAM, 0);
 	if (serv_sock < 0)
 		throw CantOpenSock();
 
@@ -196,6 +195,7 @@ void Network::Loop()
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		BlockLockMutex lock(this);
+		pf_log[W_DEBUG] << "Activity!";
 		for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
 			if(!FD_ISSET(it->first, &tmp_read_set))
@@ -224,7 +224,7 @@ void Network::Loop()
 			}
 			try
 			{
-				Packet pckt(packet_type_list, data);
+				Packet pckt(packet_type_list, data, size);
 				pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
@@ -337,7 +337,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 	memset (&to, 0, sizeof (to));
 	to.sin_family = AF_INET;
 	to.sin_addr.s_addr = htonl(host.GetAddr().ip[3]); /* TODO: ipv6! */
-	to.sin_port = htons (host.GetAddr().port);
+	to.sin_port = htons(host.GetAddr().port);
 
 	start = dtime ();
 
@@ -351,10 +351,11 @@ bool Network::Send(int sock, Host host, Packet pckt)
 		pckt.SetSeqNum(this->seqend++);
 
 
-	pf_log[W_PARSE] << "S - " << pckt.GetPacketInfo();
+	pf_log[W_PARSE] << "S(" << host << ") - " << pckt.GetPacketInfo();
 
 	const char* s = pckt.DumpBuffer();
 	ret = sendto (sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
+	delete [] s;
 
 	if (ret < 0)
 	{
@@ -362,6 +363,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 		host.UpdateStat(0);
 		return false;
 	}
+	pf_log[W_DEBUG] << "sent!";
 
 	if (pckt.HasFlag(Packet::REQUESTACK))
 	{

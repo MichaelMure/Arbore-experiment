@@ -61,7 +61,7 @@ Packet::Packet(const Packet& p)
 		arg_lst.push_back((*it)->clone());
 }
 
-Packet::Packet(PacketTypeList* pckt_type_list, char* header)
+Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t size)
 			: type(0, NULL, "NONE", T_END),
 			size(0),
 			data(NULL)
@@ -93,7 +93,9 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header)
 	seqnum = ntohl(*p++);
 
 	/* Flags */
-	flags = ntohl(*p);
+	flags = ntohl(*p++);
+
+	SetContent((char*)p, size - size_t((char*)p - header));
 }
 
 char* Packet::DumpBuffer()
