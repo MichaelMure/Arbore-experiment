@@ -30,6 +30,8 @@
 #include "net/network.h"
 #include "net/packet_handler.h"
 #include "chimera.h"
+#include "check_leafset_job.h"
+#include "scheduler_queue.h"
 
 class ChimeraBaseMessage : public PacketHandlerBase
 {
@@ -88,7 +90,34 @@ class ChimeraJoinAckMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
+		AddrList addresses = pckt.GetArg<AddrList>(NET_JOIN_ACK_ADDRESSES);
+		std::vector<Host> hosts;
 
+		for(AddrList::iterator it = addresses.begin(); it != addresses.end(); ++it)
+		{
+			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
+			chimera.GetRouting()->add(host);
+
+			Packet update(ChimeraUpdateType, chimera.GetMe().GetKey(), host.GetKey());
+			update.SetArg(NET_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
+
+			if(!chimera.Send(host, update))
+				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
+		}
+
+		hosts = chimera.GetRouting()->getRoutingTable();
+		for(std::vector<Host>::iterator it = hosts.begin(); it != hosts.end(); ++it)
+		{
+			Host host = *it;
+			Packet update(ChimeraUpdateType, chimera.GetMe().GetKey(), host.GetKey());
+
+			update.SetArg(NET_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
+			if(!chimera.Send(host, update))
+				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
+		}
+
+
+		scheduler_queue.Queue(new CheckLeafsetJob(&chimera, chimera.GetRouting()));
 	}
 };
 
