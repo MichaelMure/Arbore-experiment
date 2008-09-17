@@ -51,6 +51,7 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	{
 		return;
 	}
+	pf_log[W_INFO] << he->h_name;
 	me = network->GetHostsList()->GetHost(he->h_name, port);
 	me.SetKey(my_key);
 

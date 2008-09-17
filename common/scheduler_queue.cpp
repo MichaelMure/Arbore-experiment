@@ -24,7 +24,6 @@
 #include "scheduler_queue.h"
 #include "mutex.h"
 #include "job.h"
-#include "job_types.h"
 #include "pf_log.h"
 
 SchedulerQueue scheduler_queue;

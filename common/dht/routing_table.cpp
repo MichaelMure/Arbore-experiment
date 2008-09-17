@@ -362,7 +362,7 @@ std::vector<Host> RoutingTable::getCopy() const
 
 }
 
-Host bestEntry(Host e1, Host e2)
+Host RoutingTable::bestEntry(Host e1, Host e2)
 {
 	//priority : SuccessAvg > latency
 	if(e1.GetSuccessAvg() > e2.GetSuccessAvg() || ((e1.GetSuccessAvg() == e2.GetSuccessAvg()) && (e1.GetLatency() < e2.GetLatency())))
@@ -375,11 +375,11 @@ Host bestEntry(Host e1, Host e2)
 	}
 }
 
-Host bestEntry(Host e1, Host e2, const Key* key)
+Host RoutingTable::bestEntry(Host e1, Host e2, const Key& key)
 {
 	//priority : PrefixMatching > SuccessAvg > latency
-	size_t e1match = e1.GetKey().key_index(*key);
-	size_t e2match = e2.GetKey().key_index(*key);
+	size_t e1match = e1.GetKey().key_index(key);
+	size_t e2match = e2.GetKey().key_index(key);
 	if(e1match > e2match)
 	{
 		return e1;

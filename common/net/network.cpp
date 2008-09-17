@@ -35,11 +35,11 @@
 #include "pf_config.h"
 #include "network.h"
 #include "tools.h"
-#include "job_new_connection.h"
 #include "scheduler_queue.h"
+#include "dtime.h"
 #include "pf_thread.h"
 #include "jobs/job.h"
-#include "environment.h"
+//#include "environment.h"
 //#include "content_list.h"
 #include "net/packet.h"
 #include "net/host.h"
@@ -165,7 +165,7 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char*
 	if(serv_sock > highsock)
 		highsock = serv_sock;
 
-	environment.listening_port.Set(port);
+	//TODO environment.listening_port.Set(port);
 
 	return serv_sock;
 }
