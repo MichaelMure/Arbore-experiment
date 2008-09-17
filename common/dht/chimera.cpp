@@ -74,7 +74,7 @@ bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
 bool ChimeraDHT::Ping(const Host& dest)
 {
 	Packet pckt(ChimeraPingType, me.GetKey(), dest.GetKey());
-	pckt.SetArg(NET_PING_ME, me.GetAddr());
+	pckt.SetArg(CHIMERA_PING_ME, me.GetAddr());
 
 	return Send(dest, pckt);
 }
@@ -89,7 +89,7 @@ void ChimeraDHT::Join(const Host& bootstrap)
 	}
 
 	Packet pckt(ChimeraJoinType, GetMe().GetKey(), GetMe().GetKey());
-	pckt.SetArg(NET_JOIN_ADDRESS, GetMe().GetAddr());
+	pckt.SetArg(CHIMERA_JOIN_ADDRESS, GetMe().GetAddr());
 	if(!Send(bootstrap, pckt))
 		pf_log[W_WARNING] << "ChimeraDHT::Join: failed to contact bootstrap host " << bootstrap;
 
@@ -140,7 +140,7 @@ bool ChimeraDHT::Route(const Packet& pckt)
 
 void ChimeraDHT::sendRowInfo(const Packet& pckt)
 {
-	Host host = GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(NET_JOIN_ADDRESS));
+	Host host = GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS));
 
 	std::vector<Host> rowset = GetRouting()->rowLookup(host.GetKey());
 	std::vector<pf_addr> addresses;
@@ -148,7 +148,7 @@ void ChimeraDHT::sendRowInfo(const Packet& pckt)
 		addresses.push_back(it->GetAddr());
 
 	Packet rowinfo(ChimeraPiggyType, GetMe().GetKey(), host.GetKey());
-	rowinfo.SetArg(NET_PIGGY_ADDRESSES, addresses);
+	rowinfo.SetArg(CHIMERA_PIGGY_ADDRESSES, addresses);
 	if(!Send(host, rowinfo))
 		pf_log[W_ERR] << "Sending row information to node " << host << " failed";
 }

@@ -32,38 +32,38 @@
 
 enum
 {
-	NET_JOIN_ADDRESS,
+	CHIMERA_JOIN_ADDRESS,
 };
 extern PacketType ChimeraJoinType;
 
 enum
 {
-	NET_JOIN_ACK_ADDRESSES,
+	CHIMERA_JOIN_ACK_ADDRESSES,
 };
 extern PacketType ChimeraJoinAckType;
 
 enum
 {
-	NET_UPDATE_ADDRESS,
+	CHIMERA_UPDATE_ADDRESS,
 };
 extern PacketType ChimeraUpdateType;
 
 enum
 {
-	NET_PIGGY_ADDRESSES
+	CHIMERA_PIGGY_ADDRESSES
 };
 
 extern PacketType ChimeraPiggyType;
 
 enum
 {
-	NET_JOIN_NACK_ADDRESS,
+	CHIMERA_JOIN_NACK_ADDRESS,
 };
 extern PacketType ChimeraJoinNAckType;
 
 enum
 {
-	NET_PING_ME,
+	CHIMERA_PING_ME,
 };
 extern PacketType ChimeraPingType;
 

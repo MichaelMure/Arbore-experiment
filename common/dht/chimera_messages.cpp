@@ -57,13 +57,13 @@ class ChimeraJoinMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		pf_addr addr = pckt.GetArg<pf_addr>(NET_JOIN_ADDRESS);
+		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
 		if((dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
 		{
 			Packet pckt(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
-			pckt.SetArg(NET_JOIN_NACK_ADDRESS, addr);
+			pckt.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
 			chimera.Send(host, pckt);
 
 			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
@@ -77,7 +77,7 @@ public:
 			addresses.push_back(it->GetAddr());
 
 		Packet join_ack(ChimeraJoinAckType, chimera.GetMe().GetKey(), host.GetKey());
-		join_ack.SetArg(NET_JOIN_ACK_ADDRESSES, addresses);
+		join_ack.SetArg(CHIMERA_JOIN_ACK_ADDRESSES, addresses);
 
 		if(!chimera.Send(host, join_ack))
 			pf_log[W_WARNING] << "Send join ACK message failed!";
@@ -89,7 +89,7 @@ class ChimeraJoinAckMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		AddrList addresses = pckt.GetArg<AddrList>(NET_JOIN_ACK_ADDRESSES);
+		AddrList addresses = pckt.GetArg<AddrList>(CHIMERA_JOIN_ACK_ADDRESSES);
 		std::vector<Host> hosts;
 
 		for(AddrList::iterator it = addresses.begin(); it != addresses.end(); ++it)
@@ -98,7 +98,7 @@ public:
 			chimera.GetRouting()->add(host);
 
 			Packet update(ChimeraUpdateType, chimera.GetMe().GetKey(), host.GetKey());
-			update.SetArg(NET_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
+			update.SetArg(CHIMERA_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
 
 			if(!chimera.Send(host, update))
 				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
@@ -110,7 +110,7 @@ public:
 			Host host = *it;
 			Packet update(ChimeraUpdateType, chimera.GetMe().GetKey(), host.GetKey());
 
-			update.SetArg(NET_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
+			update.SetArg(CHIMERA_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
 			if(!chimera.Send(host, update))
 				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
 		}
@@ -125,7 +125,7 @@ class ChimeraJoinNAckMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		pf_addr addr = pckt.GetArg<pf_addr>(NET_JOIN_NACK_ADDRESS);
+		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_NACK_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
 		pf_log[W_WARNING] << "JOIN request rejected from " << host;
@@ -141,7 +141,7 @@ class ChimeraUpdateMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		pf_addr addr = pckt.GetArg<pf_addr>(NET_UPDATE_ADDRESS);
+		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_UPDATE_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 		chimera.GetRouting()->add(host);
 	}
@@ -152,7 +152,7 @@ class ChimeraPiggyMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		AddrList address = pckt.GetArg<AddrList>(NET_PIGGY_ADDRESSES);
+		AddrList address = pckt.GetArg<AddrList>(CHIMERA_PIGGY_ADDRESSES);
 		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
 		{
 			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
@@ -169,19 +169,20 @@ class ChimeraPingMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(NET_PING_ME));
+		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
 	}
 };
 
-PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      /* NET_JOIN_ADDRESS */    T_ADDR,
-                                                                                                     T_END);
-PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  T_END);
-PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* NET_UPDATE_ADDRESS */  T_ADDR,
-                                                                                                     T_END);
-PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* NET_PIGGY_ADDRESSES */ T_ADDRLIST,
-                                                                                                     T_END);
-PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", /* NET_JOIN_NACK_ADDRESS */ T_ADDR,
-                                                                                                       T_END);
-PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      /* NET_PING_ME */ T_ADDR,
-                                                                                             T_END);
+PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+                                                                                                         T_END);
+PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
+                                                                                                            T_END);
+PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+                                                                                                         T_END);
+PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
+                                                                                                         T_END);
+PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
+                                                                                                           T_END);
+PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
+                                                                                                 T_END);
 

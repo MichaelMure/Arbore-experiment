@@ -79,7 +79,7 @@ bool CheckLeafsetJob::Start()
 		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 			addrlist.push_back(it->GetAddr());
 
-		pckt.SetArg(NET_PIGGY_ADDRESSES, addrlist);
+		pckt.SetArg(CHIMERA_PIGGY_ADDRESSES, addrlist);
 
 		for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 		{
