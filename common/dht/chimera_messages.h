@@ -32,6 +32,11 @@
 
 extern PacketType ChimeraJoinType;
 extern PacketType ChimeraJoinAckType;
+
+enum
+{
+	NET_UPDATE_ADDRESS,
+};
 extern PacketType ChimeraUpdateType;
 
 enum

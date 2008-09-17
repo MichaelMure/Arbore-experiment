@@ -82,7 +82,9 @@ class ChimeraUpdateMessage : public ChimeraBaseMessage
 public:
 	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
 	{
-
+		pf_addr addr = pckt.GetArg<pf_addr>(NET_UPDATE_ADDRESS);
+		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
+		chimera.GetRouting()->add(host);
 	}
 };
 
@@ -114,7 +116,8 @@ public:
 
 PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      T_END);
 PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  T_END);
-PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    T_END);
+PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* NET_UPDATE_ADDRESS */  T_ADDR,
+                                                                                                     T_END);
 PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* NET_PIGGY_ADDRESSES */ T_ADDRLIST,
                                                                                                      T_END);
 PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", T_END);
