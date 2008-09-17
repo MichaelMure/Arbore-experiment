@@ -37,6 +37,8 @@ Packet::Packet(PacketType _type, const Key& _src, const Key& _dst)
 			size(0),
 			src(_src),
 			dst(_dst),
+			flags(0),
+			seqnum(0),
 			data(NULL)
 {
 }
@@ -44,6 +46,10 @@ Packet::Packet(PacketType _type, const Key& _src, const Key& _dst)
 Packet::Packet(const Packet& p)
 			: type(p.type),
 			size(p.size),
+			src(p.src),
+			dst(p.dst),
+			flags(p.flags),
+			seqnum(p.seqnum),
 			data(NULL)
 {
 	if(size)
@@ -92,6 +98,9 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header)
 
 char* Packet::DumpBuffer()
 {
+	BuildDataFromArgs();
+
+	pf_log[W_DEBUG] << GetSize();
 	char* dump = new char [GetSize()];
 	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
@@ -104,14 +113,14 @@ char* Packet::DumpBuffer()
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
 		memcpy(ptr, key+i, sizeof(key[i]));
-		ptr++;
+		ptr += sizeof(key[i]);
 	}
 	/* Dst key */
 	key = dst.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
 		memcpy(ptr, key+i, sizeof(key[i]));
-		ptr++;
+		ptr += sizeof(key[i]);
 	}
 
 	/* Type */
@@ -131,18 +140,19 @@ char* Packet::DumpBuffer()
 	ptr += sizeof _flags;
 
 	/* Data */
-	BuildDataFromArgs();
 	memcpy(ptr, data, GetDataSize());
+
+	pf_log[W_DEBUG] << ptr - dump + GetDataSize();
 
 	return dump;
 }
 
 uint32_t Packet::GetHeaderSize()
 {
-	return    sizeof(Key::size)        // src
-		+ sizeof(Key::size)        // dst
-		+ sizeof(uint32_t)         // size of the packet
-		+ sizeof(uint32_t)         // size of the type
+	return    Key::size                // src
+		+ Key::size                // dst
+		+ sizeof(uint32_t)         // type
+		+ sizeof(uint32_t)         // size of data
 		+ sizeof(uint32_t)         // sequence number
 		+ sizeof(uint32_t);        // flags
 }
@@ -416,7 +426,7 @@ Packet& Packet::Write(Key key)
 	if(data)
 		delete []data;
 
-	const uint32_t* val = src.GetArray();
+	const uint32_t* val = key.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
 		memcpy(new_data + size, val+i, sizeof(val[i]));

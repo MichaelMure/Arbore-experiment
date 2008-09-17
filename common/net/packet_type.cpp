@@ -52,7 +52,7 @@ PacketType::~PacketType()
 	 *   2) Implement an ugly clone() copy method in each
 	 *      PacketHandlerBase classes (see packet_arg.h)
 	 */
-	delete handler;
+	//delete handler;
 }
 
 PacketType& PacketType::operator=(const PacketType& pckt_type)
