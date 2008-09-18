@@ -47,9 +47,6 @@ public:
 
 	/** @return  the PacketType of the type id */
 	PacketType GetPacketType(uint32_t type) const;
-
-	/** @return  the PacketType of the type id */
-	PacketType operator[](uint32_t s) const;
 };
 
 #endif /* PACKET_TYPE_LIST_H */
