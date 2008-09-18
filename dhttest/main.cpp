@@ -1,15 +1,35 @@
 #include <stdlib.h>
+#include <string>
 #include <iostream>
 
 #include "common/net/network.h"
+#include "common/net/packet.h"
 #include "common/net/hosts_list.h"
 #include "common/dht/chimera.h"
 #include "common/scheduler.h"
 #include "common/pf_log.h"
 #include "common/tools.h"
+#include "common/dht/chimera_messages.h"
+
+enum
+{
+	CHIMERA_CHAT_MESSAGE
+};
+
+class ChimeraChatMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle(ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+		std::string message = pckt.GetArg<std::string>(CHIMERA_CHAT_MESSAGE);
+		pf_log[W_INFO] << "CHAT[" << pckt.GetSrc() << "] " << message;
+	}
+};
 
 int main(int argc, char** argv)
 {
+	PacketType ChimeraChatType(++LastChimeraType, new ChimeraChatMessage,  "CHAT", T_STR, T_END);
+
 	if(argc < 2)
 	{
 		std::cout << "Usage: " << argv[0] << " port [host]" << std::endl;
@@ -17,10 +37,10 @@ int main(int argc, char** argv)
 	}
 
 	Network net;
-	ChimeraDHT* dht;
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	dht = new ChimeraDHT(&net, StrToTyp<int>(argv[1]), me);
+	ChimeraDHT* dht = new ChimeraDHT(&net, StrToTyp<int>(argv[1]), me);
+	dht->RegisterType(ChimeraChatType);
 
 	pf_log.SetLoggedFlags("ALL", false);
 	Scheduler::StartSchedulers(5);
@@ -33,8 +53,19 @@ int main(int argc, char** argv)
 		dht->Join(host);
 	}
 
-	while(1) sleep(1);
+	std::string s;
+	while(std::getline(std::cin, s))
+	{
+		std::string keystr = stringtok(s, " ");
+		Key key;
+		key = keystr;
 
+		Packet pckt(ChimeraChatType, dht->GetMe().GetKey(), key);
+		pckt.SetFlag(Packet::MUSTROUTE);
+		pckt.SetArg(CHIMERA_CHAT_MESSAGE, s);
+		pf_log[W_INFO] << "CHAT[" << key << "] " << s;
+		dht->Route(pckt);
+	}
 
 	return 0;
 }
