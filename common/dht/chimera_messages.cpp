@@ -33,24 +33,19 @@
 #include "check_leafset_job.h"
 #include "scheduler_queue.h"
 
-class ChimeraBaseMessage : public PacketHandlerBase
+void ChimeraBaseMessage::operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 {
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
+	ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
+
+	if(pckt.HasFlag(Packet::MUSTROUTE))
 	{
-		ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
-
-		if(pckt.HasFlag(Packet::MUSTROUTE))
-		{
-			if(chimera.Route(pckt))
-				return;
-		}
-
-		Handle(chimera, sender, pckt);
+		if(chimera.Route(pckt))
+			return;
 	}
 
-	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
-};
+	Handle(chimera, sender, pckt);
+}
+
 
 class ChimeraJoinMessage : public ChimeraBaseMessage
 {
@@ -59,9 +54,6 @@ public:
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
-
-		pf_log[W_DEBUG] << addr;
-		pf_log[W_DEBUG] << host;
 
 		if((dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
 		{
@@ -176,16 +168,18 @@ public:
 	}
 };
 
-PacketType     ChimeraJoinType(1, new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
-                                                                                                         T_END);
-PacketType  ChimeraJoinAckType(2, new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
-                                                                                                            T_END);
-PacketType   ChimeraUpdateType(3, new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
-                                                                                                         T_END);
-PacketType    ChimeraPiggyType(4, new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
-                                                                                                         T_END);
-PacketType ChimeraJoinNAckType(5, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
-                                                                                                           T_END);
-PacketType     ChimeraPingType(6, new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
-                                                                                                 T_END);
+uint32_t LastChimeraType = 0;
+
+PacketType     ChimeraJoinType(++LastChimeraType, new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+                                                                                                                         T_END);
+PacketType  ChimeraJoinAckType(++LastChimeraType, new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
+                                                                                                                            T_END);
+PacketType   ChimeraUpdateType(++LastChimeraType, new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+                                                                                                                         T_END);
+PacketType    ChimeraPiggyType(++LastChimeraType, new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
+                                                                                                                         T_END);
+PacketType ChimeraJoinNAckType(++LastChimeraType, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
+                                                                                                                           T_END);
+PacketType     ChimeraPingType(++LastChimeraType, new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
+                                                                                                                 T_END);
 

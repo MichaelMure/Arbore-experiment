@@ -29,6 +29,18 @@
 #include <stdint.h>
 
 #include "net/packet_type.h"
+#include "net/packet_handler.h"
+
+class ChimeraDHT;
+
+class ChimeraBaseMessage : public PacketHandlerBase
+{
+public:
+	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt);
+
+	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
+};
+
 
 enum
 {
@@ -66,5 +78,7 @@ enum
 	CHIMERA_PING_ME,
 };
 extern PacketType ChimeraPingType;
+
+extern uint32_t LastChimeraType;
 
 #endif /* CHIMERA_MESSAGES_H */
