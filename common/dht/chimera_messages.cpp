@@ -70,6 +70,7 @@ public:
 		AddrList addresses;
 		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 			addresses.push_back(it->GetAddr());
+		addresses.push_back(chimera.GetMe().GetAddr());
 
 		Packet join_ack(ChimeraJoinAckType, chimera.GetMe().GetKey(), host.GetKey());
 		join_ack.SetArg(CHIMERA_JOIN_ACK_ADDRESSES, addresses);
