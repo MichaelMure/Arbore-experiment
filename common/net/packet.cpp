@@ -115,14 +115,16 @@ char* Packet::DumpBuffer()
 	const uint32_t* key = src.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
-		memcpy(ptr, key+i, sizeof(key[i]));
+		uint32_t _key = htonl(key[i]);
+		memcpy(ptr, &_key, sizeof(key[i]));
 		ptr += sizeof(key[i]);
 	}
 	/* Dst key */
 	key = dst.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
-		memcpy(ptr, key+i, sizeof(key[i]));
+		uint32_t _key = htonl(key[i]);
+		memcpy(ptr, &_key, sizeof(key[i]));
 		ptr += sizeof(key[i]);
 	}
 
@@ -433,7 +435,8 @@ Packet& Packet::Write(Key key)
 	const uint32_t* val = key.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
-		memcpy(new_data + size, val+i, sizeof(val[i]));
+		uint32_t _val = htonl(val[i]);
+		memcpy(new_data + size, &_val, sizeof(val[i]));
 		size += (uint32_t)sizeof(val[i]);
 	}
 
