@@ -42,6 +42,8 @@ int main(int argc, char** argv)
 	ChimeraDHT* dht = new ChimeraDHT(&net, StrToTyp<int>(argv[1]), me);
 	dht->RegisterType(ChimeraChatType);
 
+	std::cerr << "hosts_list pointer: " << dht->GetNetwork()->GetHostsList() << std::endl;
+
 	pf_log.SetLoggedFlags("ALL", false);
 	Scheduler::StartSchedulers(5);
 	net.Start();

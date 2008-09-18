@@ -65,6 +65,8 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	RegisterType(ChimeraPingType);
 
 	fd = network->Listen(this, port, "0.0.0.0");
+
+	pf_log[W_INFO] << "Started Chimera with key " << my_key;
 }
 
 bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
@@ -100,8 +102,12 @@ void ChimeraDHT::Join(const Host& bootstrap)
 
 bool ChimeraDHT::Route(const Packet& pckt)
 {
+	pf_log[W_DEBUG] << "***** ROUTING ******";
+
 	Key key = pckt.GetDst();
 	Host nextDest = GetRouting()->routeLookup(key);
+
+	pf_log[W_DEBUG] << "Routing to: " << nextDest;
 
 	/* this is to avoid sending JOIN request to the node that
 	 * its information is already in the routing table
@@ -110,11 +116,16 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	{
 		GetRouting()->remove(nextDest);
 		nextDest = GetRouting()->routeLookup(key);
+		pf_log[W_DEBUG] << "Heuuu, sorry, Routing to: " << nextDest;
 	}
 
 	/* if I am the only host or the closest host is me, deliver the message */
 	if(nextDest == GetMe())
+	{
+		pf_log[W_DEBUG] << "Shit, it's me";
+		pf_log[W_DEBUG] << "***** END OF ROUTING *****";
 		return false;
+	}
 
 	/* XXX possibily an infinite loop? */
 	while(!Send(nextDest, pckt))
@@ -137,6 +148,7 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	if(pckt.GetPacketType() == ChimeraJoinType)
 		sendRowInfo(pckt);
 
+	pf_log[W_DEBUG] << "******* END OF ROUTING *******";
 	return true;
 }
 

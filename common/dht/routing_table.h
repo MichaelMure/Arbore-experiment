@@ -52,6 +52,8 @@ public:
 	 */
 	RoutingTable(HostsList* hg, Host me);
 
+	void print() const;
+
 	/*! \brief Perfoms maintenance caused by a change in DHT key
 	 *
 	 * When the DHT key is changed, the routing table has to be invalidated.

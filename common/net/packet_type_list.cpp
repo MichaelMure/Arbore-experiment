@@ -22,12 +22,14 @@
 
 #include <cassert>
 #include "packet_type_list.h"
+#include "pf_log.h"
 
 void PacketTypeList::RegisterType(PacketType type)
 {
 	BlockLockMutex lock(this);
 
 	assert(find(type.GetType()) == end());
+	pf_log[W_DEBUG] << "Register " << type.GetName() << "(" << type.GetType() << ")";
 	insert(std::pair<uint32_t, PacketType>(type.GetType(), type));
 }
 

@@ -23,6 +23,7 @@
  *
  */
 
+#include <stdio.h>
 #include "routing_table.h"
 
 RoutingTable::RoutingTable(HostsList* _hg, Host _me)
@@ -48,6 +49,31 @@ void RoutingTable::clear()
 	}
 
 }
+
+void RoutingTable::print() const
+{
+	return;
+    size_t i, j, k;
+
+    fprintf (stderr,
+             "------------------------------- TABLE-------------------------------\n");
+    for (i = 0; i < MAX_ROW; i++)
+        {
+            for (j = 0; j < MAX_COL; j++)
+                {
+                    for (k = 0; k < MAX_ENTRY; k++)
+                        if (table[i][j][k] != InvalidHost)
+                            fprintf (stderr, "%s ", table[i][j][k].GetKey().str().c_str());
+                        else
+                            fprintf (stderr,
+                                     "0000000000000000000000000000000000000000 ");
+                }
+            fprintf (stderr, "\n");
+        }
+    fprintf (stderr,
+             "----------------------------------------------------------------------\n");
+}
+
 
 void RoutingTable::KeyUpdate(Host _me)
 {
@@ -189,6 +215,7 @@ size_t RoutingTable::hexalphaToInt(int c)
 
 Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 {
+	print();
 	if(this->me.GetKey() == key)
 	{
 		return this->me;

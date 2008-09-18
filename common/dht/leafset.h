@@ -106,6 +106,8 @@ private :
 	 */
 	void clear();
 
+	void print() const;
+
 	/*! \brief Find the index to insert a peer in clockwise part of the leafset.
 	 *
 	 * Finds which interval the peer belongs to and returns the position where

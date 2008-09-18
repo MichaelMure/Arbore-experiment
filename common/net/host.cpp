@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <cassert>
+#include <iostream>
 
 #include "net/pf_addr.h"
 #include "host.h"
@@ -99,6 +100,7 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 	reference(1)
 {
 	assert(mutex != NULL);
+	std::cerr << "host mutex : " << mutex << std::endl;
 	size_t i;
 	for (i = 0; i < SUCCESS_WINDOW / 2; i++)
 		success_win[i] = 0;
@@ -147,12 +149,16 @@ Host::Host()
 
 Host::Host(Mutex* mutex, const pf_addr& addr)
 {
+	assert(mutex != NULL);
 	this->host = new _Host(mutex, addr);
+	std::cerr << "new " << host << std::endl;
 	this->host->reference = 1;
 }
 
 Host::Host(const Host& h)
 {
+	if(host != h.host)
+		std::cerr << "from " << host << " to " << h.host << std::endl;
 	this->host = h.host;
 	if(this->host == NULL) return;
 
@@ -162,6 +168,8 @@ Host::Host(const Host& h)
 
 Host& Host::operator=(const Host& h)
 {
+	if(host != h.host)
+		std::cerr << "from " << host << " to " << h.host << std::endl;
 	this->host = h.host;
 	if(this->host == NULL) return *this;
 
@@ -178,7 +186,10 @@ Host::~Host()
 	BlockLockMutex(this->host->GetMutex());
 	this->host->reference--;
 	if(!this->host->reference)
+	{
+		std::cerr << "deleted" << std::endl;
 		delete this->host;
+	}
 }
 
 bool Host::operator==(const Host& h2)

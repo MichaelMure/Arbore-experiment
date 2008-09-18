@@ -28,6 +28,7 @@
 
 enum MutexType
 {
+	INVALID_MUTEX,
 	NORMAL_MUTEX,
 	RECURSIVE_MUTEX
 };
@@ -47,6 +48,7 @@ public:
 
 	Mutex(enum MutexType _type = NORMAL_MUTEX);
 	Mutex(const Mutex &m);
+	Mutex& operator=(const Mutex& m);
 	~Mutex();
 
 	void Lock() const;

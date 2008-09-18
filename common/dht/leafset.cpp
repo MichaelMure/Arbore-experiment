@@ -23,11 +23,29 @@
  *
  */
 
+#include <stdio.h>
 #include <string.h>
 #include "leafset.h"
 Leafset::Leafset(HostsList* _hg, Host _me) : hg(_hg), me(_me)
 {
 	this->clear();
+}
+
+void Leafset::print () const
+{
+    size_t i;
+    size_t Lsize, Rsize;
+
+    Lsize = nbLeavesClockwise;
+    Rsize = nbLeavesCounterclockwise;
+
+    fprintf (stderr, "LEFT: ");
+    for (i = 0; i < Lsize; i++)
+        fprintf (stderr, "%s ", leavesClockwise[i].GetKey().str().c_str());
+    fprintf (stderr, "\nRIGHT: ");
+    for (i = 0; i < Rsize; i++)
+        fprintf (stderr, "%s ", leavesCounterclockwise[i].GetKey().str().c_str());
+    fprintf (stderr, "\n");
 }
 
 bool Leafset::add(const Host& entry)
@@ -238,6 +256,7 @@ void Leafset::updateIntervalSize()
 
 Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 {
+	print();
 	//if key is in the range of our clockwise part of the leafset, we route through the leafset
 	if(this->nbLeavesClockwise > 0 && key.between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1].GetKey()))
 	{

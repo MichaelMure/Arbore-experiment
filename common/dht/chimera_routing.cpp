@@ -73,16 +73,19 @@ Host ChimeraRouting::routeLookup(const Key& key) const
 {
 	BlockLockMutex lock(this);
 	bool b;
+	pf_log[W_DEBUG] << "Lookup in the leafset table";
 	Host leafsetBest = this->leafset.routeLookup(key , &b);
 	if(b)
 	{
 		return leafsetBest;
 	}
+	pf_log[W_DEBUG] << "..failed.. Loopup in the routing table";
 	Host routingTableBest = this->routingTable.routeLookup(key , &b);
 	if(b)
 	{
 		return routingTableBest;
 	}
+	pf_log[W_DEBUG] << "..failed.. do some incantations..";
 	Key distLB = leafsetBest.GetKey().distance(key);
 	Key distRB = routingTableBest.GetKey().distance(key);
 	if(distLB < distRB)

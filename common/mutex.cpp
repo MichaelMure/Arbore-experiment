@@ -46,9 +46,10 @@ void Mutex::Init(MutexType _type)
 	{
 		case NORMAL_MUTEX:
 			//#ifdef DEBUG
+			std::cerr << this << std::endl;
 			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK) != 0)
 			{
-				std::cerr << "pthread_mutexattr_settype: " << strerror(errno);
+				std::cerr << "pthread_mutexattr_settype: " << strerror(errno) << std::endl;
 				throw MutexError();
 			}
 			//#else
@@ -59,7 +60,7 @@ void Mutex::Init(MutexType _type)
 
 			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0)
 			{
-				std::cerr << "pthread_mutexattr_settype: " << strerror(errno);
+				std::cerr << "pthread_mutexattr_settype: " << strerror(errno) << std::endl;
 				throw MutexError();
 			}
 			break;
@@ -69,7 +70,7 @@ void Mutex::Init(MutexType _type)
 
 	if(pthread_mutex_init(mutex, &attr) != 0)
 	{
-		std::cerr << "pthread_mutex_init: " << strerror(errno);
+		std::cerr << "pthread_mutex_init: " << strerror(errno) << std::endl;
 		throw MutexError();
 	}
 	pthread_mutexattr_destroy(&attr);
@@ -83,6 +84,13 @@ Mutex::Mutex(MutexType type)
 Mutex::Mutex(const Mutex& m)
 {
 	Init(m.type);
+}
+
+Mutex& Mutex::operator=(const Mutex& m)
+{
+	std::cerr << "mutex so bad" << std::endl;
+	Init(m.type);
+	return *this;
 }
 
 Mutex::~Mutex()
