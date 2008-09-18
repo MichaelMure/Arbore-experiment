@@ -42,7 +42,7 @@ void RoutingTable::clear()
 		{
 			for (int k = 0; k < MAX_ENTRY; k++)
 			{
-				this->table[i][j][k] = Host();
+				this->table[i][j][k] = InvalidHost;
 			}
 		}
 	}

@@ -131,12 +131,15 @@ Host HostsList::GetHost(const pf_addr& address)
 		pf_log[W_DEBUG] << "added";
 	}
 
+	pf_log[W_DEBUG] << "host entries:";
 	for(HostMap::iterator free_it = hosts.begin();
-	    hosts.size() > max && it != hosts.end();
-	    ++it)
+	    /*hosts.size() > max && */free_it != hosts.end();
+	    ++free_it)
 	{
-		if(it->second.GetReference() == 1)
-			hosts.erase(it);
+		pf_log[W_DEBUG] << "  " << free_it->first;
+
+		if(free_it->second.GetReference() == 1 && it != free_it)
+			hosts.erase(free_it);
 	}
 
 	pf_log[W_DEBUG] << "returned " << it->second;
