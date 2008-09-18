@@ -227,12 +227,8 @@ void Network::Loop()
 				pf_addr address(from.sin_addr.s_addr, ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
-/*				if(size != pckt.GetSize())
-				{
-					pf_log[W_ERR] << "There isn't exacly the same length of data that header says."
-						      << "(" << size << " vs " << pckt.GetSize() << ")";
-					return;
-				}*/
+				if(sender.GetKey() == (uint32_t)0)
+					sender.SetKey(pckt.GetSrc());
 
 				pf_log[W_PARSE] << "R(" << sender << ") - " << pckt.GetPacketInfo();
 
