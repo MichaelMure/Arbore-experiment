@@ -60,6 +60,9 @@ public:
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
+		pf_log[W_DEBUG] << addr;
+		pf_log[W_DEBUG] << host;
+
 		if((dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
 		{
 			Packet pckt(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());

@@ -104,7 +104,6 @@ char* Packet::DumpBuffer()
 {
 	BuildDataFromArgs();
 
-	pf_log[W_DEBUG] << GetSize();
 	char* dump = new char [GetSize()];
 	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
@@ -145,8 +144,6 @@ char* Packet::DumpBuffer()
 
 	/* Data */
 	memcpy(ptr, data, GetDataSize());
-
-	pf_log[W_DEBUG] << ptr - dump + GetDataSize();
 
 	return dump;
 }
@@ -264,7 +261,10 @@ std::string Packet::GetPacketInfo() const
 	info = "[" + GetSrc().str();
 	info += "->" + GetDst().str() + "] ";
 
-	info = "<" + std::string(type.GetName()) + "> ";
+	info += "<" + std::string(type.GetName());
+	if(HasFlag(ACK))
+		info += "(ACK)";
+	info += "> ";
 
 	for(PacketType::const_iterator it = type.begin(); it != type.end(); ++it)
 	{

@@ -122,9 +122,14 @@ Host HostsList::GetHost(const pf_addr& address)
 	BlockLockMutex lock(this);
 	HostMap::iterator it = hosts.find(address);
 
+	pf_log[W_DEBUG] << "Try to get " << address;
+
 	/* if the node is not in the cache, create an entry and allocate a host */
 	if (it == hosts.end())
+	{
 		it = hosts.insert(std::pair<pf_addr, Host>(address, Host(this, address))).first;
+		pf_log[W_DEBUG] << "added";
+	}
 
 	for(HostMap::iterator free_it = hosts.begin();
 	    hosts.size() > max && it != hosts.end();
@@ -133,6 +138,8 @@ Host HostsList::GetHost(const pf_addr& address)
 		if(it->second.GetReference() == 1)
 			hosts.erase(it);
 	}
+
+	pf_log[W_DEBUG] << "returned " << it->second;
 
 	return it->second;
 }

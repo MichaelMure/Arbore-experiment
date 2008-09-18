@@ -91,6 +91,7 @@ void ChimeraDHT::Join(const Host& bootstrap)
 
 	Packet pckt(ChimeraJoinType, GetMe().GetKey(), GetMe().GetKey());
 	pckt.SetArg(CHIMERA_JOIN_ADDRESS, GetMe().GetAddr());
+	pckt.SetFlag(Packet::MUSTROUTE);
 	if(!Send(bootstrap, pckt))
 		pf_log[W_WARNING] << "ChimeraDHT::Join: failed to contact bootstrap host " << bootstrap;
 

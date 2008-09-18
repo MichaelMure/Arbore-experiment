@@ -224,7 +224,7 @@ void Network::Loop()
 			try
 			{
 				Packet pckt(packet_type_list, data, size);
-				pf_addr address(ntohl(from.sin_addr.s_addr), ntohs(from.sin_port));
+				pf_addr address(from.sin_addr.s_addr, ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
 /*				if(size != pckt.GetSize())
@@ -234,7 +234,7 @@ void Network::Loop()
 					return;
 				}*/
 
-				pf_log[W_PARSE] << "R - " << pckt.GetPacketInfo();
+				pf_log[W_PARSE] << "R(" << sender << ") - " << pckt.GetPacketInfo();
 
 				if(pckt.HasFlag(Packet::ACK))
 				{
