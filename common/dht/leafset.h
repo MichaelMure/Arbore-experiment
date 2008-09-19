@@ -45,8 +45,8 @@ private :
 #endif
 	size_t nbLeavesClockwise;                           /*!< number of peers in the leafset clockwise */
 	size_t nbLeavesCounterclockwise;                    /*!< number of peers in the leafset counterclockwise */
-	Host leavesClockwise[ONE_SIDE_LEAFSET_SIZE];        /*!< array that contains the clowise part of the leafset */
-	Host leavesCounterclockwise[ONE_SIDE_LEAFSET_SIZE]; /*!< array that contains the counterclowise part of the leafset */
+	std::vector<Host> leavesClockwise;                  /*!< array that contains the clowise part of the leafset */
+	std::vector<Host> leavesCounterclockwise;           /*!< array that contains the counterclowise part of the leafset */
 
 public :
 	/*! \brief Constructor

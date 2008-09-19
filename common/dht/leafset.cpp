@@ -26,7 +26,13 @@
 #include <stdio.h>
 #include <string.h>
 #include "leafset.h"
-Leafset::Leafset(HostsList* _hg, Host _me) : hg(_hg), me(_me)
+Leafset::Leafset(HostsList* _hg, Host _me)
+	: hg(_hg),
+	me(_me),
+	nbLeavesClockwise(0),
+	nbLeavesCounterclockwise(0),
+	leavesClockwise(ONE_SIDE_LEAFSET_SIZE),
+	leavesCounterclockwise(ONE_SIDE_LEAFSET_SIZE)
 {
 	this->clear();
 }
@@ -64,7 +70,7 @@ bool Leafset::add(const Host& entry)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
-		for(size_t i = MIN(this->nbLeavesClockwise, ONE_SIDE_LEAFSET_SIZE-1); i > (size_t)index; i--)
+		for(size_t i = MIN(this->nbLeavesClockwise, ONE_SIDE_LEAFSET_SIZE-1); i > index; i--)
 		{
 			this->leavesClockwise[i] = this->leavesClockwise[i-1];
 		}
@@ -228,8 +234,8 @@ size_t Leafset::getCounterclockwiseIndex(const Host& entry) const
 
 void Leafset::clear()
 {
-	bzero(this->leavesClockwise, ONE_SIDE_LEAFSET_SIZE*sizeof(Host));
-	bzero(this->leavesCounterclockwise, ONE_SIDE_LEAFSET_SIZE*sizeof(Host));
+	leavesClockwise = std::vector<Host>(ONE_SIDE_LEAFSET_SIZE);
+	leavesCounterclockwise = std::vector<Host>(ONE_SIDE_LEAFSET_SIZE);
 	this->nbLeavesClockwise = 0;
 	this->nbLeavesCounterclockwise = 0;
 }
