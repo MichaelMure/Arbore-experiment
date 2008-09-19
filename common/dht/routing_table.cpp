@@ -57,23 +57,26 @@ void RoutingTable::clear()
 
 void RoutingTable::print() const
 {
-	return;
     size_t i, j, k;
+    bool b;
 
     fprintf (stderr,
              "------------------------------- TABLE-------------------------------\n");
     for (i = 0; i < MAX_ROW; i++)
         {
+            b = false;
+
             for (j = 0; j < MAX_COL; j++)
                 {
                     for (k = 0; k < MAX_ENTRY; k++)
                         if (getEntry(i, j, k) != InvalidHost)
+			{
                             fprintf (stderr, "%s ", getEntry(i, j, k).GetKey().str().c_str());
-                        else
-                            fprintf (stderr,
-                                     "0000000000000000000000000000000000000000 ");
+			    b = true;
+			}
                 }
-            fprintf (stderr, "\n");
+	    if(b)
+	            fprintf (stderr, "\n");
         }
     fprintf (stderr,
              "----------------------------------------------------------------------\n");
@@ -92,6 +95,7 @@ bool RoutingTable::add(const Host& entry)
 	//original code performs some leafset update... shoud not be needed anymore
 	//TODO see if we can remove this sanity check
 	//the entry has the same key as the local node, should never happen
+	pf_log[W_DEBUG] << "Added an entry in the routing table: " << entry;
 	if(this->me.GetKey() == entry.GetKey())
 	{
 		return false;
@@ -131,6 +135,7 @@ bool RoutingTable::remove(const Host& entry)
 	//original code performs some leafset update... shoud not be needed anymore
 	//TODO see if we can remove this sanity check
 	//the entry has the same key as the local node, should never happen
+	pf_log[W_DEBUG] << "Removed an entry from the routing table: " << entry;
 	if(this->me.GetKey() == entry.GetKey())
 	{
 		return false;
