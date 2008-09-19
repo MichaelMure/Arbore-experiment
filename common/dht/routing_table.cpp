@@ -36,12 +36,12 @@ RoutingTable::RoutingTable(HostsList* _hg, Host _me)
 
 Host& RoutingTable::getEntry(size_t i, size_t j, size_t k)
 {
-	return routing_table[k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i];
+	return routing_table.at(k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i);
 }
 
 Host RoutingTable::getEntry(size_t i, size_t j, size_t k) const
 {
-	return routing_table[k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i];
+	return routing_table.at(k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i);
 }
 
 void RoutingTable::setEntry(size_t i, size_t j, size_t k, Host host)
