@@ -56,6 +56,7 @@ void Leafset::print () const
 
 bool Leafset::add(const Host& entry)
 {
+	pf_log[W_DEBUG] << "Added an entry in the leafset: " << entry;
 	if(this->me.GetKey() == entry.GetKey())
 	{
 		return false;
@@ -75,6 +76,7 @@ bool Leafset::add(const Host& entry)
 			this->leavesClockwise[i] = this->leavesClockwise[i-1];
 		}
 		this->leavesClockwise[index] = entry;
+		pf_log[W_DEBUG] << "BLAH LEFT " << index << ": " <<leavesClockwise[index];
 		this->nbLeavesClockwise = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesClockwise + 1);
 		added = true;
 	}
@@ -86,11 +88,12 @@ bool Leafset::add(const Host& entry)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
-		for(size_t i = MIN(nbLeavesCounterclockwise, ONE_SIDE_LEAFSET_SIZE-1); i > (size_t)index; i--)
+		for(size_t i = MIN(nbLeavesCounterclockwise, ONE_SIDE_LEAFSET_SIZE-1); i > index; i--)
 		{
 			this->leavesCounterclockwise[i] = this->leavesCounterclockwise[i-1];
 		}
 		this->leavesCounterclockwise[index] = entry;
+		pf_log[W_DEBUG] << "BLAH RIGHT " << index << ": " << leavesCounterclockwise[index];
 		this->nbLeavesCounterclockwise = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesCounterclockwise + 1);
 		added = true;
 	}
@@ -102,6 +105,7 @@ bool Leafset::add(const Host& entry)
 
 bool Leafset::remove(const Host& entry)
 {
+	pf_log[W_DEBUG] << "Removed an entry from the leafset: " << entry;
 	if(entry.GetKey() == this->me.GetKey())
 	{
 		return false;
@@ -147,6 +151,8 @@ bool Leafset::remove(const Host& entry)
 
 size_t Leafset::getClockwiseInsertIndex(const Host& entry) const
 {
+	if(!nbLeavesCounterclockwise)
+		return 0;
 	//this part of the leafset is full and the entry doesn't fall into it
 	if(this->nbLeavesClockwise == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1].GetKey()))
 	{
@@ -172,11 +178,14 @@ size_t Leafset::getClockwiseInsertIndex(const Host& entry) const
 		}
 		return 0;
 	}
-	return this->nbLeavesClockwise + 1;
+	return this->nbLeavesClockwise;
 }
 
 size_t Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
 {
+	if(!nbLeavesCounterclockwise)
+		return 0;
+
 	//this part of the leafset is full and the entry doesn't fall into it
 	if(this->nbLeavesCounterclockwise == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->leavesClockwise[this->nbLeavesCounterclockwise-1].GetKey(),this->me.GetKey()))
 	{
@@ -202,7 +211,7 @@ size_t Leafset::getCounterclockwiseInsertIndex(const Host& entry) const
 		}
 		return 0;
 	}
-	return this->nbLeavesClockwise + 1;
+	return this->nbLeavesClockwise;
 }
 
 size_t Leafset::getClockwiseIndex(const Host& entry) const
