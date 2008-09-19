@@ -82,8 +82,6 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 	/* Type */
 	uint32_t type_i = ntohl(*p++);
 
-	ASSERT(type_i < pckt_type_list->size());
-
 	type = pckt_type_list->GetPacketType(type_i);
 
 	/* Size */
