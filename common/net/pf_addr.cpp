@@ -82,7 +82,7 @@ std::string pf_addr::str() const
 			nbr[1],
 			nbr[2],
 			nbr[3]);
-		ret = std::string(str);
+		ret += std::string(str);
 	}
 	else
 	{
