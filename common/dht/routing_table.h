@@ -40,7 +40,12 @@ class RoutingTable
 private:
 	HostsList* hg;
 	Host me;                                 /*!< Local host descriptor */
-	Host table[MAX_ROW][MAX_COL][MAX_ENTRY]; /*!< Routing table */
+	std::vector<Host> routing_table;
+
+	Host getEntry(size_t i, size_t j, size_t k) const;
+	Host& getEntry(size_t i, size_t j, size_t k);
+	void setEntry(size_t i, size_t j, size_t k, Host value);
+
 
 public:
 	/*! \brief Constructor

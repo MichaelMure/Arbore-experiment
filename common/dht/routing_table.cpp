@@ -28,26 +28,31 @@
 
 RoutingTable::RoutingTable(HostsList* _hg, Host _me)
 	: hg(_hg),
-	  me(_me)
+	  me(_me),
+	  routing_table(MAX_ROW * MAX_COL * MAX_ENTRY)
 {
 	this->clear();
 }
 
+Host& RoutingTable::getEntry(size_t i, size_t j, size_t k)
+{
+	return routing_table[k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i];
+}
+
+Host RoutingTable::getEntry(size_t i, size_t j, size_t k) const
+{
+	return routing_table[k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i];
+}
+
+void RoutingTable::setEntry(size_t i, size_t j, size_t k, Host host)
+{
+	routing_table[k * (MAX_COL * MAX_ROW) + j * (MAX_ROW) + i] = host;
+}
+
 void RoutingTable::clear()
 {
-	//set all the entries to null
-	//TODO use memset to go faster ?
-	for (int i = 0; i < MAX_ROW; i++)
-	{
-		for (int j = 0; j < MAX_COL; j++)
-		{
-			for (int k = 0; k < MAX_ENTRY; k++)
-			{
-				this->table[i][j][k] = InvalidHost;
-			}
-		}
-	}
-
+	for(std::vector<Host>::iterator it = routing_table.begin(); it != routing_table.end(); ++it)
+		*it = InvalidHost;
 }
 
 void RoutingTable::print() const
@@ -62,8 +67,8 @@ void RoutingTable::print() const
             for (j = 0; j < MAX_COL; j++)
                 {
                     for (k = 0; k < MAX_ENTRY; k++)
-                        if (table[i][j][k] != InvalidHost)
-                            fprintf (stderr, "%s ", table[i][j][k].GetKey().str().c_str());
+                        if (getEntry(i, j, k) != InvalidHost)
+                            fprintf (stderr, "%s ", getEntry(i, j, k).GetKey().str().c_str());
                         else
                             fprintf (stderr,
                                      "0000000000000000000000000000000000000000 ");
@@ -98,13 +103,13 @@ bool RoutingTable::add(const Host& entry)
 	for (size_t k = 0; !found && k < MAX_ENTRY; k++)
 	{
 		//we found an empty space, add the entry
-		if (this->table[i][j][k] == InvalidHost)
+		if (this->getEntry(i, j, k) == InvalidHost)
 		{
-			this->table[i][j][k] = entry;
+			this->setEntry(i, j, k, entry);
 			found = true;
 		}
 		//entry is already in the routing table, simply return
-		else if (this->table[i][j][k] != InvalidHost && this->table[i][j][k].GetKey() == entry.GetKey())
+		else if (this->getEntry(i, j, k) != InvalidHost && this->getEntry(i, j, k).GetKey() == entry.GetKey())
 		{
 			return false;
 		}
@@ -116,7 +121,7 @@ bool RoutingTable::add(const Host& entry)
 	if (!found)
 	{
 		size_t pick = this->findWorstEntry(i,j);
-		this->table[i][j][pick] = entry;
+		this->setEntry(i, j, pick, entry);
 	}
 	return true;
 }
@@ -135,10 +140,10 @@ bool RoutingTable::remove(const Host& entry)
 	size_t j = hexalphaToInt(entry.GetKey().str()[i]);
 	for (size_t k = 0; k < MAX_ENTRY; k++)
 	{
-		if (this->table[i][j][k] != InvalidHost && this->table[i][j][k].GetKey() == entry.GetKey())
+		if (this->getEntry(i, j, k) != InvalidHost && this->getEntry(i, j, k).GetKey() == entry.GetKey())
 		{
 			//when we find it, set the entry to null so that we don't use it anymore
-			this->table[i][j][k] = InvalidHost;
+			this->setEntry(i, j, k, InvalidHost);
 			return true;
 		}
 	}
@@ -149,19 +154,19 @@ size_t RoutingTable::findWorstEntry(size_t line, size_t column) const
 {
 	//TODO do a comparator for ChimeraHost instead ?
 	size_t worst = MAX_ENTRY;
-	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != InvalidHost; k++)
+	for (size_t k = 0; k < MAX_ENTRY && this->getEntry(line, column, k) != InvalidHost; k++)
 	{
 		if(worst == MAX_ENTRY)
 		{
 			worst = k;
 		}
 		//priority is SuccessAvg > Latency
-		else if (this->table[line][column][worst].GetSuccessAvg() > this->table[line][column][k].GetSuccessAvg()
+		else if (this->getEntry(line, column, worst).GetSuccessAvg() > this->getEntry(line, column, k).GetSuccessAvg()
 			||
 			(
-				this->table[line][column][worst].GetSuccessAvg() == this->table[line][column][k].GetSuccessAvg()
+				this->getEntry(line, column, worst).GetSuccessAvg() == this->getEntry(line, column, k).GetSuccessAvg()
 				&&
-				this->table[line][column][worst].GetLatency() < this->table[line][column][k].GetLatency()
+				this->getEntry(line, column, worst).GetLatency() < this->getEntry(line, column, k).GetLatency()
 			)
 		)
 		{
@@ -175,19 +180,19 @@ size_t RoutingTable::findBestEntry(size_t line, size_t column) const
 {
 	//TODO do a comparator for ChimeraHost instead ?
 	size_t best = MAX_ENTRY;
-	for (size_t k = 0; k < MAX_ENTRY && this->table[line][column][k] != InvalidHost; k++)
+	for (size_t k = 0; k < MAX_ENTRY && this->getEntry(line, column, k) != InvalidHost; k++)
 	{
 		if(best == MAX_ENTRY)
 		{
 			best = k;
 		}
 		//priority is SuccessAvg > Latency
-		else if (this->table[line][column][best].GetSuccessAvg() < this->table[line][column][k].GetSuccessAvg()
+		else if (this->getEntry(line, column, best).GetSuccessAvg() < this->getEntry(line, column, k).GetSuccessAvg()
 			||
 			(
-				this->table[line][column][best].GetSuccessAvg() == this->table[line][column][k].GetSuccessAvg()
+				this->getEntry(line, column, best).GetSuccessAvg() == this->getEntry(line, column, k).GetSuccessAvg()
 				&&
-				this->table[line][column][best].GetLatency() > this->table[line][column][k].GetLatency()
+				this->getEntry(line, column, best).GetLatency() > this->getEntry(line, column, k).GetLatency()
 			)
 		)
 		{
@@ -226,15 +231,15 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 	Host nextHop = InvalidHost;
 	for (size_t k = 0; k < MAX_ENTRY; k++)
 	{
-		if (this->table[matchLine][matchCol][k] != InvalidHost && this->table[matchLine][matchCol][k].GetSuccessAvg() > BAD_LINK)
+		if (this->getEntry(matchLine, matchCol, k) != InvalidHost && this->getEntry(matchLine, matchCol, k).GetSuccessAvg() > BAD_LINK)
 		{
 			if(nextHop == InvalidHost)
 			{
-				nextHop = this->table[matchLine][matchCol][k];
+				nextHop = this->getEntry(matchLine, matchCol, k);
 			}
 			else
 			{
-				nextHop = bestEntry(nextHop, this->table[matchLine][matchCol][k], key);
+				nextHop = bestEntry(nextHop, this->getEntry(matchLine, matchCol, k), key);
 			}
 		}
 	}
@@ -247,6 +252,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 	//no perfect match, fin the closest entry
 	*perfectMatch = false;
 	Host clockwiseBest = InvalidHost;
+	pf_log[W_DEBUG] << MAX_ROW << "x" << MAX_COL << "x" << MAX_ENTRY;
 	size_t i = matchLine;
 	size_t j = matchCol;
 	while(clockwiseBest == InvalidHost)
@@ -265,8 +271,9 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 			{
 				i++;
 				//if we were at the last line, can't go down any more, local node is the best candidate
-				if(i == MAX_ROW)
+				if(i >= MAX_ROW)
 				{
+					pf_log[W_DEBUG] << "shit";
 					clockwiseBest = this->me;
 				}
 				else
@@ -282,7 +289,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 			size_t index = this->findBestEntry(i,j);
 			if(index < MAX_ENTRY)
 			{
-				clockwiseBest = this->table[i][j][index];
+				clockwiseBest = this->getEntry(i, j, index);
 			}
 		}
 	}
@@ -322,7 +329,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 			size_t index = this->findBestEntry(i,j);
 			if(index < MAX_ENTRY)
 			{
-				counterClockwiseBest = this->table[i][j][index];
+				counterClockwiseBest = this->getEntry(i, j, index);
 			}
 		}
 	}
@@ -355,9 +362,9 @@ std::vector<Host> RoutingTable::getRow(size_t i) const
 	{
 		for (l = 0; l < MAX_ENTRY; l++)
 		{
-			if (this->table[i][j][l] != InvalidHost)
+			if (this->getEntry(i, j, l) != InvalidHost)
 			{
-				ret.insert(ret.end(), this->table[i][j][l]);
+				ret.insert(ret.end(), this->getEntry(i, j, l));
 			}
 		}
 	}
@@ -378,9 +385,9 @@ std::vector<Host> RoutingTable::getCopy() const
 		{
 			for (l = 0; l < MAX_ENTRY; l++)
 			{
-				if (this->table[i][j][l] != InvalidHost)
+				if (this->getEntry(i, j, l) != InvalidHost)
 				{
-					ret.insert(ret.end(), this->table[i][j][l]);
+					ret.insert(ret.end(), this->getEntry(i, j, l));
 				}
 			}
 		}
