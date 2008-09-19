@@ -42,6 +42,8 @@ class Mutex;
 class Host
 {
 	_Host* host;  /**< This is the private _Host object contained in all Host copied from it. */
+	static const int MagicNumber = 1234567;
+	int magicnumber;
 
 public:
 
