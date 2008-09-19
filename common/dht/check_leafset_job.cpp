@@ -33,14 +33,13 @@
 bool CheckLeafsetJob::Start()
 {
 	std::string s;
-	size_t i;
 
 	std::vector<Host> leafset = routing->getLeafset();
 	for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 	{
 		if (!chimera->Ping(*it) == 1)
 		{
-			leafset[i].SetFailureTime(dtime ());
+			it->SetFailureTime(dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
 					  << " failed at time: " << it->GetFailureTime() << "!";
 			if (it->GetSuccessAvg() < BAD_LINK)
@@ -55,7 +54,7 @@ bool CheckLeafsetJob::Start()
 	{
 		if (!chimera->Ping(*it))
 		{
-			table[i].SetFailureTime(dtime ());
+			it->SetFailureTime(dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
 					  << " failed at time: " << it->GetFailureTime() << "!";
 			if (it->GetSuccessAvg() < BAD_LINK)
