@@ -136,7 +136,7 @@ Host HostsList::GetHost(const pf_addr& address)
 	    /*hosts.size() > max && */free_it != hosts.end();
 	    ++free_it)
 	{
-		pf_log[W_DEBUG] << "  " << free_it->first;
+		pf_log[W_DEBUG] << "  " << free_it->second;
 
 /*		if(free_it->second.GetReference() == 1 && it != free_it)
 			hosts.erase(free_it);*/

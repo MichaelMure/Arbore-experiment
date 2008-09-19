@@ -37,10 +37,12 @@ Key Key_Half;
 void Key::set_key_str() throw()
 {
 	char keystr[KEY_SIZE / BASE_B + 1] = {0};
+	/*
 	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
 		    (unsigned int) this->t[4], (unsigned int) this->t[3],
 		    (unsigned int) this->t[2], (unsigned int) this->t[1],
-		    (unsigned int) this->t[0]);
+		    (unsigned int) this->t[0]);*/
+	sprintf(keystr, "0x%08x", this->t[0]);
 
 	this->key_str = keystr;
 }
