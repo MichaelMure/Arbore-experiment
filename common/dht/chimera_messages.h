@@ -41,6 +41,22 @@ public:
 	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
 };
 
+enum
+{
+	CHIMERA_JOIN        = 1,
+	CHIMERA_JOIN_ACK    = 2,
+	CHIMERA_UPDATE      = 3,
+	CHIMERA_PIGGY       = 4,
+	CHIMERA_JOIN_NACK   = 5,
+	CIHMERA_PING        = 7,
+	CHIMERA_RESERVED1   = 8,
+	CHIMERA_RESERVED2   = 9,
+	CHIMERA_RESERVED3   = 10,
+	CHIMERA_RESERVED4   = 11,
+	CHIMERA_RESERVED5   = 12,
+	CHIMERA_RESERVED6   = 13,
+	CHIMERA_RESERVED7   = 14,
+};
 
 enum
 {
@@ -78,7 +94,5 @@ enum
 	CHIMERA_PING_ME,
 };
 extern PacketType ChimeraPingType;
-
-extern uint32_t LastChimeraType;
 
 #endif /* CHIMERA_MESSAGES_H */

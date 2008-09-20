@@ -47,7 +47,7 @@ class Host;
  *
  * .----------.----------.----------.
  * |    src   |    dst   |   type   |
- * |  uint32  |  uint32  |  uint32  |
+ * |  uint160 |  uint160 |  uint32  |
  * |----------+----------+----------|
  * |   size   |  seqnum  |  flags   |
  * |  uint32  |  uint32  |  uint32  |

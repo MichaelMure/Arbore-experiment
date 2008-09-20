@@ -169,18 +169,16 @@ public:
 	}
 };
 
-uint32_t LastChimeraType = 0;
-
-PacketType     ChimeraJoinType(++LastChimeraType, new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+PacketType     ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
                                                                                                                          T_END);
-PacketType  ChimeraJoinAckType(++LastChimeraType, new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
+PacketType  ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
                                                                                                                             T_END);
-PacketType   ChimeraUpdateType(++LastChimeraType, new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+PacketType   ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
                                                                                                                          T_END);
-PacketType    ChimeraPiggyType(++LastChimeraType, new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
+PacketType    ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
                                                                                                                          T_END);
-PacketType ChimeraJoinNAckType(++LastChimeraType, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
+PacketType ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
                                                                                                                            T_END);
-PacketType     ChimeraPingType(++LastChimeraType, new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
+PacketType     ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
                                                                                                                  T_END);
 
