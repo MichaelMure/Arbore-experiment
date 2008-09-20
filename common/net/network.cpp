@@ -215,7 +215,7 @@ void Network::Loop()
 				pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
 				return;
 			}
-			if(size < Packet::GetHeaderSize())
+			if((size_t)size < Packet::GetHeaderSize())
 			{
 				pf_log[W_ERR] << "Received a packet too light "
 				              << "(size: " << size << " < " << Packet::GetHeaderSize() << ")";
