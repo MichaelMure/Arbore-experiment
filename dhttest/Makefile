@@ -27,14 +27,14 @@ COMPILE=g++ -O0 -g -Wall -Wextra -I.. -I../common -I../common/jobs -I../common/n
 
 .SUFFIXES: .cpp .o .c
 %.o: %.cpp
-	@echo '$(COMPILE) -c $<'; \
-	$(COMPILE) -c $<
+	@echo '$(COMPILE) -o $@ -c $<'; \
+	$(COMPILE) -o $@ -c $<
 
 %.o: %.c
-	gcc -c $<
+	gcc -o $@ -c $<
 
 all: $(FILES)
-	g++ -o main `ls *.o` -lssl -lcrypto -lpthread
+	g++ -o main $(FILES) -lssl -lcrypto -lpthread
 
 clean:
-	rm -rf *.o main
+	rm -rf $(FILES) main
