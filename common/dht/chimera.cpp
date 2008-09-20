@@ -112,7 +112,7 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	/* this is to avoid sending JOIN request to the node that
 	 * its information is already in the routing table
 	 */
-	if(nextDest.GetKey() == key)
+	if(nextDest.GetKey() == key && pckt.GetPacketType() == ChimeraJoinType)
 	{
 		GetRouting()->remove(nextDest);
 		nextDest = GetRouting()->routeLookup(key);
