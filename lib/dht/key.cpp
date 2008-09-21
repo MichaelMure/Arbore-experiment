@@ -28,8 +28,7 @@
 #include <string.h>
 #include <openssl/evp.h>
 #include "key.h"
-#include "base.h"
-#include "pf_log.h"
+#include "util/pf_log.h"
 
 Key Key_Max;
 Key Key_Half;

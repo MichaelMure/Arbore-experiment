@@ -1,138 +1,114 @@
 PROJECT(peerfuse)
 cmake_minimum_required(VERSION 2.6)
 
-SET(SRC
+add_library(util
+		lib/utils/dtime.c
+                lib/utils/pf_config.cpp
+		lib/utils/mutex.cpp
+		lib/utils/pf_thread.cpp
+		lib/utils/tools.cpp
+		lib/utils/pf_log.cpp
+		)
+SET(PFLIBS ${PFLIBS} util)
 
-	lib/net/pf_addr.cpp
-	lib/net/host.cpp
-	lib/net/hosts_list.cpp
-	lib/net/packet_type.cpp
-	lib/net/packet_type_list.cpp
-	lib/net/packet.cpp
-	lib/net/network.cpp
+add_library(scheduler
+		lib/scheduler/scheduler.cpp
+		lib/scheduler/scheduler_queue.cpp
+		)
+SET(PFLIBS ${PFLIBS} scheduler)
 
-	lib/dht/key.cpp
-	lib/dht/chimera_routing.cpp
-	lib/dht/routing_table.cpp
-	lib/dht/leafset.cpp
-	lib/dht/check_leafset_job.cpp
-	lib/dht/chimera_messages.cpp
-	lib/dht/chimera.cpp
+add_library(network
+		lib/net/pf_addr.cpp
+		lib/net/host.cpp
+		lib/net/hosts_list.cpp
+		lib/net/packet_type.cpp
+		lib/net/packet_type_list.cpp
+		lib/net/packet.cpp
+		lib/net/network.cpp
+	   )
+SET(PFLIBS ${PFLIBS} network)
 
-	lib/dtime.c
-	lib/download.cpp
-	lib/pf_config.cpp
-	lib/pf_log.cpp
-	lib/mutex.cpp
-	lib/pf_thread.cpp
-	lib/session_config.cpp
-	lib/scheduler.cpp
-	lib/scheduler_queue.cpp
-	lib/tools.cpp
-	lib/xmlrpc_server.cpp
-	lib/xmlrpc.cpp
+add_library(dht
+		lib/dht/key.cpp
+		lib/dht/chimera_routing.cpp
+		lib/dht/routing_table.cpp
+		lib/dht/leafset.cpp
+		lib/dht/check_leafset_job.cpp
+		lib/dht/chimera_messages.cpp
+		lib/dht/chimera.cpp
+		)
+SET(PFLIBS ${PFLIBS} dht)
 
-	lib/files/cache_base.cpp
-	lib/files/content_list_base.cpp
-	lib/files/dir_entry.cpp
-	lib/files/file_chunk.cpp
-	lib/files/file_content_base.cpp
-	lib/files/hdd.cpp
-	lib/files/file_entry_base.cpp
+add_library(files
+		lib/files/cache_base.cpp
+		lib/files/content_list_base.cpp
+		lib/files/dir_entry.cpp
+		lib/files/file_chunk.cpp
+		lib/files/file_content_base.cpp
+		lib/files/hdd.cpp
+		lib/files/file_entry_base.cpp
+	   )
+SET(PFLIBS ${PFLIBS} files)
 
-
-	lib/jobs/job.cpp
-	lib/jobs/job_new_connection.cpp
-	lib/jobs/job_new_conn_req_base.cpp
-	lib/jobs/job_new_connection_queue.cpp
-	lib/jobs/job_send_ref_file.cpp
-	lib/jobs/job_send_chunk.cpp
-	lib/jobs/job_set_chunk.cpp
-	lib/jobs/job_set_shared_part.cpp
-	lib/jobs/job_mkfile.cpp
-	lib/jobs/job_send_mkfile.cpp
-
-	lib/ssl/certificate.cpp
-	lib/ssl/connection.cpp
-	lib/ssl/connection_ssl.cpp
-	lib/ssl/connection_nossl.cpp
-	lib/ssl/crl.cpp
-	lib/ssl/pf_ssl_ssl.cpp
-	lib/ssl/pf_ssl_nossl.cpp
-	lib/ssl/private_key.cpp
-
-	lib/fuse/fs_utils.cpp
-	)
+add_library(ssl
+		lib/ssl/certificate.cpp
+		lib/ssl/connection.cpp
+		lib/ssl/connection_ssl.cpp
+		lib/ssl/connection_nossl.cpp
+		lib/ssl/crl.cpp
+		lib/ssl/pf_ssl_ssl.cpp
+		lib/ssl/pf_ssl_nossl.cpp
+		lib/ssl/private_key.cpp
+	   )
+SET(PFLIBS ${PFLIBS} ssl)
 
 IF(NOT PF_SERVER_MODE)
-	SET(SRC ${SRC}
-		lib/fuse/chmod.cpp
-		lib/fuse/chown.cpp
-		lib/fuse/create.cpp
-		lib/fuse/flush.cpp
-		lib/fuse/getattr.cpp
-		lib/fuse/mkdir.cpp
-		lib/fuse/read.cpp
-		lib/fuse/readdir.cpp
-		lib/fuse/rename.cpp
-		lib/fuse/rmdir.cpp
-		lib/fuse/truncate.cpp
-		lib/fuse/unlink.cpp
-		lib/fuse/utimens.cpp
-		lib/fuse/write.cpp)
+	add_library(fuse
+			lib/fuse/fs_utils.cpp
+			lib/fuse/chmod.cpp
+			lib/fuse/chown.cpp
+			lib/fuse/create.cpp
+			lib/fuse/flush.cpp
+			lib/fuse/getattr.cpp
+			lib/fuse/mkdir.cpp
+			lib/fuse/read.cpp
+			lib/fuse/readdir.cpp
+			lib/fuse/rename.cpp
+			lib/fuse/rmdir.cpp
+			lib/fuse/truncate.cpp
+			lib/fuse/unlink.cpp
+			lib/fuse/utimens.cpp
+			lib/fuse/write.cpp
+			)
+	SET(PFLIBS ${PFLIBS} fuse)
+
 ELSE(NOT PF_SERVER_MODE)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")
 ENDIF(NOT PF_SERVER_MODE)
 
-IF(PF_NET)
-	SET(SRC ${SRC}
-		peerfuse-net/application.cpp
-		peerfuse-net/environment.cpp
-		peerfuse-net/network.cpp
-		peerfuse-net/file_content.cpp
-		peerfuse-net/content_list.cpp
-		peerfuse-net/pfnet.cpp
-		peerfuse-net/pfnet_fuse.cpp
-		peerfuse-net/cache.cpp
-		peerfuse-net/file_entry.cpp
-		peerfuse-net/filedist.cpp
-		peerfuse-net/job_new_conn_req.cpp
-		peerfuse-net/job_update_resp_files.cpp
-		peerfuse-net/job_ls_dir.cpp
-		peerfuse-net/job_end_of_ls.cpp
-		peerfuse-net/packet.cpp
-		peerfuse-net/peers_list.cpp
-		peerfuse-net/net_proto.cpp
-		peerfuse-net/peer.cpp)
-	SET(BIN_NAME peerfuse-net)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_NET")
-	SET(CONF_NAME pfnet.conf)
-ELSE(PF_NET)
-	SET(SRC ${SRC}
-		peerfuse-lan/application.cpp
-		peerfuse-lan/environment.cpp
-		peerfuse-lan/network.cpp
-		peerfuse-lan/file_content.cpp
-		peerfuse-lan/content_list.cpp
-		peerfuse-lan/pflan.cpp
-		peerfuse-lan/pflan_fuse.cpp
-		peerfuse-lan/cache.cpp
-		peerfuse-lan/net_proto.cpp
-		peerfuse-lan/packet.cpp
-		peerfuse-lan/peer.cpp
-		peerfuse-lan/peers_list.cpp
-		peerfuse-lan/job_advertise_file.cpp
-		peerfuse-lan/job_send_changes.cpp
-		peerfuse-lan/job_set_sharer.cpp
-		peerfuse-lan/job_new_conn_req.cpp
-		peerfuse-lan/job_other_connect.cpp)
-	SET(BIN_NAME peerfuse-lan)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_LAN")
-	SET(CONF_NAME pflan.conf)
-ENDIF(PF_NET)
+SET(BIN_NAME peerfuse)
+ADD_EXECUTABLE(${BIN_NAME}
+		peerfuse/application.cpp
+		peerfuse/environment.cpp
+		peerfuse/network.cpp
+		peerfuse/file_content.cpp
+		peerfuse/content_list.cpp
+		peerfuse/pfnet.cpp
+		peerfuse/pfnet_fuse.cpp
+		peerfuse/cache.cpp
+		peerfuse/file_entry.cpp
+		peerfuse/filedist.cpp
+		peerfuse/job_new_conn_req.cpp
+		peerfuse/job_update_resp_files.cpp
+		peerfuse/job_ls_dir.cpp
+		peerfuse/job_end_of_ls.cpp
+		peerfuse/packet.cpp
+		peerfuse/peers_list.cpp
+		peerfuse/net_proto.cpp
+		peerfuse/peer.cpp)
+SET(CONF_NAME peerfuse.conf)
 
-
-ADD_EXECUTABLE(${BIN_NAME} ${SRC})
+target_link_libraries(${BIN_NAME} ${PFLIBS})
 
 ## OpenSSL
 SET(OpenSSL_FIND_REQUIRED TRUE)
