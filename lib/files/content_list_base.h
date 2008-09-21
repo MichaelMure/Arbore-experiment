@@ -18,23 +18,24 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef CONTENT_LIST_BASE_H
 #define CONTENT_LIST_BASE_H
 
-#include <string.h>
 #include <map>
-#include "mutex.h"
-#include "pf_thread.h"
+#include <string.h>
+
+#include "util/mutex.h"
+#include "util/pf_thread.h"
 #include "file_content.h"
 
 class ContentListBase : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
 	// Map the ref i'll use to SEND file
 	std::map<uint32_t, std::string> my_refs;
-	std::map<std::string, IDList> refered_by;
+	std::map<std::string, KeyList> refered_by;
 
 protected:
 	void Loop();
@@ -60,7 +61,7 @@ public:
 	 *  stopped sharing the file
 	 * @param path path to the file
 	 */
-	void RemovePeerRefs(pf_id peer);
+	void RemovePeerRefs(Key peer);
 
 	/** Resend to peers the part of the file we are sharing
 	 * @param path path to the file
@@ -70,13 +71,13 @@ public:
 	uint32_t GetRef(std::string filename);
 
 	/* Track that this peer is using this ref */
-	void AddReferer(std::string path, pf_id referer);
+	void AddReferer(std::string path, Key referer);
 	/* Stop tracking that this peer was using this ref */
-	void DelReferer(std::string path, pf_id referer);
+	void DelReferer(std::string path, Key referer);
 	/* Stop tracking all the ref a peer has */
-	void DelReferer(pf_id);
+	void DelReferer(Key);
 
 	/* Send a NET_REF_FILE message to a peer */
-	virtual void SendRefFile(pf_id to, std::string filename) = 0;
+	virtual void SendRefFile(Key to, std::string filename) = 0;
 };
 #endif						  /* CONTENT_LIST_BASE_H */

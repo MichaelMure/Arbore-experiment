@@ -25,10 +25,10 @@
 #ifndef _CHIMERA_ROUTING_H_
 #define _CHIMERA_ROUTING_H_
 #include <vector>
-#include "routing_table.h"
-#include "leafset.h"
 #include "net/host.h"
-#include "mutex.h"
+#include "util/mutex.h"
+#include "leafset.h"
+#include "routing_table.h"
 
 class HostsList;
 

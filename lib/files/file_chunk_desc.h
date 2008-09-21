@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef FILE_CHUNK_DESC_H
@@ -27,7 +27,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
-#include "tools.h"
+
+#include "util/tools.h"
 
 class FileChunkDesc
 {

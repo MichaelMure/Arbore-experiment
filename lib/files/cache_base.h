@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef CACHE_BASE_H
@@ -39,10 +38,9 @@
 #endif						  /* PF_SERVER_MODE */
 
 #include <vector>
-#include "mutex.h"
+#include "util/mutex.h"
 #include "file_entry.h"
 #include "dir_entry.h"
-#include "packet.h"
 
 class FileEntry;
 
@@ -93,10 +91,10 @@ public:
 	virtual void FillReadDir(const char* path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi);
 #endif
 
-	virtual void MkFile(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0) = 0;
+	virtual void MkFile(std::string path, pf_stat stat, KeyList sharers = KeyList(), Key sender = 0) = 0;
 	virtual void RmFile(std::string path) = 0;
-	virtual void SetAttr(std::string path, pf_stat stat, IDList sharers = IDList(), pf_id sender = 0, bool keep_newest = true, bool erase_on_modification = false) = 0;
-	virtual void RenameFile(std::string path, std::string new_path, pf_id sender = 0) = 0;
+	virtual void SetAttr(std::string path, pf_stat stat, KeyList sharers = KeyList(), Key sender = 0, bool keep_newest = true, bool erase_on_modification = false) = 0;
+	virtual void RenameFile(std::string path, std::string new_path, Key sender = 0) = 0;
 
 	virtual void SendMkFile(std::string file) = 0;
 

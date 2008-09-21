@@ -24,7 +24,6 @@
  */
 
 #include "pf_addr.h"
-#include "tools.h"
 
 pf_addr::pf_addr() throw()
 	: port(0)

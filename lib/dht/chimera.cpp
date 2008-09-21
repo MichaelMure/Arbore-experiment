@@ -26,13 +26,13 @@
 #include <unistd.h>
 #include <netdb.h>
 
-#include "chimera.h"
 #include "net/network.h"
-#include "chimera_routing.h"
-#include "key.h"
-#include "chimera_messages.h"
-#include "scheduler_queue.h"
+#include "scheduler/scheduler_queue.h"
+#include "util/key.h"
 #include "check_leafset_job.h"
+#include "chimera.h"
+#include "chimera_messages.h"
+#include "chimera_routing.h"
 
 ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	: network(_network),

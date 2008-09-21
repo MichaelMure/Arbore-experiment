@@ -8,12 +8,15 @@ add_library(util
 		lib/util/pf_thread.cpp
 		lib/util/tools.cpp
 		lib/util/pf_log.cpp
+		lib/util/key.cpp
+		lib/util/session_config.cpp
 		)
 SET(PFLIBS ${PFLIBS} util)
 
 add_library(scheduler
 		lib/scheduler/scheduler.cpp
 		lib/scheduler/scheduler_queue.cpp
+		lib/scheduler/job.cpp
 		)
 SET(PFLIBS ${PFLIBS} scheduler)
 
@@ -29,7 +32,6 @@ add_library(network
 SET(PFLIBS ${PFLIBS} network)
 
 add_library(dht
-		lib/dht/key.cpp
 		lib/dht/chimera_routing.cpp
 		lib/dht/routing_table.cpp
 		lib/dht/leafset.cpp
@@ -46,7 +48,7 @@ add_library(files
 		lib/files/file_chunk.cpp
 		lib/files/file_content_base.cpp
 		lib/files/hdd.cpp
-		lib/files/file_entry_base.cpp
+		lib/files/file_entry.cpp
 	   )
 SET(PFLIBS ${PFLIBS} files)
 

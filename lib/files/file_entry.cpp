@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <unistd.h>
@@ -26,19 +26,29 @@
 #include <sys/types.h>
 #include "file_entry_base.h"
 #include "dir_entry.h"
-#include "session_config.h"
+#include "util/session_config.h"
 
-FileEntryBase::FileEntryBase(std::string _name, pf_stat _stat, DirEntry* _parent)
+bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
+{
+	if(f1->IsChildOf(f2))
+		return false;
+	else if(f2->IsChildOf(f1))
+		return true;
+	else
+		return f1 < f2;
+}
+
+FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* _parent)
 			: name(_name), parent(_parent), stat(_stat)
 {
 }
 
-FileEntryBase::~FileEntryBase()
+FileEntry::~FileEntry()
 {
 
 }
 
-std::string FileEntryBase::GetFullName() const
+std::string FileEntry::GetFullName() const
 {
 	DirEntry* p = parent;
 	std::string path = "";
@@ -53,7 +63,7 @@ std::string FileEntryBase::GetFullName() const
 	return path;
 }
 
-bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
+bool FileEntry::IsChildOf(const FileEntry* f) const
 {
 	DirEntry* p = parent;
 
@@ -62,7 +72,7 @@ bool FileEntryBase::IsChildOf(const FileEntryBase* f) const
 	return (p);
 }
 
-void FileEntryBase::SetAttr(pf_stat new_stat, bool force)
+void FileEntry::SetAttr(pf_stat new_stat, bool force)
 {
 	// Update attribute
 	if(stat.size != new_stat.size || force)
@@ -80,10 +90,9 @@ void FileEntryBase::SetAttr(pf_stat new_stat, bool force)
 	stat = new_stat;
 }
 
-void FileEntryBase::SetSharers(IDList idl)
+void FileEntry::SetSharers(IDList idl)
 {
 	sharers = idl;
-	#ifdef PF_NET
 	std::string list;
 	for(IDList::iterator it = sharers.begin(); it != sharers.end(); ++it)
 	{
@@ -91,10 +100,9 @@ void FileEntryBase::SetSharers(IDList idl)
 		list += TypToStr(*it);
 	}
 	tree_cfg.Set(GetFullName() + "#sharers", list);
-	#endif
 }
 
-void FileEntryBase::LoadAttr()
+void FileEntry::LoadAttr()
 {
 	uint32_t cfg_val = 0;
 	if(tree_cfg.Get(GetFullName() + "#meta", cfg_val))

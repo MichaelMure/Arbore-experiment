@@ -24,15 +24,15 @@
 #define _NETWORK_H_
 
 #include <exception>
-#include <vector>
-#include <list>
 #include <fcntl.h>
+#include <list>
 #include <map>
 #include <time.h>
+#include <vector>
 
-#include "pf_thread.h"
-#include "pf_addr.h"
+#include "util/pf_thread.h"
 #include "hosts_list.h"
+#include "pf_addr.h"
 #include "packet.h"
 
 class MyConfig;

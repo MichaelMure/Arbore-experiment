@@ -1,6 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert
- *                   Romain Bignon <romain AT vaginus.org>
+ * Copyright(C) 2008 Laurent Defert, Romain Bignon
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +18,17 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef HDD_H
 #define HDD_H
-#include <string>
+
 #include <exception>
-#include "file_entry.h"
+#include <string>
+
+#include "util/mutex.h"
 #include "dir_entry.h"
-#include "mutex.h"
+#include "file_entry.h"
 
 class Hdd : public Mutex
 {

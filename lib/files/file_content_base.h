@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef FILE_CONTENT_BASE_H
@@ -28,10 +27,11 @@
 #include <list>
 #include <map>
 #include <time.h>
-#include "mutex.h"
+
+#include "util/mutex.h"
+#include "util/pf_types.h"
 #include "file_chunk.h"
 #include "file_chunk_desc.h"
-#include "pf_types.h"
 
 class FileContentBase : public Mutex, private std::list<FileChunk>
 {
@@ -59,8 +59,8 @@ private:
 	};
 protected:
 	std::string filename;
-	std::map<pf_id, struct sharedchunks> sharers;
-	pf_id last_peer_requested;
+	std::map<Key, struct sharedchunks> sharers;
+	Key last_peer_requested;
 	time_t ref_request_time;
 
 	void NetworkFlushRequests();
@@ -107,11 +107,11 @@ public:
 	time_t GetAccessTime() const;
 
 	/* Set which part of the file a peer has */
-	void SetSharer(pf_id, off_t offset, off_t size);
+	void SetSharer(Key, off_t offset, off_t size);
 
 	/* Remove the part a peer has */
-	void RemoveSharer(pf_id);
+	void RemoveSharer(Key);
 
-	IDList GetSharers();
+	KeyList GetSharers();
 };
 #endif						  /* FILE_CONTENT_BASE_H */

@@ -23,14 +23,15 @@
 #ifndef PACKET_H
 #define PACKET_H
 
-#include <vector>
 #include <cassert>
 #include <string>
-#include "pf_types.h"
+#include <vector>
+
+#include "files/file_chunk.h"
+#include "util/pf_types.h"
 #include "packet_arg.h"
 #include "packet_type.h"
 #include "packet_type_list.h"
-#include "files/file_chunk.h"
 #include "pf_addr.h"
 
 typedef std::vector<pf_addr> AddrList;

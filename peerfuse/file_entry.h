@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef FILE_ENTRY_H
@@ -26,17 +26,10 @@
 
 #include <set>
 
-#include "pf_types.h"
+#include "util/pf_types.h"
 #include "files/file_entry_base.h"
 
 class FileEntry;
-
-struct CompFiles
-{
-	bool operator() (const FileEntry* f1, const FileEntry* f2) const;
-};
-
-typedef std::set<FileEntry*, CompFiles> FileList;
 
 class FileEntry : public FileEntryBase
 {

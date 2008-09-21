@@ -23,8 +23,8 @@
  *
  */
 
-#include "jobs/job.h"
-#include "dtime.h"
+#include "scheduler/job.h"
+#include "util/dtime.h"
 
 class ChimeraDHT;
 class ChimeraRouting;

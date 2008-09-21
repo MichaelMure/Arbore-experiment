@@ -23,9 +23,10 @@
 #ifndef PACKET_TYPE_H
 #define PACKET_TYPE_H
 
-#include <vector>
-#include <string>
 #include <stdint.h>
+#include <string>
+#include <vector>
+
 #include "packet_arg.h"
 
 class PacketHandlerBase;

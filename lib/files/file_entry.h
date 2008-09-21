@@ -18,21 +18,25 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
-#ifndef FILE_ENTRY_BASE
-#define FILE_ENTRY_BASE
+#ifndef FILE_ENTRY_H
+#define FILE_ENTRY_H
 
+#include <set>
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+
+#include "util/key.h"
+#include "util/pf_types.h"
+#include "util/pf_log.h"
 #include "file_perms.h"
-#include "pf_types.h"
-#include "pf_log.h"
 
 class DirEntry;
+class FileEntry;
 
 class pf_stat : public FilePermissions
 {
@@ -65,28 +69,35 @@ public:
 
 };
 
-class FileEntryBase
+struct CompFiles
+{
+	bool operator() (const FileEntry* f1, const FileEntry* f2) const;
+};
+
+typedef std::set<FileEntry*, CompFiles> FileList;
+
+class FileEntry
 {
 	const std::string name;
 	DirEntry* parent;
-	IDList sharers;
+	KeyList sharers;
 
 protected:
 	pf_stat stat;
 public:
 
-	FileEntryBase(std::string name, pf_stat stat, DirEntry* _parent);
-	virtual ~FileEntryBase();
+	FileEntry(std::string name, pf_stat stat, DirEntry* _parent);
+	virtual ~FileEntry();
 
 	DirEntry* GetParent() const { return parent; }
 	std::string GetName() const { return name; }
 	std::string GetFullName() const;
 
-	bool IsChildOf(const FileEntryBase* f) const;
+	bool IsChildOf(const FileEntry* f) const;
 
-	IDList GetSharers() const { return sharers; }
-	void SetSharers(IDList l);
-	void AddSharer(pf_id id) { sharers.insert(id); SetSharers(sharers); }
+	KeyList GetSharers() const { return sharers; }
+	void SetSharers(KeyList l);
+	void AddSharer(Key id) { sharers.insert(id); SetSharers(sharers); }
 
 	pf_stat GetAttr() const { return stat; };
 	void SetAttr(pf_stat stat, bool force = false);
@@ -100,9 +111,9 @@ public:
 };
 
 template<>
-inline Log::flux& Log::flux::operator<< <FileEntryBase*> (FileEntryBase* file)
+inline Log::flux& Log::flux::operator<< <FileEntry*> (FileEntry* file)
 {
 	str += file->GetFullName();
 	return *this;
 }
-#endif						  /* FILE_ENTRY_BASE */
+#endif						  /* FILE_ENTRY_H */

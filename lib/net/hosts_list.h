@@ -26,10 +26,11 @@
 #ifndef _HOSTS_LIST_H_
 #define _HOSTS_LIST_H_
 
-#include <netinet/in.h>
 #include <exception>
 #include <map>
-#include "dht/key.h"
+#include <netinet/in.h>
+
+#include "util/key.h"
 #include "host.h"
 
 class HostsList : public Mutex

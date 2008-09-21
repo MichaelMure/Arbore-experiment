@@ -34,10 +34,11 @@
 #define _CHIMERA_KEY_H_
 
 #include <limits.h>
-#include <stdio.h>
 #include <openssl/evp.h>
-#include <string.h>
+#include <set>
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "util/pf_log.h"
 
@@ -192,6 +193,8 @@ inline Log::flux& Log::flux::operator<< <Key> (Key key)
 	str += key.str();
 	return *this;
 }
+
+typedef std::set<Key> KeyList;
 
 /* global variables!! that are set in key_init function */
 extern Key Key_Max;

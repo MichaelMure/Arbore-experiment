@@ -1,6 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert
- *                   Romain Bignon <romain AT vaginus.org>
+ * Copyright(C) 2008 Laurent Defert, Romain Bignon
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +18,20 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stack>
 #include <string.h>
-#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include "util/mutex.h"
+#include "util/pf_log.h"
+#include "util/session_config.h"
 #include "hdd.h"
-#include "mutex.h"
-#include "pf_log.h"
-#include "session_config.h"
 
 Hdd hdd;
 

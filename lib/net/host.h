@@ -28,9 +28,9 @@
 
 #include <netinet/in.h>
 
-#include "dht/key.h"
-#include "pf_log.h"
-#include "net/pf_addr.h"
+#include "util/pf_log.h"
+#include "util/key.h"
+#include "pf_addr.h"
 
 #define SUCCESS_WINDOW 20
 #define GOOD_LINK 0.8

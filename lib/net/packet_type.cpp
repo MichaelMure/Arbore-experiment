@@ -21,8 +21,9 @@
  */
 
 #include <cstdarg>
-#include "packet_type.h"
+
 #include "packet_handler.h"
+#include "packet_type.h"
 
 PacketType::PacketType(uint32_t _type, PacketHandlerBase* _handler, std::string _name, ...)
 	: type(_type),

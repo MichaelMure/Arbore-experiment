@@ -25,9 +25,10 @@
 
 #include <arpa/inet.h>
 #include <netdb.h>
-#include "hosts_list.h"
+
+#include "util/tools.h"
 #include "host.h"
-#include "tools.h"
+#include "hosts_list.h"
 
 /** host_init:
  ** initialize a host struct with a #size# element cache.

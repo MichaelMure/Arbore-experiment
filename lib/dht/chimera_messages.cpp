@@ -23,15 +23,15 @@
  *
  */
 
-#include "dtime.h"
-#include "chimera_messages.h"
-#include "chimera_routing.h"
-#include "pf_log.h"
+#include "util/pf_log.h"
+#include "util/dtime.h"
 #include "net/network.h"
 #include "net/packet_handler.h"
+#include "scheduler/scheduler_queue.h"
+#include "chimera_messages.h"
+#include "chimera_routing.h"
 #include "chimera.h"
 #include "check_leafset_job.h"
-#include "scheduler_queue.h"
 
 void ChimeraBaseMessage::operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 {

@@ -23,12 +23,12 @@
  *
  */
 
+#include "net/packet.h"
+#include "util/pf_log.h"
 #include "check_leafset_job.h"
-#include "chimera_routing.h"
-#include "pf_log.h"
 #include "chimera.h"
 #include "chimera_messages.h"
-#include "net/packet.h"
+#include "chimera_routing.h"
 
 bool CheckLeafsetJob::Start()
 {

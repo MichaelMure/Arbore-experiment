@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <string.h>
@@ -26,8 +25,7 @@
 #include "content_list.h"
 #include "file_content.h"
 #include "hdd.h"
-#include "session_config.h"
-#include "environment.h"
+#include "util/session_config.h"
 
 CacheBase::CacheBase() : Mutex(RECURSIVE_MUTEX)
 {

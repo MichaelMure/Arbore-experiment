@@ -20,11 +20,11 @@
  *
  */
 
+#include "net/key.h"
 #include "packet.h"
 #include "packet_arg.h"
-#include "packet_type_list.h"
 #include "packet_handler.h"
-#include "dht/key.h"
+#include "packet_type_list.h"
 
 #ifdef DEBUG
 #define ASSERT assert

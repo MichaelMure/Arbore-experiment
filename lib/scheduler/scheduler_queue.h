@@ -25,7 +25,8 @@
 #define SCHEDULER_QUEUE_H
 #include <list>
 #include <typeinfo>
-#include "mutex.h"
+
+#include "util/mutex.h"
 
 class Job;
 						  /* TODO: Make me private */
