@@ -2,12 +2,12 @@ PROJECT(peerfuse)
 cmake_minimum_required(VERSION 2.6)
 
 add_library(util
-		lib/utils/dtime.c
-                lib/utils/pf_config.cpp
-		lib/utils/mutex.cpp
-		lib/utils/pf_thread.cpp
-		lib/utils/tools.cpp
-		lib/utils/pf_log.cpp
+		lib/util/dtime.c
+                lib/util/pf_config.cpp
+		lib/util/mutex.cpp
+		lib/util/pf_thread.cpp
+		lib/util/tools.cpp
+		lib/util/pf_log.cpp
 		)
 SET(PFLIBS ${PFLIBS} util)
 

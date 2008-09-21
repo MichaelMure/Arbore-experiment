@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "pf_log.h"
+#include "util/pf_log.h"
 
 #define KEY_SIZE 160
 #define N_SIZE KEY_SIZE/sizeof(uint32_t)

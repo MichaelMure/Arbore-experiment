@@ -33,6 +33,19 @@
 Key Key_Max;
 Key Key_Half;
 
+static void convert_base16 (unsigned char num, char *out)
+{
+    unsigned char mask = 15;
+    int i = 0;
+    for (i = 1; i >= 0; i--)
+	{
+	    int digit = num >> (i * 4);
+	    sprintf (out, "%x", digit & mask);
+	    out++;
+	}
+    *out = '\0';
+}
+
 void Key::set_key_str() throw()
 {
 	char keystr[KEY_SIZE / BASE_B + 1] = {0};
