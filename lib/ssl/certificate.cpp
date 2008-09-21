@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <openssl/err.h>
@@ -27,7 +26,7 @@
 #include <cstring>
 #include <climits>
 #include "certificate.h"
-#include "tools.h"
+#include "util/tools.h"
 
 Certificate::Certificate() : ssl_cert(NULL)
 {
@@ -135,25 +134,6 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len) const
 	p = *buf;
 
 	i2d_X509(ssl_cert, &p);
-}
-
-pf_id Certificate::GetIDFromCertificate() throw(BadCertificate)
-{
-	if(!ssl_cert)
-		return 0;
-
-	ASN1_INTEGER* no = X509_get_serialNumber(ssl_cert);
-	long id = ASN1_INTEGER_get(no);
-
-	/* Note: it appears to free part of memory of ssl_cert,
-	 * so a call to X509_cert() will crash. -romain
-	 */
-	//M_ASN1_INTEGER_free(no);
-
-	if(id <= 0 || (unsigned long)id > ID_MAX)
-		throw BadCertificate("Can't read certificate's serial number");
-
-	return (pf_id)id;
 }
 
 std::string Certificate::GetCommonName() const throw(BadCertificate)

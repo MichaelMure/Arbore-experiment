@@ -20,7 +20,7 @@
  *
  */
 
-#include "net/key.h"
+#include "util/key.h"
 #include "packet.h"
 #include "packet_arg.h"
 #include "packet_handler.h"

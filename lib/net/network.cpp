@@ -31,9 +31,9 @@
 #include <sys/socket.h>
 #include <time.h>
 
-#include "jobs/job.h"
 #include "net/packet.h"
 #include "net/host.h"
+#include "scheduler/job.h"
 #include "scheduler/scheduler_queue.h"
 #include "util/dtime.h"
 #include "util/pf_config.h"

@@ -41,48 +41,48 @@ add_library(dht
 		)
 SET(PFLIBS ${PFLIBS} dht)
 
-add_library(files
-		lib/files/cache_base.cpp
-		lib/files/content_list_base.cpp
-		lib/files/dir_entry.cpp
-		lib/files/file_chunk.cpp
-		lib/files/file_content_base.cpp
-		lib/files/hdd.cpp
-		lib/files/file_entry.cpp
-	   )
-SET(PFLIBS ${PFLIBS} files)
+#add_library(files
+#		lib/files/cache_base.cpp
+#		lib/files/content_list_base.cpp
+#		lib/files/dir_entry.cpp
+#		lib/files/file_chunk.cpp
+#		lib/files/file_content_base.cpp
+#		lib/files/hdd.cpp
+#		lib/files/file_entry.cpp
+#	   )
+#SET(PFLIBS ${PFLIBS} files)
 
-add_library(ssl
-		lib/ssl/certificate.cpp
-		lib/ssl/connection.cpp
-		lib/ssl/connection_ssl.cpp
-		lib/ssl/connection_nossl.cpp
-		lib/ssl/crl.cpp
-		lib/ssl/pf_ssl_ssl.cpp
-		lib/ssl/pf_ssl_nossl.cpp
-		lib/ssl/private_key.cpp
-	   )
-SET(PFLIBS ${PFLIBS} ssl)
+#add_library(ssl
+#		lib/ssl/certificate.cpp
+#		lib/ssl/connection.cpp
+#		lib/ssl/connection_ssl.cpp
+#		lib/ssl/connection_nossl.cpp
+#		lib/ssl/crl.cpp
+#		lib/ssl/pf_ssl_ssl.cpp
+#		lib/ssl/pf_ssl_nossl.cpp
+#		lib/ssl/private_key.cpp
+#	   )
+#SET(PFLIBS ${PFLIBS} ssl)
 
 IF(NOT PF_SERVER_MODE)
-	add_library(fuse
-			lib/fuse/fs_utils.cpp
-			lib/fuse/chmod.cpp
-			lib/fuse/chown.cpp
-			lib/fuse/create.cpp
-			lib/fuse/flush.cpp
-			lib/fuse/getattr.cpp
-			lib/fuse/mkdir.cpp
-			lib/fuse/read.cpp
-			lib/fuse/readdir.cpp
-			lib/fuse/rename.cpp
-			lib/fuse/rmdir.cpp
-			lib/fuse/truncate.cpp
-			lib/fuse/unlink.cpp
-			lib/fuse/utimens.cpp
-			lib/fuse/write.cpp
-			)
-	SET(PFLIBS ${PFLIBS} fuse)
+#	add_library(fuse
+#			lib/fuse/fs_utils.cpp
+#			lib/fuse/chmod.cpp
+#			lib/fuse/chown.cpp
+#			lib/fuse/create.cpp
+#			lib/fuse/flush.cpp
+#			lib/fuse/getattr.cpp
+#			lib/fuse/mkdir.cpp
+#			lib/fuse/read.cpp
+#			lib/fuse/readdir.cpp
+#			lib/fuse/rename.cpp
+#			lib/fuse/rmdir.cpp
+#			lib/fuse/truncate.cpp
+#			lib/fuse/unlink.cpp
+#			lib/fuse/utimens.cpp
+#			lib/fuse/write.cpp
+#			)
+#	SET(PFLIBS ${PFLIBS} fuse)
 
 ELSE(NOT PF_SERVER_MODE)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")

@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #define FUSE_USE_VERSION 26
@@ -42,7 +42,7 @@
 #endif
 */
 
-#include "cache.h"
+#include "files/cache_base.h"
 #include "pf_fuse.h"
 
 int pf_chmod(const char* path, mode_t mode)

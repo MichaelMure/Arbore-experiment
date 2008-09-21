@@ -21,10 +21,11 @@
  */
 
 #include <algorithm>
-#include "scheduler_queue.h"
-#include "mutex.h"
+
+#include "util/mutex.h"
+#include "util/pf_log.h"
 #include "job.h"
-#include "pf_log.h"
+#include "scheduler_queue.h"
 
 SchedulerQueue scheduler_queue;
 

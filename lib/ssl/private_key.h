@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PF_PRIVATE_KEY_H
@@ -26,7 +26,7 @@
 
 #include <openssl/evp.h>
 #include <string>
-#include "pf_exception.h"
+#include "util/pf_exception.h"
 
 class PrivateKey
 {

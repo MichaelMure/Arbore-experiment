@@ -18,17 +18,15 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef PF_CERTIFICATE_H
 #define PF_CERTIFICATE_H
-#include <exception>
-#include "pf_exception.h"
 
-#include "public_key.h"
+#include "util/pf_exception.h"
 #include "private_key.h"
-#include "pf_types.h"
+#include "public_key.h"
 
 class Certificate
 {
@@ -56,7 +54,6 @@ public:
 	PublicKey GetPublicKey();
 
 	std::string GetCertificateInfos() const;
-	pf_id GetIDFromCertificate() throw(BadCertificate);
 	std::string GetCommonName() const throw(BadCertificate);
 
 	X509* GetSSL() const { return ssl_cert; }
