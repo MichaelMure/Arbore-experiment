@@ -3,83 +3,83 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(SRC
 
-	common/net/pf_addr.cpp
-	common/net/host.cpp
-	common/net/hosts_list.cpp
-	common/net/packet_type.cpp
-	common/net/packet_type_list.cpp
-	common/net/packet.cpp
-	common/net/network.cpp
+	lib/net/pf_addr.cpp
+	lib/net/host.cpp
+	lib/net/hosts_list.cpp
+	lib/net/packet_type.cpp
+	lib/net/packet_type_list.cpp
+	lib/net/packet.cpp
+	lib/net/network.cpp
 
-	common/dht/key.cpp
-	common/dht/chimera_routing.cpp
-	common/dht/routing_table.cpp
-	common/dht/leafset.cpp
-	common/dht/check_leafset_job.cpp
-	common/dht/chimera_messages.cpp
-	common/dht/chimera.cpp
+	lib/dht/key.cpp
+	lib/dht/chimera_routing.cpp
+	lib/dht/routing_table.cpp
+	lib/dht/leafset.cpp
+	lib/dht/check_leafset_job.cpp
+	lib/dht/chimera_messages.cpp
+	lib/dht/chimera.cpp
 
-	common/dtime.c
-	common/download.cpp
-	common/pf_config.cpp
-	common/pf_log.cpp
-	common/mutex.cpp
-	common/pf_thread.cpp
-	common/session_config.cpp
-	common/scheduler.cpp
-	common/scheduler_queue.cpp
-	common/tools.cpp
-	common/xmlrpc_server.cpp
-	common/xmlrpc.cpp
+	lib/dtime.c
+	lib/download.cpp
+	lib/pf_config.cpp
+	lib/pf_log.cpp
+	lib/mutex.cpp
+	lib/pf_thread.cpp
+	lib/session_config.cpp
+	lib/scheduler.cpp
+	lib/scheduler_queue.cpp
+	lib/tools.cpp
+	lib/xmlrpc_server.cpp
+	lib/xmlrpc.cpp
 
-	common/files/cache_base.cpp
-	common/files/content_list_base.cpp
-	common/files/dir_entry.cpp
-	common/files/file_chunk.cpp
-	common/files/file_content_base.cpp
-	common/files/hdd.cpp
-	common/files/file_entry_base.cpp
+	lib/files/cache_base.cpp
+	lib/files/content_list_base.cpp
+	lib/files/dir_entry.cpp
+	lib/files/file_chunk.cpp
+	lib/files/file_content_base.cpp
+	lib/files/hdd.cpp
+	lib/files/file_entry_base.cpp
 
 
-	common/jobs/job.cpp
-	common/jobs/job_new_connection.cpp
-	common/jobs/job_new_conn_req_base.cpp
-	common/jobs/job_new_connection_queue.cpp
-	common/jobs/job_send_ref_file.cpp
-	common/jobs/job_send_chunk.cpp
-	common/jobs/job_set_chunk.cpp
-	common/jobs/job_set_shared_part.cpp
-	common/jobs/job_mkfile.cpp
-	common/jobs/job_send_mkfile.cpp
+	lib/jobs/job.cpp
+	lib/jobs/job_new_connection.cpp
+	lib/jobs/job_new_conn_req_base.cpp
+	lib/jobs/job_new_connection_queue.cpp
+	lib/jobs/job_send_ref_file.cpp
+	lib/jobs/job_send_chunk.cpp
+	lib/jobs/job_set_chunk.cpp
+	lib/jobs/job_set_shared_part.cpp
+	lib/jobs/job_mkfile.cpp
+	lib/jobs/job_send_mkfile.cpp
 
-	common/ssl/certificate.cpp
-	common/ssl/connection.cpp
-	common/ssl/connection_ssl.cpp
-	common/ssl/connection_nossl.cpp
-	common/ssl/crl.cpp
-	common/ssl/pf_ssl_ssl.cpp
-	common/ssl/pf_ssl_nossl.cpp
-	common/ssl/private_key.cpp
+	lib/ssl/certificate.cpp
+	lib/ssl/connection.cpp
+	lib/ssl/connection_ssl.cpp
+	lib/ssl/connection_nossl.cpp
+	lib/ssl/crl.cpp
+	lib/ssl/pf_ssl_ssl.cpp
+	lib/ssl/pf_ssl_nossl.cpp
+	lib/ssl/private_key.cpp
 
-	common/fuse/fs_utils.cpp
+	lib/fuse/fs_utils.cpp
 	)
 
 IF(NOT PF_SERVER_MODE)
 	SET(SRC ${SRC}
-		common/fuse/chmod.cpp
-		common/fuse/chown.cpp
-		common/fuse/create.cpp
-		common/fuse/flush.cpp
-		common/fuse/getattr.cpp
-		common/fuse/mkdir.cpp
-		common/fuse/read.cpp
-		common/fuse/readdir.cpp
-		common/fuse/rename.cpp
-		common/fuse/rmdir.cpp
-		common/fuse/truncate.cpp
-		common/fuse/unlink.cpp
-		common/fuse/utimens.cpp
-		common/fuse/write.cpp)
+		lib/fuse/chmod.cpp
+		lib/fuse/chown.cpp
+		lib/fuse/create.cpp
+		lib/fuse/flush.cpp
+		lib/fuse/getattr.cpp
+		lib/fuse/mkdir.cpp
+		lib/fuse/read.cpp
+		lib/fuse/readdir.cpp
+		lib/fuse/rename.cpp
+		lib/fuse/rmdir.cpp
+		lib/fuse/truncate.cpp
+		lib/fuse/unlink.cpp
+		lib/fuse/utimens.cpp
+		lib/fuse/write.cpp)
 ELSE(NOT PF_SERVER_MODE)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")
 ENDIF(NOT PF_SERVER_MODE)
@@ -185,7 +185,7 @@ ENDIF(XMLRPCXX_FOUND)
 
 
 INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${XMLRPCXX_INCLUDE_DIR}
-	"${BIN_NAME}/" "common/" "common/fuse" "common/jobs" "common/ssl")
+	"${BIN_NAME}/" "lib/" "lib/fuse" "lib/jobs" "lib/ssl")
 LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LINK_DIR} ${XMLRPCXX_LINK_DIR})
 TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES} ${XMLRPCXX_LDFLAGS})
 
