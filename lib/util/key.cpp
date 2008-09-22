@@ -287,7 +287,7 @@ Key Key::operator-(const Key & op2) const
 	return result;
 }
 
-char *Key::sha1_keygen (char *key, size_t digest_size, char *digest) const
+void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
 {
 	EVP_MD_CTX mdctx;
 	const EVP_MD *md;
@@ -324,24 +324,21 @@ char *Key::sha1_keygen (char *key, size_t digest_size, char *digest) const
 	free (md_value);
 
 	tmp = '\0';
-	return (digest);
 }
 
 void Key::MakeHash (std::string s)
 {
-	key_make_hash (s.c_str(), s.size());
+	MakeHash(s.c_str(), s.size());
 
 	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = [" << *this << "]";
 }
 
-void Key::MakeHash (char *s, size_t size)
+void Key::MakeHash (const char *s, size_t size)
 {
-	char *digest;
+	char digest[KEY_SIZE / BASE_B + 1];
 
-	digest = sha1_keygen (s, size, NULL);
+	sha1_keygen (s, size, digest);
 	*this = digest;
-
-	free (digest);
 }
 
 

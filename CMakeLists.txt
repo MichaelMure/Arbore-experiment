@@ -52,17 +52,17 @@ SET(PFLIBS ${PFLIBS} dht)
 #	   )
 #SET(PFLIBS ${PFLIBS} files)
 
-add_library(ssl
-		lib/ssl/certificate.cpp
-		lib/ssl/connection.cpp
-		lib/ssl/connection_ssl.cpp
-		lib/ssl/connection_nossl.cpp
-		lib/ssl/crl.cpp
-		lib/ssl/pf_ssl_ssl.cpp
-		lib/ssl/pf_ssl_nossl.cpp
-		lib/ssl/private_key.cpp
-	   )
-SET(PFLIBS ${PFLIBS} ssl)
+#add_library(ssl
+#		lib/ssl/certificate.cpp
+#		lib/ssl/connection.cpp
+#		lib/ssl/connection_ssl.cpp
+#		lib/ssl/connection_nossl.cpp
+#		lib/ssl/crl.cpp
+#		lib/ssl/pf_ssl_ssl.cpp
+#		lib/ssl/pf_ssl_nossl.cpp
+#		lib/ssl/private_key.cpp
+#	   )
+#SET(PFLIBS ${PFLIBS} ssl)
 
 IF(NOT PF_SERVER_MODE)
 #	add_library(fuse
