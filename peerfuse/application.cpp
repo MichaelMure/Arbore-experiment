@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #define FUSE_USE_VERSION 26
@@ -31,12 +31,9 @@
 #include "pf_config.h"
 #include "application.h"
 #include "network.h"
-#include "pf_ssl_ssl.h"
-#include "certificate.h"
-#include "crl.h"
 #include "cache.h"
-#include "pf_log.h"
-#include "file_entry.h"
+#include "util/pf_log.h"
+#include "files/file_entry.h"
 #include "session_config.h"
 #include "scheduler.h"
 #include "files/hdd.h"

@@ -2,14 +2,14 @@
 #include <string>
 #include <iostream>
 
-#include "common/net/network.h"
-#include "common/net/packet.h"
-#include "common/net/hosts_list.h"
-#include "common/dht/chimera.h"
-#include "common/scheduler.h"
-#include "common/pf_log.h"
-#include "common/tools.h"
-#include "common/dht/chimera_messages.h"
+#include "lib/net/network.h"
+#include "lib/net/packet.h"
+#include "lib/net/hosts_list.h"
+#include "lib/dht/chimera.h"
+#include "lib/scheduler.h"
+#include "lib/pf_log.h"
+#include "lib/tools.h"
+#include "lib/dht/chimera_messages.h"
 
 enum
 {
