@@ -64,6 +64,8 @@ private:
 
 	void set_key_str () throw();
 
+	char *sha1_keygen (char *key, size_t digest_size, char *digest) const;
+
 public:
 
 	/** Static function which initialize the global keys. */
@@ -150,14 +152,14 @@ public:
 	 *
 	 * @param s hashed string.
 	 */
-	void key_make_hash (char *s);
+	void MakeHash (std::string s);
 
 	/** Asign sha1 hash of the string
 	 *
 	 * @param s hashed string
 	 * @param size size of the string (if this isn't a 0 terminated string).
 	 */
-	void key_make_hash (char *s, size_t size);
+	void MakeHash (char *s, size_t size);
 
 	/* key_distance:k1,k2
 	** calculate the distance between k1 and k2 in the keyspace and assign that to #diff# */

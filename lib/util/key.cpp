@@ -287,7 +287,7 @@ Key Key::operator-(const Key & op2) const
 	return result;
 }
 
-char *sha1_keygen (char *key, size_t digest_size, char *digest)
+char *Key::sha1_keygen (char *key, size_t digest_size, char *digest) const
 {
 	EVP_MD_CTX mdctx;
 	const EVP_MD *md;
@@ -327,22 +327,19 @@ char *sha1_keygen (char *key, size_t digest_size, char *digest)
 	return (digest);
 }
 
-void Key::key_make_hash (char *s)
+void Key::MakeHash (std::string s)
 {
-	key_make_hash (s, strlen (s) * sizeof (char));
+	key_make_hash (s.c_str(), s.size());
 
 	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = [" << *this << "]";
 }
 
-void Key::key_make_hash (char *s, size_t size)
+void Key::MakeHash (char *s, size_t size)
 {
 	char *digest;
 
 	digest = sha1_keygen (s, size, NULL);
 	*this = digest;
-
-	//for(i=0; i <nlen; i++) sscanf(digest+(i*8*sizeof(char)),"%08x",&hashed->t[(4-i)]);
-	//key_to_str(hashed->keystr,*hashed);
 
 	free (digest);
 }
