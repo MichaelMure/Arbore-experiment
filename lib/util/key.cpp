@@ -64,6 +64,11 @@ Key& Key::operator=(std::string str)
 	return Key::operator=(str.c_str());
 }
 
+Key::Key(std::string str)
+{
+	*this = str.c_str();
+}
+
 Key& Key::operator= (const char *strOrig)
 {
 	size_t i, len;

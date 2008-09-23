@@ -81,6 +81,7 @@ class FileEntry
 	const std::string name;
 	DirEntry* parent;
 	KeyList sharers;
+	Key key;
 
 protected:
 	pf_stat stat;
@@ -93,6 +94,8 @@ public:
 	std::string GetName() const { return name; }
 	std::string GetFullName() const;
 
+	Key getPathSerial() const { return key; }
+
 	bool IsChildOf(const FileEntry* f) const;
 
 	KeyList GetSharers() const { return sharers; }
@@ -103,7 +106,7 @@ public:
 	void SetAttr(pf_stat stat, bool force = false);
 
 	/** Load attributes from tree_cfg file. */
-	virtual void LoadAttr();
+	void LoadAttr();
 
 	bool IsRemoved() const { return stat.pf_mode & pf_stat::S_PF_REMOVED; }
 	void SetRemoved() { stat.pf_mode |= pf_stat::S_PF_REMOVED; }

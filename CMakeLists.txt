@@ -87,8 +87,8 @@ ENDIF(NOT PF_SERVER_MODE)
 
 SET(BIN_NAME peerfuse)
 ADD_EXECUTABLE(${BIN_NAME}
-		peerfuse/tree.cpp
 		peerfuse/hdd.cpp
+		peerfuse/tree.cpp
 		peerfuse/application.cpp
 		peerfuse/environment.cpp
 		peerfuse/file_content.cpp

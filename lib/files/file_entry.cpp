@@ -38,8 +38,11 @@ bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 }
 
 FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* _parent)
-			: name(_name), parent(_parent), stat(_stat)
+	: name(_name),
+	  parent(_parent),
+	  stat(_stat)
 {
+	key.MakeHash(name);
 }
 
 FileEntry::~FileEntry()
@@ -116,4 +119,14 @@ void FileEntry::LoadAttr()
 		stat.gid = (uint32_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#mode", cfg_val))
 		stat.mode = (uint32_t)cfg_val;
+	std::string cfg_val_s;
+	if(tree_cfg.Get(GetFullName() + "#sharers", cfg_val_s))
+	{
+		KeyList keylist;
+		std::string key;
+		while((key = stringtok(cfg_val_s, ",")).empty() == false)
+			keylist.insert(Key(key));
+		SetSharers(keylist);
+	}
+
 }

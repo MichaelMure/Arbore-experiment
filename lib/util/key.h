@@ -80,6 +80,9 @@ public:
 	/** Create a Key from a uint32_t[nlen] */
 	explicit Key(uint32_t key[nlen]) throw();
 
+	/** Create a Key from a std::string */
+	explicit Key(std::string str);
+
 	/** The copy constructor.
 	 *
 	 * @param k2 copy key from the other key
