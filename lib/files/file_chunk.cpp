@@ -18,13 +18,14 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <assert.h>
 #include <string.h>
+
+#include "util/pf_log.h"
 #include "file_chunk.h"
-#include "pf_log.h"
 
 FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : FileChunkDesc(_offset, _size), hdd_synced(false)
 {

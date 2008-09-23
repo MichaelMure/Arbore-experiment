@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef CACHE_H
@@ -28,9 +27,9 @@
 #include <map>
 #include "files/cache_base.h"
 #include "files/dir_entry.h"
-#include "pf_types.h"
-#include "file_entry.h"
-#include "packet.h"
+#include "util/pf_types.h"
+#include "files/file_entry.h"
+#include "net/packet.h"
 #include "filedist.h"
 
 class Cache : public CacheBase

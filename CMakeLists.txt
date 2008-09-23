@@ -41,16 +41,13 @@ add_library(dht
 		)
 SET(PFLIBS ${PFLIBS} dht)
 
-#add_library(files
-#		lib/files/cache_base.cpp
-#		lib/files/content_list_base.cpp
-#		lib/files/dir_entry.cpp
-#		lib/files/file_chunk.cpp
+add_library(files
+		lib/files/dir_entry.cpp
+		lib/files/file_entry.cpp
+		lib/files/file_chunk.cpp
 #		lib/files/file_content_base.cpp
-#		lib/files/hdd.cpp
-#		lib/files/file_entry.cpp
-#	   )
-#SET(PFLIBS ${PFLIBS} files)
+	   )
+SET(PFLIBS ${PFLIBS} files)
 
 #add_library(ssl
 #		lib/ssl/certificate.cpp
@@ -90,24 +87,21 @@ ENDIF(NOT PF_SERVER_MODE)
 
 SET(BIN_NAME peerfuse)
 ADD_EXECUTABLE(${BIN_NAME}
+		peerfuse/tree.cpp
+		peerfuse/hdd.cpp
 		peerfuse/application.cpp
 		peerfuse/environment.cpp
-		peerfuse/network.cpp
 		peerfuse/file_content.cpp
 		peerfuse/content_list.cpp
 		peerfuse/peerfuse.cpp
 		peerfuse/pf_fuse.cpp
-		peerfuse/cache.cpp
 		peerfuse/file_entry.cpp
 		peerfuse/filedist.cpp
 		peerfuse/job_new_conn_req.cpp
 		peerfuse/job_update_resp_files.cpp
 		peerfuse/job_ls_dir.cpp
 		peerfuse/job_end_of_ls.cpp
-		peerfuse/packet.cpp
-		peerfuse/peers_list.cpp
-		peerfuse/net_proto.cpp
-		peerfuse/peer.cpp)
+	      )
 SET(CONF_NAME peerfuse.conf)
 
 target_link_libraries(${BIN_NAME} ${PFLIBS})

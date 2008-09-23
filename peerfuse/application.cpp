@@ -28,19 +28,19 @@
 #include <cstring>
 #include <sys/resource.h>
 
-#include "pf_config.h"
-#include "application.h"
-#include "network.h"
-#include "cache.h"
-#include "util/pf_log.h"
+#include "dht/chimera.h"
+#include "net/network.h"
 #include "files/file_entry.h"
-#include "session_config.h"
-#include "scheduler.h"
-#include "files/hdd.h"
+#include "scheduler/scheduler.h"
+#include "util/pf_config.h"
+#include "util/pf_log.h"
+#include "util/session_config.h"
+#include "application.h"
 #include "content_list.h"
-#include "peers_list.h"
-#include "pfnet.h"
-#include "xmlrpc.h"
+#include "hdd.h"
+#include "peerfuse.h"
+#include "tree.h"
+//#include "xmlrpc.h"
 
 #ifndef PF_SERVER_MODE
 #include <fuse.h>
@@ -63,17 +63,20 @@ Application::Application()
 	ConfigSection* section = conf.AddSection("listen", "Listening server", false);
 	section->AddItem(new ConfigItem_string("bind", "IP Binding"));
 	section->AddItem(new ConfigItem_int("port", "Port", 1, 65535));
+	section->AddItem(new ConfigItem_string("key", "My Key"));
 
 	section = conf.AddSection("connection", "Connect to this server at launch", true);
 	section->AddItem(new ConfigItem_string("host", "Hostname"), true);
 	section->AddItem(new ConfigItem_int("port", "Port", 1, 65535));
 
+#if 0
 	section = conf.AddSection("ssl", "SSL parameters", false);
 	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
 	section->AddItem(new ConfigItem_string("key", "Private key path"));
 	section->AddItem(new ConfigItem_string("ca", "CA certificate"));
 	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
 	section->AddItem(new ConfigItem_string("crl_url", "URL of the crl", "http://"));
+#endif
 
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
@@ -90,16 +93,16 @@ Application::Application()
 
 void Application::StartThreads()
 {
-	xmlrpc.Start();
+	//xmlrpc.Start();
 	scheduler.Start();
 	net.Start();
-	content_list.Start();
+	//content_list.Start();
 }
 
 void Application::Exit()
 {
-	xmlrpc.Stop();
-	content_list.Stop();
+	//xmlrpc.Stop();
+	//content_list.Stop();
 	net.Stop();
 	scheduler.Stop();
 	/* It is not necessary to save session_config, because destructor do this */
@@ -151,6 +154,7 @@ int Application::main(int argc, char *argv[])
 
 		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
 
+#if 0
 		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
 		{
 			crl.Set(conf.GetSection("hdd")->GetItem("workdir")->String() + "/crl.pem",
@@ -172,6 +176,8 @@ int Application::main(int argc, char *argv[])
 		}
 		else
 			crl.Disable();
+#endif
+
 		try
 		{
 			net.StartNetwork(&conf);

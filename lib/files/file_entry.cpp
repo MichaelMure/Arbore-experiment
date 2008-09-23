@@ -24,7 +24,6 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/types.h>
-#include "file_entry_base.h"
 #include "dir_entry.h"
 #include "util/session_config.h"
 
@@ -90,11 +89,11 @@ void FileEntry::SetAttr(pf_stat new_stat, bool force)
 	stat = new_stat;
 }
 
-void FileEntry::SetSharers(IDList idl)
+void FileEntry::SetSharers(KeyList idl)
 {
 	sharers = idl;
 	std::string list;
-	for(IDList::iterator it = sharers.begin(); it != sharers.end(); ++it)
+	for(KeyList::iterator it = sharers.begin(); it != sharers.end(); ++it)
 	{
 		if(list.empty() == false) list += ",";
 		list += TypToStr(*it);

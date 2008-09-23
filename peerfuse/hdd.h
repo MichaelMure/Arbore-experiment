@@ -20,35 +20,51 @@
  *
  */
 
-#ifndef ENVIRONMENT_BASE_H
-#define ENVIRONMENT_BASE_H
-#include "mutex.h"
-#include "dht/key.h"
+#ifndef HDD_H
+#define HDD_H
 
-class EnvironmentBase
+#include <exception>
+#include <string>
+
+#include "util/mutex.h"
+#include "files/dir_entry.h"
+#include "files/file_entry.h"
+
+class Hdd : public Mutex
 {
-protected:
-	template <typename A> class SharedVar : private Mutex
-	{
-		A var;
-		public:
-			SharedVar(A _var) : var(_var) {}
-			~SharedVar() {}
+	std::string root;
 
-			void Set(A _var)
-			{
-				BlockLockMutex lock(this);
-				var = _var;
-			}
-			A Get()
-			{
-				BlockLockMutex lock(this);
-				return var;
-			}
-	};
 public:
-	EnvironmentBase() : my_key(Key()), listening_port(0) {}
-	SharedVar<Key> my_key;
-	SharedVar<uint16_t> listening_port;
+	class HddWriteFailure : public std::exception
+	{
+		public:
+			std::string dir;
+			HddWriteFailure (std::string _dir) : dir(_dir) {};
+			~HddWriteFailure () throw() {};
+	};
+	class HddAccessFailure : public std::exception
+	{
+		public:
+			std::string dir;
+			HddAccessFailure (std::string _dir) : dir(_dir) {};
+			~HddAccessFailure () throw() {};
+	};
+
+	Hdd();
+	~Hdd();
+
+	/* Create a tree from an hard drive path.
+	 * @param d pointer to the root node of tree.
+	 * @param path path to the tree on hard drive.
+	 */
+	void BuildTree(DirEntry* d, std::string path);
+
+	void MkFile(FileEntry* f);
+	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
+	void RmFile(FileEntry* f);
+
+	int GetFd(std::string path);
 };
-#endif						  /* ENVIRONMENT_BASE_H */
+
+extern Hdd hdd;
+#endif

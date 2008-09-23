@@ -18,20 +18,20 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
-#ifndef PFNET_H
-#define PFNET_H
+#ifndef PEERFUSE_H
+#define PEERFUSE_H
 
-#define PEERFUSE_VERSION_NAME   "peerfuse-net"
+#define PEERFUSE_VERSION_NAME   "peerfuse"
 #define PEERFUSE_VERSION_MAJOR  "0"
 #define PEERFUSE_VERSION_MINOR  "0"
-#define PEERFUSE_VERSION_PROTO  "2"
+#define PEERFUSE_VERSION_PROTO  "3"
 
 #define PEERFUSE_VERSION        PEERFUSE_VERSION_NAME " " \
                                 PEERFUSE_VERSION_MAJOR "." \
                                 PEERFUSE_VERSION_MINOR "-" \
                                 PEERFUSE_VERSION_PROTO
 
-#endif						  /* PFNET_H */
+#endif						  /* PEERFUSE_H */

@@ -8,42 +8,12 @@ chimera_messages.cpp->check_leafset_job.h
 chimera.cpp->check_leafset_job.h
 chimera.cpp->chimera_messages.h
 
-# NetworkBase instantiate a JobNewConnection before passing it to SchedulerQueue
-network_base.cpp->job_new_connection.h
-network.cpp->job_new_connection_queue.h
-# Peer instantiate Job*
-peer.cpp->job_new_conn_req.h
-peer.cpp->job_flush_peer.h
-peer.cpp->job_mkfile.h
-peer.cpp->job_send_ref_file.h
-peer.cpp->job_send_chunk.h
-peer.cpp->job_set_chunk.h
-peer.cpp->job_set_shared_part.h
-# pflan only:
-peer.cpp->job_other_connect.h
-peer.cpp->job_send_changes.h
-peer.cpp->job_advertise_file.h
-peer.cpp->job_set_sharer.h
-# pfnet only:
-peer.cpp->job_update_resp_files.h
-peer.cpp->job_add_sharer.h
-peer.cpp->job_ls_dir.h
-peer.cpp->job_end_of_ls.h
 file_content.cpp->cache.h
 
-pf_dir.h->pf_file.h
+dir_entry.h->file_entry.h
 
-# pflan.h / pfnet.h don't do anything dangerous
-network.cpp->pflan.h
-network.cpp->pfnet.h
-application.cpp->pflan.h
-application.cpp->pfnet.h
-peer.cpp->pflan.h
-peer.cpp->pfnet.h
-
-# Peer can call the peers_list as any Peer have to be accessed through the peers_list
-peer.h->peers_list.h
-peer.cpp->peers_list.h
+# peerfuse.h doesn't do anything dangerous
+application.cpp->peerfuse.h
 
 # Filedist
 cache.cpp->filedist.h

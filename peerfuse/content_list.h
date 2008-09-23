@@ -18,19 +18,68 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef CONTENT_LIST_H
 #define CONTENT_LIST_H
 
-#include "files/content_list_base.h"
+#include <map>
+#include <string>
 
-class ContentList : public ContentListBase
+#include "util/mutex.h"
+#include "util/pf_thread.h"
+
+class ContentList : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
+	// Map the ref i'll use to SEND file
+	std::map<uint32_t, std::string> my_refs;
+	std::map<std::string, KeyList> refered_by;
+
+protected:
+	void Loop();
+	void OnStop();
+
 public:
-	virtual void SendRefFile(pf_id to, std::string filename);
+	ContentList() : Mutex(RECURSIVE_MUTEX) {}
+	virtual ~ContentList();
+
+	/** Returns the content of the file we already have in memory
+	 * @param path path to the file
+	 * @return the file content
+	 */
+	FileContent& GetFile(std::string path);
+	FileContent& GetFile(uint32_t ref);
+
+	/** Remove a file from the list. It's content is not flushed to the disk
+	 * @param path path to the file
+	 */
+	void RemoveFile(std::string path);
+
+	/** When a peer disconnect acknowledge the file-contents that the peer
+	 *  stopped sharing the file
+	 * @param path path to the file
+	 */
+	void RemovePeerRefs(Key peer);
+
+	/** Resend to peers the part of the file we are sharing
+	 * @param path path to the file
+	 */
+	void RefreshPeersRef(std::string path);
+
+	uint32_t GetRef(std::string filename);
+
+	/* Track that this peer is using this ref */
+	void AddReferer(std::string path, Key referer);
+	/* Stop tracking that this peer was using this ref */
+	void DelReferer(std::string path, Key referer);
+	/* Stop tracking all the ref a peer has */
+	void DelReferer(Key);
+
+	/* Send a NET_REF_FILE message to a peer */
+	virtual void SendRefFile(Key to, std::string filename);
 };
 
 extern ContentList content_list;
+
 #endif						  /* CONTENT_LIST_H */

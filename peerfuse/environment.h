@@ -18,17 +18,39 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
-#include "environment_base.h"
 
-class Environment : public EnvironmentBase
+#include "util/key.h"
+#include "util/mutex.h"
+
+class Environment
 {
+protected:
+	template <typename A> class SharedVar : private Mutex
+	{
+		A var;
+		public:
+			SharedVar(A _var) : var(_var) {}
+			~SharedVar() {}
+
+			void Set(A _var)
+			{
+				BlockLockMutex lock(this);
+				var = _var;
+			}
+			A Get()
+			{
+				BlockLockMutex lock(this);
+				return var;
+			}
+	};
 public:
-	Environment() {}
+	Environment() : my_key(Key()), listening_port(0) {}
+	SharedVar<Key> my_key;
+	SharedVar<uint16_t> listening_port;
 };
 
 extern Environment environment;
