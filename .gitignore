@@ -1,3 +1,6 @@
 build.peerfuse-*
 tools/debug_env/debug_env.conf
 tools/debug_env/log*
+dhttest/*.o
+Session.vim
+tags
