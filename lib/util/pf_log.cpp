@@ -40,9 +40,7 @@ static struct
 	{ W_ROUTING,    LOG_DEBUG,   "ROUTING"    },
 	{ W_DESYNCH,    LOG_WARNING, "DESYNCH"    },
 	{ W_WARNING,    LOG_WARNING, "WARNING"    },
-	{ W_BIGWARNING, LOG_WARNING, "BIGWARNING" },
 	{ W_ERR,        LOG_ERR,     "ERR"        },
-	{ W_CONNEC,     LOG_NOTICE,  "CONNEC"     },
 	{ W_INFO,       LOG_NOTICE,  "INFO"       }
 };
 

@@ -36,13 +36,11 @@ enum
 	W_ROUTING    = 1 << 2,                    /* Routing information */
 	W_DESYNCH    = 1 << 3,			  /* Desynchronization */
 	W_WARNING    = 1 << 4,			  /* Warnings */
-	W_BIGWARNING = 1 << 5,			  /* Big warnings */
-	W_ERR        = 1 << 6,			  /* Errors */
-	W_CONNEC     = 1 << 7,			  /* (Dis)connections */
-	W_INFO       = 1 << 8			  /* Info */
+	W_ERR        = 1 << 5,			  /* Errors */
+	W_INFO       = 1 << 6			  /* Info */
 };
 
-#define DEFAULT_LOGGED_FLAGS (W_WARNING|W_BIGWARNING|W_ERR|W_INFO)
+#define DEFAULT_LOGGED_FLAGS (W_DESYNCH|W_WARNING|W_ERR|W_INFO)
 
 #define FLog(flags, msg) pf_log[flags] << __FILE__ << ":" << __PRETTY_FUNCTION << "():" << __LINE__ << ": " << msg
 
