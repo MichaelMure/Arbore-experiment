@@ -95,7 +95,6 @@ ADD_EXECUTABLE(${BIN_NAME}
 		peerfuse/content_list.cpp
 		peerfuse/peerfuse.cpp
 		peerfuse/pf_fuse.cpp
-		peerfuse/file_entry.cpp
 		peerfuse/filedist.cpp
 		peerfuse/job_new_conn_req.cpp
 		peerfuse/job_update_resp_files.cpp
