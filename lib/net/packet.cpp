@@ -37,7 +37,7 @@ Packet::Packet(PacketType _type, const Key& _src, const Key& _dst)
 			size(0),
 			src(_src),
 			dst(_dst),
-			flags(0),
+			flags(_type.GetDefFlags()),
 			seqnum(0),
 			data(NULL)
 {
@@ -62,7 +62,7 @@ Packet::Packet(const Packet& p)
 }
 
 Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
-			: type(0, NULL, "NONE", T_END),
+			: type(0, NULL, 0, "NONE", T_END),
 			size(0),
 			data(NULL)
 {

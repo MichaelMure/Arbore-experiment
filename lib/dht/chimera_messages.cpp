@@ -26,6 +26,7 @@
 #include "util/pf_log.h"
 #include "util/dtime.h"
 #include "net/network.h"
+#include "net/packet.h"
 #include "net/packet_handler.h"
 #include "scheduler/scheduler_queue.h"
 #include "chimera_messages.h"
@@ -169,16 +170,17 @@ public:
 	}
 };
 
-PacketType     ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,     "JOIN",      /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
-                                                                                                                         T_END);
-PacketType  ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage,  "JOIN_ACK",  /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
-                                                                                                                            T_END);
-PacketType   ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,   "UPDATE",    /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
-                                                                                                                         T_END);
-PacketType    ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,    "PIGGY",     /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
-                                                                                                                         T_END);
-PacketType ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage, "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
-                                                                                                                           T_END);
-PacketType     ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,     "PING",      /* CHIMERA_PING_ME */ T_ADDR,
-                                                                                                                 T_END);
+PacketType     ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,    Packet::REQUESTACK|
+                                                                             Packet::MUSTROUTE,   "JOIN",        /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+                                                                                                                                               T_END);
+PacketType  ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage, Packet::REQUESTACK,  "JOIN_ACK", /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
+                                                                                                                                               T_END);
+PacketType   ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,  Packet::REQUESTACK,  "UPDATE",      /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+                                                                                                                                               T_END);
+PacketType    ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,   Packet::REQUESTACK,  "PIGGY",       /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
+                                                                                                                                               T_END);
+PacketType ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage,Packet::REQUESTACK,  "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
+                                                                                                                                               T_END);
+PacketType     ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,    Packet::REQUESTACK,  "PING",                /* CHIMERA_PING_ME */ T_ADDR,
+                                                                                                                                               T_END);
 

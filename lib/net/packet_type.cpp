@@ -25,10 +25,11 @@
 #include "packet_handler.h"
 #include "packet_type.h"
 
-PacketType::PacketType(uint32_t _type, PacketHandlerBase* _handler, std::string _name, ...)
+PacketType::PacketType(uint32_t _type, PacketHandlerBase* _handler, uint32_t _def_flags, std::string _name, ...)
 	: type(_type),
 	  name(_name),
-	  handler(_handler)
+	  handler(_handler),
+	  def_flags(_def_flags)
 {
 	va_list ap;
 	PacketArgType t;

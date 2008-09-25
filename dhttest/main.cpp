@@ -28,7 +28,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	PacketType ChimeraChatType(++LastChimeraType, new ChimeraChatMessage,  "CHAT", T_STR, T_END);
+	PacketType ChimeraChatType(++LastChimeraType, new ChimeraChatMessage, Packet::REQUESTACK|Packet::MUSTROUTE "CHAT", T_STR, T_END);
 
 	if(argc < 2)
 	{

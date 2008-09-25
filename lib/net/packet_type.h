@@ -36,6 +36,7 @@ class PacketType : public std::vector<PacketArgType>
 	uint32_t type;
 	std::string name;
 	PacketHandlerBase* handler;
+	uint32_t def_flags;
 
 public:
 
@@ -43,12 +44,14 @@ public:
 	 *
 	 * @param type  this is the type number.
 	 * @param handler  the handler object.
+	 * @param def_flags  default flags for packets created by this packet type.
+	 * @param name  name of message, for debug information.
 	 * @param ...  put here a list of PacketArgType finished by a T_END.
 	 *
 	 * For example:
-	 *        PacketType(10, MyHandler, T_STR, T_UINT32, T_CHUNK, T_END);
+	 *        PacketType(10, MyHandler, Packet::MUSTROUTE|Packet::REQUESTACK, "BLAH", T_STR, T_UINT32, T_CHUNK, T_END);
 	 */
-	PacketType(uint32_t type, PacketHandlerBase* handler, std::string name, ...);
+	PacketType(uint32_t type, PacketHandlerBase* handler, uint32_t def_flags, std::string name, ...);
 
 	/** Destructor.
 	 *
@@ -62,6 +65,7 @@ public:
 	uint32_t GetType() const { return type; }
 	std::string GetName() const { return name; }
 	PacketHandlerBase* GetHandler() const { return handler; }
+	uint32_t GetDefFlags() const { return def_flags; }
 };
 
 #endif /* PACKET_TYPE_H */
