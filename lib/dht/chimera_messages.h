@@ -33,6 +33,10 @@
 
 class ChimeraDHT;
 
+/** Virtual class used to create handler on a chimera message.
+ *
+ * It routes message if the MUSTROUTE flag is set.
+ */
 class ChimeraBaseMessage : public PacketHandlerBase
 {
 public:
@@ -41,6 +45,11 @@ public:
 	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
 };
 
+/** This is list of all availables chimera messages.
+ *
+ * To prevent conflicts in message types numbers, we declare
+ * this list which contains all of the chimera and upcalls messages.
+ */
 enum
 {
 	CHIMERA_JOIN        = 1,
