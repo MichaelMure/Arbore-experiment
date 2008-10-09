@@ -36,6 +36,7 @@ add_library(dht
 		lib/dht/routing_table.cpp
 		lib/dht/leafset.cpp
 		lib/dht/check_leafset_job.cpp
+		lib/dht/dolr.cpp
 		lib/dht/chimera_messages.cpp
 		lib/dht/chimera.cpp
 		)

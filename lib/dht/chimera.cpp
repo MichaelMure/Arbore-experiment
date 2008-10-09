@@ -167,3 +167,13 @@ void ChimeraDHT::sendRowInfo(const Packet& pckt)
 	if(!Send(host, rowinfo))
 		pf_log[W_ERR] << "Sending row information to node " << host << " failed";
 }
+
+bool ChimeraDHT::Publish(Key key)
+{
+	return true;
+}
+
+bool ChimeraDHT::Unpublish(Key key)
+{
+	return true;
+}
