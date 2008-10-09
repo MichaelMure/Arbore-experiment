@@ -28,14 +28,17 @@
 
 void DOLR::published(Key key, Key owner)
 {
-	std::map
-	if(table.find(key) == table.end())
-	{
-		table[key] = vector;
+	TableType::iterator it = table.find(key);
+	if(it == table.end())
+		it = table.insert(TableType::value_type(key, TableType::mapped_type())).first;
+
+	it->second.insert(owner);
 }
 
 void DOLR::unpublised(Key key, Key owner)
 {
-
+	TableType::iterator it = table.find(key);
+	if(it != table.end())
+		it->second.erase(owner);
 }
 

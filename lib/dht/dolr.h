@@ -23,20 +23,25 @@
  *
  */
 
-#ifndef _DORL_H
-#define _DORL_H
+#ifndef _DOLR_H
+#define _DOLR_H
 
-class DORL
+#include <map>
+#include <set>
+#include "util/key.h"
+
+class DOLR
 {
-	std::map<Key, std::vector<Key> > table;
+	typedef std::map<Key, std::set<Key> > TableType;
+	TableType table;
 
 public:
 
-	DORL();
-	~DORL();
+	DOLR();
+	~DOLR();
 
 	void published(Key key, Key owner);
 	void unpublised(Key key, Key owner);
 };
 
-#endif /* _DORL_H */
+#endif /* _DOLR_H */
