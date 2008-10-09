@@ -108,6 +108,15 @@ public:
 	 * @return  true if the host is up.
 	 */
 	bool Ping(const Host& dest);
+
+	/** Publish an object on DHT */
+	bool Publish(Key id);
+
+	/** Unpublish an object on DHT */
+	bool Unpublish(Key id);
+
+	/** Send message to owners on an object. */
+	bool SendToObj(Key id, const Packet& pckt);
 };
 
 #endif /* CHIMERA_H */

@@ -170,17 +170,35 @@ public:
 	}
 };
 
-PacketType     ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,    Packet::REQUESTACK|
-                                                                             Packet::MUSTROUTE,   "JOIN",        /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
-                                                                                                                                               T_END);
-PacketType  ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage, Packet::REQUESTACK,  "JOIN_ACK", /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
-                                                                                                                                               T_END);
-PacketType   ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,  Packet::REQUESTACK,  "UPDATE",      /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
-                                                                                                                                               T_END);
-PacketType    ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,   Packet::REQUESTACK,  "PIGGY",       /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
-                                                                                                                                               T_END);
-PacketType ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage,Packet::REQUESTACK,  "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
-                                                                                                                                               T_END);
-PacketType     ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,    Packet::REQUESTACK,  "PING",                /* CHIMERA_PING_ME */ T_ADDR,
-                                                                                                                                               T_END);
+class ChimeraPublishMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+	}
+};
+
+class ChimeraUnpublishMessage : public ChimeraBaseMessage
+{
+public:
+	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	{
+	}
+};
+
+PacketType      ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,      Packet::REQUESTACK|
+                                                                                Packet::MUSTROUTE,   "JOIN",        /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+                                                                                                                                                  T_END);
+PacketType   ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage,   Packet::REQUESTACK,  "JOIN_ACK", /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
+                                                                                                                                                  T_END);
+PacketType    ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,    Packet::REQUESTACK,  "UPDATE",      /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+                                                                                                                                                  T_END);
+PacketType     ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,     Packet::REQUESTACK,  "PIGGY",       /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
+                                                                                                                                                  T_END);
+PacketType  ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage,  Packet::REQUESTACK,  "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
+                                                                                                                                                  T_END);
+PacketType      ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,      Packet::REQUESTACK,  "PING",                /* CHIMERA_PING_ME */ T_ADDR,
+                                                                                                                                                  T_END);
+PacketType   ChimeraPublishType(CHIMERA_PUBLISH,   new ChimeraPublishMessage,   Packet::REQUESTACK,  "PUBLISH",                                   T_END);
+PacketType ChimeraUnpublishType(CHIMERA_UNPUBLISH, new ChimeraUnpublishMessage, Packet::REQUESTACK,  "UNPUBLISH",                                 T_END);
 

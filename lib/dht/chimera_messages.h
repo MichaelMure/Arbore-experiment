@@ -104,4 +104,7 @@ enum
 };
 extern PacketType ChimeraPingType;
 
+extern PacketType ChimeraPublishType;
+extern PacketType ChimeraUnpublishType;
+
 #endif /* CHIMERA_MESSAGES_H */
