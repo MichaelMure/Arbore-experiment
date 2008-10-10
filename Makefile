@@ -18,4 +18,7 @@ clean:
 	rm -rf build.peerfuse
 	rm -rf release
 
-.PHONY: all clean install
+doc:
+	cd doc/ && /usr/bin/doxygen
+
+.PHONY: all clean install doc
