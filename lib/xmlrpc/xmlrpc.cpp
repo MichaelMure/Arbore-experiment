@@ -33,11 +33,7 @@
 #include "peer.h"
 #include "cache.h"
 
-#ifdef PF_NET
-#include <pfnet.h>
-#elif PF_LAN
-#include <pflan.h>
-#endif
+#include <peerfuse.h>
 
 using namespace XmlRpc;
 

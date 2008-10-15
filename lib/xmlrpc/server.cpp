@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <unistd.h>
@@ -33,7 +32,7 @@
 
 #include "pf_config.h"
 #include "pf_log.h"
-#include "xmlrpc_server.h"
+#include "xmlrpc/server.h"
 
 bool PfXmlRpcServer::bindAndListen(int port, int backlog)
 {
