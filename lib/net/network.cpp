@@ -183,7 +183,6 @@ void Network::Loop()
 	tmp_read_set = socks_fd_set;
 	Unlock();
 
-	/* TODO: this is useless to use select() here, because now there is only one fd (server sock) */
 	if((events = select(highsock + 1, &tmp_read_set, NULL, NULL, NULL)) < 0)
 	{
 		if(errno != EINTR)
