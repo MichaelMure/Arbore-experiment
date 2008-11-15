@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <stdio.h>
@@ -26,24 +26,23 @@
 #include <errno.h>
 #include <assert.h>
 #include <algorithm>
-#include "file_content_base.h"
-#include "file_chunk.h"
-#include "file_chunk_desc.h"
-#include "scheduler_queue.h"
-#include "session_config.h"
-#include "hdd.h"
-#include "peers_list.h"
+#include "files/file_content.h"
+#include "files/file_chunk.h"
+#include "files/file_chunk_desc.h"
+#include "files/hdd.h"
+#include "scheduler/scheduler_queue.h"
+#include "util/session_config.h"
 
 const time_t write_to_hdd_timeout = 10;
 
-FileContentBase::FileContentBase(std::string _filename) :
+FileContent::FileContent(std::string _filename) :
 			Mutex(RECURSIVE_MUTEX),
 			ondisk_offset(0),
 			ondisk_size(0),
 			ondisk_fd(-1),
 			ondisk_synced(true),
 			filename(_filename),
-			last_peer_requested(0),
+			last_peer_requested(),
 			ref_request_time(0)
 {
 	uint32_t nbr = 0;
@@ -52,7 +51,7 @@ FileContentBase::FileContentBase(std::string _filename) :
 	access_time = time(NULL);
 }
 
-FileContentBase::FileContentBase(const FileContentBase& other) :
+FileContent::FileContent(const FileContent& other) :
 			Mutex(RECURSIVE_MUTEX),
 std::list<FileChunk>(),				  /* to avoid a warning */
 			ondisk_offset(other.ondisk_offset),
@@ -71,13 +70,13 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 	access_time = other.access_time;
 }
 
-FileContentBase::~FileContentBase()
+FileContent::~FileContent()
 {
 	if(ondisk_fd != -1)
 		close(ondisk_fd);
 }
 
-bool FileContentBase::LoadFd()
+bool FileContent::LoadFd()
 {
 	BlockLockMutex lock(this);
 	if(ondisk_fd == -1)
@@ -98,7 +97,7 @@ bool FileContentBase::LoadFd()
 	return (ondisk_fd != -1);
 }
 
-void FileContentBase::OnDiskWrite(FileChunk& chunk)
+void FileContent::OnDiskWrite(FileChunk& chunk)
 {
 	BlockLockMutex lock(this);
 	ondisk_offset = 0;
@@ -120,7 +119,7 @@ void FileContentBase::OnDiskWrite(FileChunk& chunk)
 	chunk.SetHddSynced(true);
 }
 
-bool FileContentBase::OnDiskLoad(FileChunkDesc chunk_desc)
+bool FileContent::OnDiskLoad(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	if(!LoadFd())
@@ -141,7 +140,7 @@ bool FileContentBase::OnDiskLoad(FileChunkDesc chunk_desc)
 	return true;
 }
 
-bool FileContentBase::OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load)
+bool FileContent::OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load)
 {
 	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
@@ -161,7 +160,7 @@ bool FileContentBase::OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_lo
 	return false;
 }
 
-FileChunk FileContentBase::GetChunk(FileChunkDesc chunk_desc)
+FileChunk FileContent::GetChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -187,7 +186,7 @@ FileChunk FileContentBase::GetChunk(FileChunkDesc chunk_desc)
 	return chunk;
 }
 
-bool FileContentBase::FileContentHaveChunk(FileChunkDesc chunk_desc)
+bool FileContent::FileContentHaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	iterator it = begin();
@@ -212,7 +211,7 @@ bool FileContentBase::FileContentHaveChunk(FileChunkDesc chunk_desc)
 	return (it != end()) && next_off == it->GetOffset();
 }
 
-FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkDesc chunk_desc)
+FileContent::chunk_availability FileContent::NetworkHaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	/* If nobody's connected we won't receive anything */
@@ -228,7 +227,7 @@ FileContentBase::chunk_availability FileContentBase::NetworkHaveChunk(FileChunkD
 	return NetworkRequestChunk(chunk_desc);
 }
 
-FileContentBase::chunk_availability FileContentBase::HaveChunk(FileChunkDesc chunk_desc)
+FileContent::chunk_availability FileContent::HaveChunk(FileChunkDesc chunk_desc)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -245,14 +244,14 @@ FileContentBase::chunk_availability FileContentBase::HaveChunk(FileChunkDesc chu
 	return NetworkHaveChunk(chunk_desc);
 }
 
-bool FileContentBase::HaveAnyChunk()
+bool FileContent::HaveAnyChunk()
 {
 	BlockLockMutex lock(this);
 	LoadFd();				  /* Needed to update the ondisk_size value */
 	return size() != 0 || ondisk_size != 0;
 }
 
-void FileContentBase::SetChunk(FileChunk chunk)
+void FileContent::SetChunk(FileChunk chunk)
 {
 	BlockLockMutex lock(this);
 	ondisk_synced = false;
@@ -264,6 +263,8 @@ void FileContentBase::SetChunk(FileChunk chunk)
 		pf_log[W_DEBUG] << "Erasing matching request";
 		net_requested.erase(net_it);
 	}
+
+	cache.AddSharer(filename, environment.my_id.Get());
 
 	/* Merge into the chunk list */
 	iterator it = begin();
@@ -303,7 +304,7 @@ void FileContentBase::SetChunk(FileChunk chunk)
 	insert(it, new_chunk);
 }
 
-void FileContentBase::Truncate(off_t offset)
+void FileContent::Truncate(off_t offset)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -341,7 +342,7 @@ void FileContentBase::Truncate(off_t offset)
 	}
 }
 
-void FileContentBase::SyncToHdd(bool force)
+void FileContent::SyncToHdd(bool force)
 {
 	BlockLockMutex lock(this);
 	if(ondisk_synced)
@@ -385,7 +386,7 @@ void FileContentBase::SyncToHdd(bool force)
 	}
 }
 
-void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
+void FileContent::GetSharedContent(off_t& offset, off_t& size)
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -408,18 +409,18 @@ void FileContentBase::GetSharedContent(off_t& offset, off_t& size)
 			++it;
 		}
 		--it;
-	
+
 		size =  MAX(it->GetEndOffset(), ondisk_offset + ondisk_size) - offset;
 	}
 }
 
-time_t FileContentBase::GetAccessTime() const
+time_t FileContent::GetAccessTime() const
 {
 	BlockLockMutex lock(this);
 	return access_time;
 }
 
-void FileContentBase::NetworkFlushRequests()
+void FileContent::NetworkFlushRequests()
 {
 	BlockLockMutex lock(this);
 	access_time = time(NULL);
@@ -481,7 +482,7 @@ void FileContentBase::NetworkFlushRequests()
 	}
 }
 
-void FileContentBase::SetSharer(pf_id sharer, off_t offset, off_t size)
+void FileContent::SetSharer(pf_id sharer, off_t offset, off_t size)
 {
 	BlockLockMutex lock(this);
 	struct sharedchunks shared_part;
@@ -491,7 +492,7 @@ void FileContentBase::SetSharer(pf_id sharer, off_t offset, off_t size)
 	NetworkFlushRequests();
 }
 
-IDList FileContentBase::GetSharers()
+IDList FileContent::GetSharers()
 {
 	BlockLockMutex lock(this);
 	IDList lst;
@@ -501,10 +502,46 @@ IDList FileContentBase::GetSharers()
 	return lst;
 }
 
-void FileContentBase::RemoveSharer(pf_id peer)
+void FileContent::RemoveSharer(pf_id peer)
 {
 	BlockLockMutex lock(this);
 	std::map<pf_id, struct sharedchunks>::iterator it;
 	if((it = sharers.find(peer)) != sharers.end())
 		sharers.erase(it);
+}
+
+FileContent::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc chunk)
+{
+	time_t now = time(NULL);
+	if(now > ref_request_time + ref_request_refresh)
+	{
+		// We don't know who have which part of the file
+		pf_log[W_DEBUG] << "Request for file refs";
+		cache.RequestFileRefs(filename);
+		ref_request_time = time(NULL);
+	}
+
+	// Check the chunk presence on the network
+	if(/* TODO: enter this only if all FILE_REF have been received */ false)
+	{
+		std::map<pf_id, struct sharedchunks>::iterator it;
+		bool found = false;
+		for(it = sharers.begin(); it != sharers.end(); ++it)
+		{
+			if(it->second.offset <= chunk.GetOffset() && it->second.offset + it->second.size >= chunk.GetOffset() + (off_t)chunk.GetSize())
+			{
+				found = true;
+				break;
+			}
+		}
+		if(!found)
+		{
+			pf_log[W_INFO] << "Some parts of \"" << filename << "\" are not available on the network.";
+			return CHUNK_UNAVAILABLE;
+		}
+	}
+	if(sharers.size() != 0)
+		NetworkFlushRequests();
+
+	return CHUNK_NOT_READY;
 }

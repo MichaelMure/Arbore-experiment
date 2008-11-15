@@ -28,6 +28,7 @@
 
 #include "util/mutex.h"
 #include "util/pf_thread.h"
+#include "files/file_content.h"
 
 class ContentList : public Thread, private Mutex, private std::map<std::string, FileContent>
 {

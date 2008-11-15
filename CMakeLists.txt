@@ -46,7 +46,8 @@ add_library(files
 		lib/files/dir_entry.cpp
 		lib/files/file_entry.cpp
 		lib/files/file_chunk.cpp
-#		lib/files/file_content_base.cpp
+		lib/files/file_content.cpp
+		lib/files/hdd.cpp
 	   )
 SET(PFLIBS ${PFLIBS} files)
 
@@ -88,11 +89,9 @@ ENDIF(NOT PF_SERVER_MODE)
 
 SET(BIN_NAME peerfuse)
 ADD_EXECUTABLE(${BIN_NAME}
-		peerfuse/hdd.cpp
 		peerfuse/application.cpp
 		peerfuse/tree.cpp
 		peerfuse/environment.cpp
-		peerfuse/file_content.cpp
 		peerfuse/content_list.cpp
 		peerfuse/peerfuse.cpp
 		peerfuse/pf_fuse.cpp

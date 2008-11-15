@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef FILE_CONTENT_BASE_H
-#define FILE_CONTENT_BASE_H
+#ifndef FILE_CONTENT_H
+#define FILE_CONTENT_H
 
 #include <string>
 #include <list>
@@ -30,10 +30,11 @@
 
 #include "util/mutex.h"
 #include "util/pf_types.h"
+#include "util/key.h"
 #include "file_chunk.h"
 #include "file_chunk_desc.h"
 
-class FileContentBase : public Mutex, private std::list<FileChunk>
+class FileContent : public Mutex, private std::list<FileChunk>
 {
 public:
 	typedef enum _chunk_availability
@@ -73,11 +74,11 @@ private:
 	bool OnDiskLoad(FileChunkDesc chunk_desc);
 	void OnDiskWrite(FileChunk& chunk);
 
-	FileContentBase& operator=(const FileContentBase &other);
+	FileContent& operator=(const FileContent &other);
 public:
-	FileContentBase(std::string _filename);
-	FileContentBase(const FileContentBase&);
-	virtual ~FileContentBase();
+	FileContent(std::string _filename);
+	FileContent(const FileContent&);
+	virtual ~FileContent();
 
 	std::string GetFilename() const { return filename; }
 	/** Load a chunk from the hdd or ask it on the network
@@ -114,4 +115,4 @@ public:
 
 	KeyList GetSharers();
 };
-#endif						  /* FILE_CONTENT_BASE_H */
+#endif						  /* FILE_CONTENT_H */

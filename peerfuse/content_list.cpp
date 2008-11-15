@@ -22,7 +22,6 @@
 
 #include "content_list.h"
 #include "environment.h"
-#include "peers_list.h"
 
 ContentList content_list;
 

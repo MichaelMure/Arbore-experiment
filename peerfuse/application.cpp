@@ -35,6 +35,7 @@
 #include "util/pf_log.h"
 #include "util/session_config.h"
 #include "application.h"
+#include "content_list.h"
 #include "hdd.h"
 #include "peerfuse.h"
 #include "tree.h"
@@ -84,16 +85,16 @@ Application::Application()
 
 void Application::StartThreads()
 {
-	//xmlrpc.Start();
 	Scheduler::StartSchedulers(5);
 	net.Start();
-	//content_list.Start();
+	content_list.Start();
+	//xmlrpc.Start();
 }
 
 void Application::Exit()
 {
 	//xmlrpc.Stop();
-	//content_list.Stop();
+	content_list.Stop();
 	net.Stop();
 	Scheduler::StopSchedulers();
 	/* It is not necessary to save session_config, because destructor do this */
@@ -170,7 +171,7 @@ int Application::main(int argc, char *argv[])
 		pf_log[W_ERR] << "Error while loading:";
 		pf_log[W_ERR] << e.Reason();
 	}
-	catch(Thread::CantRun&e)
+	catch(Thread::CantRun &e)
 	{
 		pf_log[W_ERR] << "Unable to create network thread, exiting..";
 	}
