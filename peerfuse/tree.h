@@ -118,4 +118,6 @@ public:
 	bool FileExists(std::string path);
 };
 
+extern Tree tree;
+
 #endif /* TREE_H */

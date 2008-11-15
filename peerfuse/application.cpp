@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #define FUSE_USE_VERSION 26
@@ -36,7 +35,6 @@
 #include "util/pf_log.h"
 #include "util/session_config.h"
 #include "application.h"
-#include "content_list.h"
 #include "hdd.h"
 #include "peerfuse.h"
 #include "tree.h"
@@ -46,6 +44,8 @@
 #include <fuse.h>
 #include "pf_fuse.h"
 #endif
+
+Network net;
 
 void* fuse_init(struct fuse_conn_info* fuse_info)
 {
@@ -69,15 +69,6 @@ Application::Application()
 	section->AddItem(new ConfigItem_string("host", "Hostname"), true);
 	section->AddItem(new ConfigItem_int("port", "Port", 1, 65535));
 
-#if 0
-	section = conf.AddSection("ssl", "SSL parameters", false);
-	section->AddItem(new ConfigItem_string("cert", "Certificate path"));
-	section->AddItem(new ConfigItem_string("key", "Private key path"));
-	section->AddItem(new ConfigItem_string("ca", "CA certificate"));
-	section->AddItem(new ConfigItem_bool("disable_crl", "Disable CRL download / check", "true"));
-	section->AddItem(new ConfigItem_string("crl_url", "URL of the crl", "http://"));
-#endif
-
 	section = conf.AddSection("logging", "Log informations", false);
 	section->AddItem(new ConfigItem_string("level", "Logging level"));
 	section->AddItem(new ConfigItem_bool("to_syslog", "Log error and warnings to syslog"));
@@ -94,7 +85,7 @@ Application::Application()
 void Application::StartThreads()
 {
 	//xmlrpc.Start();
-	scheduler.Start();
+	Scheduler::StartSchedulers(5);
 	net.Start();
 	//content_list.Start();
 }
@@ -104,7 +95,7 @@ void Application::Exit()
 	//xmlrpc.Stop();
 	//content_list.Stop();
 	net.Stop();
-	scheduler.Stop();
+	Scheduler::StopSchedulers();
 	/* It is not necessary to save session_config, because destructor do this */
 }
 
@@ -112,11 +103,11 @@ int Application::main(int argc, char *argv[])
 {
 	if(argc < 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
 	{
-		#ifdef PF_SERVER_MODE
+#ifdef PF_SERVER_MODE
 		std::cerr << "Syntax: " << argv[0] << " <configpath>" << std::endl;
-		#else
+#else
 		std::cerr << "Syntax: " << argv[0] << " <configpath> <mount point> [fuse options]" << std::endl;
-		#endif
+#endif
 		return EXIT_FAILURE;
 	}
 
@@ -152,71 +143,19 @@ int Application::main(int argc, char *argv[])
 		if(!tree_cfg.Save())
 			return EXIT_FAILURE;
 
-		cache.Load(conf.GetSection("hdd")->GetItem("root")->String());
+		tree.Load(conf.GetSection("hdd")->GetItem("root")->String());
+
+		net.StartNetwork(&conf);
 
 #if 0
-		if(!conf.GetSection("ssl")->GetItem("disable_crl")->Boolean())
-		{
-			crl.Set(conf.GetSection("hdd")->GetItem("workdir")->String() + "/crl.pem",
-				conf.GetSection("ssl")->GetItem("crl_url")->String());
-			try
-			{
-				crl.Load();
-			}
-			catch(Crl::BadCRL &e)
-			{
-				pf_log[W_ERR] << "Failed to load the crl: "<< e.GetString();
-				return EXIT_FAILURE;
-			}
-			catch(...)
-			{
-				pf_log[W_ERR] << "Failed to load the crl.";
-				return EXIT_FAILURE;
-			}
-		}
-		else
-			crl.Disable();
-#endif
-
-		try
-		{
-			net.StartNetwork(&conf);
-		}
-		catch(Certificate::BadCertificate &e)
-		{
-			pf_log[W_ERR] << "Unable to read certificate: " << e.GetString();
-			return (EXIT_FAILURE);
-		}
-		catch(Certificate::BadFile &e)
-		{
-			pf_log[W_ERR] << "Unable to read certificate file";
-			return (EXIT_FAILURE);
-		}
-		catch(PrivateKey::BadPrivateKey &e)
-		{
-			pf_log[W_ERR] << "Unable to read priveate key: " << e.GetString();
-			return (EXIT_FAILURE);
-		}
-		catch(PrivateKey::BadFile &e)
-		{
-			pf_log[W_ERR] << "Unable to read private key file";
-			return (EXIT_FAILURE);
-		}
-		catch(Crl::BadCRL &e)
-		{
-			pf_log[W_ERR] << "Unable to CRL file: " << e.GetString();
-			return (EXIT_FAILURE);
-		}
-
 		xmlrpc.SetNetworkBase(net);
 		xmlrpc.SetPeersListBase(peers_list);
-
-		cache.UpdateRespFiles();
+#endif
 
 		umask(0);
-		#ifndef PF_SERVER_MODE
+#ifndef PF_SERVER_MODE
 		return fuse_main(argc-1, argv+1, &pf_oper, NULL);
-		#else
+#else
 		StartThreads();			  /* this function is called by fuse_main, so without fuse we call it ourselves. */
 		while(1) sleep(1);
 
@@ -224,7 +163,7 @@ int Application::main(int argc, char *argv[])
 		// and do:
 		Exit();
 		return EXIT_SUCCESS;
-		#endif
+#endif
 	}
 	catch(MyConfig::error_exc &e)
 	{
