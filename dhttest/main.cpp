@@ -6,9 +6,9 @@
 #include "lib/net/packet.h"
 #include "lib/net/hosts_list.h"
 #include "lib/dht/chimera.h"
-#include "lib/scheduler.h"
-#include "lib/pf_log.h"
-#include "lib/tools.h"
+#include "lib/scheduler/scheduler.h"
+#include "lib/util/pf_log.h"
+#include "lib/util/tools.h"
 #include "lib/dht/chimera_messages.h"
 
 enum
@@ -28,7 +28,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	PacketType ChimeraChatType(++LastChimeraType, new ChimeraChatMessage, Packet::REQUESTACK|Packet::MUSTROUTE "CHAT", T_STR, T_END);
+	PacketType ChimeraChatType(15, new ChimeraChatMessage, Packet::REQUESTACK|Packet::MUSTROUTE, "CHAT", T_STR, T_END);
 
 	if(argc < 2)
 	{

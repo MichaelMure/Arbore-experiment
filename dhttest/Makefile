@@ -1,29 +1,29 @@
 FILES=main.o \
-	../common/dtime.o \
-	../common/tools.o \
-	../common/mutex.o \
-	../common/pf_thread.o \
-	../common/pf_log.o \
-	../common/scheduler.o \
-	../common/scheduler_queue.o \
-	../common/files/file_chunk.o \
-	../common/jobs/job.o \
-	../common/net/network.o \
-	../common/net/packet.o \
-	../common/net/packet_type.o \
-	../common/net/packet_type_list.o \
-	../common/net/host.o \
-	../common/net/hosts_list.o \
-	../common/net/pf_addr.o \
-	../common/dht/chimera.o \
-	../common/dht/key.o \
-	../common/dht/chimera_messages.o \
-	../common/dht/chimera_routing.o \
-	../common/dht/routing_table.o \
-	../common/dht/leafset.o \
-	../common/dht/check_leafset_job.o
+	../lib/util/dtime.o \
+	../lib/util/tools.o \
+	../lib/util/mutex.o \
+	../lib/util/pf_thread.o \
+	../lib/util/pf_log.o \
+	../lib/util/key.o \
+	../lib/scheduler/scheduler.o \
+	../lib/scheduler/scheduler_queue.o \
+	../lib/scheduler/job.o \
+	../lib/files/file_chunk.o \
+	../lib/net/network.o \
+	../lib/net/packet.o \
+	../lib/net/packet_type.o \
+	../lib/net/packet_type_list.o \
+	../lib/net/host.o \
+	../lib/net/hosts_list.o \
+	../lib/net/pf_addr.o \
+	../lib/dht/chimera.o \
+	../lib/dht/chimera_messages.o \
+	../lib/dht/chimera_routing.o \
+	../lib/dht/routing_table.o \
+	../lib/dht/leafset.o \
+	../lib/dht/check_leafset_job.o
 
-COMPILE=g++ -O0 -g -Wall -Wextra -I.. -I../common -I../common/jobs -I../common/net -I../common/dht
+COMPILE=g++ -O0 -g -Wall -Wextra -I.. -I../lib -I../lib/jobs -I../lib/net -I../lib/dht
 
 .SUFFIXES: .cpp .o .c
 %.o: %.cpp
