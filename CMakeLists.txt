@@ -89,11 +89,12 @@ ENDIF(NOT PF_SERVER_MODE)
 
 SET(BIN_NAME peerfuse)
 ADD_EXECUTABLE(${BIN_NAME}
+		peerfuse/peerfuse.cpp
 		peerfuse/application.cpp
 		peerfuse/tree.cpp
 		peerfuse/environment.cpp
 		peerfuse/content_list.cpp
-		peerfuse/peerfuse.cpp
+		peerfuse/file_chunk_requester.cpp
 		peerfuse/pf_fuse.cpp
 		peerfuse/filedist.cpp
 		peerfuse/job_new_conn_req.cpp
