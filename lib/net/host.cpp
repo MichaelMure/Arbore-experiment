@@ -141,14 +141,12 @@ void _Host::UpdateStat (int success)
  *************************/
 
 Host::Host()
-	: host(NULL),
-	magicnumber(MagicNumber)
+	: host(NULL)
 {
 
 }
 
 Host::Host(Mutex* mutex, const pf_addr& addr)
-	: magicnumber(MagicNumber)
 {
 	assert(mutex != NULL);
 	this->host = new _Host(mutex, addr);
@@ -158,8 +156,6 @@ Host::Host(Mutex* mutex, const pf_addr& addr)
 Host::Host(const Host& h)
 {
 	this->host = h.host;
-	this->magicnumber = h.magicnumber;
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -182,8 +178,6 @@ Host& Host::operator=(const Host& h)
 	deinit();
 
 	this->host = h.host;
-	this->magicnumber = h.magicnumber;
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return *this;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -194,7 +188,6 @@ Host& Host::operator=(const Host& h)
 
 Host::~Host()
 {
-	assert(magicnumber == Host::MagicNumber);
 	deinit();
 }
 
@@ -215,7 +208,6 @@ Host::operator bool() const
 
 pf_addr Host::GetAddr() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return pf_addr();
 
 	BlockLockMutex(this->host->GetMutex());
@@ -224,7 +216,6 @@ pf_addr Host::GetAddr() const
 
 std::string Host::Encode() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return "";
 
 	BlockLockMutex(this->host->GetMutex());
@@ -233,7 +224,6 @@ std::string Host::Encode() const
 
 void Host::UpdateStat (int success)
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -242,7 +232,6 @@ void Host::UpdateStat (int success)
 
 Key Host::GetKey() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return Key();
 
 	BlockLockMutex(this->host->GetMutex());
@@ -251,7 +240,6 @@ Key Host::GetKey() const
 
 void Host::SetKey(Key k)
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -260,7 +248,6 @@ void Host::SetKey(Key k)
 
 double Host::GetFailureTime() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return 0.0;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -269,7 +256,6 @@ double Host::GetFailureTime() const
 
 void Host::SetLatency(double f)
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -278,7 +264,6 @@ void Host::SetLatency(double f)
 
 double Host::GetLatency() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return 0.0;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -287,7 +272,6 @@ double Host::GetLatency() const
 
 void Host::SetFailureTime(double f)
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -295,7 +279,6 @@ void Host::SetFailureTime(double f)
 }
 float Host::GetSuccessAvg() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return 0.0;
 
 	BlockLockMutex(this->host->GetMutex());
@@ -304,7 +287,6 @@ float Host::GetSuccessAvg() const
 
 unsigned int Host::GetReference() const
 {
-	assert(magicnumber == Host::MagicNumber);
 	if(this->host == NULL) return 0;
 
 	BlockLockMutex(this->host->GetMutex());
