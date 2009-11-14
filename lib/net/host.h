@@ -45,6 +45,8 @@ class Host
 	static const int MagicNumber = 1234567;
 	int magicnumber;
 
+	void deinit();
+
 public:
 
 	/** Empty constructor */

@@ -166,8 +166,21 @@ Host::Host(const Host& h)
 	this->host->reference++;
 }
 
+void Host::deinit()
+{
+	if(this->host)
+	{
+		BlockLockMutex(this->host->GetMutex());
+		this->host->reference--;
+		if(!this->host->referenc)
+			delete this->host;
+	}
+}
+
 Host& Host::operator=(const Host& h)
 {
+	deinit();
+
 	this->host = h.host;
 	this->magicnumber = h.magicnumber;
 	assert(magicnumber == Host::MagicNumber);
@@ -182,12 +195,7 @@ Host& Host::operator=(const Host& h)
 Host::~Host()
 {
 	assert(magicnumber == Host::MagicNumber);
-	if(this->host == NULL) return;
-
-	BlockLockMutex(this->host->GetMutex());
-	this->host->reference--;
-	if(!this->host->reference)
-		delete this->host;
+	deinit();
 }
 
 bool Host::operator==(const Host& h2)
