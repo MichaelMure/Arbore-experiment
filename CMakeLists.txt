@@ -1,5 +1,6 @@
 PROJECT(peerfuse)
 cmake_minimum_required(VERSION 2.6)
+SET(BUILD "Debug")
 
 add_library(util
 		lib/util/dtime.c
@@ -63,29 +64,6 @@ SET(PFLIBS ${PFLIBS} files)
 #	   )
 #SET(PFLIBS ${PFLIBS} ssl)
 
-IF(NOT PF_SERVER_MODE)
-#	add_library(fuse
-#			lib/fuse/fs_utils.cpp
-#			lib/fuse/chmod.cpp
-#			lib/fuse/chown.cpp
-#			lib/fuse/create.cpp
-#			lib/fuse/flush.cpp
-#			lib/fuse/getattr.cpp
-#			lib/fuse/mkdir.cpp
-#			lib/fuse/read.cpp
-#			lib/fuse/readdir.cpp
-#			lib/fuse/rename.cpp
-#			lib/fuse/rmdir.cpp
-#			lib/fuse/truncate.cpp
-#			lib/fuse/unlink.cpp
-#			lib/fuse/utimens.cpp
-#			lib/fuse/write.cpp
-#			)
-#	SET(PFLIBS ${PFLIBS} fuse)
-
-ELSE(NOT PF_SERVER_MODE)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DPF_SERVER_MODE")
-ENDIF(NOT PF_SERVER_MODE)
 
 SET(BIN_NAME peerfuse)
 ADD_EXECUTABLE(${BIN_NAME}
@@ -113,23 +91,6 @@ IF(NOT OPENSSL_FOUND)
 	MESSAGE(FATAL_ERROR "Unable to OpenSSL library")
 ENDIF(NOT OPENSSL_FOUND)
 
-## Fuse package, when server mode is disabled
-IF(NOT PF_SERVER_MODE)
-	INCLUDE(FindFuse.cmake)
-	IF(NOT FUSE_FOUND)
-		MESSAGE(FATAL_ERROR "Unable to find Fuse library")
-	ELSE(NOT FUSE_FOUND)
-		MESSAGE(STATUS "Found Fuse: ${FUSE_LINK_DIR} ${FUSE_LDFLAGS}")
-
-		## Check the version
-		INCLUDE(CheckLibraryExists)
-		CHECK_LIBRARY_EXISTS(fuse fuse_main_real_compat25 "" HAVE_FUSE26)
-		IF(NOT HAVE_FUSE26)
-			MESSAGE(FATAL_ERROR "The Fuse library installed isn't recent enough. Please install libfuse-2.6 or higher.")
-		ENDIF(NOT HAVE_FUSE26)
-	ENDIF(NOT FUSE_FOUND)
-ENDIF(NOT PF_SERVER_MODE)
-
 ## LibCurl
 SET(CURL_FIND_REQUIRED TRUE)
 FIND_PACKAGE(CURL)
@@ -139,31 +100,14 @@ ELSE(CURL_FOUND)
 	MESSAGE(FATAL_ERROR "Unable to find Curl library")
 ENDIF(CURL_FOUND)
 
-## LibXmlRPC++
-SET(XMLRPCXX_FIND_REQUIRED TRUE)
-INCLUDE(UsePkgConfig)
-PKGCONFIG("libxmlrpc++" XMLRPCXX_INCLUDE_DIR XMLRPCXX_LINK_DIR
-	        XMLRPCXX_LDFLAGS XMLRPCXX_CFLAGS)
-IF(XMLRPCXX_INCLUDE_DIR OR XMLRPCXX_LINK_DIR OR XMLRPCXX_LDFLAGS OR XMLRPCXX_CFLAGS)
-  SET(XMLRPCXX_FOUND TRUE)
-ELSE(XMLRPCXX_INCLUDE_DIR OR XMLRPCXX_LINK_DIR OR XMLRPCXX_LDFLAGS OR XMLRPCXX_CFLAGS)
-  SET(XMLRPCXX_FOUND FALSE)
-ENDIF(XMLRPCXX_INCLUDE_DIR OR XMLRPCXX_LINK_DIR OR XMLRPCXX_LDFLAGS OR XMLRPCXX_CFLAGS)
-IF(XMLRPCXX_FOUND)
-	MESSAGE(STATUS "Found XmlRPC++: ${XMLRPCXX_LINK_DIR} ${XMLRPCXX_LDFLAGS}")
-ELSE(XMLRPCXX_FOUND)
-	MESSAGE(FATAL_ERROR "Unable to find XmlRPC++ library")
-ENDIF(XMLRPCXX_FOUND)
 
-
-INCLUDE_DIRECTORIES(${BIN_NAME} ${FUSE_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} ${XMLRPCXX_INCLUDE_DIR}
-	"${BIN_NAME}/" "lib/")
-LINK_DIRECTORIES(${LIBS_DIR} ${FUSE_LINK_DIR} ${XMLRPCXX_LINK_DIR})
-TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${FUSE_LDFLAGS} ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES} ${XMLRPCXX_LDFLAGS})
+INCLUDE_DIRECTORIES(${BIN_NAME} ${OPENSSL_INCLUDE_DIR} ${CURL_INCLUDE_DIRS} "${BIN_NAME}/" "lib/")
+LINK_DIRECTORIES(${LIBS_DIR} )
+TARGET_LINK_LIBRARIES(${BIN_NAME} "-lpthread -lstdc++" ${OPENSSL_LIBRARIES} ${CURL_LIBRARIES} )
 
 
 SET(CMAKE_BUILD_TYPE ${BUILD})
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FUSE_CFLAGS} ${XMLRPCXX_CFLAGS} -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
 
 STRING(COMPARE EQUAL ${CMAKE_BUILD_TYPE} "Debug" DEBUG_BUILD)
@@ -186,5 +130,4 @@ INSTALL(FILES ${CONF_NAME}
 INSTALL(FILES BUGS COPYING HACKING README ROADMAP TASKS
         DESTINATION doc/peerfuse)
 INSTALL(DIRECTORY doc/
-        DESTINATION doc/peerfuse
-        PATTERN ".svn" EXCLUDE)
+        DESTINATION doc/peerfuse)
