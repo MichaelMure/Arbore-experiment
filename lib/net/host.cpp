@@ -168,7 +168,7 @@ void Host::deinit()
 	{
 		BlockLockMutex(this->host->GetMutex());
 		this->host->reference--;
-		if(!this->host->referenc)
+		if(!this->host->reference)
 			delete this->host;
 	}
 }
