@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 #
 # Copyright(C) 2008 Laurent Defert
 #
@@ -18,7 +18,6 @@
 # This product includes cryptographic software written by Eric Young
 # (eay@cryptsoft.com).  This product includes software written by Tim
 # Hudson (tjh@cryptsoft.com).
-
 
 import os, sys, re, getopt
 
@@ -118,7 +117,7 @@ if filename[len(filename)-4:] != ".cpp":
 forbidden_header = os.path.basename(filename)
 forbidden_header = forbidden_header[:len(forbidden_header)-4] + ".h"
 
-ignore_list = load_ignore_list("../tools/gcc-wrapper/header_loop_ignore")
+ignore_list = load_ignore_list("./tools/gcc-wrapper/header_loop_ignore")
 
 # Add to the search path the parent folder of the file
 include_dirs.append(os.path.dirname(filename))
