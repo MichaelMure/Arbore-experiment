@@ -4,3 +4,8 @@ tools/debug_env/log*
 dhttest/*.o
 Session.vim
 tags
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
