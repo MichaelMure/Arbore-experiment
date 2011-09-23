@@ -24,14 +24,14 @@
 #include <string>
 #include <iostream>
 
-#include "lib/net/network.h"
-#include "lib/net/packet.h"
-#include "lib/net/hosts_list.h"
-#include "lib/dht/chimera.h"
-#include "lib/scheduler/scheduler.h"
-#include "lib/util/pf_log.h"
-#include "lib/util/tools.h"
-#include "lib/dht/chimera_messages.h"
+#include <net/network.h>
+#include <net/packet.h>
+#include <net/hosts_list.h>
+#include <dht/chimera.h>
+#include <scheduler/scheduler.h>
+#include <util/pf_log.h>
+#include <util/tools.h>
+#include <dht/chimera_messages.h>
 
 enum
 {
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	Network net;
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	ChimeraDHT* dht = new ChimeraDHT(&net, StrToTyp<int>(argv[1]), me);
+	ChimeraDHT* dht = new ChimeraDHT(&net, StrToTyp<uint16_t>(argv[1]), me);
 	dht->RegisterType(ChimeraChatType);
 
 	std::cerr << "hosts_list pointer: " << dht->GetNetwork()->GetHostsList() << std::endl;

@@ -23,8 +23,8 @@
 #include <XmlRpc.h>
 #include "pf_thread.h"
 #include "xmlrpc_server.h"
-#include "net/network_base.h"
-#include "net/peers_list_base.h"
+#include <net/network_base.h>
+#include <net/peers_list_base.h>
 
 #define XMLRPC_VERSION	0
 

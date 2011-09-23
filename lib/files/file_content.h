@@ -28,12 +28,12 @@
 #include <map>
 #include <time.h>
 
-#include "files/file_chunk.h"
-#include "files/file_chunk_desc.h"
-#include "files/file_chunk_requester_interface.h"
-#include "util/mutex.h"
-#include "util/pf_types.h"
-#include "util/key.h"
+#include <util/mutex.h>
+#include <util/pf_types.h>
+#include <util/key.h>
+#include "file_chunk.h"
+#include "file_chunk_desc.h"
+#include "file_chunk_requester_interface.h"
 
 class FileContent : public Mutex, private std::list<FileChunk>
 {

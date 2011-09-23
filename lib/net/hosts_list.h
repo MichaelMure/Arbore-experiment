@@ -30,7 +30,7 @@
 #include <map>
 #include <netinet/in.h>
 
-#include "util/key.h"
+#include <util/key.h>
 #include "host.h"
 
 class HostsList : public Mutex

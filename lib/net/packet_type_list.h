@@ -25,7 +25,8 @@
 
 #include <map>
 
-#include "util/mutex.h"
+#include <util/mutex.h>
+
 #include "packet_type.h"
 
 class PacketTypeList : protected std::map<uint32_t, PacketType>, protected Mutex

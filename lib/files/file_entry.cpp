@@ -24,7 +24,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include "dir_entry.h"
-#include "util/session_config.h"
+#include <util/session_config.h>
 
 bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 {

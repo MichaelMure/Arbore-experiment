@@ -26,7 +26,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include "util/tools.h"
+#include <util/tools.h>
 #include "host.h"
 #include "hosts_list.h"
 

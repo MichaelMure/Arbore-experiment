@@ -22,8 +22,8 @@
 
 #include <algorithm>
 
-#include "util/mutex.h"
-#include "util/pf_log.h"
+#include <util/mutex.h>
+#include <util/pf_log.h>
 #include "job.h"
 #include "scheduler_queue.h"
 

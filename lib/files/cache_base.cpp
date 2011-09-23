@@ -25,7 +25,7 @@
 #include "content_list.h"
 #include "file_content.h"
 #include "hdd.h"
-#include "util/session_config.h"
+#include <util/session_config.h>
 
 CacheBase::CacheBase() : Mutex(RECURSIVE_MUTEX)
 {

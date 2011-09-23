@@ -30,7 +30,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "net/pf_addr.h"
+#include <net/pf_addr.h>
 #include "host.h"
 
 /** The invalid Host value */

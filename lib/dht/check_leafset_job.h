@@ -26,8 +26,8 @@
 #ifndef _CHECK_LEAFSET_JOB_H
 #define _CHECK_LEAFSET_JOB_H
 
-#include "scheduler/job.h"
-#include "util/dtime.h"
+#include <scheduler/job.h>
+#include <util/dtime.h>
 
 class ChimeraDHT;
 class ChimeraRouting;

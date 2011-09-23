@@ -26,7 +26,7 @@
 #include <cstring>
 #include <climits>
 #include "certificate.h"
-#include "util/tools.h"
+#include <util/tools.h>
 
 Certificate::Certificate() : ssl_cert(NULL)
 {

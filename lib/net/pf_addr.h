@@ -28,9 +28,9 @@
 
 #include <netinet/in.h>
 
-#include "util/pf_log.h"
-#include "util/pf_types.h"
-#include "util/key.h"
+#include <util/pf_log.h>
+#include <util/pf_types.h>
+#include <util/key.h>
 
 const size_t ip_t_len = 4;
 typedef uint32_t ip_t[4];

@@ -26,9 +26,9 @@
 #include <exception>
 #include <string>
 
-#include "util/mutex.h"
-#include "files/dir_entry.h"
-#include "files/file_entry.h"
+#include <util/mutex.h>
+#include <files/dir_entry.h>
+#include <files/file_entry.h>
 
 class Hdd : public Mutex
 {

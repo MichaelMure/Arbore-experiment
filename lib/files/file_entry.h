@@ -29,9 +29,9 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#include "util/key.h"
-#include "util/pf_types.h"
-#include "util/pf_log.h"
+#include <util/key.h>
+#include <util/pf_types.h>
+#include <util/pf_log.h>
 #include "file_perms.h"
 
 class DirEntry;

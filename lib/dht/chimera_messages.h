@@ -28,8 +28,8 @@
 
 #include <stdint.h>
 
-#include "net/packet_type.h"
-#include "net/packet_handler.h"
+#include <net/packet_type.h>
+#include <net/packet_handler.h>
 
 class ChimeraDHT;
 

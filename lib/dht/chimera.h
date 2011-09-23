@@ -26,8 +26,8 @@
 #ifndef CHIMERA_H
 #define CHIMERA_H
 
-#include "net/packet_type_list.h"
-#include "net/host.h"
+#include <net/packet_type_list.h>
+#include <net/host.h>
 
 class Network;
 class ChimeraRouting;

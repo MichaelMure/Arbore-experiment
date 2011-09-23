@@ -26,7 +26,7 @@
 #include <list>
 #include <typeinfo>
 
-#include "util/mutex.h"
+#include <util/mutex.h>
 
 class Job;
 						  /* TODO: Make me private */

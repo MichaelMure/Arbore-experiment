@@ -26,11 +26,12 @@
 #include <errno.h>
 #include <assert.h>
 #include <algorithm>
-#include "files/file_content.h"
-#include "files/file_chunk.h"
-#include "files/file_chunk_desc.h"
-#include "files/hdd.h"
-#include "util/session_config.h"
+
+#include "file_content.h"
+#include "file_chunk.h"
+#include "file_chunk_desc.h"
+#include "hdd.h"
+#include <util/session_config.h>
 
 const time_t write_to_hdd_timeout = 10;
 const time_t ref_request_refresh = 30;

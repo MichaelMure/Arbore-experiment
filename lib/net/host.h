@@ -28,8 +28,8 @@
 
 #include <netinet/in.h>
 
-#include "util/pf_log.h"
-#include "util/key.h"
+#include <util/pf_log.h>
+#include <util/key.h>
 #include "pf_addr.h"
 
 #define SUCCESS_WINDOW 20

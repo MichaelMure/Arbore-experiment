@@ -26,9 +26,9 @@
 #include <unistd.h>
 #include <netdb.h>
 
-#include "net/network.h"
-#include "scheduler/scheduler_queue.h"
-#include "util/key.h"
+#include <net/network.h>
+#include <scheduler/scheduler_queue.h>
+#include <util/key.h>
 #include "check_leafset_job.h"
 #include "chimera.h"
 #include "chimera_messages.h"

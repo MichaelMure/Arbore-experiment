@@ -22,7 +22,8 @@
 
 #include <cassert>
 
-#include "util/pf_log.h"
+#include <util/pf_log.h>
+
 #include "packet_type_list.h"
 
 void PacketTypeList::RegisterType(PacketType type)

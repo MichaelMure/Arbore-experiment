@@ -25,8 +25,8 @@
 #ifndef _CHIMERA_ROUTING_H_
 #define _CHIMERA_ROUTING_H_
 #include <vector>
-#include "net/host.h"
-#include "util/mutex.h"
+#include <net/host.h>
+#include <util/mutex.h>
 #include "leafset.h"
 #include "routing_table.h"
 

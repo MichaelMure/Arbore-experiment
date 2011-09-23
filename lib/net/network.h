@@ -30,7 +30,8 @@
 #include <time.h>
 #include <vector>
 
-#include "util/pf_thread.h"
+#include <util/pf_thread.h>
+
 #include "hosts_list.h"
 #include "pf_addr.h"
 #include "packet.h"

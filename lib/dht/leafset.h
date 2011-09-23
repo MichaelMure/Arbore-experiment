@@ -32,8 +32,8 @@
 #define ONE_SIDE_LEAFSET_SIZE LEAFSET_SIZE/2
 
 #include <vector>
-#include "net/hosts_list.h"
-#include "util/key.h"
+#include <net/hosts_list.h>
+#include <util/key.h>
 
 class Leafset
 {

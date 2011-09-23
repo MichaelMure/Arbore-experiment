@@ -24,8 +24,8 @@
 #include <list>
 #include <algorithm>
 
-#include "util/dtime.h"
-#include "util/pf_log.h"
+#include <util/dtime.h>
+#include <util/pf_log.h>
 #include "job.h"
 #include "scheduler.h"
 #include "scheduler_queue.h"

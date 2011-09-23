@@ -23,8 +23,8 @@
  *
  */
 
-#include "net/packet.h"
-#include "util/pf_log.h"
+#include <net/packet.h>
+#include <util/pf_log.h>
 #include "check_leafset_job.h"
 #include "chimera.h"
 #include "chimera_messages.h"
