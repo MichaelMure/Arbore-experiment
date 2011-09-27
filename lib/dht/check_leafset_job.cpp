@@ -39,7 +39,7 @@ bool CheckLeafsetJob::Start()
 	{
 		if (*it && !chimera->Ping(*it))
 		{
-			it->SetFailureTime(dtime ());
+			it->SetFailureTime(time::dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
 					  << " failed at time: " << it->GetFailureTime() << "!";
 			if (it->GetSuccessAvg() < BAD_LINK)
@@ -54,7 +54,7 @@ bool CheckLeafsetJob::Start()
 	{
 		if (*it && !chimera->Ping(*it))
 		{
-			it->SetFailureTime(dtime ());
+			it->SetFailureTime(time::dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
 					  << " failed at time: " << it->GetFailureTime() << "!";
 			if (it->GetSuccessAvg() < BAD_LINK)

@@ -24,7 +24,7 @@
  */
 
 #include <util/pf_log.h>
-#include <util/dtime.h>
+#include <util/time.h>
 #include <net/network.h>
 #include <net/packet.h>
 #include <net/packet_handler.h>
@@ -57,14 +57,14 @@ public:
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
-		if((dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
+		if((time::dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
 		{
 			Packet pckt(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
 			pckt.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
 			chimera.Send(host, pckt);
 
 			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
-			                  << "elapsed time since failure = " << dtime() - host.GetFailureTime() << " sec";
+			                  << "elapsed time since failure = " << time::dtime() - host.GetFailureTime() << " sec";
 			return;
 		}
 
@@ -154,7 +154,7 @@ public:
 		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
 		{
 			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
-			if(dtime() - host.GetFailureTime() > ChimeraDHT::GRACEPERIOD)
+			if(time::dtime() - host.GetFailureTime() > ChimeraDHT::GRACEPERIOD)
 				chimera.GetRouting()->add(host);
 			else
 				pf_log[W_WARNING] << "Refused to add " << host << " to routing table";

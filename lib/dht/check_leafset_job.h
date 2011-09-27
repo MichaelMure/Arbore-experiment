@@ -27,7 +27,7 @@
 #define _CHECK_LEAFSET_JOB_H
 
 #include <scheduler/job.h>
-#include <util/dtime.h>
+#include <util/time.h>
 
 class ChimeraDHT;
 class ChimeraRouting;
@@ -43,7 +43,7 @@ class CheckLeafsetJob : public Job
 public:
 
 	CheckLeafsetJob(ChimeraDHT* _chimera, ChimeraRouting* _routing)
-		: Job(dtime(), REPEAT_PERIODIC, 20.0),
+		: Job(time::dtime(), REPEAT_PERIODIC, 20.0),
 		  chimera(_chimera),
 		  routing(_routing),
 		  count(0)

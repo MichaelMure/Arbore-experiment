@@ -24,7 +24,7 @@
 #include <list>
 #include <algorithm>
 
-#include <util/dtime.h>
+#include <util/time.h>
 #include <util/pf_log.h>
 #include "job.h"
 #include "scheduler.h"
@@ -60,7 +60,7 @@ void Scheduler::Loop()
 {
 	usleep(100000);				  // every 0.1 sec
 
-	double now = dtime();
+	double now = time::dtime();
 
 	while(scheduler_queue.GetQueueSize() != 0 && scheduler_queue.NextJobTime() < now)
 	{

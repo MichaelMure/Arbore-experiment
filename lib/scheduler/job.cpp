@@ -20,7 +20,7 @@
  *
  */
 
-#include <util/dtime.h>
+#include <util/time.h>
 #include "job.h"
 
 bool Job::DoStart()
@@ -35,10 +35,10 @@ bool Job::DoStart()
 			case REPEAT_NONE:
 				return false;
 			case REPEAT_PERIODIC:
-				start_time = dtime() + repeat_delta;
+				start_time = time::dtime() + repeat_delta;
 				break;
 			case REPEAT_LESS_AND_LESS:
-				start_time = dtime() + repeat_delta;
+				start_time = time::dtime() + repeat_delta;
 				repeat_delta *= 2;
 				break;
 			default:

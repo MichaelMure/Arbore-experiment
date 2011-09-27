@@ -35,7 +35,7 @@
 #include <net/host.h>
 #include <scheduler/job.h>
 #include <scheduler/scheduler_queue.h>
-#include <util/dtime.h>
+#include <util/time.h>
 #include <util/pf_config.h>
 #include <util/pf_log.h>
 #include <util/pf_thread.h>
@@ -74,7 +74,7 @@ class ResendPacketJob : public Job
 public:
 
 	ResendPacketJob(Network* _network, int _sock, const Host& _desthost, const Packet& _packet, double transmit_time)
-		: Job(dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
+		: Job(time::dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
 		  sock(_sock),
 		  desthost(_desthost),
 		  packet(_packet),
@@ -252,7 +252,7 @@ void Network::Loop()
 
 					job = *it;
 					sender.UpdateStat(1);
-					double latency = dtime() - job->GetTransmitTime();
+					double latency = time::dtime() - job->GetTransmitTime();
 					if(latency > 0)
 					{
 						if(job->GetDestHost().GetLatency() == 0.0)
@@ -334,7 +334,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 	to.sin_addr.s_addr = host.GetAddr().ip[3]; /* TODO: ipv6! */
 	to.sin_port = htons(host.GetAddr().port);
 
-	start = dtime ();
+	start = time::dtime ();
 
 	BlockLockMutex lock(this);
 

@@ -10,7 +10,7 @@ SET(CMAKE_BUILD_TYPE ${BUILD})
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 add_library(util
-    lib/util/dtime.c
+    lib/util/time.cpp
     lib/util/mutex.cpp
     lib/util/tools.cpp
     lib/util/pf_log.cpp

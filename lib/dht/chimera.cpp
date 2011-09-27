@@ -131,7 +131,7 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	/* XXX possibily an infinite loop? */
 	while(!Send(nextDest, pckt))
 	{
-		nextDest.SetFailureTime(dtime());
+		nextDest.SetFailureTime(time::dtime());
 		pf_log[W_WARNING] << "message sent to host: " << nextDest
 		                  << " at time: " << nextDest.GetFailureTime()
 		                  << " failed!";

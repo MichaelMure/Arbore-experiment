@@ -23,48 +23,44 @@
  *
  */
 
-#ifndef DTIME_H
-#define DTIME_H
+#ifndef TIME_H
+#define TIME_H
 
 #include <sys/time.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+class time {
+
+public:
+  /**
+   * dtime:
+   * @return the time of day in double format with microsecond precision
+   */
+  static double dtime (void);
 
   /**
-   ** dtime:
-   **  returns the time of day in double format with microsecond precision
+   * dalarm:
+   * generates a SIGALRM signal in @time seconds.
    */
-    extern double dtime ();
+  static void dalarm (double time);
 
   /**
-   ** dalarm:
-   **  generates a SIGALRM signal in #time# seconds
+   * dalarm:
+   * sleeps for @time seconds
    */
-    extern void dalarm (double time);
+  static void dsleep (double time);
 
   /**
-   ** dalarm:
-   **  sleeps for #time# seconds
+   * dtotv:
+   * @return the struct timeval representation of double @d
    */
-    extern void dsleep (double time);
+  static struct timeval dtotv (double d);
 
   /**
-   ** dtotv:
-   **  returns the struct timeval representation of double #d#
+   * tvtod:
+   * @return the double representation of timeval @tv
    */
-    extern struct timeval dtotv (double d);
+  static double tvtod (struct timeval tv);
 
-  /**
-   ** tvtod:
-   **  returns the double representation of timeval #tv#
-   */
-    extern double tvtod (struct timeval tv);
+};
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif				/* DTIME_H */
+#endif        /* TIME_H */
