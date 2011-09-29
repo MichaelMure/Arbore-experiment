@@ -8,4 +8,5 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
-
+lib/*.so
+dht_test
