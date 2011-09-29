@@ -9,7 +9,7 @@ SET(CMAKE_BUILD_TYPE ${BUILD})
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-add_library(util
+add_library(util SHARED
     lib/util/time.cpp
     lib/util/mutex.cpp
     lib/util/tools.cpp
@@ -19,14 +19,14 @@ add_library(util
     )
 SET(PFLIBS ${PFLIBS} util)
 
-add_library(scheduler
+add_library(scheduler SHARED
     lib/scheduler/scheduler.cpp
     lib/scheduler/scheduler_queue.cpp
     lib/scheduler/job.cpp
     )
 SET(PFLIBS ${PFLIBS} scheduler)
 
-add_library(network
+add_library(network SHARED
     lib/net/host.cpp
     lib/net/hosts_list.cpp
     lib/net/packet_type.cpp
@@ -37,7 +37,7 @@ add_library(network
      )
 SET(PFLIBS ${PFLIBS} network)
 
-add_library(dht
+add_library(dht SHARED
     lib/dht/chimera_routing.cpp
     lib/dht/routing_table.cpp
     lib/dht/leafset.cpp
@@ -48,7 +48,7 @@ add_library(dht
     )
 SET(PFLIBS ${PFLIBS} dht)
 
-add_library(files
+add_library(files SHARED
    lib/files/file_chunk.cpp
     )
 SET(PFLIBS ${PFLIBS} files)
