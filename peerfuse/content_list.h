@@ -32,8 +32,9 @@
 
 class ContentList : public Thread, private Mutex, private std::map<std::string, FileContent>
 {
-	// Map the ref i'll use to SEND file
-	std::map<uint32_t, std::string> my_refs;
+	typedef std::map<uint32_t, std::string> RefMap;
+	RefMap my_refs;  /**< Map the ref I'll use to SEND file */
+
 	std::map<std::string, KeyList> refered_by;
 
 protected:
@@ -56,9 +57,9 @@ public:
 	 */
 	void RemoveFile(std::string path);
 
-	/** When a peer disconnect acknowledge the file-contents that the peer
+	/** When a peer disconnect acknowledges the file-contents that the peer
 	 *  stopped sharing the file
-	 * @param path path to the file
+	 * @param peer  peer key
 	 */
 	void RemovePeerRefs(Key peer);
 
@@ -69,14 +70,14 @@ public:
 
 	uint32_t GetRef(std::string filename);
 
-	/* Track that this peer is using this ref */
+	/** Track that this peer is using this ref */
 	void AddReferer(std::string path, Key referer);
-	/* Stop tracking that this peer was using this ref */
+	/** Stop tracking that this peer was using this ref */
 	void DelReferer(std::string path, Key referer);
-	/* Stop tracking all the ref a peer has */
+	/** Stop tracking all the ref a peer has */
 	void DelReferer(Key);
 
-	/* Send a NET_REF_FILE message to a peer */
+	/** Send a NET_REF_FILE message to a peer */
 	virtual void SendRefFile(Key to, std::string filename);
 };
 

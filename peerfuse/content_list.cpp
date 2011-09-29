@@ -79,7 +79,7 @@ FileContent& ContentList::GetFile(uint32_t ref)
 {
 	BlockLockMutex lock(this);
 	std::string filename;
-	std::map<uint32_t, std::string>::iterator it;
+	RefMap::iterator it;
 
 	//	TODO: handle this nicely
 	if((it = my_refs.find(ref)) == my_refs.end())
@@ -101,8 +101,7 @@ void ContentList::RemoveFile(std::string path)
 
 	// Find the ref and erase it
 	uint32_t ref;
-	std::map<uint32_t, std::string>::iterator ref_it;
-	for(ref_it = my_refs.begin(); ref_it != my_refs.end(); ++ref_it)
+	for(RefMap::iterator ref_it = my_refs.begin(); ref_it != my_refs.end(); ++ref_it)
 	{
 		if(ref_it->second == path)
 		{
@@ -154,10 +153,9 @@ void ContentList::RefreshPeersRef(std::string path)
 uint32_t ContentList::GetRef(std::string filename)
 {
 	BlockLockMutex lock(this);
-	std::map<uint32_t, std::string>::iterator it;
 
 	/* TODO: optimize-me */
-	for(it = my_refs.begin(); it != my_refs.end(); ++it)
+	for(RefMap::iterator it = my_refs.begin(); it != my_refs.end(); ++it)
 	{
 		if(it->second == filename)
 			return it->first;
