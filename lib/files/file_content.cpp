@@ -30,17 +30,18 @@
 #include "files/file_chunk.h"
 #include "files/file_chunk_desc.h"
 #include "files/hdd.h"
-#include "scheduler/scheduler_queue.h"
 #include "util/session_config.h"
 
 const time_t write_to_hdd_timeout = 10;
+const time_t ref_request_refresh = 30;
 
-FileContent::FileContent(std::string _filename) :
+FileContent::FileContent(std::string _filename, FileChunkRequesterInterface* _requester) :
 			Mutex(RECURSIVE_MUTEX),
 			ondisk_offset(0),
 			ondisk_size(0),
 			ondisk_fd(-1),
 			ondisk_synced(true),
+			requester(_requester),
 			filename(_filename),
 			last_peer_requested(),
 			ref_request_time(0)
@@ -53,11 +54,12 @@ FileContent::FileContent(std::string _filename) :
 
 FileContent::FileContent(const FileContent& other) :
 			Mutex(RECURSIVE_MUTEX),
-std::list<FileChunk>(),				  /* to avoid a warning */
+			std::list<FileChunk>(),		  /* to avoid a warning */
 			ondisk_offset(other.ondisk_offset),
 			ondisk_size(other.ondisk_size),
 			ondisk_fd(-1),
 			ondisk_synced(other.ondisk_synced),
+			requester(other.requester),
 			filename(other.filename),
 			last_peer_requested(other.last_peer_requested),
 			ref_request_time(other.ref_request_time)
@@ -72,6 +74,7 @@ std::list<FileChunk>(),				  /* to avoid a warning */
 
 FileContent::~FileContent()
 {
+	delete requester;
 	if(ondisk_fd != -1)
 		close(ondisk_fd);
 }
@@ -215,7 +218,7 @@ FileContent::chunk_availability FileContent::NetworkHaveChunk(FileChunkDesc chun
 {
 	BlockLockMutex lock(this);
 	/* If nobody's connected we won't receive anything */
-	if(peers_list.Size() == 0)
+	if(requester->IsConnected() == false)
 		return CHUNK_UNAVAILABLE;
 
 	if(std::find(net_requested.begin(), net_requested.end(), chunk_desc) == net_requested.end())
@@ -264,7 +267,9 @@ void FileContent::SetChunk(FileChunk chunk)
 		net_requested.erase(net_it);
 	}
 
+#if 0 /* TODO: support way to tell others that I have this part of file */
 	cache.AddSharer(filename, environment.my_id.Get());
+#endif
 
 	/* Merge into the chunk list */
 	iterator it = begin();
@@ -432,13 +437,13 @@ void FileContent::NetworkFlushRequests()
 	std::list<FileChunkDesc>::iterator it = net_pending_request.begin();
 	while(it != net_pending_request.end())
 	{
-		/* Find a sharer that have this file */
-		std::map<pf_id, struct sharedchunks>::iterator sh_it = sharers.begin();
-		std::map<pf_id, struct sharedchunks>::iterator next_it;
+		/* Find a sharer who has this file */
+		std::map<Key, struct sharedchunks>::iterator sh_it = sharers.begin();
+		std::map<Key, struct sharedchunks>::iterator next_it;
 		bool request_sent = false;
 
 		/* Find the last peer we asked a chunk to */
-		if(last_peer_requested != 0)
+		if(last_peer_requested)
 		{
 			while(sh_it != sharers.end() && last_peer_requested != sh_it->first)
 				++sh_it;
@@ -464,7 +469,7 @@ void FileContent::NetworkFlushRequests()
 			if(it->GetOffset() >= sh_it->second.offset &&
 				it->GetOffset() + (off_t)it->GetSize() <= sh_it->second.offset + sh_it->second.size)
 			{
-				peers_list.RequestChunk(filename, sh_it->first, it->GetOffset(), it->GetSize());
+				requester->RequestChunk(filename, sh_it->first, it->GetOffset(), it->GetSize());
 				request_sent = true;
 				last_peer_requested = sh_it->first;
 				break;
@@ -482,7 +487,7 @@ void FileContent::NetworkFlushRequests()
 	}
 }
 
-void FileContent::SetSharer(pf_id sharer, off_t offset, off_t size)
+void FileContent::SetSharer(Key sharer, off_t offset, off_t size)
 {
 	BlockLockMutex lock(this);
 	struct sharedchunks shared_part;
@@ -492,20 +497,20 @@ void FileContent::SetSharer(pf_id sharer, off_t offset, off_t size)
 	NetworkFlushRequests();
 }
 
-IDList FileContent::GetSharers()
+KeyList FileContent::GetSharers()
 {
 	BlockLockMutex lock(this);
-	IDList lst;
-	std::map<pf_id, struct sharedchunks>::iterator it;
+	KeyList lst;
+	std::map<Key, struct sharedchunks>::iterator it;
 	for(it = sharers.begin(); it != sharers.end(); ++it)
 		lst.insert(it->first);
 	return lst;
 }
 
-void FileContent::RemoveSharer(pf_id peer)
+void FileContent::RemoveSharer(Key peer)
 {
 	BlockLockMutex lock(this);
-	std::map<pf_id, struct sharedchunks>::iterator it;
+	std::map<Key, struct sharedchunks>::iterator it;
 	if((it = sharers.find(peer)) != sharers.end())
 		sharers.erase(it);
 }
@@ -517,14 +522,14 @@ FileContent::chunk_availability FileContent::NetworkRequestChunk(FileChunkDesc c
 	{
 		// We don't know who have which part of the file
 		pf_log[W_DEBUG] << "Request for file refs";
-		cache.RequestFileRefs(filename);
+		requester->RequestFileRefs(filename);
 		ref_request_time = time(NULL);
 	}
 
 	// Check the chunk presence on the network
 	if(/* TODO: enter this only if all FILE_REF have been received */ false)
 	{
-		std::map<pf_id, struct sharedchunks>::iterator it;
+		std::map<Key, struct sharedchunks>::iterator it;
 		bool found = false;
 		for(it = sharers.begin(); it != sharers.end(); ++it)
 		{

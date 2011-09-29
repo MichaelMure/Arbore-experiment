@@ -28,11 +28,12 @@
 #include <map>
 #include <time.h>
 
+#include "files/file_chunk.h"
+#include "files/file_chunk_desc.h"
+#include "files/file_chunk_requester_interface.h"
 #include "util/mutex.h"
 #include "util/pf_types.h"
 #include "util/key.h"
-#include "file_chunk.h"
-#include "file_chunk_desc.h"
 
 class FileContent : public Mutex, private std::list<FileChunk>
 {
@@ -59,6 +60,7 @@ private:
 		off_t size;
 	};
 protected:
+	FileChunkRequesterInterface* requester;
 	std::string filename;
 	std::map<Key, struct sharedchunks> sharers;
 	Key last_peer_requested;
@@ -66,7 +68,7 @@ protected:
 
 	void NetworkFlushRequests();
 	std::list<FileChunkDesc> net_pending_request;
-	virtual chunk_availability NetworkRequestChunk(FileChunkDesc chunk) = 0;
+	chunk_availability NetworkRequestChunk(FileChunkDesc chunk);
 
 private:
 	/* Hdd related */
@@ -76,11 +78,22 @@ private:
 
 	FileContent& operator=(const FileContent &other);
 public:
-	FileContent(std::string _filename);
+	/** Constructor
+	 *
+	 * @param filename  the file name.
+	 * @param requester  implementation object of the FileChunkRequesterInterface interface.
+	 */
+	FileContent(std::string _filename, FileChunkRequesterInterface* requester);
+
+	/** Copy constructor */
 	FileContent(const FileContent&);
+
+	/** Destructor */
 	virtual ~FileContent();
 
+	/** Get filename */
 	std::string GetFilename() const { return filename; }
+
 	/** Load a chunk from the hdd or ask it on the network
 	 * @param chunk the part to load
 	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
