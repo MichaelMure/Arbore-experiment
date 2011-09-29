@@ -2,68 +2,6 @@ PROJECT(peerfuse)
 cmake_minimum_required(VERSION 2.6)
 #SET(BUILD "Debug")
 SET(CMAKE_BUILD_TYPE ${BUILD})
-#SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-
-
-############################# Library ############
-
-SET(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-
-add_library(util SHARED
-    lib/util/time.cpp
-    lib/util/mutex.cpp
-    lib/util/tools.cpp
-    lib/util/pf_log.cpp
-    lib/util/pf_thread.cpp
-    lib/util/key.cpp
-    )
-SET(PFLIBS ${PFLIBS} util)
-
-add_library(scheduler SHARED
-    lib/scheduler/scheduler.cpp
-    lib/scheduler/scheduler_queue.cpp
-    lib/scheduler/job.cpp
-    )
-SET(PFLIBS ${PFLIBS} scheduler)
-
-add_library(network SHARED
-    lib/net/host.cpp
-    lib/net/hosts_list.cpp
-    lib/net/packet_type.cpp
-    lib/net/packet_type_list.cpp
-    lib/net/packet.cpp
-    lib/net/network.cpp
-    lib/net/pf_addr.cpp
-     )
-SET(PFLIBS ${PFLIBS} network)
-
-add_library(dht SHARED
-    lib/dht/chimera_routing.cpp
-    lib/dht/routing_table.cpp
-    lib/dht/leafset.cpp
-    lib/dht/check_leafset_job.cpp
-    lib/dht/dolr.cpp
-    lib/dht/chimera_messages.cpp
-    lib/dht/chimera.cpp
-    )
-SET(PFLIBS ${PFLIBS} dht)
-
-add_library(files SHARED
-   lib/files/file_chunk.cpp
-    )
-SET(PFLIBS ${PFLIBS} files)
-
-#add_library(ssl
-#   lib/ssl/certificate.cpp
-#   lib/ssl/connection.cpp
-#   lib/ssl/connection_ssl.cpp
-#   lib/ssl/connection_nossl.cpp
-#   lib/ssl/crl.cpp
-#   lib/ssl/pf_ssl_ssl.cpp
-#   lib/ssl/pf_ssl_nossl.cpp
-#   lib/ssl/private_key.cpp
-#    )
-#SET(PFLIBS ${PFLIBS} ssl)
 
 ########################### Dependency #################
 
@@ -84,6 +22,9 @@ IF(CURL_FOUND)
 ELSE(CURL_FOUND)
   MESSAGE(FATAL_ERROR "Unable to find Curl library")
 ENDIF(CURL_FOUND)
+
+########################### Library ###################
+SUBDIRS (lib)
 
 ########################## Target #####################
 
