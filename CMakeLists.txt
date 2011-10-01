@@ -1,30 +1,7 @@
 PROJECT(peerfuse)
 cmake_minimum_required(VERSION 2.6)
-#SET(BUILD "Debug")
-SET(CMAKE_BUILD_TYPE ${BUILD})
 
-########################### Dependency #################
-
-## OpenSSL
-SET(OpenSSL_FIND_REQUIRED TRUE)
-FIND_PACKAGE(OpenSSL)
-IF(OPENSSL_FOUND)
-  MESSAGE(STATUS "Found OpenSSL: ${OPENSSL_LIBRARIES}")
-ELSE(OPENSSL_FOUND)
-  MESSAGE(FATAL_ERROR "Unable to OpenSSL library")
-ENDIF(OPENSSL_FOUND)
-
-## LibCurl
-SET(CURL_FIND_REQUIRED TRUE)
-FIND_PACKAGE(CURL)
-IF(CURL_FOUND)
-  MESSAGE(STATUS "Found Curl: ${CURL_LIBRARIES}")
-ELSE(CURL_FOUND)
-  MESSAGE(FATAL_ERROR "Unable to find Curl library")
-ENDIF(CURL_FOUND)
-
-########################### Library ###################
-SUBDIRS (lib)
+#SET(CMAKE_BUILD_TYPE "Debug")
 
 ########################## Target #####################
 
@@ -33,21 +10,43 @@ ADD_EXECUTABLE(${BIN_NAME}
     dhttest/main.cpp
     )
 
-INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR}
-                    ${CURL_INCLUDE_DIRS}
-                    lib/)
-LINK_DIRECTORIES(${OPENSSL_LIB_DIR}
-                 ${CURL_LIB_DIR}
-                 ${LIBRARY_OUTPUT_PATH})
+INCLUDE_DIRECTORIES(lib/)
+LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
 TARGET_LINK_LIBRARIES(${BIN_NAME}
                       "-lpthread -lstdc++"
-                      ${OPENSSL_LIBRARIES}
-                      ${CURL_LIBRARIES}
                       util
                       scheduler
                       network
                       dht
                       files)
+
+########################### Dependency #################
+
+## OpenSSL
+SET(OpenSSL_FIND_REQUIRED TRUE)
+FIND_PACKAGE(OpenSSL)
+IF(OPENSSL_FOUND)
+  INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
+  LINK_DIRECTORIES(${OPENSSL_LIB_DIR})
+  TARGET_LINK_LIBRARIES(${BIN_NAME}
+                        ${OPENSSL_LIBRARIES})
+ENDIF(OPENSSL_FOUND)
+
+## LibCurl
+SET(CURL_FIND_REQUIRED TRUE)
+FIND_PACKAGE(CURL)
+IF(CURL_FOUND)
+  INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${CURL_LIB_DIR})
+  TARGET_LINK_LIBRARIES(${BIN_NAME}
+                        ${CURL_LIBRARIES})
+ENDIF(CURL_FOUND)
+
+########################### Library ###################
+
+SUBDIRS (lib)
+
+
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Werror -Wall -Wextra -Wno-unused-parameter -Wconversion")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
