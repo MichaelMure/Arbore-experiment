@@ -148,8 +148,8 @@ void Hdd::MkFile(FileEntry* f)
 	std::string path = root + f->GetFullName();
 
 	mode_t mode = f->GetAttr().mode;
-	mode &= S_IFREG | S_IFDIR;
-	mode |= S_IRUSR | S_IWUSR | (mode & S_IFDIR ? S_IXUSR : 0);
+	mode &= S_IFREG | S_IFDIR; /* only keep these two flags */
+	mode |= S_IRUSR | S_IWUSR | (mode & S_IFDIR ? S_IXUSR : 0); /* enable some flags conditionally */
 
 	if(mode & S_IFDIR)
 	{
@@ -165,11 +165,13 @@ void Hdd::MkFile(FileEntry* f)
 		int r = mkdir(path.c_str(), mode);
 		if(r)
 		{
-			/* Try to create parent directory. */
+			/* creation of the directory failed */
 			if(!f->GetParent())
 				throw HddWriteFailure(path);
 			try
 			{
+				/* ensure that the direct parent directory is created
+				 * this call recursively MkFile, so the whole path is created */
 				MkFile(f->GetParent());
 			}
 			catch(HddWriteFailure &e)
@@ -190,6 +192,7 @@ void Hdd::MkFile(FileEntry* f)
 		int hdd_fd = open(path.c_str(), O_RDONLY);
 		if(hdd_fd != -1)
 		{
+			/* file already exist */
 			// TODO: change perms
 			close(hdd_fd);
 			return;
@@ -198,11 +201,13 @@ void Hdd::MkFile(FileEntry* f)
 		int fd = creat(path.c_str(), mode);
 		if(fd == -1)
 		{
-			/* Try to create parent directory. */
+			/* creation of the file failed */
 			if(!f->GetParent())
 				throw HddWriteFailure(path);
 			try
 			{
+				/* ensure that the direct parent directory is created
+				 * this call recursively MkFile, so the whole path is created */
 				MkFile(f->GetParent());
 			}
 			catch(HddWriteFailure &e)
@@ -232,7 +237,7 @@ void Hdd::RmFile(FileEntry* f)
 	}
 	else
 	{
-		int fd = unlink(path.c_str());
+		int fd = unlink(path.c_str()); /* missing close() ? */
 		if(fd == -1)
 			throw HddWriteFailure(path);
 		pf_log[W_INFO] << "unlink on " << path;

@@ -30,11 +30,18 @@
 #include <files/dir_entry.h>
 #include <files/file_entry.h>
 
+/**
+ * This class allow to access files on disk
+ * This class is thread safe.
+ */
 class Hdd : public Mutex
 {
 	std::string root;
 
 public:
+	/**
+	 * Specialization of std::exception to indicate writing failure.
+	 */
 	class HddWriteFailure : public std::exception
 	{
 		public:
@@ -42,6 +49,10 @@ public:
 			HddWriteFailure (std::string _dir) : dir(_dir) {};
 			~HddWriteFailure () throw() {};
 	};
+
+	/**
+	 * Specialization of std::exception to indicate reading failure.
+	 */
 	class HddAccessFailure : public std::exception
 	{
 		public:
@@ -53,18 +64,38 @@ public:
 	Hdd();
 	~Hdd();
 
-	/* Create a tree from an hard drive path.
+	/** Create a tree from an hard drive path.
 	 * @param d pointer to the root node of tree.
 	 * @param path path to the tree on hard drive.
 	 */
 	void BuildTree(DirEntry* d, std::string path);
 
+	/** Create on disk a file
+	 *
+	 * If the parent directory does not exist, it will be created.
+	 *
+	 * @param f pointer to the FileEntry to create.
+	 */
 	void MkFile(FileEntry* f);
+
+
 	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
+
+	/** Remove a file from the hard drive.
+	 *
+	 * @param f pointer to the FileEntry to delete.
+	 */
 	void RmFile(FileEntry* f);
 
+	/** Return the file descriptor corresponding of a path
+	 *
+	 * If the file can't be read, -1 is returned.
+	 * @param path the path of the file
+	 * @return the file descriptor
+	 */
 	int GetFd(std::string path);
 };
 
+/** Singleton */
 extern Hdd hdd;
 #endif
