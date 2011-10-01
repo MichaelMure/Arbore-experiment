@@ -10,3 +10,4 @@ Makefile
 cmake_install.cmake
 lib/*.so
 dht_test
+doc/html/
