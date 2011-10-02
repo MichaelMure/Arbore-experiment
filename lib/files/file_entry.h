@@ -46,26 +46,9 @@ public:
 	time_t ctime;
 	time_t meta_mtime;		  /* last meta-data modification */
 
-	pf_stat()
-		: size(0),
-		atime(0),
-		mtime(0),
-		ctime(0),
-		meta_mtime(0) {}
+	pf_stat();
 
-	bool operator==(const pf_stat& st)
-	{
-		return (size == st.size &&
-			atime == st.atime &&
-			mtime == st.mtime &&
-			ctime == st.ctime &&
-			meta_mtime == st.meta_mtime &&
-			pf_mode == st.pf_mode &&
-			mode == st.mode &&
-			uid == st.uid &&
-			gid == st.gid);
-	}
-
+	bool operator==(const pf_stat& st);
 };
 
 struct CompFiles
@@ -75,6 +58,9 @@ struct CompFiles
 
 typedef std::set<FileEntry*, CompFiles> FileList;
 
+/**
+ * Abstraction of a file.
+ */
 class FileEntry
 {
 	const std::string name;
@@ -89,27 +75,27 @@ public:
 	FileEntry(std::string name, pf_stat stat, DirEntry* _parent);
 	virtual ~FileEntry();
 
-	DirEntry* GetParent() const { return parent; }
-	std::string GetName() const { return name; }
+	DirEntry* GetParent() const;
+	std::string GetName() const;
 	std::string GetFullName() const;
 
-	Key getPathSerial() const { return key; }
+	Key getPathSerial() const;
 
 	bool IsChildOf(const FileEntry* f) const;
 
-	KeyList GetSharers() const { return sharers; }
+	KeyList GetSharers() const;
 	void SetSharers(KeyList l);
-	void AddSharer(Key id) { sharers.insert(id); SetSharers(sharers); }
+	void AddSharer(Key id);
 
-	pf_stat GetAttr() const { return stat; };
+	pf_stat GetAttr() const;
 	void SetAttr(pf_stat stat, bool force = false);
 
 	/** Load attributes from tree_cfg file. */
 	void LoadAttr();
 
-	bool IsRemoved() const { return stat.pf_mode & pf_stat::S_PF_REMOVED; }
-	void SetRemoved() { stat.pf_mode |= pf_stat::S_PF_REMOVED; }
-	void ClearRemoved() { stat.pf_mode |= pf_stat::S_PF_REMOVED; }
+	bool IsRemoved() const;
+	void SetRemoved();
+	void ClearRemoved();
 };
 
 template<>

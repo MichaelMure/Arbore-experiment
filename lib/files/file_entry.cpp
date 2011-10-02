@@ -26,6 +26,27 @@
 #include "dir_entry.h"
 #include <util/session_config.h>
 
+pf_stat::pf_stat()
+	: size(0),
+	atime(0),
+	mtime(0),
+	ctime(0),
+	meta_mtime(0)
+{}
+
+bool pf_stat::operator==(const pf_stat& st)
+{
+	return (size == st.size &&
+		atime == st.atime &&
+		mtime == st.mtime &&
+		ctime == st.ctime &&
+		meta_mtime == st.meta_mtime &&
+		pf_mode == st.pf_mode &&
+		mode == st.mode &&
+		uid == st.uid &&
+		gid == st.gid);
+}
+
 bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 {
 	if(f1->IsChildOf(f2))
@@ -46,7 +67,16 @@ FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* _parent)
 
 FileEntry::~FileEntry()
 {
+}
 
+DirEntry* FileEntry::GetParent() const
+{
+	return parent;
+}
+
+std::string FileEntry::GetName() const
+{
+	return name;
 }
 
 std::string FileEntry::GetFullName() const
@@ -62,6 +92,11 @@ std::string FileEntry::GetFullName() const
 
 	path = path + name;
 	return path;
+}
+
+Key FileEntry::getPathSerial() const
+{
+	return key;
 }
 
 bool FileEntry::IsChildOf(const FileEntry* f) const
@@ -91,6 +126,11 @@ void FileEntry::SetAttr(pf_stat new_stat, bool force)
 	stat = new_stat;
 }
 
+KeyList FileEntry::GetSharers() const
+{
+	return sharers;
+}
+
 void FileEntry::SetSharers(KeyList idl)
 {
 	sharers = idl;
@@ -101,6 +141,17 @@ void FileEntry::SetSharers(KeyList idl)
 		list += TypToStr(*it);
 	}
 	tree_cfg.Set(GetFullName() + "#sharers", list);
+}
+
+void FileEntry::AddSharer(Key id)
+{
+	sharers.insert(id);
+	SetSharers(sharers);
+}
+
+pf_stat FileEntry::GetAttr() const
+{
+	return stat;
 }
 
 void FileEntry::LoadAttr()
@@ -128,4 +179,20 @@ void FileEntry::LoadAttr()
 		SetSharers(keylist);
 	}
 
+}
+
+
+bool FileEntry::IsRemoved() const
+{
+	return stat.pf_mode & pf_stat::S_PF_REMOVED;
+}
+
+void FileEntry::SetRemoved()
+{
+	stat.pf_mode |= pf_stat::S_PF_REMOVED;
+}
+
+void FileEntry::ClearRemoved()
+{
+	stat.pf_mode |= pf_stat::S_PF_REMOVED;
 }
