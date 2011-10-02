@@ -39,6 +39,7 @@ protected:
 public:
 	FileChunkDesc() : offset(0), size(0) {}
 	FileChunkDesc(off_t _offset, size_t _size) : offset(_offset), size(_size) {}
+	virtual ~FileChunkDesc() {};
 
 	bool operator==(const FileChunkDesc &other)
 	{
