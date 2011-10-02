@@ -28,7 +28,7 @@
 
 #include "file_chunk.h"
 
-FileChunk()
+FileChunk::FileChunk()
  : access_time(0), data(NULL), hdd_synced(false)
 {
 }

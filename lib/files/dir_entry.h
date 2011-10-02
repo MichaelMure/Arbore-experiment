@@ -35,9 +35,9 @@ class DirEntry : public FileEntry
 
 public:
 
-	/** Creator of DirEntry.
+	/** Constructor of DirEntry.
 	 * @param name dir's name (not full path).
-	 * @param stat stat informations. If S_IFREG is set in mode, it will changed to S_IFDIR.
+	 * @param stat stat informations. If S_IFREG is set in mode, it will be changed to S_IFDIR.
 	 * @param parent parent directory (NULL if root dir)
 	 */
 	DirEntry(std::string name, pf_stat stat, DirEntry* parent);
