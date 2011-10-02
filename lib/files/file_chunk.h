@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef FILE_CHUNK_H
@@ -35,15 +35,15 @@ class FileChunk : public FileChunkDesc
 	bool hdd_synced;
 
 public:
-	FileChunk() : access_time(0), data(NULL), hdd_synced(false) {}
+	FileChunk();
 	FileChunk(const char* _data, off_t _offset, size_t _size);
 	FileChunk(const FileChunk &other);
 	FileChunk& operator=(const FileChunk &other);
 	~FileChunk();
 
-	time_t GetAccessTime() const { return access_time; }
-	bool GetHddSynced() const { return hdd_synced; }
-	void SetHddSynced(bool _hdd_synced) { hdd_synced = _hdd_synced; }
+	time_t GetAccessTime() const;
+	bool GetHddSynced() const;
+	void SetHddSynced(bool _hdd_synced);
 	const char* GetData();
 
 	void Merge(FileChunk chunk);

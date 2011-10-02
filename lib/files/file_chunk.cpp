@@ -28,7 +28,13 @@
 
 #include "file_chunk.h"
 
-FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : FileChunkDesc(_offset, _size), hdd_synced(false)
+FileChunk()
+ : access_time(0), data(NULL), hdd_synced(false)
+{
+}
+
+FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size)
+ : FileChunkDesc(_offset, _size), hdd_synced(false)
 {
 	access_time = time(NULL);
 	if(_data)
@@ -40,8 +46,8 @@ FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size) : FileChunk
 		data = NULL;
 }
 
-FileChunk::FileChunk(const FileChunk& other) : FileChunkDesc(other), access_time(other.access_time),
-			hdd_synced(other.hdd_synced)
+FileChunk::FileChunk(const FileChunk& other)
+ : FileChunkDesc(other), access_time(other.access_time), hdd_synced(other.hdd_synced)
 {
 	if(other.data)
 	{
@@ -76,6 +82,21 @@ FileChunk::~FileChunk()
 {
 	if(data)
 		delete []data;
+}
+
+time_t FileChunk::GetAccessTime() const
+{
+	return access_time;
+}
+
+bool FileChunk::GetHddSynced() const
+{
+	return hdd_synced;
+}
+
+void FileChunk::SetHddSynced(bool _hdd_synced)
+{
+	hdd_synced = _hdd_synced;
 }
 
 const char* FileChunk::GetData()
