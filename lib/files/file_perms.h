@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef FILE_PERMS_H
@@ -26,6 +26,7 @@
 
 #include <unistd.h>
 
+/** This class represent a file permission */
 class FilePermissions
 {
 public:
@@ -35,10 +36,10 @@ public:
 		S_PF_REMOVED = 1 << 0
 	};
 
-	uint32_t pf_mode;
-	mode_t  mode;
-	uid_t uid;
-	gid_t gid;
+	uint32_t pf_mode; /** Special peerfuse flag holder */
+	mode_t  mode; /** Unix file mode (e.g. 0755 ) */
+	uid_t uid; /** User ID of file */
+	gid_t gid; /** Group ID of file */
 
 	FilePermissions()
 		: pf_mode(0),
