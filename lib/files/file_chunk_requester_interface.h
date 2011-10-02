@@ -33,7 +33,7 @@ public:
 
 	virtual bool RequestFileRefs(std::string filename) = 0;
 
-	virtual void RequestChunk(std::string filename, Key key,
+	virtual void RequestChunk(std::string filename, Key key) = 0;
 };
 
 #endif /* FILE_CHUNK_REQUESTER_INTERFACE_H */
