@@ -65,10 +65,6 @@ FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* _parent)
 	key.MakeHash(name);
 }
 
-FileEntry::~FileEntry()
-{
-}
-
 DirEntry* FileEntry::GetParent() const
 {
 	return parent;
@@ -108,24 +104,6 @@ bool FileEntry::IsChildOf(const FileEntry* f) const
 	return (p);
 }
 
-void FileEntry::SetAttr(pf_stat new_stat, bool force)
-{
-	// Update attribute
-	if(stat.size != new_stat.size || force)
-		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
-	if(stat.meta_mtime != new_stat.meta_mtime || force)
-		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
-	if(stat.pf_mode != new_stat.pf_mode || force)
-		tree_cfg.Set(GetFullName() + "#pfmode", (uint32_t)new_stat.pf_mode);
-	if(stat.uid != new_stat.uid || force)
-		tree_cfg.Set(GetFullName() + "#uid", (uint32_t)new_stat.uid);
-	if(stat.gid != new_stat.gid || force)
-		tree_cfg.Set(GetFullName() + "#gid", (uint32_t)new_stat.gid);
-	if(stat.mode != new_stat.mode || force)
-		tree_cfg.Set(GetFullName() + "#mode", (uint32_t)new_stat.mode);
-	stat = new_stat;
-}
-
 KeyList FileEntry::GetSharers() const
 {
 	return sharers;
@@ -152,6 +130,24 @@ void FileEntry::AddSharer(Key id)
 pf_stat FileEntry::GetAttr() const
 {
 	return stat;
+}
+
+void FileEntry::SetAttr(pf_stat new_stat, bool force)
+{
+	// Update attribute
+	if(stat.size != new_stat.size || force)
+		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
+	if(stat.meta_mtime != new_stat.meta_mtime || force)
+		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
+	if(stat.pf_mode != new_stat.pf_mode || force)
+		tree_cfg.Set(GetFullName() + "#pfmode", (uint32_t)new_stat.pf_mode);
+	if(stat.uid != new_stat.uid || force)
+		tree_cfg.Set(GetFullName() + "#uid", (uint32_t)new_stat.uid);
+	if(stat.gid != new_stat.gid || force)
+		tree_cfg.Set(GetFullName() + "#gid", (uint32_t)new_stat.gid);
+	if(stat.mode != new_stat.mode || force)
+		tree_cfg.Set(GetFullName() + "#mode", (uint32_t)new_stat.mode);
+	stat = new_stat;
 }
 
 void FileEntry::LoadAttr()
