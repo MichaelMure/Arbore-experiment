@@ -21,6 +21,8 @@
  *
  */
 
+#include <unistd.h>
+#include <assert.h>
 #include "file_chunk_desc.h"
 
 FileChunkDesc::FileChunkDesc()

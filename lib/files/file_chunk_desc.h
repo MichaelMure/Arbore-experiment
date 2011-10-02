@@ -25,8 +25,6 @@
 #define FILE_CHUNK_DESC_H
 
 #include <time.h>
-#include <unistd.h>
-#include <assert.h>
 
 #include <util/tools.h>
 
