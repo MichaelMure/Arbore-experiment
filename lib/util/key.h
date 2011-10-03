@@ -168,7 +168,7 @@ public:
 	** calculate the distance between k1 and k2 in the keyspace and assign that to #diff# */
 	Key distance(const Key& k2) const;
 
-	//returns the size of the interval starting from this to upperBound
+	/**returns the size of the interval starting from this to upperBound */
 	Key intervalSize(const Key& upperBound) const;
 
 	/* key_between: test, left, right

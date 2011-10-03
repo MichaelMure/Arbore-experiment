@@ -26,6 +26,7 @@
 #include <pthread.h>
 #include <exception>
 
+/** Enumeration of mutex type */
 enum MutexType
 {
 	INVALID_MUTEX,
@@ -46,12 +47,34 @@ public:
 
 	class MutexError : public std::exception {};
 
+	/** Create a Mutex with a type
+	* 
+	* default type is NORMAL_MUTEX
+	* 
+	* @param _type type of the mutex
+	*/	
 	Mutex(enum MutexType _type = NORMAL_MUTEX);
+
+	/** The copy constructor.
+	 *  
+	 * create a Mutex with the same type from which it's copied
+	 *
+	 * @param m copy mutex from the other mutex
+	 */
 	Mutex(const Mutex &m);
+	
+	/** Copy the type from another Mutex
+	*
+	* @param m Mutex from which type is copied
+	* @return current Mutex initialize with the copied type
+	*/
 	Mutex& operator=(const Mutex& m);
 	~Mutex();
-
+	
+	/** Lock the Mutex */
 	void Lock() const;
+	
+	/** Unlock the Mutex */
 	void Unlock() const;
 };
 
