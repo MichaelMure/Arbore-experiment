@@ -53,6 +53,7 @@ public:
 	bool operator==(const pf_stat& st);
 };
 
+/** Comparator class used to sort FileEntry object in the std::set FileList */
 struct CompFiles
 {
 	bool operator() (const FileEntry* f1, const FileEntry* f2) const;

@@ -69,6 +69,7 @@ public:
 	bool Contains(const FileChunkDesc& other) const;
 };
 
+/** Comparator class to be used for sorting FileChunkDesc in a std::set */
 struct CompFileChunk
 {
 	/* currently unimplemented */
