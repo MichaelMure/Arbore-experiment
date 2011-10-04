@@ -33,7 +33,25 @@
  *
  * It's usefull to be sure that an object is free in all cases
  * when we leave a block (with exception, inside returns, etc.)
+ *
+ * Example usage:
+ * @code
+ * bool Peer::Receive()
+ * {
+ * if(!PeerBase::ReceivePacket())
+ * return false;
+ * Deleter<Packet> packet(incoming);
+ * incoming = NULL;
+ * HandleMsg(*packet);
+ * return false;
+ * }
+ * @endcode
+ * We use the Deleter class because we don't know how we will
+ * exit this function. With it, we are *sure* than Packet instance
+ * will be free'd.
+ *
  */
+
 template<typename T>
 class Deleter
 {
