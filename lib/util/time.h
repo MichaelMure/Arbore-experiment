@@ -31,34 +31,19 @@
 class time {
 
 public:
-  /**
-   * dtime:
-   * @return the time of day in double format with microsecond precision
-   */
+  /** @return the time of day in double format with microsecond precision*/
   static double dtime (void);
 
-  /**
-   * dalarm:
-   * generates a SIGALRM signal in @time seconds.
-   */
+  /** Generates a SIGALRM signal after time seconds.*/
   static void dalarm (double time);
 
-  /**
-   * dalarm:
-   * sleeps for @time seconds
-   */
+  /** Sleeps for time seconds */
   static void dsleep (double time);
 
-  /**
-   * dtotv:
-   * @return the struct timeval representation of double @d
-   */
+  /** @return the struct timeval representation of double d */
   static struct timeval dtotv (double d);
 
-  /**
-   * tvtod:
-   * @return the double representation of timeval @tv
-   */
+  /** @return the double representation of timeval tv */
   static double tvtod (struct timeval tv);
 
 };
