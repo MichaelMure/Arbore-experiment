@@ -80,7 +80,7 @@ private:
 public:
 	/** Constructor
 	 *
-	 * @param filename  the file name.
+	 * @param _filename  the file name.
 	 * @param requester  implementation object of the FileChunkRequesterInterface interface.
 	 */
 	FileContent(std::string _filename, FileChunkRequesterInterface* requester);
@@ -94,12 +94,13 @@ public:
 	/** Get filename */
 	std::string GetFilename() const { return filename; }
 
+	bool FileContentHaveChunk(FileChunkDesc chunk_desc);
+
 	/** Load a chunk from the hdd or ask it on the network
-	 * @param chunk the part to load
+	 * @param chunk_desc the part to load
 	 * @param blockant_load if true and the chunk is available on hardrive, the call will lock until it's loaded
 	 * @return returns true if the chunk is available after returning from this method
 	 */
-	bool FileContentHaveChunk(FileChunkDesc chunk_desc);
 	bool OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load = false);
 	chunk_availability NetworkHaveChunk(FileChunkDesc chunk_desc);
 
