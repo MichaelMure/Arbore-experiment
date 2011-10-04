@@ -28,6 +28,7 @@
 
 #include <util/tools.h>
 
+/** Lightweight description of a chunk */
 class FileChunkDesc
 {
 protected:
@@ -39,18 +40,32 @@ public:
 	FileChunkDesc(off_t _offset, size_t _size);
 	virtual ~FileChunkDesc() {};
 
+	/** Compare two chunk
+	 * @return true if other represent the same chunk
+	 */
 	bool operator==(const FileChunkDesc &other);
+
+	/** Compare the position of two chunk.
+	 * @return true if the left chunk's offset is lower, or if equal, if the size is lower.
+	 */
 	bool operator<(const FileChunkDesc &other);
 
+	/** @return the offset */
 	off_t GetOffset() const;
+
+	/** @return the size */
 	size_t GetSize() const;
 
+	/** @return the offset of the next chunk */
 	off_t GetEndOffset() const;
 
+	/** @return true if both chunk overlaps*/
 	bool Overlaps(const FileChunkDesc& other) const;
 
+	/** @return a FileChunkDesc describing the common part of two chunk */
 	FileChunkDesc GetCommonPartDesc(const FileChunkDesc& other);
 
+	/** @return true if the given chunk is completly enclosed in our chunk */
 	bool Contains(const FileChunkDesc& other) const;
 };
 
