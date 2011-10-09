@@ -59,6 +59,7 @@ public:
 	/** @return the data and update the access time */
 	const char* GetData();
 
+	/** Overwrite the common data part of this and chunk in this */
 	void Merge(FileChunk chunk);
 
 	/** Copy the data of the given chunk and concatenate it in this.
