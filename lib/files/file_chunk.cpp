@@ -132,17 +132,20 @@ void FileChunk::Concatenate(FileChunk other)
 
 	if(!data)
 	{
+		/* overwrite this with other */
 		*this = other;
 		return;
 	}
 
-	if(offset + (off_t)size != other.GetOffset())
+	if(GetEndOffset() != other.GetOffset())
 		pf_log[W_ERR] << "Ooops! Concatenating 2 non-contiguous chunks";
 
 	access_time = time(NULL);
 	hdd_synced = false;
 	size_t new_size = (size_t) (GetSize() + other.GetSize());
 	char* new_data = new char[new_size];
+
+	/* zero the newly allocated data, is this really necessary since we overwrite after ? */
 	memset(new_data, 0, new_size);
 
 	if(data)

@@ -25,9 +25,9 @@
 #define FILE_CHUNK_H
 
 #include <time.h>
-#include <unistd.h>
 #include "file_chunk_desc.h"
 
+/** Specialisation of FileChunkDesc to actually hold data of a chunk */
 class FileChunk : public FileChunkDesc
 {
 	time_t access_time;
@@ -37,17 +37,38 @@ class FileChunk : public FileChunkDesc
 public:
 	FileChunk();
 	FileChunk(const char* _data, off_t _offset, size_t _size);
+
+	/** Copy constructor */
 	FileChunk(const FileChunk &other);
+
 	FileChunk& operator=(const FileChunk &other);
 	~FileChunk();
 
+	/** @return the time of the last access */
 	time_t GetAccessTime() const;
+
+	/** Indicate if the chunk is marked as synced on the disk */
 	bool GetHddSynced() const;
+
+	/**
+	 * Setter for the synced on disk flag
+	 * @param _hdd_synced new value for the synced on disk flag
+	 */
 	void SetHddSynced(bool _hdd_synced);
+
+	/** @return the data and update the access time */
 	const char* GetData();
 
 	void Merge(FileChunk chunk);
+
+	/** Copy the data of the given chunk and concatenate it in this.
+	 * \note if the two chunk are not continous, an error is logged and the operation is done anyway.
+	 *
+	 * @param chunk a FileChunk
+	 */
 	void Concatenate(FileChunk chunk);
+
+	/** @return a FilChunk that hold the data of the common part of this and chunk_desc */
 	FileChunk GetPart(FileChunkDesc chunk_desc);
 };
 #endif						  /* FILE_CHUNK_H */
