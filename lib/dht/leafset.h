@@ -35,6 +35,9 @@
 #include <net/hosts_list.h>
 #include <util/key.h>
 
+/**The leafset contains the current peer's immediate neighbors in key space
+ *
+ */
 class Leafset
 {
 private :

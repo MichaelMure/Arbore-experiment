@@ -30,6 +30,7 @@
 /** DOLR : Distributed Object Location and Routing
  *
  * DOLR is used to maintain a mapping between an object and its' owner(s)
+ * NOT USED AT THE MOMENT
  */
 class DOLR
 {
@@ -40,9 +41,9 @@ public:
 
 	DOLR();
 	~DOLR();
-/** Add the object's @key if it does not exist in the table, and the @owner in the table*/
+  /** Add the object's key if it does not exist in the table, and the owner in the table*/
 	void published(Key key, Key owner);
-/** Remove the owner of the list of @key owners */
+  /** Remove the owner of the list of key owners */
 	void unpublised(Key key, Key owner);
 };
 
