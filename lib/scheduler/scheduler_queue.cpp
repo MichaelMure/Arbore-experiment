@@ -29,7 +29,15 @@
 
 SchedulerQueue scheduler_queue;
 
-// Queue a new job
+SchedulerQueue::SchedulerQueue()
+  : Mutex(RECURSIVE_MUTEX)
+{
+}
+
+SchedulerQueue::~SchedulerQueue()
+{
+}
+
 void SchedulerQueue::Queue(Job* job)
 {
 	BlockLockMutex lock(this);

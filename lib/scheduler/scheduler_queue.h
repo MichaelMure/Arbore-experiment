@@ -29,31 +29,33 @@
 #include <util/mutex.h>
 
 class Job;
-						  /* TODO: Make me private */
-class SchedulerQueue : public std::list<Job*>, public Mutex
+
+/** Queue of job, used by the Scheduler */
+class SchedulerQueue : private std::list<Job*>, public Mutex
 {
 public:
-	SchedulerQueue() : Mutex(RECURSIVE_MUTEX) {}
-	~SchedulerQueue() {}
+	SchedulerQueue();
+	~SchedulerQueue();
 
-	// Get the nxt job to be executed from the queue
+	/** @return the next job to be executed from the queue */
 	Job* PopJob();
 
-	// Put a new job into queue
+	/** Put a new job into the queue */
 	void Queue(Job* job);
 
-	// Remove a job from the queue
+	/** Remove a job from the queue */
 	void Cancel(Job* job);
 
-	// Remove all jobs of a specific type from the queue
+	/** Remove all jobs of a specific type from the queue */
 	void CancelType(std::type_info type);
 
-	// Return the date of the next scheduled job
+	/** @return the date of the next scheduled job */
 	double NextJobTime();
 
+  /** @return the size of the queue */
 	size_t GetQueueSize();
-
 };
 
+/* Singleton */
 extern SchedulerQueue scheduler_queue;
 #endif						  /* SCHEDULER_QUEUE_H */
