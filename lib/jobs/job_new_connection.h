@@ -18,15 +18,12 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef JOB_NEW_CONNECTION_H
 #define JOB_NEW_CONNECTION_H
+
 #include <string>
-#include "job.h"
-#include "dtime.h"
-#include "pf_types.h"
 
 class JobNewConnection : public Job, private pf_addr
 {
