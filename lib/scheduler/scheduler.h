@@ -24,21 +24,31 @@
 #define SCHEDULER_H
 
 #include <vector>
+
 #include <util/pf_thread.h>
 
+/** This class inherit from Thread and manage a static vector of instance of himself.
+  * Each instance will run regularly and run job located in the scheduler_queue.
+  * TODO: probably need to keep an instance of scheduler_queue rather than use a static
+  * vector and a global variable.
+  */
 class Scheduler : public Thread
 {
 public:
-	Scheduler() {}
-	~Scheduler() {}
-
+	/** Create, add and run nb new instance of Scheduler in the vector. */
 	static void StartSchedulers(size_t nb);
+
+	/** Stop all the instance of Scheduler and destroy them. */
 	static void StopSchedulers();
 
 private:
+	Scheduler() {}
+	~Scheduler() {}
+
+	/** Internal run implementation of the Scheduler's thread */
 	void Loop();
 
-  typedef std::vector<Scheduler*> SchedulerVector;
-  static SchedulerVector schedulers;
+	typedef std::vector<Scheduler*> SchedulerVector;
+	static SchedulerVector schedulers;
 };
 #endif
