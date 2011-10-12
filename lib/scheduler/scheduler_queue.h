@@ -52,12 +52,12 @@ public:
 	/** @return the date of the next scheduled job */
 	double NextJobTime();
 
-  /** @return the size of the queue */
+	/** @return the size of the queue */
 	size_t GetQueueSize();
 
 private:
-  typedef std::list<Job*> JobList;
-  JobList jobs;
+	typedef std::list<Job*> JobList;
+	JobList jobs;
 };
 
 /* Singleton */

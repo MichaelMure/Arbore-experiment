@@ -44,9 +44,9 @@ private:
 
 protected:
 	/** Virtual protected function to be implemented by children class,
-   * that contain what actually do the job.
-   * @return true if the job needs to be restarted later.
-   */
+	 * that contain what actually do the job.
+	 * @return true if the job needs to be restarted later.
+	 */
 	virtual bool Start() = 0;
 
 public:
@@ -54,11 +54,11 @@ public:
 	virtual ~Job() {}
 
 	/** Start the job
-   * @return true if the job needs to be restarted later
-   */
+	 * @return true if the job needs to be restarted later
+	 */
 	bool DoStart();
 
-  /** @return the time when the job was started */
+	/** @return the time when the job was started */
 	double GetStartTime() const;
 };
 #endif						  /* JOB_H */
