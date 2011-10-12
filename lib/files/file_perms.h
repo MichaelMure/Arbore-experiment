@@ -24,6 +24,8 @@
 #ifndef FILE_PERMS_H
 #define FILE_PERMS_H
 
+#include <sys/stat.h>
+#include <stdint.h>
 #include <unistd.h>
 
 /** This class represent a file permission */
@@ -41,11 +43,6 @@ public:
 	uid_t uid; /** User ID of file */
 	gid_t gid; /** Group ID of file */
 
-	FilePermissions()
-		: pf_mode(0),
-		mode(S_IFREG | S_IRUSR | S_IWUSR),
-		uid(getuid()),
-		gid(getgid())
-		{}
+	FilePermissions();
 };
 #endif						  /* FILE_PERMS_H */
