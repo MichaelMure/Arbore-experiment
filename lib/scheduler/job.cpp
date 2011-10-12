@@ -23,6 +23,13 @@
 #include <util/time.h>
 #include "job.h"
 
+Job::Job(double start_at, repeat_type_t _repeat_type, double _repeat_delta)
+ : start_time(start_at),
+   repeat_type(_repeat_type),
+   repeat_delta(_repeat_delta)
+{
+}
+
 bool Job::DoStart()
 {
 	bool ret = Start();
@@ -46,4 +53,9 @@ bool Job::DoStart()
 		}
 	}
 	return ret;
+}
+
+double Job::GetStartTime() const
+{
+  return start_time;
 }

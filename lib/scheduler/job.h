@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef JOB_H
@@ -27,6 +26,7 @@
 #include <time.h>
 #include <string>
 
+/** Base class for a Job, to be executed by a Scheduler */
 class Job
 {
 protected:
@@ -39,18 +39,26 @@ protected:
 
 private:
 	double start_time;
-	repeat_type_t repeat_type;
-	double repeat_delta;
+	repeat_type_t repeat_type; /** Repeat scheme */
+	double repeat_delta; /** Delta between each start */
 
 protected:
-	// Start the job, returns true if the job needs to be restarted later
+	/** Virtual protected function to be implemented by children class,
+   * that contain what actually do the job.
+   * @return true if the job needs to be restarted later.
+   */
 	virtual bool Start() = 0;
+
 public:
-	Job(double start_at, repeat_type_t _repeat_type, double _repeat_delta = 0.0) : start_time(start_at), repeat_type(_repeat_type), repeat_delta(_repeat_delta) {}
+	Job(double start_at, repeat_type_t _repeat_type, double _repeat_delta = 0.0);
 	virtual ~Job() {}
 
-	// Start the job, returns true if the job needs to be restarted later
+	/** Start the job
+   * @return true if the job needs to be restarted later
+   */
 	bool DoStart();
-	double GetStartTime() const { return start_time; }
+
+  /** @return the time when the job was started */
+	double GetStartTime() const;
 };
 #endif						  /* JOB_H */
