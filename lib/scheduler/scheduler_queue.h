@@ -31,7 +31,7 @@
 class Job;
 
 /** Queue of job, used by the Scheduler */
-class SchedulerQueue : private std::list<Job*>, public Mutex
+class SchedulerQueue : public Mutex
 {
 public:
 	SchedulerQueue();
@@ -54,6 +54,10 @@ public:
 
   /** @return the size of the queue */
 	size_t GetQueueSize();
+
+private:
+  typedef std::list<Job*> JobList;
+  JobList jobs;
 };
 
 /* Singleton */

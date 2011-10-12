@@ -43,39 +43,39 @@ void SchedulerQueue::Queue(Job* job)
 	BlockLockMutex lock(this);
 	pf_log[W_DEBUG] << "Queueing job \"" << typeid(job).name() << "\"";
 
-	for(iterator it = begin();
-		it != end();
+	for(JobList::iterator it = jobs.begin();
+		it != jobs.end();
 		++it)
 	{
 		if(job->GetStartTime() < (*it)->GetStartTime())
 		{
-			insert(it, job);
+			jobs.insert(it, job);
 			return;
 		}
 	}
 
-	push_back(job);
+	jobs.push_back(job);
 }
 
 Job* SchedulerQueue::PopJob()
 {
 	BlockLockMutex lock(this);
-	if(size() == 0)
+	if(jobs.size() == 0)
 		return NULL;
-	Job* j = front();
-	pop_front();
+	Job* j = jobs.front();
+	jobs.pop_front();
 	return j;
 }
 
 void SchedulerQueue::Cancel(Job* job)
 {
 	BlockLockMutex lock(this);
-	iterator it = find(begin(), end(), job);
+	JobList::iterator it = find(jobs.begin(), jobs.end(), job);
 
-	if(it == end())
+	if(it == jobs.end())
 		return;
 
-	erase(it);
+	jobs.erase(it);
 	delete job;
 }
 
@@ -83,13 +83,13 @@ void SchedulerQueue::CancelType(std::type_info type)
 {
 	BlockLockMutex lock(this);
 
-	iterator it = begin();
-	while(it != end())
+	JobList::iterator it = jobs.begin();
+	while(it != jobs.end())
 	{
 		if(typeid(*it) == type)
 		{
 			delete *it;
-			it = erase(it);
+			it = jobs.erase(it);
 		}
 		else
 			++it;
@@ -99,13 +99,13 @@ void SchedulerQueue::CancelType(std::type_info type)
 double SchedulerQueue::NextJobTime()
 {
 	BlockLockMutex lock(this);
-	if(size() == 0)
+	if(jobs.size() == 0)
 		return 0;
-	return front()->GetStartTime();
+	return jobs.front()->GetStartTime();
 }
 
 size_t SchedulerQueue::GetQueueSize()
 {
 	BlockLockMutex lock(this);
-	return size();
+	return jobs.size();
 }
