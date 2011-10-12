@@ -57,14 +57,15 @@ bool pf_addr::operator ==(const pf_addr &other) const
 bool pf_addr::operator<(const pf_addr &other) const
 {
 	for(size_t i = 0; i < 4; ++i)
-		if(ip[i] < other.ip[i])
-			return true;
+		if(ip[i] != other.ip[i])
+			return ip[i] < other.ip[i];
 
-	if(port < other.port)
-		return true;
+	if(port != other.port)
+		return port < other.port;
 
 	if(key && other.key)
 		return key < other.key;
+
 	return false;
 }
 
