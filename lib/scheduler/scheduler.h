@@ -24,19 +24,21 @@
 #define SCHEDULER_H
 
 #include <vector>
-
 #include <util/pf_thread.h>
 
 class Scheduler : public Thread
 {
-	static std::vector<Scheduler*> schedulers;
-
-	void Loop();
 public:
 	Scheduler() {}
 	~Scheduler() {}
 
 	static void StartSchedulers(size_t nb);
 	static void StopSchedulers();
+
+private:
+	void Loop();
+
+  typedef std::vector<Scheduler*> SchedulerVector;
+  static SchedulerVector schedulers;
 };
 #endif

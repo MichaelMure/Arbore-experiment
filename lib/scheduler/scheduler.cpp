@@ -44,7 +44,7 @@ void Scheduler::StartSchedulers(size_t nb)
 
 void Scheduler::StopSchedulers()
 {
-	for(std::vector<Scheduler*>::iterator it = schedulers.begin();
+	for(SchedulerVector::iterator it = schedulers.begin();
 	    it != schedulers.end();
 	    ++it)
 	{
@@ -78,4 +78,4 @@ void Scheduler::Loop()
 				delete job;
 		}
 	}
-}
+} 
