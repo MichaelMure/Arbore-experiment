@@ -32,6 +32,11 @@
 
 class HostsList;
 
+/** Class used for routing packet among the DHT using Key Based Routing
+ *
+ * Find the best next host to send the packet according to the final destination
+ *
+ */
 class ChimeraRouting : protected Mutex
 {
 private :
@@ -85,9 +90,9 @@ public :
 	/*! \brief Finds the next routing destination
 	 *
 	 * Finds the best destination for the next step of routing to key.
-	 * First we look for a final destination in the leafset, then for a
-	 * prefix match in the routing table, and finally we take the node
-	 * from the routing table or the leafset which is the closest to the
+	 * First we look for a final destination in the leafset, then, if its
+	 * necessary for a prefix match in the routing table, and finally
+	 * we take the node from the routing table or the leafset which is the closest to the
 	 * destination.
 	 *
 	 * \param key  routing destination
