@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <stdio.h>
@@ -29,13 +28,14 @@
 #include "connection.h"
 #include "pf_log.h"
 
-Connection::Connection(int _fd) : fd(_fd),
+Connection::Connection(int _fd)
+		: fd(_fd),
 			read_buf(NULL),
 			read_buf_size(0),
 			write_buf(NULL),
 			write_buf_size(0)
 {
-	// Set the fd to non-bloquant
+	/* Set the fd to non-bloquant */
 	int flags = fcntl(fd, F_GETFL);
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
@@ -46,12 +46,9 @@ Connection::~Connection()
 		close(fd);
 }
 
-// Read "size" octets from the read buffer
-// returns true and buf if enough datas can be read
-// returns false when not enough data is available
 bool Connection::Read(char **buf, size_t size)
 {
-	// Fill the buffer
+	/* Fill the internal buffer */
 	SocketRead();
 
 	if(read_buf_size < size)
@@ -62,7 +59,7 @@ bool Connection::Read(char **buf, size_t size)
 	*buf = (char*)malloc(size);
 	memcpy(*buf, read_buf, size);
 
-	// The buffer has been totally read
+	/* The internal buffer has been totally read */
 	if(size == read_buf_size)
 	{
 		read_buf_size = 0;
@@ -71,7 +68,7 @@ bool Connection::Read(char **buf, size_t size)
 		return true;
 	}
 
-	// Remove read data from the buffer
+	/* Remove read data from the internal buffer */
 	read_buf_size -= size;
 	char* new_buf = (char*)malloc(read_buf_size);
 	memcpy(new_buf, read_buf + size, read_buf_size);
@@ -86,6 +83,6 @@ void Connection::Write(const char* buf, size_t size)
 	memcpy(write_buf + write_buf_size, buf, size);
 	write_buf_size += size;
 
-	// Try to flush to the socket
+	/* Try to flush to the socket */
 	SocketWrite();
 }
