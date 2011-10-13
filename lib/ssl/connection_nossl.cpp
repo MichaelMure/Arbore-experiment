@@ -25,18 +25,21 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <errno.h>
+
+#include <util/pf_log.h>
+
 #include "connection_nossl.h"
-#include "pf_log.h"
 
 ConnectionNoSsl::ConnectionNoSsl(int _fd)
 			: Connection(_fd)
-{}
+{
+}
 
 ConnectionNoSsl::~ConnectionNoSsl()
 {
 }
 
-void ConnectionNoSsl::SocketWrite() throw(WriteError)
+void ConnectionNoSsl::SocketWrite()
 {
 	if(send(fd, write_buf, write_buf_size, 0) <= 0)
 		throw WriteError(std::string(strerror(errno)));
@@ -46,7 +49,7 @@ void ConnectionNoSsl::SocketWrite() throw(WriteError)
 	write_buf = NULL;
 }
 
-void ConnectionNoSsl::SocketRead() throw(RecvError)
+void ConnectionNoSsl::SocketRead()
 {
 	const int buf_size = 128;
 	char buf[buf_size];
