@@ -28,6 +28,16 @@
 
 class JobMkFile : public Job
 {
+public:
+	JobMkFile(std::string _file,
+						pf_stat _stat,
+						IDList _sharers,
+						pf_id _sender,
+						bool _keep_newest,
+						bool _erase_on_modification);
+	~JobMkFile() {}
+
+private:
 	std::string file;
 	pf_stat stat;
 	pf_id sender;
@@ -36,17 +46,5 @@ class JobMkFile : public Job
 	bool erase_on_modification;
 
 	bool Start();
-public:
-	JobMkFile(std::string _file, pf_stat _stat, IDList _sharers, pf_id _sender, bool _keep_newest, bool _erase_on_modification)
-		: Job(0, REPEAT_NONE),
-		file(_file),
-		stat(_stat),
-		sender(_sender),
-		sharers(_sharers),
-		keep_newest(_keep_newest),
-		erase_on_modification(_erase_on_modification)
-		{}
-	~JobMkFile() {}
-
 };
 #endif						  /* JOB_MKFILE_H */

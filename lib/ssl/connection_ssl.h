@@ -24,13 +24,13 @@
 #ifndef PF_CONNECTION_SSL_H
 #define PF_CONNECTION_SSL_H
 
-#include <exception>
 #include <queue>
 #include "connection.h"
 #include "certificate.h"
 
 class ConnectionSsl : public Connection
 {
+private:
 	SSL* ssl;
 	struct buf_t
 	{
@@ -43,10 +43,9 @@ public:
 	ConnectionSsl(SSL* _ssl, int _fd) : Connection(_fd), ssl(_ssl) {}
 	~ConnectionSsl();
 
-	void SocketWrite() throw(WriteError);
-	void SocketRead() throw(RecvError);
+	void SocketWrite();
+	void SocketRead();
 
 	Certificate GetCertificate();
-	pf_id GetCertificateID();
 };
 #endif						  // PF_CONNECTION_SSL_H

@@ -25,8 +25,10 @@
 #include <string.h>
 #include <unistd.h>				  // fcntl
 #include <fcntl.h>				  // fcntl
+
+#include <util/pf_log.h>
+
 #include "connection.h"
-#include "pf_log.h"
 
 Connection::Connection(int _fd)
 		: fd(_fd),

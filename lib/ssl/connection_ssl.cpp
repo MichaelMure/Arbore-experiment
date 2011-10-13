@@ -18,15 +18,16 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include <assert.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <climits>
+
+#include <util/pf_log.h>
+
 #include "connection_ssl.h"
-#include "pf_log.h"
 
 ConnectionSsl::~ConnectionSsl()
 {
@@ -37,7 +38,7 @@ ConnectionSsl::~ConnectionSsl()
 	}
 }
 
-void ConnectionSsl::SocketWrite() throw(WriteError)
+void ConnectionSsl::SocketWrite()
 {
 	if(write_buf_size != 0)
 	{
@@ -88,7 +89,7 @@ void ConnectionSsl::SocketWrite() throw(WriteError)
 	}
 }
 
-void ConnectionSsl::SocketRead() throw(RecvError)
+void ConnectionSsl::SocketRead()
 {
 	const int buf_size = 128;
 	char buf[buf_size];
@@ -131,9 +132,4 @@ Certificate ConnectionSsl::GetCertificate()
 	Certificate cert;
 	cert.SetSSL(X509_dup(ssl_cert));
 	return cert;
-}
-
-pf_id ConnectionSsl::GetCertificateID()
-{
-	return GetCertificate().GetIDFromCertificate();
 }

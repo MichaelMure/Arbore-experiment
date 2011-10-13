@@ -18,24 +18,21 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef CONNECTION_NOSSL_H
 #define CONNECTION_NOSSL_H
+
 #include "connection.h"
-#include <exception>
 
 class ConnectionNoSsl : public Connection
 {
-	int fd;
 public:
-	class ConnectionError : public std::exception {};
-
 	ConnectionNoSsl(int _fd);
 	~ConnectionNoSsl();
 
-	void SocketWrite() throw(WriteError);
-	void SocketRead() throw(RecvError);
+private:
+	void SocketWrite();
+	void SocketRead();
 };
 #endif						  // CONNECTION_NOSSL_H

@@ -23,17 +23,15 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include "pf_exception.h"
-#include "pf_types.h"
+#include <util/pf_exception.h>
 
 /** This base class provide an abstraction for a connection, and have to be derived in concrete
   * implementation for e.g add encryption or not.  */
 class Connection
 {
-private:
+protected:
 	int fd;
 
-protected:
 	char* read_buf;
 	size_t read_buf_size;
 
