@@ -257,6 +257,7 @@ void Leafset::KeyUpdate(Host _me)
 
 #if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
 void Leafset::updateIntervalSize()
+//why only checking on the Clockwise side ? why not on the counterClockwise ? -- BenoitS
 {
 	if(this->nbLeavesClockwise > 0)
 	{
