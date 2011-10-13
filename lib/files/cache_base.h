@@ -23,20 +23,6 @@
 #ifndef CACHE_BASE_H
 #define CACHE_BASE_H
 
-#ifndef PF_SERVER_MODE
-#ifndef FUSE_USE_VERSION
-#define FUSE_USE_VERSION 26
-#endif						  /* FUSE_USE_VERSION */
-#ifndef _XOPEN_SOURCE
-#ifdef linux
-/* For pread()/pwrite() */
-#define _XOPEN_SOURCE 500
-#endif						  /* linux */
-#endif						  /* _XOPEN_SOURCE */
-
-#include <fuse.h>
-#endif						  /* PF_SERVER_MODE */
-
 #include <vector>
 #include "util/mutex.h"
 #include "file_entry.h"
