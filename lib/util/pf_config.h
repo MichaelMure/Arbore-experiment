@@ -20,7 +20,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 /* !WARNING! This library must be used in a program with this function :
@@ -419,38 +419,14 @@ public:
 		: ConfigItem(_label, _description, def_value, cb, _config, _parent), min(_min), max(_max)
 		{}
 
-	virtual ConfigItem* Clone() const
-	{
-		return new ConfigItem_int(Label(), Description(), min, max, DefValue(), CallBack(), GetConfig(), Parent());
-	}
+	virtual ConfigItem* Clone() const;
 
 	/** We return a string form of this integer */
 	virtual std::string String() const { std::ostringstream oss; oss << value; return oss.str(); }
 
 	virtual int Integer() const { return value; }
-	virtual bool SetValue(std::string s)
-	{
-		for(std::string::const_iterator it = s.begin(); it != s.end(); ++it)
-			if(!isdigit(*it)) return false;
-		std::istringstream(s) >> value;
-		return (value >= min && value <= max);
-	}
-
-	std::string ValueType() const
-	{
-		if(min == INT_MIN)
-			return "integer";
-		else
-		{
-			std::ostringstream off;
-			std::string in, ax;
-			off << min;
-			in = off.str();
-			off << max;
-			ax = off.str();
-			return "integer (between " + in + " and " + ax + ")";
-		}
-	}
+	virtual bool SetValue(std::string s);
+	std::string ValueType() const;
 
 private:
 	int value, min, max;
@@ -465,28 +441,15 @@ public:
 		: ConfigItem(_label, _description, def_value, cb, _config, _parent)
 		{}
 
-	virtual ConfigItem* Clone() const
-	{
-		return new ConfigItem_bool(Label(), Description(), DefValue(), CallBack(), GetConfig(), Parent());
-	}
-
+	virtual ConfigItem* Clone() const;
 	/** We return a string form of this integer */
 	virtual std::string String() const { return (value ? "true" : "false"); }
 
 	virtual int Integer() const { return value; }
 	virtual bool Boolean() const { return value; }
-	virtual bool SetValue(std::string s)
-	{
-		if(s == "true" || s == "on" || s == "yes")
-			value = true;
-		else if(s == "false" || s == "off" || s == "no")
-			value = false;
-		else
-			return false;
-		return true;
-	}
+	virtual bool SetValue(std::string s);
 
-	std::string ValueType() const { return "boolean ('true' or 'false')"; }
+	std::string ValueType() const;
 
 private:
 	bool value;

@@ -20,7 +20,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #include <fstream>
@@ -42,13 +42,13 @@ MyConfig conf;
 	T::iterator x##ub = v.upper_bound(label); \
 	for(T::iterator x = x##lb; x != x##ub; ++x)
 #define Error(x) do { std::cerr << path << ":" << line_count << ": " << x << std::endl ; error = true; } while(0)
-			
+
 std::string stringtok(std::string &in, const char * const delimiters = " \t\n");
-			
+
 			/********************************************************************************************
 			 *                                Config                                                    *
 			 ********************************************************************************************/
-			
+
 MyConfig::MyConfig(std::string _path)
 			: path(_path), loaded(false)
 {
@@ -409,3 +409,56 @@ void ConfigSection::AddItem(ConfigItem* item, bool is_name) throw(MyConfig::erro
 		throw;
 	}
 }
+
+/********************************************************************************************
+ *                                ConfigItem                                                *
+ ********************************************************************************************/
+
+ConfigItem* ConfigItem_int::Clone() const
+{
+  return new ConfigItem_int(Label(), Description(), min, max, DefValue(), CallBack(), GetConfig(), Parent());
+}
+
+bool ConfigItem_int::SetValue(std::string s)
+{
+  for(std::string::const_iterator it = s.begin(); it != s.end(); ++it)
+    if(!isdigit(*it)) return false;
+  std::istringstream(s) >> value;
+  return (value >= min && value <= max);
+}
+std::string ConfigItem_int::ValueType() const
+{
+  if(min == INT_MIN)
+		return "integer";
+  else
+  {
+		std::ostringstream off;
+		std::string in, ax;
+		off << min;
+		in = off.str();
+		off << max;
+		ax = off.str();
+		return "integer (between " + in + " and " + ax + ")";
+  }
+}
+
+ConfigItem* ConfigItem_bool::Clone() const
+{
+  return new ConfigItem_bool(Label(), Description(), DefValue(), CallBack(), GetConfig(), Parent());
+}
+
+bool ConfigItem_bool::SetValue(std::string s)
+{
+  if(s == "true" || s == "on" || s == "yes")
+		value = true;
+  else if(s == "false" || s == "off" || s == "no")
+		value = false;
+  else
+    return false;
+  return true;
+}
+
+std::string ConfigItem_bool::ValueType() const { return "boolean ('true' or 'false')"; }
+
+
+
