@@ -64,24 +64,24 @@ enum
 	CHIMERA_RESERVED4   = 11,
 	CHIMERA_RESERVED5   = 12,
 	CHIMERA_RESERVED6   = 13,
-	CHIMERA_RESERVED7   = 14,
+	CHIMERA_RESERVED7   = 14
 };
 
 enum
 {
-	CHIMERA_JOIN_ADDRESS,
+	CHIMERA_JOIN_ADDRESS
 };
 extern PacketType ChimeraJoinType;
 
 enum
 {
-	CHIMERA_JOIN_ACK_ADDRESSES,
+	CHIMERA_JOIN_ACK_ADDRESSES
 };
 extern PacketType ChimeraJoinAckType;
 
 enum
 {
-	CHIMERA_UPDATE_ADDRESS,
+	CHIMERA_UPDATE_ADDRESS
 };
 extern PacketType ChimeraUpdateType;
 
@@ -94,13 +94,13 @@ extern PacketType ChimeraPiggyType;
 
 enum
 {
-	CHIMERA_JOIN_NACK_ADDRESS,
+	CHIMERA_JOIN_NACK_ADDRESS
 };
 extern PacketType ChimeraJoinNAckType;
 
 enum
 {
-	CHIMERA_PING_ME,
+	CHIMERA_PING_ME
 };
 extern PacketType ChimeraPingType;
 
