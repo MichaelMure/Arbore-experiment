@@ -18,12 +18,17 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
+#include <util/pf_log.h>
+#include <net/network.h>
+#include <scheduler/job.h>
+#include <util/time.h>
+#include <util/pf_types.h>
+#include <net/pf_addr.h>
+
 #include "job_new_connection.h"
-#include "pf_log.h"
-#include "network.h"
 
 bool JobNewConnection::Start()
 {

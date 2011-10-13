@@ -35,17 +35,20 @@
 const size_t ip_t_len = 4;
 typedef uint32_t ip_t[4];
 
+/** This class holds an adress of a host, defined by it's ip adress (ipv4/6),
+ * port and key.
+ */
 struct pf_addr
 {
 	static const size_t size = sizeof(ip_t) +       /* ip */
 	                           sizeof(uint16_t) +   /* port */
-				   Key::size;           /* key */
+	                           Key::size;           /* key */
 	ip_t ip;
 	uint16_t port;
 	Key key;
 
 	pf_addr() throw();
-	pf_addr(in_addr_t address, uint16_t port, Key key = Key()) throw();
+	pf_addr(in_addr_t address_v4, uint16_t port, Key key = Key()) throw();
 	pf_addr(const char* buf) throw();
 	~pf_addr() throw() {}
 
@@ -56,7 +59,7 @@ struct pf_addr
 	 * @param other this is the other pf_addr which is compared to me
 	 * @return true if the two objects are equal.
 	 *
-	 * \note The key isn't compared if one of the two is 0.
+	 * \note The key isn't compared if one of the two is NULL. In that case, false is returned.
 	 */
 	bool operator ==(const pf_addr &other) const;
 
@@ -65,11 +68,12 @@ struct pf_addr
 	 * @param other this is the other pf_addr which is compared to me
 	 * @return true if my address is before the other's.
 	 *
-	 * \note The key isn't compared if one of the two is 0.
+	 * \note The key isn't compared if one of the two is NULL. In that case, false is returned.
 	 */
 
 	bool operator<(const pf_addr &other) const;
 
+	/** @return a serialized version of the pf_addr */
 	std::string str() const;
 };
 

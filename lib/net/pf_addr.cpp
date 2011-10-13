@@ -34,37 +34,41 @@ pf_addr::pf_addr() throw()
 	ip[3] = 0;
 }
 
-pf_addr::pf_addr(in_addr_t address, uint16_t _port, Key _key) throw()
+pf_addr::pf_addr(in_addr_t address_v4, uint16_t _port, Key _key) throw()
 	: port(_port),
 	  key(_key)
 {
 	ip[0] = 0;
 	ip[1] = 0;
 	ip[2] = 0;
-	ip[3] = address;
+	ip[3] = address_v4;
 }
 
 bool pf_addr::operator ==(const pf_addr &other) const
 {
+	if (!key || !other.key)
+		return false;
+
 	return (ip[0] == other.ip[0]
 		&& ip[1] == other.ip[1]
 		&& ip[2] == other.ip[2]
 		&& ip[3] == other.ip[3]
 		&& port == other.port
-		&& (!key || !other.key || key == other.key));
+		&& key == other.key);
 }
 
 bool pf_addr::operator<(const pf_addr &other) const
 {
 	for(size_t i = 0; i < 4; ++i)
-		if(ip[i] < other.ip[i])
-			return true;
+		if(ip[i] != other.ip[i])
+			return ip[i] < other.ip[i];
 
-	if(port < other.port)
-		return true;
+	if(port != other.port)
+		return port < other.port;
 
 	if(key && other.key)
 		return key < other.key;
+
 	return false;
 }
 

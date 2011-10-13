@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2011 Michael Muré <batolettre@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,14 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
+ *
  */
 
-#ifndef JOB_NEW_CONNECTION_H
-#define JOB_NEW_CONNECTION_H
+#include "file_perms.h"
 
-#include <string>
-
-class JobNewConnection : public Job, private pf_addr
-{
-public:
-	JobNewConnection(pf_addr addr) : Job(time::dtime(), REPEAT_LESS_AND_LESS, 1.0), pf_addr(addr) {}
-
-	bool Start();
-	bool IsMe(const pf_addr&);
-};
-#endif
+FilePermissions::FilePermissions()
+	: pf_mode(0),
+	mode(S_IFREG | S_IRUSR | S_IWUSR),
+	uid(getuid()),
+	gid(getgid())
+	{}

@@ -1,7 +1,18 @@
 			README
 			======
 
-To try peerfuse:
+This is a fork of the Peerfuse project. The goal is to implement a new
+kind of sharing network. Ideal future characteristic are:
+* acentred network (run with a DHT)
+* Really easy to use
+* Multi-platform
+
+Main goal:
+* Allow peoples to share arbitrary data with others, without needs to
+  use cloud based hosting service, especially if they are located in the
+  United State (Patriot Act).
+* Allow peoples to easily choose who can access the data.
+* Allow peoples to share publicly signed data.
 
 Dependences:
 ------------
@@ -10,49 +21,20 @@ Dependences:
 * pkg-config
 * libssl-dev
 * libcurl-dev
-* libfuse-dev
-* libxmlrpc++-dev
-
-If your distro don't have libxmlrpc++ packaged, you can
-grab source at http://xmlrpcpp.sourceforge.net/ .
 
 Compilation:
 ------------
 
-To compile peerfuse-net
-$ make pfnet
-To compile peerfuse-lan
-$ make pflan
+To compile Arbore
+$ cmake .
+$ make
 
 make install won't work, no need to try it.
-
-Running:
---------
-
-On the root folder, run as root:
-# modprobe fuse
-
-You must add your user in the 'fuse' group by editing /etc/group:
-# vim /etc/group
-> fuse:x:114:rom1
-
-You can also allow all users to use fuse with:
-# chmod 666 /dev/fuse
-or tune your configuration of udev
-
-Now edit the default config file and you're ready to start peerfuse :
-$ ./build.peerfuse-net/peerfuse-net pfnet.conf -d /path/to/mount/folder
-or
-$ ./build.peerfuse-lan/peerfuse-lan pflan.conf -d /path/to/mount/folder
 
 More information
 ----------------
 
 If you want to get more information, or if you want ton contribute
-to peerfuse, please go on our website:
-
-	http://peerfuse.org
-
-Or join our IRC channel at #peerfuse@irc.freenode.org
+to Arbore, please our IRC channel at #arbore@irc.freenode.org
 
 Have fun!
