@@ -86,8 +86,8 @@ bool FileContent::LoadFd()
 	if(ondisk_fd == -1)
 	{
 		ondisk_fd = hdd.GetFd(filename);
-		ondisk_size = lseek(ondisk_fd, 0, SEEK_END);
-		if(ondisk_size == (off_t)-1)
+		ondisk_size = lseek(ondisk_fd, 0, SEEK_END); /* move the r/w pointer to the end of the file */
+		if(ondisk_size == (off_t)-1) /* error while moving the pointer */
 		{
 			pf_log[W_ERR] << "Error loading \"" << filename << "\": " << strerror(errno);
 			close(ondisk_fd);
@@ -401,7 +401,7 @@ void FileContent::GetSharedContent(off_t& offset, off_t& size)
 	offset = ondisk_offset;
 	size = ondisk_size;
 
-	if(begin() != end())
+	if(begin() != end()) // <-- LOLWAT ?
 	{
 		if(front().GetOffset() <= offset && front().GetEndOffset() >= offset)
 			offset = front().GetOffset();

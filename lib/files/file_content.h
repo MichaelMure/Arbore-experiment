@@ -48,7 +48,7 @@ private:
 	/* Information about what's currently stored on hardrive */
 	off_t ondisk_offset;
 	off_t ondisk_size;
-	int ondisk_fd;
+	int ondisk_fd; /** Corresponding file descriptor */
 	bool ondisk_synced;
 	time_t access_time;
 
@@ -72,14 +72,25 @@ protected:
 
 private:
 	/* Hdd related */
+
+  /** Initialise the internal file descriptor and move the r/w pointer in the end.
+   * @return true if successful, false otherwise
+   */
 	bool LoadFd();
+
+  /** Load a new chunk from the hdd and store it.
+   * @return true if successful, false otherwise
+   */
 	bool OnDiskLoad(FileChunkDesc chunk_desc);
+
+  /** Store the given chunk in the file on the hdd.
+   * @return true if successful, false otherwise
+   */
 	void OnDiskWrite(FileChunk& chunk);
 
 	FileContent& operator=(const FileContent &other);
 public:
 	/** Constructor
-	 *
 	 * @param _filename  the file name.
 	 * @param requester  implementation object of the FileChunkRequesterInterface interface.
 	 */
@@ -91,9 +102,10 @@ public:
 	/** Destructor */
 	virtual ~FileContent();
 
-	/** Get filename */
+	/** @return the name of the file. */
 	std::string GetFilename() const { return filename; }
 
+	/** @return true if the whole chunk_desc is available. */
 	bool FileContentHaveChunk(FileChunkDesc chunk_desc);
 
 	/** Load a chunk from the hdd or ask it on the network
@@ -104,13 +116,14 @@ public:
 	bool OnDiskHaveChunk(FileChunkDesc chunk_desc, bool blockant_load = false);
 	chunk_availability NetworkHaveChunk(FileChunkDesc chunk_desc);
 
-	/* Returns a copy of the chunk */
+	/** @return a copy of the chunk. */
 	FileChunk GetChunk(FileChunkDesc chunk_desc);
 
-	/* Return true or false if we have it */
+	/** @return true or false if we have the chunk */
 	/* Triggers loading the file from the cache or download from the network */
 	chunk_availability HaveChunk(FileChunkDesc chunk_desc);
 
+	/** @return true if at least one chunk is available, either on disk or on memory */
 	bool HaveAnyChunk();
 	void GetSharedContent(off_t& offset, off_t& size);
 
