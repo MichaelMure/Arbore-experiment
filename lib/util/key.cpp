@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <cassert>
 #include <openssl/evp.h>
 #include "key.h"
 #include <util/pf_log.h>
