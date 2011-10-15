@@ -3,6 +3,10 @@ add_library(network SHARED
     host.cpp
     hosts_list.h
     hosts_list.cpp
+    job_handle_packet.h
+    job_handle_packet.cpp
+    job_resend_packet.h
+    job_resend_packet.cpp
     network.h
     network.cpp
     packet.h

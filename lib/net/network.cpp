@@ -41,83 +41,9 @@
 #include <util/pf_thread.h>
 #include <util/tools.h>
 
+#include "job_handle_packet.h"
+#include "job_resend_packet.h"
 #include "network.h"
-//#include "environment.h"
-//#include "content_list.h"
-
-/** Resend a packet after a waited time.
- *
- * This job resend frequently a packet until
- * it receives an ACK message.
- */
-class ResendPacketJob : public Job
-{
-	int sock;
-	Host desthost;
-	Packet packet;
-	unsigned int retry;
-	double transmittime;
-	Network* network;
-
-	bool Start()
-	{
-		if(!network->Send(sock, desthost, packet))
-			return false;
-		retry++;
-		if(retry < Network::MAX_RETRY)
-			return true;
-
-		desthost.UpdateStat(0);
-		return false;
-	}
-
-public:
-
-	ResendPacketJob(Network* _network, int _sock, const Host& _desthost, const Packet& _packet, double transmit_time)
-		: Job(time::dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
-		  sock(_sock),
-		  desthost(_desthost),
-		  packet(_packet),
-		  retry(0),
-		  transmittime(transmit_time),
-		  network(_network)
-	{}
-
-	const Packet& GetPacket() const { return packet; }
-	double GetTransmitTime() const { return transmittime; }
-	Host GetDestHost() const { return desthost; }
-};
-
-/** Call the packet handler.
- *
- * Because we don't want to monopolize the Network thread,
- * this job is used to ask a scheduler thread to call the
- * packet handler.
- */
-class HandlePacketJob : public Job
-{
-	Host sender;
-	Packet pckt;
-	PacketTypeList& pckt_type_list;
-
-	bool Start()
-	{
-		pckt.Handle(pckt_type_list, sender);
-		return false;
-	}
-
-public:
-	HandlePacketJob(PacketTypeList& _pckt_type_list, const Host& _sender, const Packet& _pckt)
-		: Job(0.0, REPEAT_NONE),
-		  sender(_sender),
-		  pckt(_pckt),
-		  pckt_type_list(_pckt_type_list)
-	{}
-};
-
-/*******************
- *    NETWORK      *
- *******************/
 
 Network::Network()
 	: Mutex(RECURSIVE_MUTEX),
