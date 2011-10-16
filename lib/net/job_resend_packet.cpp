@@ -21,6 +21,8 @@
  */
 
 #include <util/time.h>
+#include "network.h"
+
 #include "job_resend_packet.h"
 
 bool ResendPacketJob::Start()

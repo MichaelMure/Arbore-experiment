@@ -27,7 +27,8 @@
 
 #include "host.h"
 #include "packet.h"
-#include "network.h"
+
+class Network;
 
 /** Resend a packet after a waited time.
  *
