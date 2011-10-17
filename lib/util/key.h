@@ -113,7 +113,7 @@ public:
 	/** Copy a key from an uin32_t
 	 *
 	 * @param ul this is the last 32 bits of the key
-	 * @param a new Key object.
+	 * @return a new Key object.
 	 */
 	Key& operator=(uint32_t ul);
 

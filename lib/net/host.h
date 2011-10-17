@@ -68,7 +68,7 @@ public:
 
 	/** \brief The copy constructor.
 	 *
-	 * @param host  this is Host object which is copied from.
+	 * @param other  this is Host object which is copied from.
 	 *
 	 * \note when you copy two Host objects, the same _Host contained object
 	 * will be referenced.

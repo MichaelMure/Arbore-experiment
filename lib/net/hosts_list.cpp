@@ -30,20 +30,12 @@
 #include "host.h"
 #include "hosts_list.h"
 
-/** host_init:
- ** initialize a host struct with a #size# element cache.
- */
 HostsList::HostsList(size_t _size)
 	: Mutex(RECURSIVE_MUTEX),
 	  max(_size)
 {
-
 }
 
-/** host_decode:
- ** decodes a string into a chimera host structure. This acts as a
- ** host_get, and should be followed eventually by a host_release.
- */
 Host HostsList::DecodeHost(std::string hostname)
 {
 	std::string name;
@@ -58,9 +50,6 @@ Host HostsList::DecodeHost(std::string hostname)
 
 }
 
-/** network_address:
- ** returns the ip address of the #hostname#
- */
 pf_addr HostsList::MakeAddr(std::string hostname, uint16_t port) const
 {
 	int is_addr;
@@ -103,10 +92,6 @@ pf_addr HostsList::MakeAddr(std::string hostname, uint16_t port) const
 	return pf_addr(addr, port);
 }
 
-/** host_get:
- ** gets a host entry for the given host, getting it from the cache if
- ** possible, or alocates memory for it
- */
 Host HostsList::GetHost(std::string hostname, uint16_t port)
 {
 	pf_addr address;

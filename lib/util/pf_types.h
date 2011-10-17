@@ -38,12 +38,12 @@
  * @code
  * bool Peer::Receive()
  * {
- * if(!PeerBase::ReceivePacket())
- * return false;
- * Deleter<Packet> packet(incoming);
- * incoming = NULL;
- * HandleMsg(*packet);
- * return false;
+ *   Deleter<Packet> packet(incoming);
+ *   incoming = NULL;
+ *   if(SOME TEST)
+ *     return true;
+ *   (*packet)->someMethod();
+ *   return false;
  * }
  * @endcode
  * We use the Deleter class because we don't know how we will

@@ -61,16 +61,13 @@ public:
 
 	pf_addr GetAddr() const { return addr; }
 
-	/** host_encode:
-	 ** encodes the #host# into a string, putting it in #s#, which has
-	 ** #len# bytes in it.
+	/** Encodes the #Host# into a string
 	 */
 	std::string Encode() const;
 
 	Mutex* GetMutex() const { return mutex; }
 
-	/** host_update_stat:
-	 ** updates the success rate to the host based on the SUCCESS_WINDOW average
+	/** Updates the success rate to the host based on the SUCCESS_WINDOW average
 	 */
 	void UpdateStat (int success);
 
@@ -114,7 +111,6 @@ std::string _Host::Encode() const
 
 void _Host::UpdateStat (int success)
 {
-
 	int i;
 	float total = 0;
 
@@ -173,12 +169,14 @@ void Host::deinit()
 	}
 }
 
-Host& Host::operator=(const Host& h)
+Host& Host::operator=(const Host& other)
 {
 	deinit();
 
-	this->host = h.host;
-	if(this->host == NULL) return *this;
+	this->host = other.host;
+
+	if(this->host == NULL)
+		return *this;
 
 	BlockLockMutex(this->host->GetMutex());
 	this->host->reference++;

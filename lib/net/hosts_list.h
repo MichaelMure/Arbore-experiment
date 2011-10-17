@@ -43,13 +43,11 @@ public:
 
 	class CantResolvHostname : public std::exception {};
 
-	/** host_init:
-	 ** initialize a host struct with a #size# element cache.
+	/** Initialize a host struct with a size element cache.
 	 */
 	HostsList(size_t size);
 
-	/** host_get:
-	 ** gets a host entry for the given host, getting it from the cache if
+	/** Gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
 	 */
 	Host GetHost(std::string hn, uint16_t port);
@@ -61,12 +59,13 @@ public:
 	 */
 	Host GetHost(const pf_addr& address);
 
-	/** host_decode:
-	 ** decodes a string into a chimera host structure. This acts as a
-	 ** host_get, and should be followed eventually by a host_release.
+	/** Decodes a string into a chimera host structure. This acts as a
+	 ** GetHost.
 	 */
 	Host DecodeHost (std::string s);
 
+	/** @return the ip address of hostname
+	 */
 	pf_addr MakeAddr(std::string hostname, uint16_t port) const;
 };
 

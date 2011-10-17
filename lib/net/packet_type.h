@@ -49,7 +49,9 @@ public:
 	 * @param ...  put here a list of PacketArgType finished by a T_END.
 	 *
 	 * For example:
-	 *        PacketType(10, MyHandler, Packet::MUSTROUTE|Packet::REQUESTACK, "BLAH", T_STR, T_UINT32, T_CHUNK, T_END);
+	 * @code
+	 * PacketType(10, MyHandler, Packet::MUSTROUTE|Packet::REQUESTACK, "BLAH", T_STR, T_UINT32, T_CHUNK, T_END);
+	 * @endcode
 	 */
 	PacketType(uint32_t type, PacketHandlerBase* handler, uint32_t def_flags, std::string name, ...);
 
