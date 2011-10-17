@@ -57,7 +57,8 @@ bool ChimeraRouting::add(const Host& host)
 {
 	BlockLockMutex lock(this);
 	bool added = this->leafset.add(host);
-	added = added || this->routingTable.add(host);
+	if (!added)
+		added = this->routingTable.add(host);
 	return added;
 }
 
@@ -65,7 +66,8 @@ bool ChimeraRouting::remove(const Host& host)
 {
 	BlockLockMutex lock(this);
 	bool removed = this->leafset.remove(host);
-	removed = removed || this->routingTable.remove(host);
+	if (!removed)
+		removed = this->routingTable.remove(host);
 	return removed;
 }
 
@@ -79,7 +81,7 @@ Host ChimeraRouting::routeLookup(const Key& key) const
 	{
 		return leafsetBest;
 	}
-	pf_log[W_DEBUG] << "..failed.. Loopup in the routing table";
+	pf_log[W_DEBUG] << "..failed.. Lookup in the routing table";
 	Host routingTableBest = this->routingTable.routeLookup(key , &b);
 	if(b)
 	{
