@@ -66,7 +66,7 @@ public:
 	/** Load all tree from an hard drive path.
 	 * It will call the Hdd object to load it.
 	 *
-	 * @param hd_param path on hard drive
+	 * @param hd_path path on hard drive
 	 */
 	void Load(std::string hd_path);
 
