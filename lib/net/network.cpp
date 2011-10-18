@@ -288,9 +288,20 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	if (pckt.HasFlag(Packet::REQUESTACK))
 	{
-		ResendPacketJob* job = new ResendPacketJob(this, sock, host, pckt, start);
-		resend_list.push_back(job);
-		scheduler_queue.Queue(job);
+		ResendPacketJob* job;
+		std::vector<ResendPacketJob*>::iterator it;
+		for(it = resend_list.begin();
+		    it != resend_list.end() && (*it)->GetPacket().GetSeqNum() != pckt.GetSeqNum();
+		    ++it)
+			;
+
+		if(it == resend_list.end())
+		{
+			/* There isn't any already existing job to retransmit this packet. */
+			ResendPacketJob* job = new ResendPacketJob(this, sock, host, pckt, start);
+			resend_list.push_back(job);
+			scheduler_queue.Queue(job);
+		}
 	}
 
 	return true;
