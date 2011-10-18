@@ -69,7 +69,7 @@ bool CheckLeafsetJob::Start()
 	if (count == 2)
 	{
 		Packet pckt(ChimeraPiggyType, chimera->GetMe().GetKey());
-		std::vector<Host> leafset = routing->getLeafset();
+		leafset = routing->getLeafset();
 
 		leafset.push_back(chimera->GetMe());
 		count = 0;
