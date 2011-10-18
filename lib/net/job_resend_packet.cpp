@@ -38,7 +38,7 @@ bool ResendPacketJob::Start()
 }
 
 ResendPacketJob::ResendPacketJob(Network* _network, int _sock, const Host& _desthost, const Packet& _packet, double transmit_time)
-	: Job(time::dtime(), REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
+	: Job(time::dtime() + Network::RETRANSMIT_INTERVAL, REPEAT_PERIODIC, Network::RETRANSMIT_INTERVAL),
 		sock(_sock),
 		desthost(_desthost),
 		packet(_packet),
