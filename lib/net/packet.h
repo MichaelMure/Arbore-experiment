@@ -98,7 +98,7 @@ public:
 	 * @param src  sender's key of the packet.
 	 * @param dst  receiver's key of the packet.
 	 */
-	Packet(PacketType type, const Key& src = Key(), const Key& dst = Key());
+	Packet(const PacketType& type, const Key& src = Key(), const Key& dst = Key());
 
 	/** Copy constructor.
 	 *

@@ -32,7 +32,7 @@
 #define ASSERT(x) if(!(x)) throw Malformated();
 #endif
 
-Packet::Packet(PacketType _type, const Key& _src, const Key& _dst)
+Packet::Packet(const PacketType& _type, const Key& _src, const Key& _dst)
 			: type(_type),
 			size(0),
 			src(_src),
