@@ -195,9 +195,10 @@ void Network::Loop()
 				if(pckt.HasFlag(Packet::REQUESTACK))
 				{
 					/* It request an ACK, so we send it. */
-					Packet ack(pckt.GetPacketType(), pckt.GetSrc(), pckt.GetDst());
-					ack.SetFlag(Packet::ACK);
-					ack.SetSeqNum(pckt.GetSeqNum());
+					Packet ack(pckt);
+					ack.SetSrc(pckt.GetDst());
+					ack.SetDst(pckt.GetSrc());
+					ack.SetFlags(Packet::ACK);
 					Send(sock, sender, ack);
 				}
 
