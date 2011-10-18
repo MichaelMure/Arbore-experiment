@@ -376,13 +376,33 @@ Key Key::intervalSize(const Key& upperBound) const
 
 bool Key::between (const Key& left, const Key& right) const
 {
-  assert(left < right);
 
-  /* it's on one of the edges */
-  if (left == *this || right == *this)
-    return true;
+	int complr = left < right;
+	int complt = left < *this;
+	int comptr = *this < right;
 
-  return (left < *this && *this < right);
+	/* it's on one of the edges */
+	if (complt == 0 || comptr == 0)
+		return true;
+
+
+	if (complr < 0)
+	{
+		if (complt < 0 && comptr < 0)
+			return true;
+		return false;
+	}
+	else if (complr == 0)
+	{
+		return false;
+	}
+	else
+	{
+		if (complt < 0 || comptr < 0)
+			return true;
+		return false;
+
+	}
 }
 
 Key Key::midpoint () const
