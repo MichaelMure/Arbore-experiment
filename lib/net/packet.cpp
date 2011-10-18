@@ -262,8 +262,12 @@ std::string Packet::GetPacketInfo() const
 	info += "->" + GetDst().str() + "] ";
 
 	info += "<" + std::string(type.GetName());
+	if(HasFlag(REQUESTACK))
+		info += "(RACK)";
 	if(HasFlag(ACK))
 		info += "(ACK)";
+	if(HasFlag(MUSTROUTE))
+		info += "(ROUTE)";
 	info += "> ";
 
 	for(PacketType::const_iterator it = type.begin(); it != type.end(); ++it)
