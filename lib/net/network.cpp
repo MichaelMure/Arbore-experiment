@@ -288,7 +288,6 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	if (pckt.HasFlag(Packet::REQUESTACK))
 	{
-		ResendPacketJob* job;
 		std::vector<ResendPacketJob*>::iterator it;
 		for(it = resend_list.begin();
 		    it != resend_list.end() && (*it)->GetPacket().GetSeqNum() != pckt.GetSeqNum();
