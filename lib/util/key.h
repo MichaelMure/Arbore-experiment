@@ -23,13 +23,6 @@
  *
  */
 
-/*
-** $Id: key.h,v 1.16 2006/06/07 09:21:28 krishnap Exp $
-**
-** Matthew Allen
-** description:
-*/
-
 #ifndef _CHIMERA_KEY_H_
 #define _CHIMERA_KEY_H_
 
@@ -110,26 +103,12 @@ public:
 	 */
 	Key& operator=(const Key& k2);
 
-	/** Copy a key from an uin32_t
-	 *
-	 * @param ul this is the last 32 bits of the key
-	 * @return a new Key object.
-	 */
-	Key& operator=(uint32_t ul);
-
 	/** Comparaison between two keys.
 	 *
 	 * @param k2 other key which is compared to.
 	 * @return true if two keys are equals.
 	 */
 	bool operator==(const Key& k2) const;
-
-	/** Comparaison with an uin32_t
-	 *
-	 * @param ul the last 32 bits of the key.
-	 * @return true if I equal to this key.
-	 */
-	bool operator==(uint32_t ul) const;
 
 	/** Comparaison with an other key.
 	 *
@@ -177,10 +156,13 @@ public:
 	bool between (const Key& left, const Key& right) const;
 
 	/** Check if the key is null.
-	 *
 	 * @return true if the key is equal to 0.
 	 */
 	bool operator!() const;
+
+	/** Check if the key is non-null.
+	 * @return true if the key is different than 0.
+	 */
 	operator bool() const;
 
 	/* key_midpoint: mid, key

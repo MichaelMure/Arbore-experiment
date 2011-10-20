@@ -158,33 +158,11 @@ Key::Key(uint32_t key[Key::nlen]) throw()
 	set_key_str();
 }
 
-Key& Key::operator=(uint32_t ul)
-{
-	size_t i;
-	for (i = 1; i < nlen; i++)
-		this->t[i] = 0;
-	this->t[0] = ul;
-
-	set_key_str();
-
-	return *this;
-}
-
 bool Key::operator==(const Key& k2) const
 {
 	size_t i;
 	for (i = 0; i < nlen; i++)
 		if (this->t[i] != k2.t[i])
-			return false;
-	return true;
-}
-
-bool Key::operator==(uint32_t ul) const
-{
-	if (t[0] != ul)
-		return false;
-	for (size_t i = 1; i < nlen; i++)
-		if (t[i] != 0)
 			return false;
 	return true;
 }

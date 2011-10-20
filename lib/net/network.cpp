@@ -153,7 +153,7 @@ void Network::Loop()
 				pf_addr address(from.sin_addr.s_addr, ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
-				if(sender.GetKey() == (uint32_t)0)
+				if(!sender.GetKey())
 					sender.SetKey(pckt.GetSrc());
 
 				pf_log[W_PARSE] << "R(" << sender << ") - " << pckt.GetPacketInfo();
