@@ -52,7 +52,7 @@ void ChimeraBaseMessage::operator() (PacketTypeList& pckt_type_list, const Host&
 class ChimeraJoinMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
@@ -85,7 +85,7 @@ public:
 class ChimeraJoinAckMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		AddrList addresses = pckt.GetArg<AddrList>(CHIMERA_JOIN_ACK_ADDRESSES);
 		std::vector<Host> hosts;
@@ -121,7 +121,7 @@ public:
 class ChimeraJoinNAckMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_NACK_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
@@ -137,7 +137,7 @@ public:
 class ChimeraUpdateMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_UPDATE_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
@@ -148,7 +148,7 @@ public:
 class ChimeraPiggyMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		AddrList address = pckt.GetArg<AddrList>(CHIMERA_PIGGY_ADDRESSES);
 		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
@@ -165,7 +165,7 @@ public:
 class ChimeraPingMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
 	}

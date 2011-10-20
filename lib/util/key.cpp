@@ -325,7 +325,6 @@ void Key::MakeHash (const char *s, size_t size)
 	*this = digest;
 }
 
-
 Key Key::distance(const Key& k2) const
 {
 	Key diff;
@@ -354,7 +353,6 @@ Key Key::intervalSize(const Key& upperBound) const
 
 bool Key::between (const Key& left, const Key& right) const
 {
-
 	int complr = left < right;
 	int complt = left < *this;
 	int comptr = *this < right;
@@ -362,7 +360,6 @@ bool Key::between (const Key& left, const Key& right) const
 	/* it's on one of the edges */
 	if (complt == 0 || comptr == 0)
 		return true;
-
 
 	if (complr < 0)
 	{
@@ -379,7 +376,6 @@ bool Key::between (const Key& left, const Key& right) const
 		if (complt < 0 || comptr < 0)
 			return true;
 		return false;
-
 	}
 }
 
