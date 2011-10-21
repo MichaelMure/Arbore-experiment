@@ -75,6 +75,10 @@ private:
 	std::vector<ResendPacketJob*> resend_list;
 	uint32_t seqend;
 
+	void CloseAll();
+	void Loop();
+	void OnStop();
+
 public:
 
 	Network();
@@ -90,15 +94,18 @@ public:
 	 */
 	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
 
-	void CloseAll();
-	void Loop();
-	void OnStop();
-
-	HostsList* GetHostsList() { return &hosts_list; }
+	/** @return a pointer to the Host list */
+	HostsList* GetHostsList();
 
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);
 
+	/** Send a packet.
+	 * @param sock the socket
+	 * @param host the Host which will receive the message
+	 * @param pckt the Packet to send
+	 * @return true if success, false otherwise
+	 */
 	bool Send(int sock, Host host, Packet pckt);
 };
 

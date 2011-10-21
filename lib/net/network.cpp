@@ -231,6 +231,11 @@ void Network::CloseAll()
 	socks.clear();
 }
 
+HostsList* Network::GetHostsList()
+{
+	return &hosts_list;
+}
+
 void Network::StartNetwork(MyConfig* conf)
 {
 #if 0
