@@ -78,8 +78,8 @@ public:
 	 */
 	void MkFile(FileEntry* f);
 
-
-	void UpdateFile(FileEntry* f) { /* TODO: Not Implemented Yet */ }
+	/* TODO: Not Implemented Yet */
+	void UpdateFile(FileEntry* f);
 
 	/** Remove a file from the hard drive.
 	 *

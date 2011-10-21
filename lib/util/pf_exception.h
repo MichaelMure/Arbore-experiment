@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #ifndef PF_EXCEPTION_H
@@ -30,11 +29,11 @@
 
 class StrException : public std::exception
 {
-	std::string err;
+	std::string _err;
 public:
-	StrException(std::string _err="") : err(_err) {}
+	StrException(std::string err="") : _err(err) {}
 	~StrException() throw() {}
-	void SetString(const std::string& _err) { err = _err; }
-	const std::string GetString() const { return err; }
+	void SetString(const std::string& err) { _err = err; }
+	const std::string GetString() const { return _err; }
 };
 #endif						  // PF_EXCEPTION_H
