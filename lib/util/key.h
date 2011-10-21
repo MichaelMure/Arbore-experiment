@@ -126,7 +126,7 @@ public:
 	bool operator<(const Key& k2) const;
 
 	/** Return the string hexadecimal representation of key. */
-	std::string str() const { return key_str; }
+	std::string GetStr() const { return key_str; }
 
 	const uint32_t* GetArray() const { return t; }
 
@@ -177,7 +177,7 @@ public:
 template<>
 inline Log::flux& Log::flux::operator<< <Key> (Key key)
 {
-	_str += key.str();
+	_str += key.GetStr();
 	return *this;
 }
 

@@ -74,13 +74,13 @@ struct pf_addr
 	bool operator<(const pf_addr &other) const;
 
 	/** @return a serialized version of the pf_addr */
-	std::string str() const;
+	std::string GetStr() const;
 };
 
 template<>
 inline Log::flux& Log::flux::operator<< <pf_addr> (pf_addr addr)
 {
-	_str += addr.str();
+	_str += addr.GetStr();
 	return *this;
 }
 

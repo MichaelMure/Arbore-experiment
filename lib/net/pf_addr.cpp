@@ -72,9 +72,9 @@ bool pf_addr::operator<(const pf_addr &other) const
 	return false;
 }
 
-std::string pf_addr::str() const
+std::string pf_addr::GetStr() const
 {
-	std::string ret = key.str() + ":";
+	std::string ret = key.GetStr() + ":";
 	if(ip[0] == 0 &&
 		ip[1] == 0 &&
 		ip[2] == 0)

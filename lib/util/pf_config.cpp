@@ -426,6 +426,7 @@ bool ConfigItem_int::SetValue(std::string s)
   std::istringstream(s) >> value;
   return (value >= min && value <= max);
 }
+
 std::string ConfigItem_int::ValueType() const
 {
   if(min == INT_MIN)

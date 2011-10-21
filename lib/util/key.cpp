@@ -396,8 +396,8 @@ size_t Key::key_index (Key k) const
 	std::string mystr, kstr;
 
 	max_len = KEY_SIZE / BASE_B;
-	mystr = this->str();
-	kstr = k.str();
+	mystr = this->GetStr();
+	kstr = k.GetStr();
 
 	for (i = 0; (mystr[i] == kstr[i]) && (i < max_len); i++)
 		;

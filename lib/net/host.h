@@ -140,7 +140,7 @@ public:
 template<>
 inline Log::flux& Log::flux::operator<< <Host> (Host host)
 {
-	_str += host.GetAddr().str();
+	_str += host.GetAddr().GetStr();
 	return *this;
 }
 

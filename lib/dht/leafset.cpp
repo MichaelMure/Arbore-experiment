@@ -47,10 +47,10 @@ void Leafset::print () const
 
     fprintf (stderr, "LEFT: ");
     for (i = 0; i < Lsize; i++)
-        fprintf (stderr, "%s ", leavesClockwise[i].GetKey().str().c_str());
+        fprintf (stderr, "%s ", leavesClockwise[i].GetKey().GetStr().c_str());
     fprintf (stderr, "\nRIGHT: ");
     for (i = 0; i < Rsize; i++)
-        fprintf (stderr, "%s ", leavesCounterclockwise[i].GetKey().str().c_str());
+        fprintf (stderr, "%s ", leavesCounterclockwise[i].GetKey().GetStr().c_str());
     fprintf (stderr, "\n");
 }
 

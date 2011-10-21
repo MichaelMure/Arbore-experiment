@@ -258,8 +258,8 @@ std::string Packet::GetPacketInfo() const
 {
 	std::string s, info;
 
-	info = "[" + GetSrc().str();
-	info += "->" + GetDst().str() + "] ";
+	info = "[" + GetSrc().GetStr();
+	info += "->" + GetDst().GetStr() + "] ";
 
 	info += "<" + std::string(type.GetName());
 	if(HasFlag(REQUESTACK))
@@ -279,7 +279,7 @@ std::string Packet::GetPacketInfo() const
 		{
 			case T_UINT32: s += TypToStr(GetArg<uint32_t>(arg_no)); break;
 			case T_UINT64: s += TypToStr(GetArg<uint64_t>(arg_no)); break;
-			case T_KEY: s += GetArg<Key>(arg_no).str(); break;
+			case T_KEY: s += GetArg<Key>(arg_no).GetStr(); break;
 			case T_STR: s += "'" + GetArg<std::string>(arg_no) + "'"; break;
 			case T_ADDRLIST:
 			{
@@ -290,12 +290,12 @@ std::string Packet::GetPacketInfo() const
 					++it)
 				{
 					if(!list.empty()) list += ",";
-					list += (*it).str();
+					list += (*it).GetStr();
 				}
 				s += "[" + list + "]";
 				break;
 			}
-			case T_ADDR: s += GetArg<pf_addr>(arg_no).str(); break;
+			case T_ADDR: s += GetArg<pf_addr>(arg_no).GetStr(); break;
 			case T_CHUNK:
 				s += "chunk(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
 					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";

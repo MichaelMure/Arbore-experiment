@@ -106,7 +106,7 @@ _Host::_Host(Mutex* _mutex, const pf_addr& _addr)
 
 std::string _Host::Encode() const
 {
-	return addr.str();
+	return addr.GetStr();
 }
 
 void _Host::UpdateStat (int success)

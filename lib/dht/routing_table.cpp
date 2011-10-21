@@ -71,7 +71,7 @@ void RoutingTable::print() const
                     for (k = 0; k < MAX_ENTRY; k++)
                         if (getEntry(i, j, k) != InvalidHost)
 			{
-                            fprintf (stderr, "%s ", getEntry(i, j, k).GetKey().str().c_str());
+                            fprintf (stderr, "%s ", getEntry(i, j,k).GetKey().GetStr().c_str());
 			    b = true;
 			}
                 }
@@ -102,7 +102,7 @@ bool RoutingTable::add(const Host& entry)
 	}
 	//get the coordinates where the entry should go
 	size_t i = this->me.GetKey().key_index(entry.GetKey());
-	size_t j = hexalphaToInt(entry.GetKey().str()[i]);
+	size_t j = hexalphaToInt(entry.GetKey().GetStr()[i]);
 	bool found = false;
 	for (size_t k = 0; !found && k < MAX_ENTRY; k++)
 	{
@@ -142,7 +142,7 @@ bool RoutingTable::remove(const Host& entry)
 	}
 	//get the coordinates where the entry should go
 	size_t i = this->me.GetKey().key_index(entry.GetKey());
-	size_t j = hexalphaToInt(entry.GetKey().str()[i]);
+	size_t j = hexalphaToInt(entry.GetKey().GetStr()[i]);
 	for (size_t k = 0; k < MAX_ENTRY; k++)
 	{
 		if (this->getEntry(i, j, k) != InvalidHost && this->getEntry(i, j, k).GetKey() == entry.GetKey())
@@ -232,7 +232,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 	}
 	//try perfect match
 	size_t matchLine = this->me.GetKey().key_index(key);
-	size_t matchCol = hexalphaToInt(key.str()[matchLine]);
+	size_t matchCol = hexalphaToInt(key.GetStr()[matchLine]);
 	Host nextHop = InvalidHost;
 	for (size_t k = 0; k < MAX_ENTRY; k++)
 	{
@@ -272,7 +272,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 		else
 		{
 			//reached local node cell, move down to the next line
-			if(hexalphaToInt(this->me.GetKey().str()[i]) == j)
+			if(hexalphaToInt(this->me.GetKey().GetStr()[i])	== j)
 			{
 				i++;
 				//if we were at the last line, can't go down any more, local node is the best candidate
@@ -313,7 +313,7 @@ Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 		{
 			--j;
 			//reached local node cell, move down to the next line
-			if(hexalphaToInt(this->me.GetKey().str()[i]) == j)
+			if(hexalphaToInt(this->me.GetKey().GetStr()[i]) == j)
 			{
 				i++;
 				//if we were at the last line, can't go down any more, local node is the best candidate
