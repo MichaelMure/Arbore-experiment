@@ -80,7 +80,7 @@ struct pf_addr
 template<>
 inline Log::flux& Log::flux::operator<< <pf_addr> (pf_addr addr)
 {
-	str += addr.str();
+	_str += addr.str();
 	return *this;
 }
 

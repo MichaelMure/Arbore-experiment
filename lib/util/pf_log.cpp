@@ -48,18 +48,18 @@ Log::flux::~flux()
 {
 	int i;
 
-	if(!(flag & pf_log.LoggedFlags()))
+	if(!(_flag & pf_log.LoggedFlags()))
 		return;
 
-	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(flag & all_flags[i].flag); --i)
+	for(i = (sizeof all_flags / sizeof *all_flags) - 1; i >= 0 && !(_flag & all_flags[i].flag); --i)
 		;
 
 	if(i < 0)
-		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", (uint32_t)flag, str.c_str());
+		syslog(LOG_WARNING, "[SYSLOG] (%X) Unable to find how to log this message: %s", (uint32_t)_flag, _str.c_str());
 	else
 	{
 		if((all_flags[i].level == LOG_ERR || all_flags[i].level == LOG_WARNING) && pf_log.ToSyslog())
-			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, str.c_str());
+			syslog(all_flags[i].level, "[%s] %s", all_flags[i].s, _str.c_str());
 
 		struct timeval t;
 		gettimeofday(&t, NULL);
@@ -69,7 +69,7 @@ Log::flux::~flux()
 			<< ":" << (t.tv_sec % (60 * 60)) / 60
 			<< ":" << t.tv_sec % 60
 			<< "." << t.tv_usec / 1000
-			<< "[" << all_flags[i].s << "] " << str << std::endl;
+			<< "[" << all_flags[i].s << "] " << _str << std::endl;
 		pf_log.std_lock.Unlock();
 	}
 }

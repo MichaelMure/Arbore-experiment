@@ -71,12 +71,12 @@ public:
 
 	class flux
 	{
-		std::string str;
-		size_t flag;
+		std::string _str;
+		size_t _flag;
 
 		public:
 			flux(size_t i)
-				: flag(i)
+				: _flag(i)
 				{}
 
 			~flux();
@@ -86,7 +86,7 @@ public:
 			{
 				std::ostringstream oss;
 				oss << s;
-				str += oss.str();
+				_str += oss.str();
 				return *this;
 			}
 	};
@@ -105,7 +105,7 @@ private:
 template<>
 inline Log::flux& Log::flux::operator<< <std::string> (std::string s)
 {
-	str += s;
+	_str += s;
 	return *this;
 }
 

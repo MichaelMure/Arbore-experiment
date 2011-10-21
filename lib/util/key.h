@@ -177,7 +177,7 @@ public:
 template<>
 inline Log::flux& Log::flux::operator<< <Key> (Key key)
 {
-	str += key.str();
+	_str += key.str();
 	return *this;
 }
 

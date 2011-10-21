@@ -159,7 +159,7 @@ public:
 template<>
 inline Log::flux& Log::flux::operator<< <FileEntry*> (FileEntry* file)
 {
-	str += file->GetFullName();
+	_str += file->GetFullName();
 	return *this;
 }
 #endif						  /* FILE_ENTRY_H */
