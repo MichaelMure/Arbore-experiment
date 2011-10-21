@@ -59,9 +59,9 @@ public:
 
 		if((time::dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
 		{
-			Packet pckt(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
-			pckt.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
-			chimera.Send(host, pckt);
+			Packet join_nack(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
+			join_nack.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
+			chimera.Send(host, join_nack);
 
 			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
 			                  << "elapsed time since failure = " << time::dtime() - host.GetFailureTime() << " sec";
@@ -174,16 +174,18 @@ public:
 class ChimeraPublishMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT&, const Host&, const Packet&)
 	{
+		/* TODO: unimplemented */
 	}
 };
 
 class ChimeraUnpublishMessage : public ChimeraBaseMessage
 {
 public:
-	void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle (ChimeraDHT&, const Host&, const Packet&)
 	{
+		/* TODO: unimplemented */
 	}
 };
 
