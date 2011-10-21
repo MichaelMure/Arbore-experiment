@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #include <map>
@@ -30,10 +29,10 @@
 #include <cstring>
 #include "mutex.h"
 
-void Mutex::Init(MutexType _type)
+void Mutex::Init(MutexType type)
 {
-	mutex = (pthread_mutex_t*) new pthread_mutex_t;
-	type = _type;
+	_mutex = (pthread_mutex_t*) new pthread_mutex_t;
+	_type = type;
 
 	pthread_mutexattr_t attr;
 	if(pthread_mutexattr_init(&attr) != 0)
@@ -42,7 +41,7 @@ void Mutex::Init(MutexType _type)
 		throw MutexError();
 	}
 
-	switch(type)
+	switch(_type)
 	{
 		case NORMAL_MUTEX:
 			//#ifdef DEBUG
@@ -64,11 +63,12 @@ void Mutex::Init(MutexType _type)
 				throw MutexError();
 			}
 			break;
+		case INVALID_MUTEX:
 		default:
 			assert(false);
 	}
 
-	if(pthread_mutex_init(mutex, &attr) != 0)
+	if(pthread_mutex_init(_mutex, &attr) != 0)
 	{
 		std::cerr << "pthread_mutex_init: " << strerror(errno) << std::endl;
 		throw MutexError();
@@ -83,25 +83,25 @@ Mutex::Mutex(MutexType type)
 
 Mutex::Mutex(const Mutex& m)
 {
-	Init(m.type);
+	Init(m._type);
 }
 
 Mutex& Mutex::operator=(const Mutex& m)
 {
 	std::cerr << "mutex so bad" << std::endl;
-	Init(m.type);
+	Init(m._type);
 	return *this;
 }
 
 Mutex::~Mutex()
 {
-	pthread_mutex_destroy(mutex);
-	delete mutex;
+	pthread_mutex_destroy(_mutex);
+	delete _mutex;
 }
 
 void Mutex::Lock() const
 {
-	int res = pthread_mutex_lock(mutex);
+	int res = pthread_mutex_lock(_mutex);
 	//assert(res == 0);
 	/* Don't use pf_log, because it locks the stdout mutex. */
 	if(res)
@@ -110,7 +110,7 @@ void Mutex::Lock() const
 
 void Mutex::Unlock() const
 {
-	int res = pthread_mutex_unlock(mutex);
+	int res = pthread_mutex_unlock(_mutex);
 	//assert(res == 0);
 	/* Don't use pf_log, because it locks the stdout mutex. */
 	if(res)

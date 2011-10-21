@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 #ifndef MUTEX_H
@@ -37,11 +36,11 @@ enum MutexType
 class Mutex
 {
 private:
-	pthread_mutex_t* mutex;
+	pthread_mutex_t* _mutex;
 
-	MutexType type;
+	MutexType _type;
 
-	void Init(enum MutexType _type);
+	void Init(enum MutexType type);
 
 public:
 
@@ -52,8 +51,8 @@ public:
 	* default type is NORMAL_MUTEX
 	* 
 	* @param _type type of the mutex
-	*/	
-	Mutex(enum MutexType _type = NORMAL_MUTEX);
+	*/
+	Mutex(enum MutexType type = NORMAL_MUTEX);
 
 	/** The copy constructor.
 	 *  
@@ -89,19 +88,19 @@ public:
  */
 class BlockLockMutex
 {
-	const Mutex* p;
+	const Mutex* _p;
 	BlockLockMutex(const BlockLockMutex&);
 	BlockLockMutex& operator=(const BlockLockMutex&);
 
 public:
-	explicit BlockLockMutex(const Mutex* _p)
-		: p(_p)
+	explicit BlockLockMutex(const Mutex* p)
+		: _p(p)
 	{
-		p->Lock();
+		_p->Lock();
 	}
 	~BlockLockMutex()
 	{
-		p->Unlock();
+		_p->Unlock();
 	}
 };
 #endif
