@@ -226,7 +226,9 @@ void Packet::BuildArgsFromData()
 			case T_ADDRLIST: SetArg(arg_no, ReadAddrList()); break;
 			case T_ADDR: SetArg(arg_no, ReadAddr()); break;
 			case T_CHUNK: SetArg(arg_no, ReadChunk()); break;
-			default: throw Malformated();
+			case T_END:
+			default:
+				throw Malformated();
 		}
 	}
 	if(data)
@@ -249,7 +251,9 @@ void Packet::BuildDataFromArgs()
 			case T_ADDRLIST: Write(GetArg<AddrList>(arg_no)); break;
 			case T_ADDR: Write(GetArg<pf_addr>(arg_no)); break;
 			case T_CHUNK: Write(GetArg<FileChunk>(arg_no)); break;
-			default: throw Malformated();
+			case T_END:
+			default:
+				throw Malformated();
 		}
 	}
 }
@@ -285,12 +289,12 @@ std::string Packet::GetPacketInfo() const
 			{
 				AddrList v = GetArg<AddrList>(arg_no);
 				std::string list;
-				for(AddrList::const_iterator it = v.begin();
-					it != v.end();
-					++it)
+				for(AddrList::const_iterator it2 = v.begin();
+					it2 != v.end();
+					++it2)
 				{
 					if(!list.empty()) list += ",";
-					list += (*it).GetStr();
+					list += (*it2).GetStr();
 				}
 				s += "[" + list + "]";
 				break;
@@ -300,7 +304,9 @@ std::string Packet::GetPacketInfo() const
 				s += "chunk(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
 					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
 				break;
-			default: throw Malformated();
+			case T_END:
+			default:
+				throw Malformated();
 		}
 	}
 

@@ -73,11 +73,11 @@ class Packet
 	std::vector<PacketArgBase*> arg_lst;
 
 	PacketType type;                  /**< packet type */
-	uint32_t size;			  /**< size of the msg (excluding header) */
+	uint32_t size;                    /**< size of the msg (excluding header) */
 	Key src;                          /**< sender's key */
 	Key dst;                          /**< destination's key */
 	uint32_t flags;                   /**< flags */
-	uint32_t seqnum;                    /**< sequence number */
+	uint32_t seqnum;                  /**< sequence number */
 	char* data;                       /**< data buffer */
 
 public:
@@ -193,7 +193,7 @@ public:
 
 	/** Set the argument's value.
 	 *
-	 * This template function msut be used to set the argument's value
+	 * This template function must be used to set the argument's value
 	 * at any position.
 	 *
 	 * @param arg  the argument's position.
