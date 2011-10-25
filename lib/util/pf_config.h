@@ -50,7 +50,7 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  *
  * This library can be used to read a configuration in this form :
  *
- * <pre>
+ * @code
  * section {
  *      label = value
  *      subsection {
@@ -65,7 +65,7 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  * section2 {
  *       ...
  * }
- *</pre>
+ * @endcode
  *
  * You have to create an instance of class \b MyConfig .
  * Next, define all sections, subsections and items. If there is an error, a MyConfig::error exception is sended.
@@ -77,7 +77,7 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  * There is a few types of item classes. Each class is derived from \b ConfigItem and have some features
  * about his type, condition to a valid value, etc.
  *
- * \b ConfigItem Has some functions to return a valid in a few types. This functions are \b String(), \b Integer()
+ * \b ConfigItem has some functions to return a valid in a few types. This functions are \b String(), \b Integer()
  * and \b Boolean().
  *
  * You can create your own derived class, read \b ConfigItem interface and a derived class from \b ConfigItem to
@@ -86,9 +86,9 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  *
  * There is an example :
  *
- * <pre>
+ * @code
  * // Creation of a new instance of MyConfig. It will read "app.cfg".
- * MyConfig* config = new MyConfig("app.cfg');
+ * MyConfig* config = new MyConfig("app.cfg");
  *
  * // Use of a try/catch bloc, to print an error if we catch an exception
  * try
@@ -125,7 +125,7 @@ typedef std::map<std::string, ConfigItem*> ItemMap;
  *    delete config;
  *    return false;
  * }
- * </pre>
+ * @endcode
  *
  */
 class MyConfig
