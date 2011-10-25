@@ -54,6 +54,7 @@ public:
 		public:
 			int port;
 			CantListen(int _port) : port(_port) {}
+			~CantListen() throw() {};
 	};
 	class CantResolvHostname : public std::exception {};
 	class CantConnectTo : public std::exception
@@ -62,6 +63,7 @@ public:
 			int err;
 			pf_addr addr;
 			CantConnectTo(int _errno, const pf_addr _addr) : err(_errno), addr(_addr) {}
+			~CantConnectTo() throw() {};
 	};
 
 private:
@@ -92,7 +94,7 @@ public:
 	 * @param bind_addr  the listened address
 	 * @return  the file descriptor
 	 */
-	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen);
+	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr);
 
 	/** @return a pointer to the Host list */
 	HostsList* GetHostsList();

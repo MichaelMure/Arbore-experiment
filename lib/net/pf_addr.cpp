@@ -25,7 +25,7 @@
 
 #include "pf_addr.h"
 
-pf_addr::pf_addr() throw()
+pf_addr::pf_addr()
 	: port(0)
 {
 	ip[0] = 0;
@@ -34,7 +34,7 @@ pf_addr::pf_addr() throw()
 	ip[3] = 0;
 }
 
-pf_addr::pf_addr(in_addr_t address_v4, uint16_t _port, Key _key) throw()
+pf_addr::pf_addr(in_addr_t address_v4, uint16_t _port, Key _key)
 	: port(_port),
 	  key(_key)
 {
@@ -95,7 +95,7 @@ std::string pf_addr::GetStr() const
 	return ret;
 }
 
-pf_addr::pf_addr(const char* p) throw()
+pf_addr::pf_addr(const char* p)
 {
 	for(size_t i = 0; i < ip_t_len; ++i)
 	{

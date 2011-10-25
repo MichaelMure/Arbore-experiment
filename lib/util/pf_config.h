@@ -183,7 +183,7 @@ public:
 	 * @param description section's description, sended to user when this section is forgotten
 	 * @param multiple if setted, this section can have multiple definitions (see ConfigSection::AddItem)
 	 */
-	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(error_exc);
+	ConfigSection* AddSection(std::string label, std::string description, bool multiple);
 
 	unsigned NbLines() const { return line_count; }
 	std::string Path() const { return path; }
@@ -239,7 +239,7 @@ public:
 	 * @param description section's description, sended to user when this section is forgotten
 	 * @param multiple if setted, this section can have multiple definitions (see ConfigSection::AddItem)
 	 */
-	ConfigSection* AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc);
+	ConfigSection* AddSection(std::string label, std::string description, bool multiple);
 
 	/** Get an item from his label */
 	ConfigItem* GetItem(std::string label);
@@ -250,7 +250,7 @@ public:
 	 * @param item this is a new item of a derived type from ConfigItem. It will be deleted if there is an exception
 	 * @param is_name if true, this is the name (identificator) of the section.
 	 */
-	void AddItem(ConfigItem* item, bool is_name = false) throw(MyConfig::error_exc);
+	void AddItem(ConfigItem* item, bool is_name = false);
 
 	/** Is this is a multiple struct, name is an identificator of this type of struct in the configuration */
 	std::string Name() const { return name; }

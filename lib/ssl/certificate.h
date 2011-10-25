@@ -48,13 +48,13 @@ public:
 	Certificate& operator=(const Certificate& cert);
 	~Certificate();
 
-	void LoadPem(std::string filename, std::string password) throw(BadFile, BadCertificate);
-	void LoadRaw(const unsigned char* buf, size_t len) throw(BadCertificate);
+	void LoadPem(std::string filename, std::string password);
+	void LoadRaw(const unsigned char* buf, size_t len);
 
 	PublicKey GetPublicKey();
 
 	std::string GetCertificateInfos() const;
-	std::string GetCommonName() const throw(BadCertificate);
+	std::string GetCommonName() const;
 
 	X509* GetSSL() const { return ssl_cert; }
 

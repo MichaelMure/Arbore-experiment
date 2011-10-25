@@ -49,8 +49,8 @@ public:
 	~PrivateKey();
 
 	static int PasswordCallback(char* buf, int size, int rwflag, void* datas);
-	void LoadPem(std::string filename, std::string password) throw(BadPrivateKey, BadFile);
-	void LoadBuf(const char* buf, size_t size) throw(BadPrivateKey);
+	void LoadPem(std::string filename, std::string password);
+	void LoadBuf(const char* buf, size_t size);
 
 	/* Not implemented yet */
 	void Decrypt(const char* buf, size_t but_size, char** crypted, size_t* crypt_size);

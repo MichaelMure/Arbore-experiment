@@ -50,7 +50,7 @@ Thread::~Thread()
 	pthread_attr_destroy(&attr);
 }
 
-void Thread::Start() throw(CantRun)
+void Thread::Start()
 {
 	if(IsRunning())
 		return;

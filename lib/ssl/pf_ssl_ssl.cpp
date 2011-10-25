@@ -134,7 +134,7 @@ void SslSsl::CheckPeerCertificate(SSL* ssl)
 	OPENSSL_free (str);
 }
 
-Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
+Connection* SslSsl::Accept(int fd)
 {
 	int ret;
 	SSL* ssl = SSL_new(server_ctx);
@@ -161,7 +161,7 @@ Connection* SslSsl::Accept(int fd) throw(SslSsl::SslHandshakeFailed)
 	return new_conn;
 }
 
-Connection* SslSsl::Connect(int fd) throw(SslSsl::SslHandshakeFailed)
+Connection* SslSsl::Connect(int fd)
 {
 	int ret;
 	SSL* ssl = SSL_new(client_ctx);

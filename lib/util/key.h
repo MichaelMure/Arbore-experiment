@@ -55,7 +55,7 @@ private:
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;
 
-	void set_key_str () throw();
+	void set_key_str ();
 
 	void sha1_keygen (const char *key, size_t digest_size, char *digest) const;
 
@@ -68,10 +68,10 @@ public:
 	 *
 	 * @param ul this is the last 32 bits of the key
 	 */
-	Key(uint32_t ul = 0) throw();
+	Key(uint32_t ul = 0);
 
 	/** Create a Key from a uint32_t[nlen] */
-	explicit Key(uint32_t key[nlen]) throw();
+	explicit Key(uint32_t key[nlen]);
 
 	/** Create a Key from a std::string */
 	explicit Key(std::string str);
@@ -80,7 +80,7 @@ public:
 	 *
 	 * @param k2 copy key from the other key
 	 */
-	Key(const Key& k2) throw();
+	Key(const Key& k2);
 
 	/** Copy a key from a string
 	 *

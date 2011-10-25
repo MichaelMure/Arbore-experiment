@@ -50,7 +50,7 @@ int PrivateKey::PasswordCallback(char* buf, int size, int rwflag, void* datas)
 	return 0;
 }
 
-void PrivateKey::LoadBuf(const char* buf, size_t size) throw(BadPrivateKey)
+void PrivateKey::LoadBuf(const char* buf, size_t size)
 {
 	if(raw_key)
 		delete []raw_key;
@@ -83,7 +83,7 @@ void PrivateKey::LoadBuf(const char* buf, size_t size) throw(BadPrivateKey)
 	}
 }
 
-void PrivateKey::LoadPem(std::string filename, std::string password) throw(BadPrivateKey, BadFile)
+void PrivateKey::LoadPem(std::string filename, std::string password)
 {
 	FILE* f = fopen(filename.c_str(), "r");
 	if(!f)

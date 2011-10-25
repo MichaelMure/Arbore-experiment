@@ -47,7 +47,7 @@ static void convert_base16 (unsigned char num, char *out)
     *out = '\0';
 }
 
-void Key::set_key_str() throw()
+void Key::set_key_str()
 {
 	char keystr[KEY_SIZE / BASE_B + 1] = {0};
 	/*
@@ -119,7 +119,7 @@ Key& Key::operator= (const char *strOrig)
 	return *this;
 }
 
-Key::Key(const Key& k2) throw()
+Key::Key(const Key& k2)
 {
 	size_t i;
 	for (i = 0; i < nlen; i++)
@@ -139,7 +139,7 @@ Key& Key::operator=(const Key& k2)
 	return *this;
 }
 
-Key::Key(uint32_t ul) throw()
+Key::Key(uint32_t ul)
 {
 	size_t i;
 	for (i = 1; i < nlen; i++)
@@ -149,7 +149,7 @@ Key::Key(uint32_t ul) throw()
 	set_key_str();
 }
 
-Key::Key(uint32_t key[Key::nlen]) throw()
+Key::Key(uint32_t key[Key::nlen])
 {
 	size_t i;
 	for(i = 0; i < nlen; ++i)

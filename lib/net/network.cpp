@@ -59,7 +59,7 @@ Network::~Network()
 	CloseAll();
 }
 
-int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr) throw(CantOpenSock, CantListen)
+int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr)
 {
 	BlockLockMutex lock(this);
 	struct sockaddr_in saddr;

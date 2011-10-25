@@ -55,7 +55,7 @@ Certificate::~Certificate()
 		X509_free(ssl_cert);
 }
 
-void Certificate::LoadPem(std::string filename, std::string password) throw(BadFile, BadCertificate)
+void Certificate::LoadPem(std::string filename, std::string password)
 {
 	if(ssl_cert)
 	{
@@ -104,7 +104,7 @@ void Certificate::SetSSL(X509* _ssl_cert)
 	ssl_cert = _ssl_cert;
 }
 
-void Certificate::LoadRaw(const unsigned char* buf, size_t len) throw(BadCertificate)
+void Certificate::LoadRaw(const unsigned char* buf, size_t len)
 {
 	if(ssl_cert)
 		X509_free(ssl_cert);
@@ -136,7 +136,7 @@ void Certificate::GetRaw(unsigned char** buf, size_t* len) const
 	i2d_X509(ssl_cert, &p);
 }
 
-std::string Certificate::GetCommonName() const throw(BadCertificate)
+std::string Certificate::GetCommonName() const
 {
 	if(!ssl_cert)
 		return "";

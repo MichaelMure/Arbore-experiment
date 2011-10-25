@@ -57,7 +57,7 @@ public:
 	class CantCreate : std::exception {};
 
 	/* Methods */
-	void Start() throw(CantRun);
+	void Start();
 	void Stop();
 	bool IsRunning();
 

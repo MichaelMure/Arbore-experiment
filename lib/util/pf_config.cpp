@@ -243,7 +243,7 @@ ConfigSection* MyConfig::AddSection(ConfigSection* section)
 	return section;
 }
 
-ConfigSection* MyConfig::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc)
+ConfigSection* MyConfig::AddSection(std::string label, std::string description, bool multiple)
 {
 	if(loaded) throw error_exc("Configuration is already loaded !");
 
@@ -365,7 +365,7 @@ ConfigSection* ConfigSection::AddSection(ConfigSection* section)
 	return section;
 }
 
-ConfigSection* ConfigSection::AddSection(std::string label, std::string description, bool multiple) throw(MyConfig::error_exc)
+ConfigSection* ConfigSection::AddSection(std::string label, std::string description, bool multiple)
 {
 	FORit(SectionMap, sections, it)
 		if(it->second->Label() == label)
@@ -383,7 +383,7 @@ ConfigItem* ConfigSection::GetItem(std::string label)
 		return it->second;
 }
 
-void ConfigSection::AddItem(ConfigItem* item, bool is_name) throw(MyConfig::error_exc)
+void ConfigSection::AddItem(ConfigItem* item, bool is_name)
 {
 	try
 	{

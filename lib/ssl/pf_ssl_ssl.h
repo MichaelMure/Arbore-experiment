@@ -55,8 +55,8 @@ public:
 	Certificate GetCertificate() const { return cert; }
 	Certificate GetCACertificate() const { return cacert; }
 
-	Connection* Accept(int fd) throw(SslHandshakeFailed);
-	Connection* Connect(int fd) throw(SslHandshakeFailed);
+	Connection* Accept(int fd);
+	Connection* Connect(int fd);
 	void Close(Connection* conn);
 	void CloseAll();
 };
