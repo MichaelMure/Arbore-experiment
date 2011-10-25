@@ -20,7 +20,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- *
  */
 
 /* !WARNING! This library must be used in a program with this function :
@@ -145,18 +144,16 @@ public:
 	class error_exc
 	{
 		public:
-			error_exc(std::string _reason) : reason(_reason) {}
-
-			std::string Reason() const { return reason; }
-
+			error_exc(std::string reason) : reason_(reason) {}
+			std::string Reason() const { return reason_; }
 		private:
-			std::string reason;
+			std::string reason_;
 	};
 
 	/* Methodes */
 public:
 
-	bool Load(std::string _path = "");
+	bool Load(std::string path = "");
 
 	bool FindEmpty();
 
@@ -185,16 +182,18 @@ public:
 	 */
 	ConfigSection* AddSection(std::string label, std::string description, bool multiple);
 
-	unsigned NbLines() const { return line_count; }
-	std::string Path() const { return path; }
+	unsigned NbLines() const { return line_count_; }
+	std::string Path() const { return path_; }
+
+private:
+	ConfigSection* AddSection(ConfigSection*);
 
 	/* Variables privées */
 private:
-	ConfigSection* AddSection(ConfigSection*);
-	std::string path;
-	bool loaded;
-	SectionMap sections;
-	unsigned int line_count;
+	std::string path_;
+	bool loaded_;
+	SectionMap sections_;
+	unsigned int line_count_;
 };
 
 /********************************************************************************************
@@ -213,9 +212,6 @@ public:
 
 	friend class MyConfig;
 	/* Methodes */
-public:
-
-	/* Attributs */
 public:
 
 	/** Get a subsection from his label */
@@ -253,54 +249,56 @@ public:
 	void AddItem(ConfigItem* item, bool is_name = false);
 
 	/** Is this is a multiple struct, name is an identificator of this type of struct in the configuration */
-	std::string Name() const { return name; }
-	void SetName(std::string n) { name = n; }
+	std::string Name() const { return name_; }
+	void SetName(std::string name) { name_ = name; }
 
 	/** Label is an identificator in the configuration « label { }; » */
-	std::string Label() const { return label; }
+	std::string Label() const { return label_; }
 
-	std::string Description() const { return description; }
+	std::string Description() const { return description_; }
 
 	/** If this is true, this section can be forked */
-	bool IsMultiple() const { return multiple; }
+	bool IsMultiple() const { return multiple_; }
 
-	ConfigSection* Parent() const { return parent; }
+	ConfigSection* Parent() const { return parent_; }
 
-	bool IsCopy() const { return copy; }
-	void SetCopy() { copy = true; }
+	bool IsCopy() const { return copy_; }
+	void SetCopy() { copy_ = true; }
 
 	/** NameItem is name's item of this section */
-	ConfigItem* NameItem() const { return name_item; }
+	ConfigItem* NameItem() const { return name_item_; }
 
 	/** If true, this item is found in the configuration */
-	bool Found() const { return found; }
-	void SetFound() { found = true; }
+	bool Found() const { return found_; }
+	void SetFound() { found_ = true; }
 
 	/** This function will be called when parser is at the end of the section.
 	 * @param eot_f a function in form « void Name (ConfigSection*); »
 	 */
-	void SetEndOfTab(TEndOfTab eot_f) { end_func = eot_f; }
-	TEndOfTab EndOfTab() const { return end_func; }
+	void SetEndOfTab(TEndOfTab eot_f) { end_func_ = eot_f; }
+	TEndOfTab EndOfTab() const { return end_func_; }
 
-	/* Variables privées */
 private:
 	/** This constructor is privated because only AddSection must call him. */
 	ConfigSection(std::string name, std::string description, bool multiple, MyConfig* config, ConfigSection* parent);
 
 	bool FindEmpty();
 	ConfigSection* AddSection(ConfigSection*);
-	std::string name;
-	std::string label;
-	std::string description;
-	bool multiple;
-	ItemMap items;
-	SectionMap sections;
-	MyConfig* config;
-	ConfigSection* parent;
-	bool copy;
-	ConfigItem* name_item;
-	bool found;
-	TEndOfTab end_func;
+
+	/* Variables privées */
+private:
+	std::string name_;
+	std::string label_;
+	std::string description_;
+	bool multiple_;
+	ItemMap items_;
+	SectionMap sections_;
+	MyConfig* config_;
+	ConfigSection* parent_;
+	bool copy_;
+	ConfigItem* name_item_;
+	bool found_;
+	TEndOfTab end_func_;
 };
 
 /********************************************************************************************
@@ -319,17 +317,17 @@ public:
 	typedef void (*TCallBack) (ConfigItem*);
 
 	/** \b ConfigItem is a section's item.
-	 * @param _label this is the identificator of the item (in pair \a label=value )
-	 * @param _description description of this item
-	 * @param _def_value default value, if isn't setted, this item is needed
-	 * @param _call_back this is a pointer to a function called before setting this item
-	 * @param _config a pointer to the MyConfig instance
-	 * @param _parent parent of this item (a ConfigSection)
+	 * @param label this is the identificator of the item (in pair \a label=value )
+	 * @param description description of this item
+	 * @param def_value default value, if isn't setted, this item is needed
+	 * @param call_back this is a pointer to a function called before setting this item
+	 * @param config a pointer to the MyConfig instance
+	 * @param parent parent of this item (a ConfigSection)
 	 */
-	ConfigItem(std::string _label, std::string _description, std::string _def_value, TCallBack _call_back,
-		MyConfig* _config, ConfigSection* _parent)
-		: label(_label), description(_description), config(_config), parent(_parent), found(false),
-		call_back(_call_back), def_value(_def_value)
+	ConfigItem(std::string label, std::string description, std::string def_value, TCallBack call_back,
+		MyConfig* config, ConfigSection* parent)
+		: label_(label), description_(description), config_(config), parent_(parent), found_(false),
+		call_back_(call_back), def_value_(def_value)
 		{}
 
 	virtual ~ConfigItem() {}
@@ -345,15 +343,15 @@ public:
 	/* Attributs */
 public:
 
-	std::string Label() const { return label; }
-	std::string Description() const { return description; }
+	std::string Label() const { return label_; }
+	std::string Description() const { return description_; }
 
-	ConfigSection* Parent() const { return parent; }
-	MyConfig* GetConfig() const { return config; }
+	ConfigSection* Parent() const { return parent_; }
+	MyConfig* GetConfig() const { return config_; }
 
 	/** If true, this item was found on the configuration by parser */
-	bool Found() const { return found; }
-	void SetFound() { found = true; }
+	bool Found() const { return found_; }
+	void SetFound() { found_ = true; }
 
 	virtual int Integer() const	  /**< Get value as an integer */
 	{
@@ -372,28 +370,28 @@ public:
 
 	virtual std::string ValueType() const = 0;
 
-	TCallBack CallBack() const { return call_back; }
+	TCallBack CallBack() const { return call_back_; }
 
-	std::string DefValue() const { return def_value; }
+	std::string DefValue() const { return def_value_; }
 
 	/* Variables privées */
 private:
-	std::string label;
-	std::string description;
-	MyConfig* config;
-	ConfigSection* parent;
-	bool found;
-	TCallBack call_back;
-	std::string def_value;
+	std::string label_;
+	std::string description_;
+	MyConfig* config_;
+	ConfigSection* parent_;
+	bool found_;
+	TCallBack call_back_;
+	std::string def_value_;
 };
 
 /** This is a derived class from ConfigItem whose represent a string item */
 class ConfigItem_string : public ConfigItem
 {
 public:
-	ConfigItem_string(std::string _label, std::string _description, std::string def_value = "", TCallBack cb = 0,
-		MyConfig* _config = 0, ConfigSection* _parent = 0)
-		: ConfigItem(_label, _description, def_value, cb, _config, _parent)
+	ConfigItem_string(std::string label, std::string description, std::string def_value = "", TCallBack cb = 0,
+		MyConfig* config = 0, ConfigSection* parent = 0)
+		: ConfigItem(label, description, def_value, cb, config, parent)
 		{}
 
 	virtual ConfigItem* Clone() const
@@ -401,58 +399,58 @@ public:
 		return new ConfigItem_string(Label(), Description(), DefValue(), CallBack(), GetConfig(), Parent());
 	}
 
-	virtual std::string String() const { return value; }
-	virtual bool SetValue(std::string s) { value = s; return true; }
+	virtual std::string String() const { return value_; }
+	virtual bool SetValue(std::string s) { value_ = s; return true; }
 
 	std::string ValueType() const { return "string"; }
 
 private:
-	std::string value;
+	std::string value_;
 };
 
 /** This is a derived class from ConfigItem whose represent an integer item */
 class ConfigItem_int : public ConfigItem
 {
 public:
-	ConfigItem_int(std::string _label, std::string _description, int _min = INT_MIN, int _max = INT_MAX, std::string def_value = "",
-		TCallBack cb = 0, MyConfig* _config = 0, ConfigSection* _parent = 0)
-		: ConfigItem(_label, _description, def_value, cb, _config, _parent), min(_min), max(_max)
+	ConfigItem_int(std::string label, std::string description, int min = INT_MIN, int max = INT_MAX, std::string def_value = "",
+		TCallBack cb = 0, MyConfig* config = 0, ConfigSection* parent = 0)
+		: ConfigItem(label, description, def_value, cb, config, parent), min_(min), max_(max)
 		{}
 
 	virtual ConfigItem* Clone() const;
 
 	/** We return a string form of this integer */
-	virtual std::string String() const { std::ostringstream oss; oss << value; return oss.str(); }
+	virtual std::string String() const { std::ostringstream oss; oss << value_; return oss.str(); }
 
-	virtual int Integer() const { return value; }
+	virtual int Integer() const { return value_; }
 	virtual bool SetValue(std::string s);
 	std::string ValueType() const;
 
 private:
-	int value, min, max;
+	int value_, min_, max_;
 };
 
 /** This is a derived class from ConfigItem whose represent an integer item */
 class ConfigItem_bool : public ConfigItem
 {
 public:
-	ConfigItem_bool(std::string _label, std::string _description, std::string def_value = "", TCallBack cb = 0,
-		MyConfig* _config = 0, ConfigSection* _parent = 0)
-		: ConfigItem(_label, _description, def_value, cb, _config, _parent)
+	ConfigItem_bool(std::string label, std::string description, std::string def_value = "", TCallBack cb = 0,
+		MyConfig* config = 0, ConfigSection* parent = 0)
+		: ConfigItem(label, description, def_value, cb, config, parent)
 		{}
 
 	virtual ConfigItem* Clone() const;
 	/** We return a string form of this integer */
-	virtual std::string String() const { return (value ? "true" : "false"); }
+	virtual std::string String() const { return (value_ ? "true" : "false"); }
 
-	virtual int Integer() const { return value; }
-	virtual bool Boolean() const { return value; }
+	virtual int Integer() const { return value_; }
+	virtual bool Boolean() const { return value_; }
 	virtual bool SetValue(std::string s);
 
 	std::string ValueType() const;
 
 private:
-	bool value;
+	bool value_;
 };
 
 extern MyConfig conf;
