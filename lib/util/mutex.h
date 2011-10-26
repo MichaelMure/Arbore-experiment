@@ -62,13 +62,14 @@ public:
 	 */
 	Mutex(const Mutex &m);
 
+	virtual ~Mutex();
+
 	/** Copy the type from another Mutex
 	*
 	* @param m Mutex from which type is copied
 	* @return current Mutex initialize with the copied type
 	*/
 	Mutex& operator=(const Mutex& m);
-	~Mutex();
 
 	/** Lock the Mutex */
 	void Lock() const;

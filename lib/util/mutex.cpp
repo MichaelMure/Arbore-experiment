@@ -82,17 +82,17 @@ Mutex::Mutex(const Mutex& m)
 	Init(m._type);
 }
 
+Mutex::~Mutex()
+{
+	pthread_mutex_destroy(_mutex);
+	delete _mutex;
+}
+
 Mutex& Mutex::operator=(const Mutex& m)
 {
 	std::cerr << "mutex so bad" << std::endl;
 	Init(m._type);
 	return *this;
-}
-
-Mutex::~Mutex()
-{
-	pthread_mutex_destroy(_mutex);
-	delete _mutex;
 }
 
 void Mutex::Lock() const
