@@ -57,63 +57,63 @@ bool CompFiles::operator() (const FileEntry* f1, const FileEntry* f2) const
 		return f1 < f2;
 }
 
-FileEntry::FileEntry(std::string _name, pf_stat _stat, DirEntry* _parent)
-	: name(_name),
-	  parent(_parent),
-	  stat(_stat)
+FileEntry::FileEntry(std::string name, pf_stat stat, DirEntry* parent)
+	: stat_(stat),
+		name_(name),
+	  parent_(parent)
 {
-	key.MakeHash(name);
+	key_.MakeHash(name_);
 }
 
 DirEntry* FileEntry::GetParent() const
 {
-	return parent;
+	return parent_;
 }
 
 std::string FileEntry::GetName() const
 {
-	return name;
+	return name_;
 }
 
 std::string FileEntry::GetFullName() const
 {
-	DirEntry* p = parent;
+	DirEntry* p = parent_;
 	std::string path = "";
 
 	while(p)
 	{
 		path = p->GetName() + "/" + path;
-		p = p->parent;
+		p = p->parent_;
 	}
 
-	path = path + name;
+	path = path + name_;
 	return path;
 }
 
 Key FileEntry::getPathSerial() const
 {
-	return key;
+	return key_;
 }
 
 bool FileEntry::IsChildOf(const FileEntry* f) const
 {
-	DirEntry* p = parent;
+	DirEntry* p = parent_;
 
-	while(p && p != f) p = p->parent;
+	while(p && p != f) p = p->parent_;
 
 	return (p);
 }
 
 KeyList FileEntry::GetSharers() const
 {
-	return sharers;
+	return sharers_;
 }
 
 void FileEntry::SetSharers(KeyList idl)
 {
-	sharers = idl;
+	sharers_ = idl;
 	std::string list;
-	for(KeyList::iterator it = sharers.begin(); it != sharers.end(); ++it)
+	for(KeyList::iterator it = sharers_.begin(); it != sharers_.end(); ++it)
 	{
 		if(list.empty() == false) list += ",";
 		list += TypToStr(*it);
@@ -123,48 +123,48 @@ void FileEntry::SetSharers(KeyList idl)
 
 void FileEntry::AddSharer(Key id)
 {
-	sharers.insert(id);
-	SetSharers(sharers);
+	sharers_.insert(id);
+	SetSharers(sharers_); /* Non-awesome */
 }
 
 pf_stat FileEntry::GetAttr() const
 {
-	return stat;
+	return stat_;
 }
 
 void FileEntry::SetAttr(pf_stat new_stat, bool force)
 {
 	// Update attribute
-	if(stat.size != new_stat.size || force)
+	if(stat_.size != new_stat.size || force)
 		tree_cfg.Set(GetFullName() + "#size", (uint32_t)new_stat.size);
-	if(stat.meta_mtime != new_stat.meta_mtime || force)
+	if(stat_.meta_mtime != new_stat.meta_mtime || force)
 		tree_cfg.Set(GetFullName() + "#meta", (uint32_t)new_stat.meta_mtime);
-	if(stat.pf_mode != new_stat.pf_mode || force)
+	if(stat_.pf_mode != new_stat.pf_mode || force)
 		tree_cfg.Set(GetFullName() + "#pfmode", (uint32_t)new_stat.pf_mode);
-	if(stat.uid != new_stat.uid || force)
+	if(stat_.uid != new_stat.uid || force)
 		tree_cfg.Set(GetFullName() + "#uid", (uint32_t)new_stat.uid);
-	if(stat.gid != new_stat.gid || force)
+	if(stat_.gid != new_stat.gid || force)
 		tree_cfg.Set(GetFullName() + "#gid", (uint32_t)new_stat.gid);
-	if(stat.mode != new_stat.mode || force)
+	if(stat_.mode != new_stat.mode || force)
 		tree_cfg.Set(GetFullName() + "#mode", (uint32_t)new_stat.mode);
-	stat = new_stat;
+	stat_ = new_stat;
 }
 
 void FileEntry::LoadAttr()
 {
 	uint32_t cfg_val = 0;
 	if(tree_cfg.Get(GetFullName() + "#meta", cfg_val))
-		stat.meta_mtime = (time_t)cfg_val;
+		stat_.meta_mtime = (time_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#size", cfg_val))
-		stat.size = (size_t)cfg_val;
+		stat_.size = (size_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#pfmode", cfg_val))
-		stat.pf_mode = (uint32_t)cfg_val;
+		stat_.pf_mode = (uint32_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#uid", cfg_val))
-		stat.uid = (uint32_t)cfg_val;
+		stat_.uid = (uint32_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#gid", cfg_val))
-		stat.gid = (uint32_t)cfg_val;
+		stat_.gid = (uint32_t)cfg_val;
 	if(tree_cfg.Get(GetFullName() + "#mode", cfg_val))
-		stat.mode = (uint32_t)cfg_val;
+		stat_.mode = (uint32_t)cfg_val;
 	std::string cfg_val_s;
 	if(tree_cfg.Get(GetFullName() + "#sharers", cfg_val_s))
 	{
@@ -180,15 +180,15 @@ void FileEntry::LoadAttr()
 
 bool FileEntry::IsRemoved() const
 {
-	return stat.pf_mode & pf_stat::S_PF_REMOVED;
+	return stat_.pf_mode & pf_stat::S_PF_REMOVED;
 }
 
 void FileEntry::SetRemoved()
 {
-	stat.pf_mode |= pf_stat::S_PF_REMOVED;
+	stat_.pf_mode |= pf_stat::S_PF_REMOVED;
 }
 
 void FileEntry::ClearRemoved()
 {
-	stat.pf_mode |= pf_stat::S_PF_REMOVED;
+	stat_.pf_mode |= pf_stat::S_PF_REMOVED;
 }

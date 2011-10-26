@@ -18,7 +18,6 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
  */
 
 #include "dir_entry.h"
@@ -26,8 +25,8 @@
 DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
 			: FileEntry(name, _stat, _parent)
 {
-	stat.mode &= ~S_IFREG;
-	stat.mode |= S_IFDIR;
+	stat_.mode &= ~S_IFREG;
+	stat_.mode |= S_IFDIR;
 }
 
 DirEntry::~DirEntry()

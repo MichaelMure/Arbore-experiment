@@ -66,13 +66,6 @@ typedef std::set<FileEntry*, CompFiles> FileList;
  */
 class FileEntry
 {
-	const std::string name; /** Name of the file */
-	DirEntry* parent; /** Parent directory */
-	KeyList sharers; /** key of nodes that share this file */
-	Key key; /** probably unique key of the file for the DHT */
-
-protected:
-	pf_stat stat; /** set of attributes */
 public:
 
 	/**
@@ -154,6 +147,15 @@ public:
 	 * Unset the file as removed.
 	 */
 	void ClearRemoved();
+
+protected:
+	pf_stat stat_; /** set of attributes */
+
+private:
+	const std::string name_; /** Name of the file */
+	DirEntry* parent_; /** Parent directory */
+	KeyList sharers_; /** key of nodes that share this file */
+	Key key_; /** probably unique key of the file for the DHT */
 };
 
 template<>
