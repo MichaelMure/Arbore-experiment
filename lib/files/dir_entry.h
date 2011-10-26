@@ -18,7 +18,7 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- * 
+ *
  */
 
 #ifndef DIR_ENTRY_H
@@ -31,8 +31,6 @@ typedef std::map<std::string, FileEntry*> FileMap;
 
 class DirEntry : public FileEntry
 {
-	FileMap files;
-
 public:
 
 	/** Constructor of DirEntry.
@@ -43,8 +41,8 @@ public:
 	DirEntry(std::string name, pf_stat stat, DirEntry* parent);
 	~DirEntry();
 
-	const FileMap& GetFiles() { return files; }
-	size_t GetSize() const { return files.size(); }
+	const FileMap& GetFiles() { return files_; }
+	size_t GetSize() const { return files_.size(); }
 
 	/** Return number of existant files (which are not marked as removed) */
 	size_t CountExistantFiles() const;
@@ -61,5 +59,8 @@ public:
 
 	/** Get a file from name. */
 	FileEntry* GetFile(std::string name) const;
+
+private:
+	FileMap files_;
 };
 #endif						  /* DIR_ENTRY_H */

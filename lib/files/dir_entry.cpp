@@ -22,8 +22,8 @@
 
 #include "dir_entry.h"
 
-DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
-			: FileEntry(name, _stat, _parent)
+DirEntry::DirEntry(std::string name, pf_stat stat, DirEntry* parent)
+			: FileEntry(name, stat, parent)
 {
 	stat_.mode &= ~S_IFREG;
 	stat_.mode |= S_IFDIR;
@@ -32,14 +32,14 @@ DirEntry::DirEntry(std::string name, pf_stat _stat, DirEntry* _parent)
 DirEntry::~DirEntry()
 {
 	/* Remove all entries in this directory. */
-	for(FileMap::iterator it = files.begin(); it != files.end(); ++it)
+	for(FileMap::iterator it = files_.begin(); it != files_.end(); ++it)
 		delete it->second;
 }
 
 size_t DirEntry::CountExistantFiles() const
 {
 	size_t i = 0;
-	for(FileMap::const_iterator it = files.begin(); it != files.end(); ++it)
+	for(FileMap::const_iterator it = files_.begin(); it != files_.end(); ++it)
 		if(it->second->IsRemoved() == false)
 			++i;
 
@@ -49,26 +49,26 @@ size_t DirEntry::CountExistantFiles() const
 void DirEntry::AddFile(FileEntry* file)
 {
 	FileMap::iterator it;
-	if((it = files.find(file->GetName())) != files.end())
+	if((it = files_.find(file->GetName())) != files_.end())
 	{
 		pf_log[W_DEBUG] << "File already exists, replacing it";
 		delete it->second;
 	}
 
-	files[file->GetName()] = file;
+	files_[file->GetName()] = file;
 }
 
 void DirEntry::RemFile(FileEntry* file)
 {
-	FileMap::iterator it = files.find(file->GetName());
-	if(it != files.end())
-		files.erase(it);
+	FileMap::iterator it = files_.find(file->GetName());
+	if(it != files_.end())
+		files_.erase(it);
 }
 
 FileEntry* DirEntry::GetFile(std::string name) const
 {
-	FileMap::const_iterator ret = files.find(name);
-	if(ret == files.end())
+	FileMap::const_iterator ret = files_.find(name);
+	if(ret == files_.end())
 		return NULL;
 
 	return ret->second;
