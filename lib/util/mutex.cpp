@@ -44,25 +44,21 @@ void Mutex::Init(MutexType type)
 	switch(_type)
 	{
 		case NORMAL_MUTEX:
-			//#ifdef DEBUG
-			std::cerr << this << std::endl;
 			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK) != 0)
 			{
 				std::cerr << "pthread_mutexattr_settype: " << strerror(errno) << std::endl;
 				throw MutexError();
 			}
-			//#else
-			//		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_NORMAL);
-			//#endif
 			break;
-		case RECURSIVE_MUTEX:
 
+		case RECURSIVE_MUTEX:
 			if(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) != 0)
 			{
 				std::cerr << "pthread_mutexattr_settype: " << strerror(errno) << std::endl;
 				throw MutexError();
 			}
 			break;
+
 		case INVALID_MUTEX:
 		default:
 			assert(false);
