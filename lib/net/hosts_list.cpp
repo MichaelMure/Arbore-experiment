@@ -23,8 +23,7 @@
  *
  */
 
-#include <arpa/inet.h>
-#include <netdb.h>
+
 
 #include <util/tools.h>
 #include "host.h"
@@ -47,58 +46,14 @@ Host HostsList::DecodeHost(std::string hostname)
 	Host host = GetHost(name, port);
 
 	return (host);
-
-}
-
-pf_addr HostsList::MakeAddr(std::string hostname, uint16_t port) const
-{
-	int is_addr;
-	struct hostent *he;
-	in_addr_t addr;
-	in_addr_t local;
-	int i;
-
-	/* apparently gethostbyname does not portably recognize ip addys */
-#ifdef SunOS
-	is_addr = inet_addr (hostname.c_str());
-	if (is_addr == -1)
-		is_addr = 0;
-	else
-	{
-		memcpy (&addr, (struct in_addr *) &is_addr, sizeof (addr));
-		is_addr = inet_addr ("127.0.0.1");
-		memcpy (&local, (struct in_addr *) &is_addr, sizeof (addr));
-		is_addr = 1;
-	}
-#else
-	is_addr = inet_aton (hostname.c_str(), (struct in_addr *) &addr);
-	inet_aton ("127.0.0.1", (struct in_addr *) &local);
-#endif
-
-	if (is_addr)
-		he = gethostbyaddr ((char *) &addr, sizeof (addr), AF_INET);
-	else
-		he = gethostbyname (hostname.c_str());
-
-	if (he == NULL)
-		throw CantResolvHostname();
-
-	/* TODO: check why he does that, because I don't understand... --romain */
-	/* make sure the machine is not returning localhost */
-	addr = *(in_addr_t *) he->h_addr_list[0];
-	for (i = 1; he->h_addr_list[i] != NULL && addr == local; i++)
-		addr = *(in_addr_t *) he->h_addr_list[i];
-
-	return pf_addr(addr, port);
 }
 
 Host HostsList::GetHost(std::string hostname, uint16_t port)
 {
-	pf_addr address;
 	BlockLockMutex lock(this);
 
 	/* create an id of the form ip:port */
-	address = MakeAddr(hostname, port);
+	pf_addr address = pf_addr(hostname, port);
 
 	return GetHost(address);
 }

@@ -41,8 +41,6 @@ class HostsList : public Mutex
 
 public:
 
-	class CantResolvHostname : public std::exception {};
-
 	/** Initialize a host struct with a size element cache.
 	 */
 	HostsList(size_t size);
@@ -63,10 +61,6 @@ public:
 	 ** GetHost.
 	 */
 	Host DecodeHost (std::string s);
-
-	/** @return the ip address of hostname
-	 */
-	pf_addr MakeAddr(std::string hostname, uint16_t port) const;
 };
 
 #endif /* _HOSTS_LIST_H */

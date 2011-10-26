@@ -38,8 +38,9 @@ typedef uint32_t ip_t[4];
 /** This class holds an adress of a host, defined by it's ip adress (ipv4/6),
  * port and key.
  */
-struct pf_addr
+class pf_addr
 {
+public:
 	static const size_t size = sizeof(ip_t) +       /* ip */
 	                           sizeof(uint16_t) +   /* port */
 	                           Key::size;           /* key */
@@ -47,9 +48,12 @@ struct pf_addr
 	uint16_t port;
 	Key key;
 
+	class CantResolvHostname : public std::exception {};
+
 	pf_addr();
 	pf_addr(in_addr_t address_v4, uint16_t port, Key key = Key());
 	pf_addr(const char* buf);
+	pf_addr(std::string hostname, uint16_t port);
 	~pf_addr() {}
 
 	void dump(char* buf);
@@ -75,6 +79,9 @@ struct pf_addr
 
 	/** @return a serialized version of the pf_addr */
 	std::string GetStr() const;
+
+private:
+	void Init(uint32_t adr0, uint32_t adr1, uint32_t adr2, uint32_t adr3);
 };
 
 template<>
