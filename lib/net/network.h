@@ -56,7 +56,6 @@ public:
 			CantListen(int _port) : port(_port) {}
 			~CantListen() throw() {};
 	};
-	class CantResolvHostname : public std::exception {};
 	class CantConnectTo : public std::exception
 	{
 		public:
