@@ -236,7 +236,7 @@ Key Host::GetKey() const
 	return host->GetKey();
 }
 
-void Host::SetKey(Key k)
+void Host::SetKey(const Key k)
 {
 	if(this->host == NULL) return;
 
@@ -252,7 +252,7 @@ double Host::GetFailureTime() const
 	return host->GetFailureTime();
 }
 
-void Host::SetLatency(double f)
+void Host::SetLatency(const double f)
 {
 	if(this->host == NULL) return;
 
@@ -268,13 +268,14 @@ double Host::GetLatency() const
 	return host->GetLatency();
 }
 
-void Host::SetFailureTime(double f)
+void Host::SetFailureTime(const double f)
 {
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
 	host->SetFailureTime(f);
 }
+
 float Host::GetSuccessAvg() const
 {
 	if(this->host == NULL) return 0.0;

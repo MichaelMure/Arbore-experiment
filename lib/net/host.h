@@ -118,13 +118,13 @@ public:
 	void UpdateStat (int success);
 
 	Key GetKey() const;                   /**< Get the key */
-	void SetKey(Key k);                   /**< Set the key */
+	void SetKey(const Key k);             /**< Set the key */
 
 	double GetFailureTime() const;        /**< Get the failure time */
-	void SetFailureTime(double f);        /**< Set the failure time */
+	void SetFailureTime(const double f);  /**< Set the failure time */
 
 	double GetLatency() const;            /**< Get the latency */
-	void SetLatency(double l);            /**< Set the latency */
+	void SetLatency(const double l);      /**< Set the latency */
 
 	float GetSuccessAvg() const;          /**< Get the success average */
 
