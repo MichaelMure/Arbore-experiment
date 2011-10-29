@@ -140,6 +140,16 @@ bool pf_addr::operator<(const pf_addr &other) const
 	return false;
 }
 
+Key& GetKey() const
+{
+	return key_;
+}
+
+void SetKey(const Key& key)
+{
+	key_ = key;
+}
+
 std::string pf_addr::GetStr() const
 {
 	std::string ret = key.GetStr() + ":";

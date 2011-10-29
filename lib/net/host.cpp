@@ -71,8 +71,8 @@ public:
 	 */
 	void UpdateStat (int success);
 
-	const Key& GetKey() const { return addr.key; }
-	void SetKey(Key k) { addr.key = k; }
+	const Key& GetKey() const { return addr.GetKey(); }
+	void SetKey(Key k) { addr.SetKey(k); }
 
 	double GetFailureTime() const { return failuretime; }
 

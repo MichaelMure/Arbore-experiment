@@ -77,11 +77,19 @@ public:
 
 	bool operator<(const pf_addr &other) const;
 
+	/** @return a reference the key */
+	Key& GetKey() const;
+
+	/** Change the key. */
+	void SetKey(const Key& key);
+
 	/** @return a serialized version of the pf_addr */
 	std::string GetStr() const;
 
 private:
 	void Init(uint32_t adr0, uint32_t adr1, uint32_t adr2, uint32_t adr3);
+
+	Key key_;
 };
 
 template<>
