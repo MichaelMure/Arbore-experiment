@@ -99,10 +99,11 @@ public :
 	 */
 	Host routeLookup(const Key& key) const;
 
-	/** route_row_lookup:
-	** return the row in the routing table that matches the longest prefix with key.
-	*/
-
+	/* Finds the row in the routing table
+	 *
+	 * @param key  key we're looking for
+	 * @return row  row which matches the longest prefix with key.
+	 */
 	inline std::vector<Host>  rowLookup(const Key& key) const
 	{
 		BlockLockMutex lock(this);
@@ -110,20 +111,14 @@ public :
 		return this->routingTable.getRow(lineNum);
 	}
 
-	/** route_neighbors:
-	** returns an array of count neighbor nodes with priority to closer nodes.
-	*/
-
+	/* Returns all the entries in the leafset */
 	inline std::vector<Host> getLeafset() const
 	{
 		BlockLockMutex lock(this);
 		return this->leafset.getCopy();
 	}
 
-	/** route_get_table:
-	** returns all the entries in the routing table in an array of ChimeraHost.
-	*/
-
+/* Returns all the entries in the routing table */
 	inline std::vector<Host> getRoutingTable() const
 	{
 		BlockLockMutex lock(this);
