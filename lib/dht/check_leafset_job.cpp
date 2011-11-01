@@ -27,8 +27,8 @@
 #include <util/pf_log.h>
 #include "check_leafset_job.h"
 #include "chimera.h"
-#include "chimeramessages.h"
-#include "chimerarouting.h"
+#include "chimera_messages.h"
+#include "chimera_routing.h"
 
 bool CheckLeafsetJob::Start()
 {
