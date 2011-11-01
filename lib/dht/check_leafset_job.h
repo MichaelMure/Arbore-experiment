@@ -32,21 +32,25 @@
 class ChimeraDHT;
 class ChimeraRouting;
 
+/** Class to make the update of the leafset of a Host
+ * When it's started by the scheduler, it will update delete bad link in the leafset and routing table
+ * and send leafset update to hosts present in its leafset
+ */
 class CheckLeafsetJob : public Job
 {
-	ChimeraDHT* chimera;
-	ChimeraRouting* routing;
-	size_t count;
+	ChimeraDHT* chimera_;
+	ChimeraRouting* routing_;
+	size_t count_;
 
 	bool Start();
 
 public:
 
-	CheckLeafsetJob(ChimeraDHT* _chimera, ChimeraRouting* _routing)
+	CheckLeafsetJob(ChimeraDHT* chimera, ChimeraRouting* routing)
 		: Job(time::dtime(), REPEAT_PERIODIC, 20.0),
-		  chimera(_chimera),
-		  routing(_routing),
-		  count(0)
+		  chimera_(chimera),
+		  routing_(routing),
+		  count_(0)
 	{}
 };
 

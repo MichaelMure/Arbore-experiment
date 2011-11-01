@@ -27,17 +27,17 @@
 #include <util/pf_log.h>
 #include "check_leafset_job.h"
 #include "chimera.h"
-#include "chimera_messages.h"
-#include "chimera_routing.h"
+#include "chimeramessages.h"
+#include "chimerarouting.h"
 
 bool CheckLeafsetJob::Start()
 {
 	std::string s;
 
-	std::vector<Host> leafset = routing->getLeafset();
+	std::vector<Host> leafset = routing_->getLeafset();
 	for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 	{
-		if (*it && !chimera->Ping(*it))
+		if (*it && !chimera_->Ping(*it))
 		{
 			it->SetFailureTime(time::dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
@@ -45,14 +45,14 @@ bool CheckLeafsetJob::Start()
 			if (it->GetSuccessAvg() < BAD_LINK)
 			{
 				pf_log[W_DEBUG] << "Deleting " << *it;
-				routing->remove(*it);
+				routing_->remove(*it);
 			}
 		}
 	}
-	std::vector<Host> table = routing->getRoutingTable();
+	std::vector<Host> table = routing_->getRoutingTable();
 	for (std::vector<Host>::iterator it = table.begin(); it != table.end(); ++it)
 	{
-		if (*it && !chimera->Ping(*it))
+		if (*it && !chimera_->Ping(*it))
 		{
 			it->SetFailureTime(time::dtime ());
 			pf_log[W_WARNING] << "message send to host: " << *it
@@ -60,19 +60,19 @@ bool CheckLeafsetJob::Start()
 			if (it->GetSuccessAvg() < BAD_LINK)
 			{
 				pf_log[W_DEBUG] << "Deleting " << *it;
-				routing->remove(*it);
+				routing_->remove(*it);
 			}
 		}
 	}
 
 	/* send leafset exchange data every  3 times that pings the leafset */
-	if (count == 2)
+	if (count_ == 2)
 	{
-		Packet pckt(ChimeraPiggyType, chimera->GetMe().GetKey());
-		leafset = routing->getLeafset();
+		Packet pckt(ChimeraPiggyType, chimera_->GetMe().GetKey());
+		leafset = routing_->getLeafset();
 
-		leafset.push_back(chimera->GetMe());
-		count = 0;
+		leafset.push_back(chimera_->GetMe());
+		count_ = 0;
 
 		AddrList addrlist;
 		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
@@ -83,19 +83,19 @@ bool CheckLeafsetJob::Start()
 		for (std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 		{
 			pckt.SetDst(it->GetKey());
-			if(!chimera->Send(*it, pckt))
+			if(!chimera_->Send(*it, pckt))
 			{
 				pf_log[W_WARNING] << "sending leafset update to " << *it << " failed!";
 				if (it->GetSuccessAvg() < BAD_LINK)
 				{
-					routing->remove(*it);
+					routing_->remove(*it);
 				}
 			}
 		}
 	}
 	else
 	{
-		count++;
+		count_++;
 	}
 
 	return true;
