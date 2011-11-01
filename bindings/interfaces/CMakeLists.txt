@@ -1,10 +1,6 @@
 FILE(GLOB Interfaces */*.i)
 #FILE(GLOB Wrapper *.cxx)
 
-message("HELLO")
-message(${Interfaces})
-
-#SET(CMAKE_SWIG_FLAGS "-c++")
 SET_SOURCE_FILES_PROPERTIES(${Interfaces} PROPERTIES CPLUSPLUS ON)
 #SET_SOURCE_FILES_PROPERTIES(${Interfaces} PROPERTIES SWIG_FLAGS "-includeall")
 

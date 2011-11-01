@@ -48,8 +48,10 @@ SUBDIRS (lib)
 
 ########################### Bindings ##################
 
-SUBDIRS (bindings)
-
+IF(BUILD_BINDINGS)
+  MESSAGE(STATUS "Bindings building enabled")
+  SUBDIRS(bindings)
+ENDIF(BUILD_BINDINGS)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb -DDEBUG -D_REENTRANT -D_FILE_OFFSET_BITS=64 -Wextra -Wall -Wcast-align -Wcast-qual -Wconversion -Wdisabled-optimization -Wfloat-equal -Wformat=2 -Wimport -Winit-self -Winline -Winvalid-pch -Wunsafe-loop-optimizations -Wlong-long -Wmissing-format-attribute -Wmissing-include-dirs -Wmissing-noreturn -Wpacked -Wpointer-arith -Wredundant-decls -Wshadow -Wstack-protector -Wswitch-default -Wswitch-enum -Wunused -Wvariadic-macros -Wwrite-strings")
 SET(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
