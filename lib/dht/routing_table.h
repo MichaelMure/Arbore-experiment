@@ -35,6 +35,9 @@
 
 #include <vector>
 
+/** Define the routing table of the DHT
+ * Hosts are in added in the routing table if can't be added in the leafset
+ */
 class RoutingTable
 {
 private:

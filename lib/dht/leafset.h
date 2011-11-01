@@ -35,8 +35,8 @@
 #include <net/hosts_list.h>
 #include <util/key.h>
 
-/**The leafset contains the current peer's immediate neighbors in key space
- *
+/** The leafset contains the current peer's immediate neighbors in key space
+ * It's used in order to route packet among the DHT
  */
 class Leafset
 {
