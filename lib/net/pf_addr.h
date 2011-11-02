@@ -26,14 +26,13 @@
 #ifndef PF_ADDR_H
 #define PF_ADDR_H
 
+#include <sys/socket.h>
 #include <netinet/in.h>
 
 #include <util/pf_log.h>
 #include <util/pf_types.h>
 #include <util/key.h>
 
-const size_t ip_t_len = 4;
-typedef uint32_t ip_t[4];
 
 /** This class holds an adress of a host, defined by it's ip adress (ipv4/6),
  * port and key.
@@ -41,21 +40,33 @@ typedef uint32_t ip_t[4];
 class pf_addr
 {
 public:
-	static const size_t size = sizeof(ip_t) +       /* ip */
-	                           sizeof(uint16_t) +   /* port */
+
+	static const size_t size = sizeof(sockaddr) +   /* address */
 	                           Key::size;           /* key */
-	ip_t ip;
-	uint16_t port;
-	Key key;
+
+	static const in_port_t DEFAULT_PORT = 4280;
 
 	class CantResolvHostname : public std::exception {};
+	class CantParse : public std::exception {};
 
 	pf_addr();
-	pf_addr(in_addr_t address_v4, uint16_t port, Key key = Key());
+	pf_addr(std::string str);
+	pf_addr(sockaddr addr, Key key = Key());
+	pf_addr(in_addr address_v4, in_port_t port = DEFAULT_PORT, Key key = Key());
+	pf_addr(in6_addr address_v6, in_port_t port = DEFAULT_PORT, Key key = Key());
+
+	/** Deserialize a pf_addr
+	 * @param buf The buffer to read on.
+	 */
 	pf_addr(const char* buf);
+
+	/* Obsolete constructor */
+	pf_addr(in_addr_t address_v4, uint16_t port, Key key = Key());
 	pf_addr(std::string hostname, uint16_t port);
+
 	~pf_addr() {}
 
+	/** Serialyze in binary format the pf_addr */
 	void dump(char* buf);
 
 	/** Comparaison between two pf_addr
@@ -74,21 +85,29 @@ public:
 	 *
 	 * \note The key isn't compared if one of the two is NULL. In that case, false is returned.
 	 */
-
 	bool operator<(const pf_addr &other) const;
 
-	/** @return a reference the key */
-	Key& GetKey() const;
+	/** @return True if the address is a IPV4 one */
+	bool IsIPV4() const;
+
+	/** @return True if the address is a IPV6 one */
+	bool IsIPV6() const;
+
+	/** @return the key */
+	Key GetKey() const;
 
 	/** Change the key. */
 	void SetKey(const Key& key);
+
+	/** @return a copy of the sockaddr structure describing the sock address */
+	sockaddr GetSockAddr() const;
 
 	/** @return a serialized version of the pf_addr */
 	std::string GetStr() const;
 
 private:
-	void Init(uint32_t adr0, uint32_t adr1, uint32_t adr2, uint32_t adr3);
 
+	struct sockaddr addr_;
 	Key key_;
 };
 

@@ -257,14 +257,10 @@ void Network::StartNetwork(MyConfig* conf)
 
 bool Network::Send(int sock, Host host, Packet pckt)
 {
-	struct sockaddr_in to;
 	ssize_t ret;
 	double start;
 
-	memset (&to, 0, sizeof (to));
-	to.sin_family = AF_INET;
-	to.sin_addr.s_addr = host.GetAddr().ip[3]; /* TODO: ipv6! */
-	to.sin_port = htons(host.GetAddr().port);
+	struct sockaddr to = host.GetAddr().GetSockAddr();
 
 	start = time::dtime ();
 
@@ -281,7 +277,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 	pf_log[W_PARSE] << "S(" << host << ") - " << pckt.GetPacketInfo();
 
 	const char* s = pckt.DumpBuffer();
-	ret = sendto (sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
+	ret = sendto (sock, s, pckt.GetSize(), 0, &to, sizeof (to));
 	delete [] s;
 
 	if (ret < 0)
