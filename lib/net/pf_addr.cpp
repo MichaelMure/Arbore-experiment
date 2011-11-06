@@ -49,7 +49,7 @@ pf_addr::pf_addr(const std::string str)
 		if(str.find("[")) /* port */
 		{
 			int pos = str.find_last_of(":");
-			addr->sin6_port = StrToTyp<in_port_t>(str.substr(pos+1));
+			addr->sin6_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
 			res = inet_pton(AF_INET6, str.substr(0, pos).c_str(), &(addr->sin6_addr));
 		}
 		else
@@ -79,7 +79,7 @@ pf_addr::pf_addr(const std::string str)
 		if(colon_nbr == 1) /* port */
 		{
 			int pos = str.find_last_of(":");
-			addr->sin_port = StrToTyp<in_port_t>(str.substr(pos+1));
+			addr->sin_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
 			res = inet_pton(AF_INET, str.substr(0, pos).c_str(), &(addr->sin_addr));
 		}
 		else
@@ -119,19 +119,19 @@ pf_addr::pf_addr(in6_addr address_v6, in_port_t port, Key key)
 	addr->sin6_port = port;
 }
 
-/*pf_addr::pf_addr(std::string address_v4, uint16_t port, Key key)
-	: key_(key)
+pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
+//	: key_(key)
 {
-	sockaddr_in *sock = (sockaddr_in*) &addr_;
+/*	sockaddr_in *sock = (sockaddr_in*) &addr_;
 
 	sock->sin_family = AF_INET;
 	inet_aton(address_v4, sock->sin_addr->s_addr)
-	sock->sin_port = htons(port);
-}*/
+	sock->sin_port = htons(port);*/
+}
 
-/*pf_addr::pf_addr(const char* p)
+pf_addr::pf_addr(const char* p)
 {
-	for(size_t i = 0; i < ip_t_len; ++i)
+/*	for(size_t i = 0; i < ip_t_len; ++i)
 	{
 		ip[i] = ntohl(*(uint32_t*)p);
 		p += sizeof(ip[i]);
@@ -146,14 +146,14 @@ pf_addr::pf_addr(in6_addr address_v6, in_port_t port, Key key)
 		array[i] = ntohl(*(uint32_t*)p);
 		p += sizeof(array[i]);
 	}
-	key = Key(array);
-}*/
+	key = Key(array);*/
+}
 
-/*pf_addr::pf_addr(std::string hostname, uint16_t port)
-	: port(port), key(Key())
+pf_addr::pf_addr(std::string hostname, uint16_t port)
+//	: port(port), key(Key())
 {
 
-}*/
+}
 
 
 
