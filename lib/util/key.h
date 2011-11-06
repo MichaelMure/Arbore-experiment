@@ -36,8 +36,10 @@
 #include "util/pf_log.h"
 
 #define KEY_SIZE 160
+#define N_SIZE KEY_SIZE/sizeof(uint32_t)
 #define BASE_B 4		/* Base representation of key digits */
 #define BASE_16_KEYLENGTH 40
+
 
 class Key
 {
