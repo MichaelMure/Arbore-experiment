@@ -36,10 +36,7 @@
 #include "util/pf_log.h"
 
 #define KEY_SIZE 160
-#define N_SIZE KEY_SIZE/sizeof(uint32_t)
-
 #define BASE_B 4		/* Base representation of key digits */
-
 #define BASE_16_KEYLENGTH 40
 
 class Key
@@ -145,16 +142,28 @@ public:
 	 */
 	void MakeHash (const char *s, size_t size);
 
-	/* key_distance:k1,k2
-	** calculate the distance between k1 and k2 in the keyspace and assign that to #diff# */
+	/** Calculate the distance between this and another key
+	*
+	* @param k2 key that we want to evaluate the distance
+	* @return difference between this and k2
+	*/
 	Key distance(const Key& k2) const;
 
-	/**returns the size of the interval starting from this to upperBound */
+	/** Calculate the size of the interval starting from this to upperBound
+	 *
+	 * @param upperBound
+	 * @return size of the invterval
+	 * */
 	Key intervalSize(const Key& upperBound) const;
 
-	/* key_between: test, left, right
-	** check to see if the value in #test# falls in the range from #left# clockwise
-	** around the ring to #right#. */
+	/** Check if the key is between 2 others keys
+	* check to see if the value of this falls in the range from left clockwise
+	* around the ring to right.
+	*
+	* @param left key which will be considered on the left in keyspace
+	* @param right key which will be considered on the right in keyspace
+	* @return true if the key is between or on one edge
+	* */
 	bool between (const Key& left, const Key& right) const;
 
 	/** Check if the key is null.
