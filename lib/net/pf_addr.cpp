@@ -120,16 +120,6 @@ pf_addr::pf_addr(in6_addr address_v6, in_port_t port, Key key)
 	addr->sin6_port = port;
 }
 
-pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
-//	: key_(key)
-{
-/*	sockaddr_in *sock = (sockaddr_in*) &addr_;
-
-	sock->sin_family = AF_INET;
-	inet_aton(address_v4, sock->sin_addr->s_addr)
-	sock->sin_port = htons(port);*/
-}
-
 pf_addr::pf_addr(const char* p)
 {
 	/* read family */
@@ -150,13 +140,42 @@ pf_addr::pf_addr(const char* p)
 	key_ = Key(array);
 }
 
+pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
+//	: key_(key)
+{
+/*	sockaddr_in *sock = (sockaddr_in*) &addr_;
+
+	sock->sin_family = AF_INET;
+	inet_aton(address_v4, sock->sin_addr->s_addr)
+	sock->sin_port = htons(port);*/
+}
+
 pf_addr::pf_addr(std::string hostname, uint16_t port)
 //	: port(port), key(Key())
 {
 
 }
 
+void pf_addr::dump(char* p)
+{
+	/* dump family */
+	uint16_t nfamily = htons(addr_.sa_family);
+	memcpy(p, &nfamily, sizeof(nfamily));
+	p += sizeof(nfamily);
 
+	/* dump address */
+	memcpy(p, &addr_.sa_data, sizeof(addr_.sa_data));
+	p += sizeof(addr_.sa_data);
+
+	/* dump key */
+	const uint32_t* array = key_.GetArray();
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		uint32_t nbr = htonl(array[i]);
+		memcpy(p, &nbr, sizeof(nbr));
+		p += sizeof(nbr);
+	}
+}
 
 bool pf_addr::operator ==(const pf_addr &other) const
 {
@@ -266,25 +285,4 @@ std::string pf_addr::GetStr() const
 	std::string ret = key_.GetStr() + ":" + ip + ":" + port;
 
 	return ret;
-}
-
-void pf_addr::dump(char* p)
-{
-	/* dump family */
-	uint16_t nfamily = htons(addr_.sa_family);
-	memcpy(p, &nfamily, sizeof(nfamily));
-	p += sizeof(nfamily);
-
-	/* dump address */
-	memcpy(p, &addr_.sa_data, sizeof(addr_.sa_data));
-	p += sizeof(addr_.sa_data);
-
-	/* dump key */
-	const uint32_t* array = key_.GetArray();
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		uint32_t nbr = htonl(array[i]);
-		memcpy(p, &nbr, sizeof(nbr));
-		p += sizeof(nbr);
-	}
 }
