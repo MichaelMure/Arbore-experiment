@@ -46,11 +46,11 @@ pf_addr::pf_addr(const std::string str)
 		sockaddr_in6 *addr = (sockaddr_in6 *) &addr_;
 		addr->sin6_family = AF_INET6;
 
-		if(str.find("[")) /* port */
+		if(str.find("[") != -1) /* port */
 		{
 			int pos = str.find_last_of(":");
 			addr->sin6_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
-			res = inet_pton(AF_INET6, str.substr(0, pos).c_str(), &(addr->sin6_addr));
+			res = inet_pton(AF_INET6, str.substr(1, pos-2).c_str(), &(addr->sin6_addr));
 		}
 		else
 		{
