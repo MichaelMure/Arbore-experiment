@@ -35,6 +35,7 @@ pf_addr::pf_addr()
 }
 
 pf_addr::pf_addr(const std::string str)
+	: key_(Key())
 {
 	bool success = false;
 	int res;
@@ -131,22 +132,22 @@ pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
 
 pf_addr::pf_addr(const char* p)
 {
-/*	for(size_t i = 0; i < ip_t_len; ++i)
-	{
-		ip[i] = ntohl(*(uint32_t*)p);
-		p += sizeof(ip[i]);
-	}
+	/* read family */
+	addr_.sa_family = ntohs(*(uint16_t*)p);
+	p += sizeof(addr_.sa_family);
 
-	port = ntohs(*(uint16_t*)p);
-	p += sizeof(port);
+	/* read address */
+	memcpy(&addr_.sa_data, p, sizeof(addr_.sa_data));
+	p += sizeof(addr_.sa_data);
 
+	/* read key */
 	uint32_t array[Key::nlen];
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{
 		array[i] = ntohl(*(uint32_t*)p);
 		p += sizeof(array[i]);
 	}
-	key = Key(array);*/
+	key_ = Key(array);
 }
 
 pf_addr::pf_addr(std::string hostname, uint16_t port)
