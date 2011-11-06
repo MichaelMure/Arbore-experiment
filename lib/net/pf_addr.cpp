@@ -34,7 +34,7 @@ pf_addr::pf_addr()
 {
 }
 
-pf_addr::pf_addr(std::string str)
+pf_addr::pf_addr(const std::string str)
 {
 	bool success = false;
 	int res;
@@ -269,13 +269,16 @@ std::string pf_addr::GetStr() const
 
 void pf_addr::dump(char* p)
 {
+	/* dump family */
 	uint16_t nfamily = htons(addr_.sa_family);
 	memcpy(p, &nfamily, sizeof(nfamily));
 	p += sizeof(nfamily);
 
+	/* dump address */
 	memcpy(p, &addr_.sa_data, sizeof(addr_.sa_data));
 	p += sizeof(addr_.sa_data);
 
+	/* dump key */
 	const uint32_t* array = key_.GetArray();
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{

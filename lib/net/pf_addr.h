@@ -41,8 +41,9 @@ class pf_addr
 {
 public:
 
-	static const size_t size = sizeof(sockaddr) +   /* address */
-	                           Key::size;           /* key */
+	static const size_t size = sizeof(sa_family_t) +  /* address type */
+	                           sizeof(char) * 14 +    /* address */
+	                           Key::size;             /* key */
 
 	static const in_port_t DEFAULT_PORT = 4280;
 
@@ -50,7 +51,7 @@ public:
 	class CantParse : public std::exception {};
 
 	pf_addr();
-	pf_addr(std::string str);
+	pf_addr(const std::string str);
 	pf_addr(sockaddr addr, Key key = Key());
 	pf_addr(in_addr address_v4, in_port_t port = DEFAULT_PORT, Key key = Key());
 	pf_addr(in6_addr address_v6, in_port_t port = DEFAULT_PORT, Key key = Key());
@@ -66,7 +67,7 @@ public:
 
 	~pf_addr() {}
 
-	/** Serialyze in binary format the pf_addr */
+	/** Serialyze the pf_addr in binary format */
 	void dump(char* buf);
 
 	/** Comparaison between two pf_addr
