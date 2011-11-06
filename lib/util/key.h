@@ -152,11 +152,12 @@ public:
 	/** Calculate the size of the interval starting from this to upperBound
 	 *
 	 * @param upperBound
-	 * @return size of the invterval
+	 * @return size of the interval
 	 * */
 	Key intervalSize(const Key& upperBound) const;
 
 	/** Check if the key is between 2 others keys
+	*
 	* check to see if the value of this falls in the range from left clockwise
 	* around the ring to right.
 	*
@@ -176,12 +177,17 @@ public:
 	 */
 	operator bool() const;
 
-	/* key_midpoint: mid, key
-	** calculates the midpoint of the namespace from the #key#  */
+	/** Calculate the midpoint for this
+	 *
+	 * @return this +/- Key_Half
+	 */
 	Key midpoint () const;
 
-	/* key_index: mykey, key
-	** returns the lenght of the longest prefix match between #mykey# and #k# */
+	/** Calculate the lenght of the longest prefix match between this and a key
+	*
+	* @param key you wan't compare prefix with this
+	* @return size of the prefix match
+	*/
 	size_t key_index (Key k) const;
 };
 
