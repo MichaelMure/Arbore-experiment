@@ -419,7 +419,7 @@ void Key::Init ()
 		Key_Max.t[i] = UINT_MAX;
 		Key_Half.t[i] = UINT_MAX;
 	}
-	Key_Half.t[N_SIZE-1] = Key_Half.t[N_SIZE-1] / 2;
+	Key_Half.t[nlen-1] = Key_Half.t[nlen-1] / 2;
 
 	Key_Max.set_key_str();
 	Key_Half.set_key_str();
