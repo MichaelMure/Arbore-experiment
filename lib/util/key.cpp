@@ -49,7 +49,7 @@ static void convert_base16 (unsigned char num, char *out)
 
 void Key::set_key_str()
 {
-	char keystr[KEY_SIZE / BASE_B + 1] = {0};
+	char keystr[HEXA_KEYLENGTH + 1] = {0};
 	/*
 	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
 		    (unsigned int) this->t[4], (unsigned int) this->t[3],
@@ -73,22 +73,22 @@ Key::Key(std::string str)
 Key& Key::operator= (const char *strOrig)
 {
 	size_t i, len;
-	char key_str[KEY_SIZE / BASE_B + 1];
+	char key_str[HEXA_KEYLENGTH + 1];
 
-	char str[KEY_SIZE / BASE_B + 1];
+	char str[HEXA_KEYLENGTH + 1];
 
 	// This loop below is required, though Patrik L. from sparta recommended against it
-	for (i = 0; i < KEY_SIZE / BASE_B + 1; i++)
+	for (i = 0; i < HEXA_KEYLENGTH + 1; i++)
 		key_str[i] = '0';
-	memset (str, 0, KEY_SIZE / BASE_B + 1);
-	if (strlen (strOrig) < KEY_SIZE / BASE_B)
+	memset (str, 0, HEXA_KEYLENGTH + 1);
+	if (strlen (strOrig) < HEXA_KEYLENGTH)
 	{
 		strcpy (str, strOrig);
 	}
 	else
 	{
-		strncpy (str, strOrig, KEY_SIZE / BASE_B);
-		str[KEY_SIZE / BASE_B] = '\0';
+		strncpy (str, strOrig, HEXA_KEYLENGTH);
+		str[HEXA_KEYLENGTH] = '\0';
 	}
 
 	// By now, the string should be in base 16
@@ -97,19 +97,19 @@ Key& Key::operator= (const char *strOrig)
 	{
 		pf_log[W_ERR] << "str_to_key: Warning:Empty input string";
 	}
-	else if (len > BASE_16_KEYLENGTH)
+	else if (len > HEXA_KEYLENGTH)
 	{
-		strncpy (key_str, str, BASE_16_KEYLENGTH);
+		strncpy (key_str, str, HEXA_KEYLENGTH);
 		//  key_str[KEY_SIZE/BASE_B]='\0';
 	}
 
-	else if (len <= BASE_16_KEYLENGTH)
+	else if (len <= HEXA_KEYLENGTH)
 	{
 		for (i = 0; i < len; i++)
-			key_str[i + (BASE_16_KEYLENGTH) - len] = str[i];
+			key_str[i + (HEXA_KEYLENGTH) - len] = str[i];
 	}
 
-	key_str[BASE_16_KEYLENGTH] = '\0';
+	key_str[HEXA_KEYLENGTH] = '\0';
 
 	for (i = 0; i < nlen; i++)
 		sscanf (key_str + (i * 8 * sizeof (char)), "%08x", &(this->t[(nlen-1 - i)]));
@@ -293,7 +293,7 @@ void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
 	EVP_DigestFinal_ex (&mdctx, md_value, &md_len);
 	EVP_MD_CTX_cleanup (&mdctx);
 
-	digest = (char *) malloc (KEY_SIZE / BASE_B + 1);
+	digest = (char *) malloc (HEXA_KEYLENGTH + 1);
 
 	tmp = digest;
 	*tmp = '\0';
@@ -319,7 +319,7 @@ void Key::MakeHash (std::string s)
 
 void Key::MakeHash (const char *s, size_t size)
 {
-	char digest[KEY_SIZE / BASE_B + 1];
+	char digest[HEXA_KEYLENGTH + 1];
 
 	sha1_keygen (s, size, digest);
 	*this = digest;
@@ -395,7 +395,7 @@ size_t Key::key_index (Key k) const
 	size_t max_len, i;
 	std::string mystr, kstr;
 
-	max_len = KEY_SIZE / BASE_B;
+	max_len = HEXA_KEYLENGTH;
 	mystr = this->GetStr();
 	kstr = k.GetStr();
 

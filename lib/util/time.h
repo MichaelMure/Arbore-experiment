@@ -45,7 +45,6 @@ public:
 
   /** @return the double representation of timeval tv */
   static double tvtod (struct timeval tv);
-
 };
 
 #endif        /* TIME_H */

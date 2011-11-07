@@ -35,11 +35,12 @@
 
 #include "util/pf_log.h"
 
+/** Size of the Key in bits */
 #define KEY_SIZE 160
-#define N_SIZE KEY_SIZE/sizeof(uint32_t)
-#define BASE_B 4		/* Base representation of key digits */
-#define BASE_16_KEYLENGTH 40
-
+/** Number of bits represented by an hexadecimal char */
+#define HEXA_BASE 4
+/** Size of the hexa representation of the key in char */
+#define HEXA_KEYLENGTH KEY_SIZE / HEXA_BASE
 
 class Key
 {

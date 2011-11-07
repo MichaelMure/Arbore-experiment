@@ -29,7 +29,7 @@
 #include <net/hosts_list.h>
 #include <util/key.h>
 
-#define MAX_ROW KEY_SIZE/BASE_B
+#define MAX_ROW KEY_SIZE/HEXA_BASE
 #define MAX_COL 16 /* 2^4 */
 #define MAX_ENTRY 3
 
