@@ -406,16 +406,25 @@ size_t Key::key_index (Key k) const
 	return (i);
 }
 
-void Key::Init ()
+Key Key::Init_Max ()
 {
+	Key max;
 	for (size_t i = 0; i < nlen; i++)
 	{
-		Key_Max.t[i] = UINT_MAX;
-		Key_Half.t[i] = UINT_MAX;
+		max.t[i] = UINT_MAX;
 	}
-	Key_Half.t[nlen-1] = Key_Half.t[nlen-1] / 2;
-
-	Key_Max.set_key_str();
-	Key_Half.set_key_str();
+	max.set_key_str();
+	return max;
 }
 
+Key Key::Init_Half ()
+{
+	Key half;
+	for (size_t i = 0; i < nlen; i++)
+	{
+		half.t[i] = UINT_MAX;
+	}
+	half.t[nlen-1] = half.t[nlen-1] / 2;
+	half.set_key_str();
+	return half;
+}

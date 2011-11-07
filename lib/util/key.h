@@ -50,21 +50,12 @@ public:
 	/** Size of the key in uint32_t */
 	static const size_t nlen = (KEY_SIZE / (8 * sizeof(uint32_t)));
 
-private:
-	uint32_t t[nlen];
-	std::string key_str;
+	static const Key Key_Max;
+	static const Key Key_Half;
 
-	Key operator+(const Key& op2) const;
-	Key operator-(const Key& k2) const;
-
-	void set_key_str ();
-
-	void sha1_keygen (const char *key, size_t digest_size, char *digest) const;
-
-public:
-
-	/** Static function which initialize the global keys. */
-	static void Init();
+	/** Static function which initialize the maximum and half keys. */
+	static Key Init_Max();
+	static Key Init_Half();
 
 	/** Create a Key from an uint32_t.
 	 *
@@ -192,6 +183,17 @@ public:
 	* @return size of the prefix match
 	*/
 	size_t key_index (Key k) const;
+
+private:
+	uint32_t t[nlen];
+	std::string key_str;
+
+	Key operator+(const Key& op2) const;
+	Key operator-(const Key& k2) const;
+
+	void set_key_str ();
+
+	void sha1_keygen (const char *key, size_t digest_size, char *digest) const;
 };
 
 template<>
@@ -202,9 +204,5 @@ inline Log::flux& Log::flux::operator<< <Key> (Key key)
 }
 
 typedef std::set<Key> KeyList;
-
-/* global variables!! that are set in key_init function */
-extern Key Key_Max;
-extern Key Key_Half;
 
 #endif /* _CHIMERA_KEY_H_ */

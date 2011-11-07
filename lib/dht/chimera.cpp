@@ -41,7 +41,8 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 {
 	char name[256];
 	struct hostent* he;
-	Key::Init();
+	Key::Init_Max();
+	Key::Init_Half();
 
 	if(gethostname(name, sizeof(name)) != 0)
 	{
