@@ -53,10 +53,6 @@ public:
 	static const Key Key_Max;
 	static const Key Key_Half;
 
-	/** Static function which initialize the maximum and half keys. */
-	static Key Init_Max();
-	static Key Init_Half();
-
 	/** Create a Key from an uint32_t.
 	 *
 	 * @param ul this is the last 32 bits of the key
@@ -187,6 +183,10 @@ public:
 private:
 	uint32_t t[nlen];
 	std::string key_str;
+
+	/** Static function which initialize the maximum and half keys. */
+	static Key Init_Max();
+	static Key Init_Half();
 
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;

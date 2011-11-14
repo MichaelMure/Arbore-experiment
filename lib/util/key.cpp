@@ -31,8 +31,8 @@
 #include "key.h"
 #include <util/pf_log.h>
 
-Key Key_Max;
-Key Key_Half;
+const Key Key::Key_Max = Init_Max();
+const Key Key::Key_Half = Init_Half();
 
 static void convert_base16 (unsigned char num, char *out)
 {
