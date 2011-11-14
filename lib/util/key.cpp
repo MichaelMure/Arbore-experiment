@@ -312,11 +312,15 @@ void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
 
 void Key::MakeHash (std::string s)
 {
-	char digest[HEXA_KEYLENGTH + 1];
-
-	sha1_keygen (s.c_str(), s.size(), digest);
-	*this = digest;
+	MakeHash(s.c_str(), s.size());
 	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = [" << *this << "]";
+}
+
+void Key::MakeHash (const char *s, size_t size)
+{
+	char digest[HEXA_KEYLENGTH + 1];
+	sha1_keygen (s, size, digest);
+	*this = digest;
 }
 
 Key Key::distance(const Key& k2) const
