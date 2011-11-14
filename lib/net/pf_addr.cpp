@@ -168,13 +168,7 @@ void pf_addr::dump(char* p)
 	p += sizeof(addr_.sa_data);
 
 	/* dump key */
-	const uint32_t* array = key_.GetArray();
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		uint32_t nbr = htonl(array[i]);
-		memcpy(p, &nbr, sizeof(nbr));
-		p += sizeof(nbr);
-	}
+	key_.dump(p);
 }
 
 bool pf_addr::operator ==(const pf_addr &other) const

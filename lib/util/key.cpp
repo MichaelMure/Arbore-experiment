@@ -28,6 +28,7 @@
 #include <string.h>
 #include <cassert>
 #include <openssl/evp.h>
+#include <arpa/inet.h>
 #include "key.h"
 #include <util/pf_log.h>
 
@@ -431,4 +432,14 @@ Key Key::Init_Half ()
 	half.t[nlen-1] = half.t[nlen-1] / 2;
 	half.set_key_str();
 	return half;
+}
+
+void Key::dump(char* p)
+{
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		uint32_t nbr = htonl(t[i]);
+		memcpy(p, &nbr, sizeof(nbr));
+		p += sizeof(nbr);
+	}
 }

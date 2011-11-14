@@ -110,21 +110,10 @@ char* Packet::DumpBuffer()
 	char* ptr = dump;
 
 	/* Src key */
-	const uint32_t* key = src.GetArray();
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		uint32_t _key = htonl(key[i]);
-		memcpy(ptr, &_key, sizeof(key[i]));
-		ptr += sizeof(key[i]);
-	}
+	src.dump(ptr);
+
 	/* Dst key */
-	key = dst.GetArray();
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		uint32_t _key = htonl(key[i]);
-		memcpy(ptr, &_key, sizeof(key[i]));
-		ptr += sizeof(key[i]);
-	}
+	dst.dump(ptr);
 
 	/* Type */
 	memcpy(ptr, &_type, sizeof(_type));
