@@ -59,6 +59,12 @@ public:
 	 */
 	Key(uint32_t ul = 0);
 
+	/** Create a Key from a serialized key
+	 *
+	 * @param buf is the key serialized
+	 */
+	Key(const char* buf);
+
 	/** Create a Key from a uint32_t[nlen] */
 	explicit Key(uint32_t key[nlen]);
 
@@ -173,7 +179,7 @@ public:
 	 */
 	Key midpoint () const;
 
-	/** Calculate the lenght of the longest prefix match between this and a key
+	/** Calculate the length of the longest prefix match between this and a key
 	*
 	* @param key you wan't compare prefix with this
 	* @return size of the prefix match

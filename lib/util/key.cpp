@@ -150,6 +150,16 @@ Key::Key(uint32_t ul)
 	set_key_str();
 }
 
+Key::Key(const char* buf)
+{
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		t[i] = ntohl(*(uint32_t*)buf);
+		buf += sizeof(t[i]);
+	}
+	set_key_str();
+}
+
 Key::Key(uint32_t key[Key::nlen])
 {
 	size_t i;

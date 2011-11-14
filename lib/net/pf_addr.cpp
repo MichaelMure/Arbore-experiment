@@ -130,14 +130,8 @@ pf_addr::pf_addr(const char* p)
 	memcpy(&addr_.sa_data, p, sizeof(addr_.sa_data));
 	p += sizeof(addr_.sa_data);
 
-	/* read key */
-	uint32_t array[Key::nlen];
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		array[i] = ntohl(*(uint32_t*)p);
-		p += sizeof(array[i]);
-	}
-	key_ = Key(array);
+	/* read and create a Key */
+	key_=Key(p);
 }
 
 pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
