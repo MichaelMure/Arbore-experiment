@@ -34,67 +34,43 @@ pf_addr::pf_addr()
 {
 }
 
-pf_addr::pf_addr(const std::string str)
+pf_addr::pf_addr(const std::string hostname, uint16_t port)
 	: key_(Key())
 {
-	bool success = false;
-	int res;
-	int colon_nbr = std::count(str.begin(), str.end(), ':');
-	int alpha_nbr = std::count_if(str.begin(), str.end(), isalpha);
+	struct addrinfo *result;
+	int error;
 
-	if (colon_nbr >= 2) /* IPV6 */
+	error = getaddrinfo(hostname.c_str(), NULL, NULL, &result);
+	if (error != 0)
 	{
-		sockaddr_in6 *addr = (sockaddr_in6 *) &addr_;
-		addr->sin6_family = AF_INET6;
-
-		if(str.find("[") != (size_t) -1) /* port */
-		{
-			int pos = str.find_last_of(":");
-			addr->sin6_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
-			res = inet_pton(AF_INET6, str.substr(1, pos-2).c_str(), &(addr->sin6_addr));
-		}
-		else
-		{
-			addr->sin6_port = htons(DEFAULT_PORT);
-			res = inet_pton(AF_INET6, str.c_str(), &(addr->sin6_addr));
-		}
-	}
-	else if(alpha_nbr > 0) /* Hostname */
-	{
-		if(colon_nbr == 1) /* port */
-		{
-			/* TODO */
-			throw CantParse();
-		}
-		else
-		{
-			/* TODO */
-			throw CantParse();
-		}
-	}
-	else /* IPV4 */
-	{
-		sockaddr_in *addr = (sockaddr_in *) &addr_;
-		addr->sin_family = AF_INET;
-
-		if(colon_nbr == 1) /* port */
-		{
-			int pos = str.find_last_of(":");
-			addr->sin_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
-			res = inet_pton(AF_INET, str.substr(0, pos).c_str(), &(addr->sin_addr));
-		}
-		else
-		{
-			addr->sin_port = htons(DEFAULT_PORT);
-			res = inet_pton(AF_INET, str.c_str(), &(addr->sin_addr));
-		}
+		pf_log[W_ERR] << "error in getaddrinfo: " << gai_strerror(error);
+		throw std::exception();
 	}
 
-	if(res == 1)
-		success = true;
+	if (result == NULL)
+		throw std::exception();
 
-	if(!success)
-		throw CantParse();
+	addr_ = *(result->ai_addr);
+
+	switch(addr_.sa_family)
+	{
+		case AF_INET: /* IPV4 */
+		{
+			struct sockaddr_in *addr = (struct sockaddr_in *) &addr_;
+			addr->sin_port = htons(port);
+			break;
+		}
+		case AF_INET6: /* IPV6 */
+		{
+			struct sockaddr_in6 *addr = (struct sockaddr_in6 *) &addr_;
+			addr->sin6_port = htons(port);
+			break;
+		}
+		default:
+			pf_log[W_ERR] << "Address format not recognized, new protocol ?";
+			throw InvalidAddr();
+	}
+	freeaddrinfo(result);
 }
 
 pf_addr::pf_addr(sockaddr addr, Key key)
@@ -132,12 +108,6 @@ pf_addr::pf_addr(const char* p)
 
 	/* read and create a Key */
 	key_=Key(p);
-}
-
-pf_addr::pf_addr(std::string hostname, uint16_t port)
-//	: port(port), key(Key())
-{
-
 }
 
 void pf_addr::dump(char* p)
@@ -212,6 +182,46 @@ bool pf_addr::IsIPV6() const
 	return (addr_.sa_family == AF_INET6);
 }
 
+uint16_t pf_addr::GetPort() const
+{
+	switch(addr_.sa_family)
+	{
+		case AF_INET: /* IPV4 */
+		{
+			struct sockaddr_in *addr = (struct sockaddr_in *) &addr_;
+			return ntohs(addr->sin_port);
+		}
+		case AF_INET6: /* IPV6 */
+		{
+			struct sockaddr_in6 *addr = (struct sockaddr_in6 *) &addr_;
+			return ntohs(addr->sin6_port);
+		}
+		default:
+			throw InvalidAddr();
+	}
+}
+
+void pf_addr::SetPort(const uint16_t port)
+{
+	switch(addr_.sa_family)
+	{
+		case AF_INET: /* IPV4 */
+		{
+			struct sockaddr_in *addr = (struct sockaddr_in *) &addr_;
+			addr->sin_port = htons(port);
+			break;
+		}
+		case AF_INET6: /* IPV6 */
+		{
+			struct sockaddr_in6 *addr = (struct sockaddr_in6 *) &addr_;
+			addr->sin6_port = htons(port);
+			break;
+		}
+		default:
+			throw InvalidAddr();
+	}
+}
+
 Key pf_addr::GetKey() const
 {
 	return key_;
@@ -254,7 +264,7 @@ std::string pf_addr::GetStr() const
 		}
 		default:
 			pf_log[W_ERR] << "Address format not recognized, new protocol ?";
-			return NULL;
+			throw InvalidAddr();
 	}
 
 	if(res == NULL)

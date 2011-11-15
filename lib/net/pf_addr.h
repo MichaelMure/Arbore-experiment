@@ -47,11 +47,10 @@ public:
 
 	static const in_port_t DEFAULT_PORT = 4280;
 
-	class CantResolvHostname : public std::exception {};
-	class CantParse : public std::exception {};
+	class InvalidAddr : public std::exception {};
 
 	pf_addr();
-	pf_addr(const std::string str);
+	pf_addr(const std::string hostname, uint16_t port = DEFAULT_PORT);
 	pf_addr(sockaddr addr, Key key = Key());
 	pf_addr(in_addr address_v4, in_port_t port = DEFAULT_PORT, Key key = Key());
 	pf_addr(in6_addr address_v6, in_port_t port = DEFAULT_PORT, Key key = Key());
@@ -60,9 +59,6 @@ public:
 	 * @param buf The buffer to read on.
 	 */
 	pf_addr(const char* buf);
-
-	/* Obsolete constructor */
-	pf_addr(std::string hostname, uint16_t port);
 
 	~pf_addr() {}
 
@@ -92,6 +88,12 @@ public:
 
 	/** @return True if the address is a IPV6 one */
 	bool IsIPV6() const;
+
+	/** @return the port */
+	uint16_t GetPort() const;
+
+	/** Change the port */
+	void SetPort(const uint16_t port);
 
 	/** @return the key */
 	Key GetKey() const;
