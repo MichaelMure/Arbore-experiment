@@ -50,10 +50,10 @@ public:
 	class InvalidAddr : public std::exception {};
 
 	pf_addr();
-	pf_addr(const std::string hostname, uint16_t port = DEFAULT_PORT);
-	pf_addr(sockaddr addr, Key key = Key());
-	pf_addr(in_addr address_v4, in_port_t port = DEFAULT_PORT, Key key = Key());
-	pf_addr(in6_addr address_v6, in_port_t port = DEFAULT_PORT, Key key = Key());
+	pf_addr(const std::string hostname, const uint16_t port = DEFAULT_PORT);
+	pf_addr(const sockaddr addr, const Key key = Key());
+	pf_addr(const in_addr address_v4, const in_port_t port = DEFAULT_PORT, const Key key = Key());
+	pf_addr(const in6_addr address_v6, const in_port_t port = DEFAULT_PORT, const Key key = Key());
 
 	/** Deserialize a pf_addr
 	 * @param buf The buffer to read on.
@@ -63,7 +63,7 @@ public:
 	~pf_addr() {}
 
 	/** Serialyze the pf_addr in binary format */
-	void dump(char* buf);
+	void dump(char* buf) const;
 
 	/** Comparaison between two pf_addr
 	 *

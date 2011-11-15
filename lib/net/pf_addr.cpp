@@ -34,7 +34,7 @@ pf_addr::pf_addr()
 {
 }
 
-pf_addr::pf_addr(const std::string hostname, uint16_t port)
+pf_addr::pf_addr(const std::string hostname, const uint16_t port)
 	: key_(Key())
 {
 	struct addrinfo *result;
@@ -73,12 +73,12 @@ pf_addr::pf_addr(const std::string hostname, uint16_t port)
 	freeaddrinfo(result);
 }
 
-pf_addr::pf_addr(sockaddr addr, Key key)
+pf_addr::pf_addr(const sockaddr addr, const Key key)
 	: addr_(addr), key_(key)
 {
 }
 
-pf_addr::pf_addr(in_addr address_v4, in_port_t port, Key key)
+pf_addr::pf_addr(const in_addr address_v4, const in_port_t port, const Key key)
 	: key_(key)
 {
 	sockaddr_in *addr = (sockaddr_in *) &addr_;
@@ -87,7 +87,7 @@ pf_addr::pf_addr(in_addr address_v4, in_port_t port, Key key)
 	addr->sin_port = port;
 }
 
-pf_addr::pf_addr(in6_addr address_v6, in_port_t port, Key key)
+pf_addr::pf_addr(const in6_addr address_v6, const in_port_t port, const Key key)
 	: key_(key)
 {
 	sockaddr_in6 *addr = (sockaddr_in6 *) &addr_;
@@ -110,7 +110,7 @@ pf_addr::pf_addr(const char* p)
 	key_=Key(p);
 }
 
-void pf_addr::dump(char* p)
+void pf_addr::dump(char* p) const
 {
 	/* dump family */
 	uint16_t nfamily = htons(addr_.sa_family);
