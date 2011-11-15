@@ -47,7 +47,7 @@ pf_addr::pf_addr(const std::string str)
 		sockaddr_in6 *addr = (sockaddr_in6 *) &addr_;
 		addr->sin6_family = AF_INET6;
 
-		if(str.find("[") != -1) /* port */
+		if(str.find("[") != (size_t) -1) /* port */
 		{
 			int pos = str.find_last_of(":");
 			addr->sin6_port = htons(StrToTyp<in_port_t>(str.substr(pos+1)));
@@ -132,16 +132,6 @@ pf_addr::pf_addr(const char* p)
 
 	/* read and create a Key */
 	key_=Key(p);
-}
-
-pf_addr::pf_addr(in_addr_t address_v4, uint16_t port, Key key)
-//	: key_(key)
-{
-/*	sockaddr_in *sock = (sockaddr_in*) &addr_;
-
-	sock->sin_family = AF_INET;
-	inet_aton(address_v4, sock->sin_addr->s_addr)
-	sock->sin_port = htons(port);*/
 }
 
 pf_addr::pf_addr(std::string hostname, uint16_t port)

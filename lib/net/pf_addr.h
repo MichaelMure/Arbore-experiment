@@ -62,7 +62,6 @@ public:
 	pf_addr(const char* buf);
 
 	/* Obsolete constructor */
-	pf_addr(in_addr_t address_v4, uint16_t port, Key key = Key());
 	pf_addr(std::string hostname, uint16_t port);
 
 	~pf_addr() {}

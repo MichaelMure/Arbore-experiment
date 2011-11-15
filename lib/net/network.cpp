@@ -129,7 +129,7 @@ void Network::Loop()
 			int sock = it->first;
 			PacketTypeList* packet_type_list = it->second;
 			static char data[PACKET_MAX_SIZE];
-			struct sockaddr_in from;
+			struct sockaddr from;
 			ssize_t size;
 			socklen_t socklen = sizeof(from);
 
@@ -150,7 +150,7 @@ void Network::Loop()
 			try
 			{
 				Packet pckt(packet_type_list, data, size);
-				pf_addr address(from.sin_addr.s_addr, ntohs(from.sin_port));
+				pf_addr address(from);
 				Host sender = hosts_list.GetHost(address);
 
 				if(!sender.GetKey())
