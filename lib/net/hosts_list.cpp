@@ -29,13 +29,13 @@
 #include "host.h"
 #include "hosts_list.h"
 
-HostsList::HostsList(size_t _size)
+HostsList::HostsList(size_t size)
 	: Mutex(RECURSIVE_MUTEX),
-	  max(_size)
+	  max_(size)
 {
 }
 
-Host HostsList::GetHost(std::string hostname, uint16_t port)
+Host HostsList::GetHost(const std::string hostname, const uint16_t port)
 {
 	BlockLockMutex lock(this);
 
@@ -48,20 +48,20 @@ Host HostsList::GetHost(std::string hostname, uint16_t port)
 Host HostsList::GetHost(const pf_addr& address)
 {
 	BlockLockMutex lock(this);
-	HostMap::iterator it = hosts.find(address);
+	HostMap::iterator it = hosts_.find(address);
 
 	pf_log[W_DEBUG] << "Try to get " << address;
 
 	/* if the node is not in the cache, create an entry and allocate a host */
-	if (it == hosts.end())
+	if (it == hosts_.end())
 	{
-		it = hosts.insert(std::pair<pf_addr, Host>(address, Host(this, address))).first;
+		it = hosts_.insert(value_type(address, Host(this, address))).first;
 		pf_log[W_DEBUG] << "added";
 	}
 
 	pf_log[W_DEBUG] << "host entries:";
-	for(HostMap::iterator free_it = hosts.begin();
-	    /*hosts.size() > max && */free_it != hosts.end();
+	for(HostMap::iterator free_it = hosts_.begin();
+	    /*hosts.size() > max && */free_it != hosts_.end();
 	    ++free_it)
 	{
 		pf_log[W_DEBUG] << "  " << free_it->second;

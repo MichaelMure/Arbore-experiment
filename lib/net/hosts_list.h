@@ -35,22 +35,18 @@
 
 class HostsList : public Mutex
 {
-	typedef std::map<pf_addr, Host> HostMap;
-	HostMap hosts;
-	size_t max;
-
 public:
 
 	/** Initialize a host struct with a size element cache.
 	 */
-	HostsList(size_t size);
+	HostsList(const size_t size);
 
 	/** Gets a host entry for the given host, getting it from the cache if
 	 * possible, or alocates memory for it.
 	 * @param hostname the hostname of the host (can be ipv4/6 address, or a hostname to resolve)
 	 * @param port the port of the host
 	 */
-	Host GetHost(std::string hostname, uint16_t port = pf_addr::DEFAULT_PORT);
+	Host GetHost(const std::string hostname, const uint16_t port = pf_addr::DEFAULT_PORT);
 
 	/** Get an host from a pf_addr.
 	 *
@@ -58,6 +54,13 @@ public:
 	 * @return  the Host object.
 	 */
 	Host GetHost(const pf_addr& address);
+
+private:
+	typedef std::map<pf_addr, Host> HostMap;
+	typedef HostMap::value_type value_type;
+
+	HostMap hosts_;
+	size_t max_; /* not used right now */
 };
 
 #endif /* _HOSTS_LIST_H */
