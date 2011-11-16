@@ -46,9 +46,11 @@ public:
 	HostsList(size_t size);
 
 	/** Gets a host entry for the given host, getting it from the cache if
-	 ** possible, or alocates memory for it
+	 * possible, or alocates memory for it.
+	 * @param hostname the hostname of the host (can be ipv4/6 address, or a hostname to resolve)
+	 * @param port the port of the host
 	 */
-	Host GetHost(std::string hn, uint16_t port);
+	Host GetHost(std::string hostname, uint16_t port = pf_addr::DEFAULT_PORT);
 
 	/** Get an host from a pf_addr.
 	 *
@@ -56,11 +58,6 @@ public:
 	 * @return  the Host object.
 	 */
 	Host GetHost(const pf_addr& address);
-
-	/** Decodes a string into a chimera host structure. This acts as a
-	 ** GetHost.
-	 */
-	Host DecodeHost (std::string s);
 };
 
 #endif /* _HOSTS_LIST_H */

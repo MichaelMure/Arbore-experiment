@@ -35,19 +35,6 @@ HostsList::HostsList(size_t _size)
 {
 }
 
-Host HostsList::DecodeHost(std::string hostname)
-{
-	std::string name;
-	uint16_t port = 0;
-
-	name = stringtok(hostname, ":");
-	port = StrToTyp<uint16_t>(hostname);
-
-	Host host = GetHost(name, port);
-
-	return (host);
-}
-
 Host HostsList::GetHost(std::string hostname, uint16_t port)
 {
 	BlockLockMutex lock(this);
