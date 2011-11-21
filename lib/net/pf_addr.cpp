@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <cctype>
 
+#include <util/time.h>
+
 #include "pf_addr.h"
 
 pf_addr::pf_addr()
@@ -40,6 +42,8 @@ pf_addr::pf_addr(const std::string hostname, const uint16_t port)
 	struct addrinfo *result;
 	int error;
 
+	double time_ref = time::dtime();
+
 	error = getaddrinfo(hostname.c_str(), NULL, NULL, &result);
 	if (error != 0)
 	{
@@ -49,6 +53,8 @@ pf_addr::pf_addr(const std::string hostname, const uint16_t port)
 
 	if (result == NULL)
 		throw std::exception();
+
+	pf_log[W_DEBUG] << "Resolved " << hostname << " in " << (uint32_t) (time::dtime() - time_ref) << " milliseconds.";
 
 	addr_ = *(result->ai_addr);
 
