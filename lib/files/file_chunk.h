@@ -30,7 +30,7 @@
 /** Specialisation of FileChunkDesc to actually hold data of a chunk */
 class FileChunk : public FileChunkDesc
 {
-	time_t access_time;
+	mutable time_t access_time;
 	char* data;
 	bool hdd_synced;
 
@@ -57,7 +57,7 @@ public:
 	void SetHddSynced(bool _hdd_synced);
 
 	/** @return the data and update the access time */
-	const char* GetData();
+	const char* GetData() const;
 
 	/** Overwrite the common data part of this and chunk in this */
 	void Merge(FileChunk chunk);

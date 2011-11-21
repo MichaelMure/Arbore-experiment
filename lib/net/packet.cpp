@@ -82,6 +82,7 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 	/* Type */
 	uint32_t type_i = ntohl(*p++);
 
+	/* TODO: should handle unknow packet type (out of range exception) */
 	type = pckt_type_list->GetPacketType(type_i);
 
 	/* Size */
@@ -328,19 +329,19 @@ uint32_t Packet::ReadInt32()
 }
 
 
-Packet& Packet::Write(uint32_t nbr)
+Packet& Packet::Write(const uint32_t nbr)
 {
 	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
 
 	char* new_data = new char [size + sizeof nbr];
 
-	nbr = htonl(nbr);
+	uint32_t nbr_net  = htonl(nbr);
 	if(data)
 		memcpy(new_data, data, size);
 	if(data)
 		delete []data;
-	memcpy(new_data + size, &nbr, sizeof(nbr));
-	size += (uint32_t)sizeof(nbr);
+	memcpy(new_data + size, &nbr_net, sizeof(nbr_net));
+	size += (uint32_t)sizeof(nbr_net);
 	data = new_data;
 
 	return *this;
@@ -370,19 +371,19 @@ uint64_t Packet::ReadInt64()
 	return val;
 }
 
-Packet& Packet::Write(uint64_t nbr)
+Packet& Packet::Write(const uint64_t nbr)
 {
 	ASSERT(((uint32_t)sizeof(nbr)) + size >= size);
 
 	char* new_data = new char [size + sizeof nbr];
 
-	nbr = htonll(nbr);
+	uint64_t nbr_net = htonll(nbr);
 	if(data)
 		memcpy(new_data, data, size);
 	if(data)
 		delete []data;
-	memcpy(new_data + size, &nbr, sizeof(nbr));
-	size += (uint32_t)sizeof(nbr);
+	memcpy(new_data + size, &nbr_net, sizeof(nbr_net));
+	size += (uint32_t)sizeof(nbr_net);
 	data = new_data;
 
 	return *this;
@@ -418,7 +419,7 @@ Key Packet::ReadKey()
 	return key;
 }
 
-Packet& Packet::Write(Key key)
+Packet& Packet::Write(const Key key)
 {
 	ASSERT(((uint32_t)Key::size) + size >= size);
 
@@ -467,7 +468,7 @@ pf_addr Packet::ReadAddr()
 	return val;
 }
 
-Packet& Packet::Write(pf_addr addr)
+Packet& Packet::Write(const pf_addr addr)
 {
 	ASSERT(((uint32_t)pf_addr::size) + size >= size);
 	char* new_data = new char [size + pf_addr::size];
@@ -589,7 +590,7 @@ FileChunk Packet::ReadChunk()
 	return chunk;
 }
 
-Packet& Packet::Write(FileChunk chunk)
+Packet& Packet::Write(const FileChunk chunk)
 {
 	ASSERT(chunk.GetSize() <= UINT_MAX);
 	ASSERT(((uint32_t)sizeof(chunk.GetOffset()) + ((uint32_t)sizeof(chunk.GetSize())) + chunk.GetSize()) + size >= size);

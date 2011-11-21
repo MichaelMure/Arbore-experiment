@@ -234,13 +234,13 @@ private:
 	void BuildDataFromArgs();
 
 	// Writing to buffer functions
-	Packet& Write(uint32_t nbr);
-	Packet& Write(uint64_t nbr);
-	Packet& Write(Key nbr);
-	Packet& Write(pf_addr addr);
+	Packet& Write(const uint32_t nbr);
+	Packet& Write(const uint64_t nbr);
+	Packet& Write(const Key nbr);
+	Packet& Write(const pf_addr addr);
 	Packet& Write(const std::string& str);
 	Packet& Write(const AddrList& addr_list);
-	Packet& Write(FileChunk chunk);
+	Packet& Write(const FileChunk chunk);
 
 	// Reading from buffer functions
 	uint32_t ReadInt32();
@@ -250,7 +250,5 @@ private:
 	std::string ReadStr();
 	AddrList ReadAddrList();
 	FileChunk ReadChunk();
-
-
 };
 #endif						  /* PACKET_H */

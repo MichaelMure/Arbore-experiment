@@ -99,7 +99,7 @@ void FileChunk::SetHddSynced(bool _hdd_synced)
 	hdd_synced = _hdd_synced;
 }
 
-const char* FileChunk::GetData()
+const char* FileChunk::GetData() const
 {
 	access_time = time(NULL);
 	return data;
