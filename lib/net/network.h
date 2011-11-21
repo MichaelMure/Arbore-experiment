@@ -93,7 +93,7 @@ public:
 	 * @param bind_addr  the listened address
 	 * @return  the file descriptor
 	 */
-	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr);
+	int Listen(PacketTypeList* packet_type_list, uint16_t port, const std::string bind_addr);
 
 	/** @return a pointer to the Host list */
 	HostsList* GetHostsList();

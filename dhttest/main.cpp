@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 {
 	PacketType ChimeraChatType(15, new ChimeraChatMessage, Packet::REQUESTACK|Packet::MUSTROUTE, "CHAT", T_STR, T_END);
 
-	if(argc < 2 || argc > 3)
+	if(argc < 2 || argc > 4)
 	{
 		std::cout << "Usage: " << argv[0] << " listen_port [boostrap_host] [port]" << std::endl;
 		return EXIT_FAILURE;
@@ -72,17 +72,18 @@ int main(int argc, char** argv)
 
 	Host host;
 
-	if(argc == 2)
+	if(argc == 3)
 	{
 		host = net.GetHostsList()->GetHost((std::string) argv[2]);
+		pf_log[W_INFO] << "Connecting to " << host;
+		dht->Join(host);
 	}
-	else if(argc==3)
+	else if(argc==4)
 	{
 		host = net.GetHostsList()->GetHost((std::string) argv[2], StrToTyp<uint16_t>(argv[3]));
+		pf_log[W_INFO] << "Connecting to " << host;
+		dht->Join(host);
 	}
-
-	pf_log[W_INFO] << "Connecting to " << host;
-	dht->Join(host);
 
 	std::string s;
 	while(std::getline(std::cin, s))

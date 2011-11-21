@@ -59,29 +59,30 @@ Network::~Network()
 	CloseAll();
 }
 
-int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr)
+int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const std::string bind_addr)
 {
 	BlockLockMutex lock(this);
-	struct sockaddr_in saddr;
+
+	pf_addr addr = pf_addr(bind_addr, port);
+	struct sockaddr saddr = addr.GetSockAddr();
+
 	int one = 0;
 
 	/* create socket */
-	int serv_sock = socket (AF_INET, SOCK_DGRAM, 0);
+	int serv_sock = socket (saddr.sa_family, SOCK_DGRAM, 0);
 	if (serv_sock < 0)
 		throw CantOpenSock();
 
 	if (setsockopt (serv_sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one, sizeof (one)) == -1)
 	{
+		pf_log[W_ERR] << "Error in setting socket option: " << strerror(errno);
 		close (serv_sock);
 		throw CantOpenSock();
 	}
 
-	/* attach socket to #port#. */
-	saddr.sin_family = AF_INET;
-	saddr.sin_addr.s_addr = inet_addr(bind_addr);
-	saddr.sin_port = htons (port);
-	if (bind (serv_sock, (struct sockaddr *) &saddr, sizeof (saddr)) < 0)
+	if (bind (serv_sock, &saddr, sizeof (saddr)) < 0)
 	{
+		pf_log[W_ERR] << "Error in binding socket: " << strerror(errno);
 		close (serv_sock);
 		throw CantListen(port);
 	}
