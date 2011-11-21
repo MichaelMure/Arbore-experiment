@@ -222,7 +222,7 @@ void pf_addr::SetPort(const uint16_t port)
 	}
 }
 
-Key pf_addr::GetKey() const
+const Key& pf_addr::GetKey() const
 {
 	return key_;
 }

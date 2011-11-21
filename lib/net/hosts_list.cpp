@@ -23,8 +23,6 @@
  *
  */
 
-
-
 #include <util/tools.h>
 #include "host.h"
 #include "hosts_list.h"

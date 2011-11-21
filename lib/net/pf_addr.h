@@ -96,7 +96,7 @@ public:
 	void SetPort(const uint16_t port);
 
 	/** @return the key */
-	Key GetKey() const;
+	const Key& GetKey() const;
 
 	/** Change the key. */
 	void SetKey(const Key& key);
