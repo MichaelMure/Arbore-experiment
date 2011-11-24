@@ -34,40 +34,37 @@
 const Key Key::Key_Max = Init_Max();
 const Key Key::Key_Half = Init_Half();
 
-static void convert_base16 (unsigned char num, char *out)
+Key::Key(uint32_t ul)
 {
-    unsigned char mask = 15;
-    int i = 0;
-    for (i = 1; i >= 0; i--)
-	{
-	    int digit = num >> (i * 4);
-	    sprintf (out, "%x", digit & mask);
-	    out++;
-	}
-    *out = '\0';
+	size_t i;
+	for (i = 1; i < nlen; i++)
+		this->t[i] = 0;
+	this->t[0] = ul;
+
+	set_key_str();
 }
 
-void Key::set_key_str()
+Key::Key(uint32_t key[Key::nlen])
 {
-	char keystr[HEXA_KEYLENGTH + 1] = {0};
-	/*
-	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
-		    (unsigned int) this->t[4], (unsigned int) this->t[3],
-		    (unsigned int) this->t[2], (unsigned int) this->t[1],
-		    (unsigned int) this->t[0]);*/
-	sprintf(keystr, "0x%08x", this->t[0]);
+	size_t i;
+	for(i = 0; i < nlen; ++i)
+		this->t[i] = key[i];
 
-	this->key_str = keystr;
-}
-
-Key& Key::operator=(std::string str)
-{
-	return Key::operator=(str.c_str());
+	set_key_str();
 }
 
 Key::Key(std::string str)
 {
 	*this = str.c_str();
+}
+
+Key::Key(const Key& k2)
+{
+	size_t i;
+	for (i = 0; i < nlen; i++)
+		this->t[i] = k2.t[i];
+
+	set_key_str();
 }
 
 Key& Key::operator= (const char *strOrig)
@@ -119,13 +116,9 @@ Key& Key::operator= (const char *strOrig)
 	return *this;
 }
 
-Key::Key(const Key& k2)
+Key& Key::operator=(std::string str)
 {
-	size_t i;
-	for (i = 0; i < nlen; i++)
-		this->t[i] = k2.t[i];
-
-	set_key_str();
+	return Key::operator=(str.c_str());
 }
 
 Key& Key::operator=(const Key& k2)
@@ -139,31 +132,21 @@ Key& Key::operator=(const Key& k2)
 	return *this;
 }
 
-Key::Key(uint32_t ul)
-{
-	size_t i;
-	for (i = 1; i < nlen; i++)
-		this->t[i] = 0;
-	this->t[0] = ul;
-
-	set_key_str();
-}
-
-Key::Key(uint32_t key[Key::nlen])
-{
-	size_t i;
-	for(i = 0; i < nlen; ++i)
-		this->t[i] = key[i];
-
-	set_key_str();
-}
-
 bool Key::operator==(const Key& k2) const
 {
 	size_t i;
 	for (i = 0; i < nlen; i++)
 		if (this->t[i] != k2.t[i])
 			return false;
+	return true;
+}
+
+bool Key::operator!() const
+{
+	for(size_t i = 0; i < nlen; ++i)
+		if(t[i] > 0)
+			return false;
+
 	return true;
 }
 
@@ -191,123 +174,12 @@ bool Key::operator<(const Key& k2) const
 	return false;
 }
 
-Key Key::operator+(const Key& op2) const
-{
-	Key result;
-	double tmp, a, b;
-	size_t i;
-	a = b = tmp = 0;
-
-	for (i = 0; i < nlen; i++)
-	{
-		a = this->t[i];
-		b = op2.t[i];
-		tmp += a + b;
-
-		if (tmp > ULONG_MAX)
-		{
-			result.t[i] = (uint32_t) tmp;
-			tmp = 1;
-		}
-		else
-		{
-			result.t[i] = (uint32_t) tmp;
-			tmp = 0;
-		}
-	}
-
-	return result;
-}
-
-bool Key::operator!() const
-{
-	for(size_t i = 0; i < nlen; ++i)
-		if(t[i] > 0)
-			return false;
-
-	return true;
-}
-
 Key::operator bool() const
 {
 	for(size_t i = 0; i < nlen; ++i)
 		if(t[i] > 0)
 			return true;
 	return false;
-}
-Key Key::operator-(const Key & op2) const
-{
-	Key result;
-	size_t i;
-	double tmp, a, b, carry;
-
-	carry = 0;
-
-	if (*this < op2)
-	{
-		pf_log[W_ERR] << "key_sub: Operation is not allowed " << this->key_str << " < " << op2.key_str;
-		return result;
-	}
-
-	for (i = 0; i < nlen; i++)
-	{
-		a = this->t[i] - carry;
-		b = op2.t[i];
-
-		if (b <= a)
-		{
-			 tmp = a - b;
-			 carry = 0;
-		}
-		else
-		{
-			a = a + (double)UINT_MAX + 1;
-			tmp = a - b;
-			carry = 1;
-		}
-		result.t[i] = (uint32_t) tmp;
-	}
-
-	return result;
-}
-
-void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
-{
-	EVP_MD_CTX mdctx;
-	const EVP_MD *md;
-	unsigned char *md_value;
-	unsigned int md_len;
-	size_t i;
-	char digit[10];
-	char *tmp;
-
-	md_value = (unsigned char *) malloc (EVP_MAX_MD_SIZE);
-
-	OpenSSL_add_all_digests ();
-
-	md = EVP_get_digestbyname ("sha1");
-
-	EVP_MD_CTX_init (&mdctx);
-	EVP_DigestInit_ex (&mdctx, md, NULL);
-	EVP_DigestUpdate (&mdctx, key, digest_size);
-	EVP_DigestFinal_ex (&mdctx, md_value, &md_len);
-	EVP_MD_CTX_cleanup (&mdctx);
-
-	digest = (char *) malloc (HEXA_KEYLENGTH + 1);
-
-	tmp = digest;
-	*tmp = '\0';
-	for (i = 0; i < md_len; i++)
-	{
-		convert_base16 (md_value[i], digit);
-
-		strcat (tmp, digit);
-		tmp = tmp + strlen (digit);
-	}
-
-	free (md_value);
-
-	tmp = '\0';
 }
 
 void Key::MakeHash (std::string s)
@@ -432,3 +304,133 @@ Key Key::Init_Half ()
 	half.set_key_str();
 	return half;
 }
+
+Key Key::operator+(const Key& op2) const
+{
+	Key result;
+	double tmp, a, b;
+	size_t i;
+	a = b = tmp = 0;
+
+	for (i = 0; i < nlen; i++)
+	{
+		a = this->t[i];
+		b = op2.t[i];
+		tmp += a + b;
+
+		if (tmp > ULONG_MAX)
+		{
+			result.t[i] = (uint32_t) tmp;
+			tmp = 1;
+		}
+		else
+		{
+			result.t[i] = (uint32_t) tmp;
+			tmp = 0;
+		}
+	}
+
+	return result;
+}
+
+Key Key::operator-(const Key & op2) const
+{
+	Key result;
+	size_t i;
+	double tmp, a, b, carry;
+
+	carry = 0;
+
+	if (*this < op2)
+	{
+		pf_log[W_ERR] << "key_sub: Operation is not allowed " << this->key_str << " < " << op2.key_str;
+		return result;
+	}
+
+	for (i = 0; i < nlen; i++)
+	{
+		a = this->t[i] - carry;
+		b = op2.t[i];
+
+		if (b <= a)
+		{
+			 tmp = a - b;
+			 carry = 0;
+		}
+		else
+		{
+			a = a + (double)UINT_MAX + 1;
+			tmp = a - b;
+			carry = 1;
+		}
+		result.t[i] = (uint32_t) tmp;
+	}
+	return result;
+}
+
+
+static void convert_base16 (unsigned char num, char *out)
+{
+    unsigned char mask = 15;
+    int i = 0;
+    for (i = 1; i >= 0; i--)
+	{
+	    int digit = num >> (i * 4);
+	    sprintf (out, "%x", digit & mask);
+	    out++;
+	}
+    *out = '\0';
+}
+
+void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
+{
+	EVP_MD_CTX mdctx;
+	const EVP_MD *md;
+	unsigned char *md_value;
+	unsigned int md_len;
+	size_t i;
+	char digit[10];
+	char *tmp;
+
+	md_value = (unsigned char *) malloc (EVP_MAX_MD_SIZE);
+
+	OpenSSL_add_all_digests ();
+
+	md = EVP_get_digestbyname ("sha1");
+
+	EVP_MD_CTX_init (&mdctx);
+	EVP_DigestInit_ex (&mdctx, md, NULL);
+	EVP_DigestUpdate (&mdctx, key, digest_size);
+	EVP_DigestFinal_ex (&mdctx, md_value, &md_len);
+	EVP_MD_CTX_cleanup (&mdctx);
+
+	digest = (char *) malloc (HEXA_KEYLENGTH + 1);
+
+	tmp = digest;
+	*tmp = '\0';
+	for (i = 0; i < md_len; i++)
+	{
+		convert_base16 (md_value[i], digit);
+
+		strcat (tmp, digit);
+		tmp = tmp + strlen (digit);
+	}
+
+	free (md_value);
+
+	tmp = '\0';
+}
+
+void Key::set_key_str()
+{
+	char keystr[HEXA_KEYLENGTH + 1] = {0};
+	/*
+	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
+		    (unsigned int) this->t[4], (unsigned int) this->t[3],
+		    (unsigned int) this->t[2], (unsigned int) this->t[1],
+		    (unsigned int) this->t[0]);*/
+	sprintf(keystr, "0x%08x", this->t[0]);
+
+	this->key_str = keystr;
+}
+
