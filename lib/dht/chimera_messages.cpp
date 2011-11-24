@@ -57,14 +57,16 @@ public:
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
-		if((time::dtime() - host.GetFailureTime()) < ChimeraDHT::GRACEPERIOD)
+		double elapsed_time = time::dtime() - host.GetFailureTime();
+
+		if(elapsed_time < ChimeraDHT::GRACEPERIOD)
 		{
 			Packet join_nack(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
 			join_nack.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
 			chimera.Send(host, join_nack);
 
 			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
-			                  << "elapsed time since failure = " << time::dtime() - host.GetFailureTime() << " sec";
+			                  << "elapsed time since failure = " << elapsed_time << " sec";
 			return;
 		}
 
