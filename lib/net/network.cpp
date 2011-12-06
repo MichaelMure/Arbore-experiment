@@ -197,7 +197,7 @@ void Network::Loop()
 
 				scheduler_queue.Queue(new HandlePacketJob(*packet_type_list, sender, pckt));
 			}
-			catch(Packet/*::Malformated*/ &e)
+			catch(Packet::Malformated &e)
 			{
 				pf_log[W_ERR] << "Received malformed message!";
 				return;
