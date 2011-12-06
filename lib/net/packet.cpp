@@ -104,31 +104,33 @@ char* Packet::DumpBuffer()
 	BuildDataFromArgs();
 
 	char* dump = new char [GetSize()];
-	uint32_t _type = htonl(type.GetType());
-	uint32_t _size = htonl(size);
-	uint32_t _seqnum = htonl(seqnum);
-	uint32_t _flags = htonl(flags);
 	char* ptr = dump;
 
 	/* Src key */
 	src.dump(ptr);
+	ptr += Key::size;
 
 	/* Dst key */
 	dst.dump(ptr);
+	ptr += Key::size;
 
 	/* Type */
+	uint32_t _type = htonl(type.GetType());
 	memcpy(ptr, &_type, sizeof(_type));
 	ptr += sizeof _type;
 
 	/* Size */
+	uint32_t _size = htonl(size);
 	memcpy(ptr, &_size, sizeof(_size));
 	ptr += sizeof _size;
 
 	/* Sequence number */
+	uint32_t _seqnum = htonl(seqnum);
 	memcpy(ptr, &_seqnum, sizeof(_seqnum));
 	ptr += sizeof _seqnum;
 
 	/* Flags */
+	uint32_t _flags = htonl(flags);
 	memcpy(ptr, &_flags, sizeof(_flags));
 	ptr += sizeof _flags;
 
