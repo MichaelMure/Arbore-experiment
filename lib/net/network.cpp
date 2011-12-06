@@ -66,14 +66,13 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const std::
 	pf_addr addr = pf_addr(bind_addr, port);
 	struct sockaddr saddr = addr.GetSockAddr();
 
-	int one = 0;
-
 	/* create socket */
 	int serv_sock = socket (saddr.sa_family, SOCK_DGRAM, 0);
 	if (serv_sock < 0)
 		throw CantOpenSock();
 
-	if (setsockopt (serv_sock, SOL_SOCKET, SO_REUSEADDR, (void *) &one, sizeof (one)) == -1)
+	int zero = 0; /* mean false */
+	if (setsockopt (serv_sock, SOL_SOCKET, SO_REUSEADDR, (void *) &zero, sizeof (zero)) == -1)
 	{
 		pf_log[W_ERR] << "Error in setting socket option: " << strerror(errno);
 		close (serv_sock);
