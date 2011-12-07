@@ -189,7 +189,7 @@ public:
 	 * @return  a string in form:
 	 *          [src->dst] <type's string> arg1, arg2, arg3, ...
 	 */
-	virtual std::string GetPacketInfo() const;
+	virtual std::string GetStr() const;
 
 	/** Set the argument's value.
 	 *
@@ -253,4 +253,11 @@ private:
 
 
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <Packet> (Packet packet)
+{
+	_str += packet.GetStr();
+	return *this;
+}
 #endif						  /* PACKET_H */
