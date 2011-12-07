@@ -59,16 +59,13 @@ Host HostsList::GetHost(const pf_addr& address)
 
 	pf_log[W_DEBUG] << "host entries:";
 	for(HostMap::iterator free_it = hosts_.begin();
-	    /*hosts.size() > max && */free_it != hosts_.end();
+	    hosts_.size() > max_ && free_it != hosts_.end();
 	    ++free_it)
 	{
 		pf_log[W_DEBUG] << "  " << free_it->second;
-
-/*		if(free_it->second.GetReference() == 1 && it != free_it)
-			hosts.erase(free_it);*/
+		if(free_it->second.GetReference() == 1 && it != free_it)
+			hosts_.erase(free_it);
 	}
-
-	pf_log[W_DEBUG] << "returned " << it->second;
-
 	return it->second;
+	pf_log[W_DEBUG] << "returned " << it->second;
 }
