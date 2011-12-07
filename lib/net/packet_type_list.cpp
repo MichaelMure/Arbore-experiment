@@ -32,17 +32,23 @@ void PacketTypeList::RegisterType(PacketType type)
 
 	assert(find(type.GetType()) == end());
 	pf_log[W_DEBUG] << "Register " << type.GetName() << "(" << type.GetType() << ")";
-	insert(std::pair<uint32_t, PacketType>(type.GetType(), type));
+	insert(value_type(type.GetType(), type));
 }
 
 ssize_t PacketTypeList::size() const
 {
 	BlockLockMutex lock(this);
-	return std::map<uint32_t, PacketType>::size();
+	return PacketTypeMap::size();
 }
 
 PacketType PacketTypeList::GetPacketType(uint32_t type) const
 {
 	BlockLockMutex lock(this);
-	return at(type);
+
+	PacketTypeMap::const_iterator it = find(type);
+
+	if(it == end())
+		throw UnknowType();
+
+	return it->second;
 }
