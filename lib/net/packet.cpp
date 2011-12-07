@@ -67,7 +67,6 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 			data(NULL)
 {
 	uint32_t* p = (uint32_t*)header;
-	uint32_t* s = p;
 
 	/* Src key */
 	src = Key(p);
@@ -80,8 +79,14 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 	/* Type */
 	uint32_t type_i = ntohl(*p++);
 
-	/* TODO: should handle unknow packet type (out of range exception) */
-	type = pckt_type_list->GetPacketType(type_i);
+	try
+	{
+		type = pckt_type_list->GetPacketType(type_i);
+	}
+	catch(PacketTypeList::UnknowType& e)
+	{
+		throw Malformated();
+	}
 
 	/* Size */
 	size = ntohl(*p++);
