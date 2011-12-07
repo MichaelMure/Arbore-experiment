@@ -70,14 +70,12 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 	uint32_t* s = p;
 
 	/* Src key */
-	while((size_t)(s - p) < Key::nlen) *s = ntohl(*s), s++;
 	src = Key(p);
-	p = s;
+	p += Key::size;
 
 	/* Dst key */
-	while(size_t(s - p) < Key::nlen) *s = ntohl(*s), s++;
 	dst = Key(p);
-	p = s;
+	p += Key::size;
 
 	/* Type */
 	uint32_t type_i = ntohl(*p++);
