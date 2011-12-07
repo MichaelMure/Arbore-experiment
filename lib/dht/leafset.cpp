@@ -26,9 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "leafset.h"
-Leafset::Leafset(HostsList* _hg, Host _me)
-	: hg(_hg),
-	me(_me),
+Leafset::Leafset(Host _me)
+	: me(_me),
 	nbLeavesClockwise(0),
 	nbLeavesCounterclockwise(0),
 	leavesClockwise(ONE_SIDE_LEAFSET_SIZE),

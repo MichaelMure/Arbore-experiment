@@ -25,11 +25,10 @@
 
 #include "chimera_routing.h"
 
-ChimeraRouting::ChimeraRouting(HostsList* _hg, Host _me)
-	: hg(_hg),
-	me(_me),
-	routingTable(_hg, _me),
-	leafset(_hg, _me)
+ChimeraRouting::ChimeraRouting(Host _me)
+	: me(_me),
+	routingTable(_me),
+	leafset(_me)
 {
 }
 

@@ -26,9 +26,8 @@
 #include <stdio.h>
 #include "routing_table.h"
 
-RoutingTable::RoutingTable(HostsList* _hg, Host _me)
-	: hg(_hg),
-	  me(_me),
+RoutingTable::RoutingTable(Host _me)
+	: me(_me),
 	  routing_table(MAX_ROW * MAX_COL * MAX_ENTRY)
 {
 	this->clear();

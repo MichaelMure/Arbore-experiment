@@ -54,7 +54,7 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	me = network->GetHostsList()->GetHost(he->h_name, port);
 	me.SetKey(my_key);
 
-	routing = new ChimeraRouting(network->GetHostsList(), me);
+	routing = new ChimeraRouting(me);
 
 	RegisterType(ChimeraJoinType);
 	RegisterType(ChimeraJoinAckType);

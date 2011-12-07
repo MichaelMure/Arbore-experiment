@@ -41,7 +41,6 @@
 class Leafset
 {
 private :
-	HostsList* hg;                                      /*!< Global peer manager */
 	Host me;                                            /*!< Local host descriptor */
 #if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
 	Key intervalSize;                                   /*!< Interval between the peer ID and a leafset extremity */
@@ -56,10 +55,9 @@ public :
 	 *
 	 * Constructor, creates an empty leafset
 	 *
-	 * \param hg the global host
 	 * \param me the local node
 	 */
-	Leafset(HostsList* hg, Host me);
+	Leafset(Host me);
 
 	/*! \brief Perfoms maintenance caused by a change in DHT key
 	 *

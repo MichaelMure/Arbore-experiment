@@ -40,7 +40,6 @@ class HostsList;
 class ChimeraRouting : protected Mutex
 {
 private :
-	HostsList* hg;              /*!< Global peer manager */
 	Host me;                    /*!< Local host descriptor */
 	RoutingTable routingTable;  /*!< DHT routing table */
 	Leafset	leafset;            /*!< DHT leafset */
@@ -50,10 +49,9 @@ public :
 	 *
 	 * Constructor, a new chimera routing system
 	 *
-	 * \param hg the global host
 	 * \param me the local node
 	 */
-	ChimeraRouting(HostsList* hg, Host me);
+	ChimeraRouting(Host me);
 	void KeyUpdate(Host me);
 
 	/*! \brief Updates the routing information by adding or removing a peer.

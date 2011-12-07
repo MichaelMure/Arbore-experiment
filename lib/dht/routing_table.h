@@ -41,7 +41,6 @@
 class RoutingTable
 {
 private:
-	HostsList* hg;
 	Host me;                                 /*!< Local host descriptor */
 	std::vector<Host> routing_table;
 
@@ -55,10 +54,9 @@ public:
 	 *
 	 * Constructor, creates an empty routing table
 	 *
-	 * \param hg  the global host
 	 * \param me  the local node
 	 */
-	RoutingTable(HostsList* hg, Host me);
+	RoutingTable(Host me);
 
 	void print() const;
 
