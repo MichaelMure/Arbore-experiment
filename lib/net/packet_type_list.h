@@ -32,6 +32,7 @@
 class PacketTypeList : protected std::map<uint32_t, PacketType>, protected Mutex
 {
 public:
+	class UnknowType : public std::exception {};
 
 	PacketTypeList() {}
 	virtual ~PacketTypeList() {}
@@ -48,6 +49,10 @@ public:
 
 	/** @return  the PacketType of the type id */
 	PacketType GetPacketType(uint32_t type) const;
+
+private:
+	typedef std::map<uint32_t, PacketType> PacketTypeMap;
+	typedef PacketTypeMap::value_type value_type;
 };
 
 #endif /* PACKET_TYPE_LIST_H */
