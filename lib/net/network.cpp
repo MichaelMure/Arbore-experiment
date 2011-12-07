@@ -156,7 +156,7 @@ void Network::Loop()
 				if(!sender.GetKey())
 					sender.SetKey(pckt.GetSrc());
 
-				pf_log[W_PARSE] << "R(" << sender << ") - " << pckt.GetPacketInfo();
+				pf_log[W_PARSE] << "R(" << sender << ") - " << pckt;
 
 				if(pckt.HasFlag(Packet::ACK))
 				{
@@ -274,7 +274,7 @@ bool Network::Send(int sock, Host host, Packet pckt)
 		pckt.SetSeqNum(this->seqend++);
 
 
-	pf_log[W_PARSE] << "S(" << host << ") - " << pckt.GetPacketInfo();
+	pf_log[W_PARSE] << "S(" << host << ") - " << pckt;
 
 	const char* s = pckt.DumpBuffer();
 	ret = sendto (sock, s, pckt.GetSize(), 0, &to, sizeof (to));

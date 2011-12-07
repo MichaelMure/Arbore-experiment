@@ -227,7 +227,7 @@ void Packet::BuildArgsFromData()
 		}
 	}
 	if(data)
-		pf_log[W_WARNING] << "There are some unread data in packet: " << GetPacketInfo();
+		pf_log[W_WARNING] << "There are some unread data in packet: " << *this;
 }
 
 void Packet::BuildDataFromArgs()
@@ -253,7 +253,7 @@ void Packet::BuildDataFromArgs()
 	}
 }
 
-std::string Packet::GetPacketInfo() const
+std::string Packet::GetStr() const
 {
 	std::string s, info;
 
