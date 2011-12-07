@@ -67,7 +67,6 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 			data(NULL)
 {
 	uint32_t* p = (uint32_t*)header;
-	uint32_t* s = p;
 
 	/* Src key */
 	while((size_t)(s - p) < Key::nlen) *s = ntohl(*s), s++;
@@ -82,7 +81,14 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 	/* Type */
 	uint32_t type_i = ntohl(*p++);
 
-	type = pckt_type_list->GetPacketType(type_i);
+	try
+	{
+		type = pckt_type_list->GetPacketType(type_i);
+	}
+	catch(PacketTypeList::UnknowType& e)
+	{
+		throw Malformated();
+	}
 
 	/* Size */
 	size = ntohl(*p++);
