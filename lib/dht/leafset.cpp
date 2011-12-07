@@ -273,7 +273,7 @@ void Leafset::updateIntervalSize()
 
 Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 {
-	pf_log[W_DEBUG] << this;
+	pf_log[W_DEBUG] << "Leafset contains " << *this;
 	//if key is in the range of our clockwise part of the leafset, we route through the leafset
 	if(this->nbLeavesClockwise > 0 && key.between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1].GetKey()))
 	{
