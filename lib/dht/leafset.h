@@ -98,6 +98,8 @@ public :
 	 */
 	Host routeLookup(const Key& key , bool* inLeafset) const;
 
+	std::string GetStr() const;
+
 	std::vector<Host> getCopy() const;
 
 private :
@@ -106,8 +108,6 @@ private :
 	 * Clears the leafset, all entries are removed
 	 */
 	void clear();
-
-	void print() const;
 
 	/*! \brief Find the index to insert a peer in clockwise part of the leafset.
 	 *
@@ -162,4 +162,12 @@ private :
 	void updateIntervalSize();
 #endif
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <Leafset> (Leafset leafset)
+{
+	_str += leafset.GetStr();
+	return *this;
+}
+
 #endif /* _CHIMERA_LEAFSET_H_ */

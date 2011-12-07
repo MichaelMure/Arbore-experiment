@@ -36,21 +36,24 @@ Leafset::Leafset(Host _me)
 	this->clear();
 }
 
-void Leafset::print () const
+std::string Leafset::GetStr() const
 {
     size_t i;
     size_t Lsize, Rsize;
+		std::string leafset_str;
 
     Lsize = nbLeavesClockwise;
     Rsize = nbLeavesCounterclockwise;
 
-    fprintf (stderr, "LEFT: ");
+    leafset_str = "LEFT: ";
     for (i = 0; i < Lsize; i++)
-        fprintf (stderr, "%s ", leavesClockwise[i].GetKey().GetStr().c_str());
-    fprintf (stderr, "\nRIGHT: ");
+        leafset_str = leafset_str + leavesClockwise[i].GetKey().GetStr();
+    leafset_str = leafset_str + "\nRIGHT: ";
     for (i = 0; i < Rsize; i++)
-        fprintf (stderr, "%s ", leavesCounterclockwise[i].GetKey().GetStr().c_str());
-    fprintf (stderr, "\n");
+        leafset_str = leafset_str + leavesCounterclockwise[i].GetKey().GetStr();
+    leafset_str = leafset_str +"\n" ;
+
+		return leafset_str;
 }
 
 bool Leafset::add(const Host& entry)
@@ -270,7 +273,7 @@ void Leafset::updateIntervalSize()
 
 Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 {
-	print();
+	pf_log[W_DEBUG] << this;
 	//if key is in the range of our clockwise part of the leafset, we route through the leafset
 	if(this->nbLeavesClockwise > 0 && key.between(this->me.GetKey(), this->leavesClockwise[this->nbLeavesClockwise-1].GetKey()))
 	{
