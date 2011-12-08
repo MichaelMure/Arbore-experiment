@@ -56,6 +56,20 @@ std::string Leafset::GetStr() const
 		return leafset_str;
 }
 
+bool Leafset::isInside(const Host& entry)
+{
+	for (std::vector<Host>::iterator it = leavesClockwise.begin(); it != leavesClockwise.end(); ++it)
+	{
+		if(entry==*it)
+			return true;
+	}
+	for (std::vector<Host>::iterator it = leavesCounterclockwise.begin(); it != leavesCounterclockwise.end(); ++it)
+	{
+		if(entry==*it)
+			return true;
+	}
+	return false;
+}
 bool Leafset::add(const Host& entry)
 {
 	pf_log[W_DEBUG] << "Added an entry in the leafset: " << entry;
@@ -69,7 +83,7 @@ bool Leafset::add(const Host& entry)
 	//TODO some code copy, not very nice
 	size_t index = this->getClockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index < ONE_SIDE_LEAFSET_SIZE)
+	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
@@ -86,7 +100,7 @@ bool Leafset::add(const Host& entry)
 	//get the index where the leaf should be
 	index = this->getCounterclockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index < ONE_SIDE_LEAFSET_SIZE)
+	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster

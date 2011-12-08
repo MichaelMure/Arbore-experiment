@@ -76,6 +76,8 @@ public :
 	 */
 	bool add(const Host& entry);
 
+	bool isInside(const Host& entry);
+
 	/*! \brief Remove an entry from the leafset
 	 *
 	 * Remove an entry from the leafset
