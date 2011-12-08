@@ -58,17 +58,23 @@ std::string Leafset::GetStr() const
 
 bool Leafset::isInside(const Host& entry)
 {
-		for (std::vector<Host>::iterator it = leavesClockwise.begin(); it != leavesClockwise.end(); ++it)
+	std::vector<Host> lcw = this->leavesClockwise;
+	std::vector<Host> lccw = this->leavesCounterclockwise;
+		for (std::vector<Host>::iterator it = lcw.begin(); it != lcw.end(); ++it)
 		{
-			if(entry.GetKey()==it->GetKey())
-				pf_log[W_INFO] << " Already inside (clocwise) " << entry;
+			if(entry.GetKey() == it->GetKey())
+			{
+				pf_log[W_DEBUG] << " Already inside (clockwise) " << entry;
 				return true;
+			}
 		}
-		for (std::vector<Host>::iterator it = leavesCounterclockwise.begin(); it != leavesCounterclockwise.end(); ++it)
+		for (std::vector<Host>::iterator it = lccw.begin(); it != lccw.end(); ++it)
 		{
-			if(entry==it->GetKey())
-				pf_log[W_INFO] << " Already inside (countclockswise) " << entry;
+			if(entry.GetKey() == it->GetKey())
+			{
+				pf_log[W_DEBUG] << " Already inside (countclockswise) " << entry;
 				return true;
+			}
 		}
 	return false;
 }
@@ -86,7 +92,7 @@ bool Leafset::add(const Host& entry)
 	//TODO some code copy, not very nice
 	size_t index = this->getClockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index < ONE_SIDE_LEAFSET_SIZE)
+	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
@@ -95,7 +101,7 @@ bool Leafset::add(const Host& entry)
 			this->leavesClockwise[i] = this->leavesClockwise[i-1];
 		}
 		this->leavesClockwise[index] = entry;
-		pf_log[W_DEBUG] << "BLAH LEFT " << index << ": " <<leavesClockwise[index];
+		pf_log[W_DEBUG] << "Added in the leafset at index LEFT " << index << ": " <<leavesClockwise[index];
 		this->nbLeavesClockwise = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesClockwise + 1);
 		added = true;
 	}
@@ -103,7 +109,7 @@ bool Leafset::add(const Host& entry)
 	//get the index where the leaf should be
 	index = this->getCounterclockwiseInsertIndex(entry);
 	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(index < ONE_SIDE_LEAFSET_SIZE)
+	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE)
 	{
 		//move the entries to make some space and add it
 		//TODO data copy could be faster
@@ -112,7 +118,7 @@ bool Leafset::add(const Host& entry)
 			this->leavesCounterclockwise[i] = this->leavesCounterclockwise[i-1];
 		}
 		this->leavesCounterclockwise[index] = entry;
-		pf_log[W_DEBUG] << "BLAH RIGHT " << index << ": " << leavesCounterclockwise[index];
+		pf_log[W_DEBUG] << "Added in the leafset at index RIGHT " << index << ": " << leavesCounterclockwise[index];
 		this->nbLeavesCounterclockwise = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesCounterclockwise + 1);
 		added = true;
 	}
