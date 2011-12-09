@@ -41,17 +41,17 @@
 class Leafset
 {
 private :
-	Host me;                                            /*!< Local host descriptor */
+	Host me;                                      /** Local host descriptor */
 #if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-	Key intervalSize;                                   /*!< Interval between the peer ID and a leafset extremity */
+	Key intervalSize;                             /** Interval between the peer ID and a leafset extremity */
 #endif
-	size_t nbLeavesClockwise;                           /*!< number of peers in the leafset clockwise */
-	size_t nbLeavesCounterclockwise;                    /*!< number of peers in the leafset counterclockwise */
-	std::vector<Host> leavesClockwise;                  /*!< array that contains the clowise part of the leafset */
-	std::vector<Host> leavesCounterclockwise;           /*!< array that contains the counterclowise part of the leafset */
+	size_t nbLeavesCW;                            /** number of peers in the leafset clockwise */
+	size_t nbLeavesCCW;                           /** number of peers in the leafset counterclockwise */
+	std::vector<Host> leavesCW;                   /** array that contains the clowise part of the leafset */
+	std::vector<Host> leavesCCW;                  /** array that contains the counterclowise part of the leafset */
 
 public :
-	/*! \brief Constructor
+	/** \brief Constructor
 	 *
 	 * Constructor, creates an empty leafset
 	 *
@@ -59,7 +59,7 @@ public :
 	 */
 	Leafset(Host me);
 
-	/*! \brief Perfoms maintenance caused by a change in DHT key
+	/** \brief Perfoms maintenance caused by a change in DHT key
 	 *
 	 * When the DHT key is changed, the leafset has to be invalidated.
 	 *
@@ -67,7 +67,7 @@ public :
 	 */
 	void KeyUpdate(Host me);
 
-	/*! \brief Add an entry to the leafset
+	/** \brief Add an entry to the leafset
 	 *
 	 * Adds en entry to the leafset. At the beginning of the DHT, it can be added on both sides of the leafset.
 	 *
@@ -78,7 +78,7 @@ public :
 
 	bool isInside(const Host& entry);
 
-	/*! \brief Remove an entry from the leafset
+	/** \brief Remove an entry from the leafset
 	 *
 	 * Remove an entry from the leafset
 	 *
@@ -87,7 +87,7 @@ public :
 	 */
 	bool remove(const Host& entry);
 
-	/*! \brief Finds the next routing destination
+	/** \brief Finds the next routing destination
 	 *
 	 * Finds the best destination for the next step of routing to key.
 	 * First check if the key falls into the leafset. If it is the case,
@@ -105,13 +105,13 @@ public :
 	std::vector<Host> getCopy() const;
 
 private :
-	/*! \brief Clears the leafset
+	/** \brief Clears the leafset
 	 *
 	 * Clears the leafset, all entries are removed
 	 */
 	void clear();
 
-	/*! \brief Find the index to insert a peer in clockwise part of the leafset.
+	/** \brief Find the index to insert a peer in clockwise part of the leafset.
 	 *
 	 * Finds which interval the peer belongs to and returns the position where
 	 * it should be added. If a peer whith the same key already exists, it
@@ -121,9 +121,9 @@ private :
 	 * \param entry the peer we're trying to insert
 	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
 	 */
-	size_t getClockwiseInsertIndex(const Host& entry) const;
+	size_t getCWInsertIndex(const Host& entry) const;
 
-	/*! \brief Find the index to insert a peer in counterclockwise part of the leafset.
+	/** \brief Find the index to insert a peer in counterclockwise part of the leafset.
 	 *
 	 * Finds which interval the peer belongs to and returns the position
 	 * where it should be added. If a peer whith the same key already
@@ -133,9 +133,9 @@ private :
 	 * \param entry the peer we're trying to insert
 	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
 	 */
-	size_t getCounterclockwiseInsertIndex(const Host& entry) const;
+	size_t getCCWInsertIndex(const Host& entry) const;
 
-	/*! \brief Find the index of the peer if it is present in the clockwise part of the leafset.
+	/** \brief Find the index of the peer if it is present in the clockwise part of the leafset.
 	 *
 	 * Finds the index of the peer if it is present in the clockwise part
 	 * of the leafset, returns -1 if it is not present.
@@ -143,9 +143,9 @@ private :
 	 * \param entry the peer we're looking for
 	 * \return the position of the peer, -1 if it is not present
 	 */
-	size_t getClockwiseIndex(const Host& entry) const;
+	size_t getCWIndex(const Host& entry) const;
 
-	/*! \brief Find the index of the peer if it is present in the counterclockwise part of the leafset.
+	/** \brief Find the index of the peer if it is present in the counterclockwise part of the leafset.
 	 *
 	 * Finds the index of the peer if it is present in the counterclockwise
 	 * part of the leafset, returns -1 if it is not present.
@@ -153,10 +153,10 @@ private :
 	 * \param entry the peer we're looking for
 	 * \return the position of the peer, -1 if it is not present
 	 */
-	size_t getCounterclockwiseIndex(const Host& entry) const;
+	size_t getCCWIndex(const Host& entry) const;
 
 #if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-	/*! \brief Updates the distance between the local peer and is most clockwise distant neighbour in the leafset.
+	/** \brief Updates the distance between the local peer and is most clockwise distant neighbour in the leafset.
 	 * Updates the distance between the local peer and is most clockwise
 	 * distant neighbour in the leafset. The choice of the clockwise side
 	 * is arbitrary.
