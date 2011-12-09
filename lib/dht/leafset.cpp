@@ -27,11 +27,8 @@
 #include <string.h>
 #include "leafset.h"
 Leafset::Leafset(Host _me)
-	: me(_me),
-	leavesCW(ONE_SIDE_LEAFSET_SIZE),
-	leavesCCW(ONE_SIDE_LEAFSET_SIZE)
+	: me(_me)
 {
-	this->clear();
 }
 
 std::string Leafset::GetStr() const
