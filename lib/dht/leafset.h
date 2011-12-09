@@ -100,8 +100,10 @@ public :
 	 */
 	Host routeLookup(const Key& key , bool* inLeafset) const;
 
+	/** @return a textual representation of the leafset. */
 	std::string GetStr() const;
 
+	/** @return a copy of all the host stored in the leafset. */
 	std::vector<Host> getCopy() const;
 
 private :
