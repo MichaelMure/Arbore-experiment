@@ -28,8 +28,6 @@
 #include "leafset.h"
 Leafset::Leafset(Host _me)
 	: me(_me),
-	nbLeavesCW(0),
-	nbLeavesCCW(0),
 	leavesCW(ONE_SIDE_LEAFSET_SIZE),
 	leavesCCW(ONE_SIDE_LEAFSET_SIZE)
 {
@@ -38,350 +36,172 @@ Leafset::Leafset(Host _me)
 
 std::string Leafset::GetStr() const
 {
-    size_t i;
-    size_t Lsize, Rsize;
-		std::string leafset_str;
+	HostVector::const_iterator it;
+	std::string leafset_str = "LEFT: ";
 
-    Lsize = nbLeavesCW;
-    Rsize = nbLeavesCCW;
+	for(it = leavesCW.begin(); it != leavesCW.end(); it++)
+		leafset_str = leafset_str + it->GetKey().GetStr() + " ";
 
-    leafset_str = "LEFT: ";
-    for (i = 0; i < Lsize; i++)
-        leafset_str = leafset_str + leavesCW[i].GetKey().GetStr();
-    leafset_str = leafset_str + "\nRIGHT: ";
-    for (i = 0; i < Rsize; i++)
-        leafset_str = leafset_str + leavesCCW[i].GetKey().GetStr();
-    leafset_str = leafset_str +"\n" ;
+	leafset_str = leafset_str + "\nRIGHT: ";
+	for(it = leavesCCW.begin(); it != leavesCCW.end(); it++)
+		leafset_str = leafset_str + it->GetKey().GetStr() + " ";
 
-		return leafset_str;
+	leafset_str = leafset_str +"\n" ;
+
+	return leafset_str;
 }
 
 bool Leafset::isInside(const Host& entry)
 {
-	std::vector<Host> lcw = this->leavesCW;
-	std::vector<Host> lccw = this->leavesCCW;
-		for (std::vector<Host>::iterator it = lcw.begin(); it != lcw.end(); ++it)
+	HostVector::const_iterator it;
+
+	for (it = leavesCW.begin(); it != leavesCW.end(); ++it)
+	{
+		if(entry.GetKey() == it->GetKey())
 		{
-			if(entry.GetKey() == it->GetKey())
-			{
-				pf_log[W_DEBUG] << " Already inside (clockwise) " << entry;
-				return true;
-			}
+			pf_log[W_DEBUG] << " Already inside (clockwise) " << entry;
+			return true;
 		}
-		for (std::vector<Host>::iterator it = lccw.begin(); it != lccw.end(); ++it)
+	}
+	for (it = leavesCCW.begin(); it != leavesCCW.end(); ++it)
+	{
+		if(entry.GetKey() == it->GetKey())
 		{
-			if(entry.GetKey() == it->GetKey())
-			{
-				pf_log[W_DEBUG] << " Already inside (countclockswise) " << entry;
-				return true;
-			}
+			pf_log[W_DEBUG] << " Already inside (countclockswise) " << entry;
+			return true;
 		}
+	}
 	return false;
 }
 
 bool Leafset::add(const Host& entry)
 {
-	pf_log[W_DEBUG] << " Try to add an entry in the leafset: " << entry;
-	if(this->me.GetKey() == entry.GetKey())
-	{
+	pf_log[W_DEBUG] << " Adding an entry in the leafset: " << entry;
+	if(me.GetKey() == entry.GetKey())
 		return false;
-	}
-	//try add clockwise
-	//get the index where the leaf should be
-	bool added = false;
-	//TODO some code copy, not very nice
-	size_t index = this->getCWInsertIndex(entry);
-	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE-1 && this->nbLeavesCW < 4)
+
+	if(isInside(entry))
+		return false;
+
+	HostVector::iterator it;
+
+	/* Try clockwise first */
+	if(entry.GetKey().between(me.GetKey(), leavesCW.back().GetKey()))
 	{
-		//move the entries to make some space and add it
-		//TODO data copy could be faster
-		for(size_t i = MIN(this->nbLeavesCW, ONE_SIDE_LEAFSET_SIZE-1); i > index; i--)
+		/* If needed, remove the last host clockwise */
+		if(leavesCW.size() == ONE_SIDE_LEAFSET_SIZE)
+			leavesCW.pop_back();
+
+		for(it = leavesCW.begin(); it != leavesCW.end(); it++)
 		{
-			this->leavesCW[i] = this->leavesCW[i-1];
+			if(entry.GetKey() < it->GetKey())
+			{
+				leavesCW.insert(it, entry);
+				return true;
+			}
 		}
-		this->leavesCW[index] = entry;
-		pf_log[W_DEBUG] << "Added in the leafset at index LEFT " << index << ": " <<leavesCW[index];
-		this->nbLeavesCW = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesCW + 1);
-		added = true;
+		/* Insert in the last position */
+		leavesCW.push_back(entry);
+		return true;
 	}
-	//try add counterclockwise
-	//get the index where the leaf should be
-	index = this->getCCWInsertIndex(entry);
-	//if there is not already an entry with that key and it does not fall out of the leafset
-	if(!this->isInside(entry) && index < ONE_SIDE_LEAFSET_SIZE-1 && this->nbLeavesCCW < 4)
+
+	/* Then counter-clockwise */
+	if(entry.GetKey().between(me.GetKey(), leavesCCW.back().GetKey()))
 	{
-		//move the entries to make some space and add it
-		//TODO data copy could be faster
-		for(size_t i = MIN(nbLeavesCCW, ONE_SIDE_LEAFSET_SIZE-1); i > index; i--)
+		/* If needed, remove the last host clockwise */
+		if(leavesCCW.size() == ONE_SIDE_LEAFSET_SIZE)
+			leavesCCW.pop_back();
+
+		for(it = leavesCCW.begin(); it != leavesCCW.end(); it++)
 		{
-			this->leavesCCW[i] = this->leavesCCW[i-1];
+			if(entry.GetKey() > it->GetKey())
+			{
+				leavesCCW.insert(it, entry);
+				return true;
+			}
 		}
-		this->leavesCCW[index] = entry;
-		pf_log[W_DEBUG] << "Added in the leafset at index RIGHT " << index << ": " << leavesCCW[index];
-		this->nbLeavesCCW = MIN(ONE_SIDE_LEAFSET_SIZE, this->nbLeavesCCW + 1);
-		added = true;
+		/* Insert in the last position */
+		leavesCCW.push_back(entry);
+		return true;
 	}
-#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-	this->updateIntervalSize();
-#endif
-	return added;
+
+	return false;
 }
 
 bool Leafset::remove(const Host& entry)
 {
 	pf_log[W_DEBUG] << "Removed an entry from the leafset: " << entry;
 	if(entry.GetKey() == this->me.GetKey())
-	{
 		return false;
-	}
-	//TODO some code copy, not very nice
-	bool removed = false;
-	//try to remove clockwise
-	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
-	if(this->nbLeavesCW > 0 && entry.GetKey().between(this->me.GetKey(), this->leavesCW[this->nbLeavesCW - 1].GetKey()))
-	{
-		size_t pos = this->getCWIndex(entry);
-		if(pos < ONE_SIDE_LEAFSET_SIZE)
-		{
-			//TODO data copy could be faster
-			for(size_t i = pos; i < this->nbLeavesCW-1; i++)
-			{
-				this->leavesCW[i] = this->leavesCW[i+1];
-			}
-			this->leavesCW[this->nbLeavesCW] = InvalidHost;
-			this->nbLeavesCW--;
-			removed = true;
-		}
-	}
-	//try to remove counterclockwise
-	//if we make sure that the remove is only used when the entry is in the leafset, we can remove that check
-	if(this->nbLeavesCCW > 0 && entry.GetKey().between(this->leavesCCW[this->nbLeavesCCW - 1].GetKey(), this->me.GetKey()))
-	{
-		size_t pos = this->getCCWIndex(entry);
-		if(pos < ONE_SIDE_LEAFSET_SIZE)
-		{
-			//TODO data copy could be faster
-			for(size_t i = pos; i < this->nbLeavesCCW-1; i++)
-			{
-				this->leavesCCW[i] = this->leavesCCW[i+1];
-			}
-			this->leavesCCW[this->nbLeavesCCW] = InvalidHost;
-			this->nbLeavesCCW--;
-			removed = true;
-		}
-	}
-	return removed;
-}
 
-size_t Leafset::getCWInsertIndex(const Host& entry) const
-{
-	if(!nbLeavesCW)
-		return 0;
-	//this part of the leafset is full and the entry doesn't fall into it
-	if(this->nbLeavesCW == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->me.GetKey(), this->leavesCW[this->nbLeavesCW-1].GetKey()))
-	{
-		return ONE_SIDE_LEAFSET_SIZE;
-	}
-	for(size_t i = 0; i < this->nbLeavesCW-1; i++)
-	{
-		if(entry.GetKey().between(this->leavesCW[i].GetKey(), this->leavesCW[i+1].GetKey()))
-		{
-			//we don't allow 2 entries with the same dht id
-			if((entry.GetKey() == this->leavesCW[i].GetKey()) || (entry.GetKey() == this->leavesCW[i+1].GetKey()))
-			{
-				return ONE_SIDE_LEAFSET_SIZE;
-			}
-			return i+1;
-		}
-	}
-	if(entry.GetKey().between(this->me.GetKey(), this->leavesCW[0].GetKey()))
-	{
-		if(entry.GetKey() == this->leavesCW[0].GetKey())
-		{
-			return ONE_SIDE_LEAFSET_SIZE;
-		}
-		return 0;
-	}
-	return this->nbLeavesCW;
-}
+	HostVector::iterator it;
 
-size_t Leafset::getCCWInsertIndex(const Host& entry) const
-{
-	if(!nbLeavesCCW)
-		return 0;
-
-	//this part of the leafset is full and the entry doesn't fall into it
-	if(this->nbLeavesCCW == ONE_SIDE_LEAFSET_SIZE && !entry.GetKey().between(this->leavesCCW[this->nbLeavesCCW-1].GetKey(),this->me.GetKey()))
+	for (it = leavesCW.begin(); it != leavesCW.end(); ++it)
 	{
-		return ONE_SIDE_LEAFSET_SIZE;
-	}
-	for(size_t i = 0; i < this->nbLeavesCCW-1; i++)
-	{
-		if(entry.GetKey().between(this->leavesCCW[i+1].GetKey(), this->leavesCCW[i].GetKey()))
+		if(entry.GetKey() == it->GetKey())
 		{
-			//we don't allow 2 entries with the same dht id
-			if((entry.GetKey() == this->leavesCCW[i].GetKey()) || (entry.GetKey() == this->leavesCCW[i+1].GetKey()))
-			{
-				return ONE_SIDE_LEAFSET_SIZE;
-			}
-			return i+1;
+			leavesCW.erase(it);
+			return true;
 		}
 	}
-	if(entry.GetKey().between(this->leavesCCW[0].GetKey(), this->me.GetKey()))
+	for (it = leavesCCW.begin(); it != leavesCCW.end(); ++it)
 	{
-		if(entry.GetKey() == this->leavesCCW[0].GetKey())
+		if(entry.GetKey() == it->GetKey())
 		{
-			return ONE_SIDE_LEAFSET_SIZE;
-		}
-		return 0;
-	}
-	return this->nbLeavesCCW;
-}
-
-size_t Leafset::getCWIndex(const Host& entry) const
-{
-	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
-	for(size_t i = 0; i < this->nbLeavesCW; i++)
-	{
-		if(entry.GetKey() == this->leavesCW[i].GetKey())
-		{
-			return i;
+			leavesCCW.erase(it);
+			return true;
 		}
 	}
-	return ONE_SIDE_LEAFSET_SIZE;
-}
-
-//TODO some code copy again...
-size_t Leafset::getCCWIndex(const Host& entry) const
-{
-	//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
-	for(size_t i = 0; i < this->nbLeavesCCW; i++)
-	{
-		if(entry.GetKey() == this->leavesCCW[i].GetKey())
-		{
-			return i;
-		}
-	}
-	return ONE_SIDE_LEAFSET_SIZE;
+	return false;
 }
 
 void Leafset::clear()
 {
-	leavesCW = std::vector<Host>(ONE_SIDE_LEAFSET_SIZE);
-	leavesCCW = std::vector<Host>(ONE_SIDE_LEAFSET_SIZE);
-	this->nbLeavesCW = 0;
-	this->nbLeavesCCW = 0;
+	/* Should we delete previoulsy stored host ? */
+	leavesCW.clear();
+	leavesCCW.clear();
 }
 
 void Leafset::KeyUpdate(Host _me)
 {
+	/* The leafset is defined around me's key, so when it changes, we drop all the others hosts. */
 	this->clear();
 	this->me = _me;
 }
 
-#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-void Leafset::updateIntervalSize()
-{
-	if(this->nbLeavesCW > 0)
-	{
-		this->intervalSize = this->me.GetKey().intervalSize(this->leavesCW[this->nbLeavesCW-1].GetKey());
-	}
-	else
-	{
-		this->intervalSize = Key();
-	}
-}
-#endif
-
 Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 {
 	pf_log[W_DEBUG] << "Leafset contains " << *this;
-	//if key is in the range of our clockwise part of the leafset, we route through the leafset
-	if(this->nbLeavesCW > 0 && key.between(this->me.GetKey(), this->leavesCW[this->nbLeavesCW-1].GetKey()))
+
+	HostVector::const_iterator it;
+	*inLeafset = true;
+
+	for (it = leavesCW.begin(); it != leavesCW.end(); ++it)
 	{
-		*inLeafset = true;
-		//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
-		Host closest = this->me;
-		Key bestDist = this->me.GetKey().distance(key);
-		for(size_t i = 0; i < this->nbLeavesCW; i++)
-		{
-			Key newDist = this->leavesCW[i].GetKey().distance(key);
-			if(newDist > bestDist)
-			{
-				return closest;
-			}
-			else
-			{
-				bestDist = newDist;
-				closest = leavesCW[i];
-			}
-		}
-		return closest;
+		if(key == it->GetKey())
+			return *it;
 	}
-	//TODO code copy again...
-	//if key is in the range of our counterclockwise part of the leafset, we route through the leafset
-	if(this->nbLeavesCCW > 0 && key.between(this->me.GetKey(), this->leavesCCW[this->nbLeavesCCW-1].GetKey()))
+
+	for (it = leavesCCW.begin(); it != leavesCCW.end(); ++it)
 	{
-		//TODO code copy, again
-		*inLeafset = true;
-		//TODO could find a better algorithm (dichotomic search) but the leafset is quite small...
-		Host closest = this->me;
-		Key bestDist = this->me.GetKey().distance(key);
-		for(size_t i = 0; i < this->nbLeavesCCW; i++)
-		{
-			Key newDist = this->leavesCCW[i].GetKey().distance(key);
-			if(newDist > bestDist)
-			{
-				return closest;
-			}
-			else
-			{
-				bestDist = newDist;
-				closest = this->leavesCCW[i];
-			}
-		}
-		return closest;
+		if(key == it->GetKey())
+			return *it;
 	}
-	//key doesn't fall in the leafset, we choose the best leafset which is the closest to the key
+
 	*inLeafset = false;
-	Host clockwiseExtrem;
-	if(this->nbLeavesCW == 0)
+
+	if(key > me.GetKey())
 	{
-		clockwiseExtrem = this->me;
+		if(!leavesCW.empty())
+			return leavesCW.back();
 	}
 	else
 	{
-		clockwiseExtrem = this->leavesCW[this->nbLeavesCW-1];
+		if(!leavesCCW.empty())
+			return leavesCCW.back();
 	}
-	Host counterclockwiseExtrem;
-	if(this->nbLeavesCCW == 0)
-	{
-		counterclockwiseExtrem = this->me;
-	}
-	else
-	{
-		counterclockwiseExtrem = this->leavesCCW[this->nbLeavesCCW-1];
-	}
-	Key clockwiseDist = clockwiseExtrem.GetKey().distance(key);
-	Key counterclockwiseDist = counterclockwiseExtrem.GetKey().distance(key);
-	if(clockwiseDist < counterclockwiseDist)
-	{
-		return clockwiseExtrem;
-	}
-	if(clockwiseDist > counterclockwiseDist)
-	{
-		return counterclockwiseExtrem;
-	}
-	//if distance are equal and one extremity is local node (which means that part of the leafset is dead, should never happen), stay at local node
-	if(clockwiseExtrem == this->me)
-	{
-		return clockwiseExtrem;
-	}
-	else
-	{
-		return counterclockwiseExtrem;
-	}
+
+	return me;
 }
 
 std::vector<Host> Leafset::getCopy() const

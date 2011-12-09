@@ -26,8 +26,6 @@
 #ifndef _CHIMERA_LEAFSET_H_
 #define _CHIMERA_LEAFSET_H_
 
-#define OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL 1
-
 #define LEAFSET_SIZE 8		/* (must be even) excluding node itself */
 #define ONE_SIDE_LEAFSET_SIZE LEAFSET_SIZE/2
 
@@ -42,13 +40,10 @@ class Leafset
 {
 private :
 	Host me;                                      /** Local host descriptor */
-#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-	Key intervalSize;                             /** Interval between the peer ID and a leafset extremity */
-#endif
-	size_t nbLeavesCW;                            /** number of peers in the leafset clockwise */
-	size_t nbLeavesCCW;                           /** number of peers in the leafset counterclockwise */
-	std::vector<Host> leavesCW;                   /** array that contains the clowise part of the leafset */
-	std::vector<Host> leavesCCW;                  /** array that contains the counterclowise part of the leafset */
+
+	typedef std::vector<Host> HostVector;
+	HostVector leavesCW;                          /** array that contains the clowise part of the leafset */
+	HostVector leavesCCW;                         /** array that contains the counterclowise part of the leafset */
 
 public :
 	/** \brief Constructor
@@ -112,59 +107,6 @@ private :
 	 * Clears the leafset, all entries are removed
 	 */
 	void clear();
-
-	/** \brief Find the index to insert a peer in clockwise part of the leafset.
-	 *
-	 * Finds which interval the peer belongs to and returns the position where
-	 * it should be added. If a peer whith the same key already exists, it
-	 * returns -1. The return index can be out of the array if all the peers in
-	 * it are closer to the local peer thant the entry.
-	 *
-	 * \param entry the peer we're trying to insert
-	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
-	 */
-	size_t getCWInsertIndex(const Host& entry) const;
-
-	/** \brief Find the index to insert a peer in counterclockwise part of the leafset.
-	 *
-	 * Finds which interval the peer belongs to and returns the position
-	 * where it should be added. If a peer whith the same key already
-	 * exists, it returns -1. The return index can be out of the array if
-	 * all the peers in it are closer to the local peer thant the entry.
-	 *
-	 * \param entry the peer we're trying to insert
-	 * \return the position where the peer should be, -1 if it is already in this part of the leafset, out of the array if it is not close enough to the peer to have a place
-	 */
-	size_t getCCWInsertIndex(const Host& entry) const;
-
-	/** \brief Find the index of the peer if it is present in the clockwise part of the leafset.
-	 *
-	 * Finds the index of the peer if it is present in the clockwise part
-	 * of the leafset, returns -1 if it is not present.
-	 *
-	 * \param entry the peer we're looking for
-	 * \return the position of the peer, -1 if it is not present
-	 */
-	size_t getCWIndex(const Host& entry) const;
-
-	/** \brief Find the index of the peer if it is present in the counterclockwise part of the leafset.
-	 *
-	 * Finds the index of the peer if it is present in the counterclockwise
-	 * part of the leafset, returns -1 if it is not present.
-	 *
-	 * \param entry the peer we're looking for
-	 * \return the position of the peer, -1 if it is not present
-	 */
-	size_t getCCWIndex(const Host& entry) const;
-
-#if OPTIMIZE_ROUTING_WITH_LEAFSET_INTERVAL
-	/** \brief Updates the distance between the local peer and is most clockwise distant neighbour in the leafset.
-	 * Updates the distance between the local peer and is most clockwise
-	 * distant neighbour in the leafset. The choice of the clockwise side
-	 * is arbitrary.
-	 */
-	void updateIntervalSize();
-#endif
 };
 
 template<>
