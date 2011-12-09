@@ -43,25 +43,25 @@ class PacketTypeList;
 class Network : public Thread, protected Mutex
 {
 public:
-	static const double RETRANSMIT_INTERVAL = 1.0; /**< Seconds before we try to retransmit a packet */
-	static const unsigned int MAX_RETRY = 3;       /**< Maximum tries before abording resend a packet */
-	static const size_t PACKET_MAX_SIZE = 1024;    /**< Maximum size for packets */
+	static const double RETRANSMIT_INTERVAL = 1.0; /** Seconds before we try to retransmit a packet */
+	static const unsigned int MAX_RETRY = 3;       /** Maximum tries before abording resend a packet */
+	static const size_t PACKET_MAX_SIZE = 1024;    /** Maximum size for packets */
 
 	/* Exceptions */
 	class CantOpenSock : public std::exception {};
 	class CantListen : public std::exception
 	{
 		public:
-			int port;
-			CantListen(int _port) : port(_port) {}
+			int port_;
+			CantListen(int port) : port_(port) {}
 			~CantListen() throw() {};
 	};
 	class CantConnectTo : public std::exception
 	{
 		public:
-			int err;
-			pf_addr addr;
-			CantConnectTo(int _errno, const pf_addr _addr) : err(_errno), addr(_addr) {}
+			int err_;
+			pf_addr addr_;
+			CantConnectTo(int errno, const pf_addr addr) : err_(errno), addr_(addr) {}
 			~CantConnectTo() throw() {};
 	};
 
