@@ -386,14 +386,13 @@ Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 
 std::vector<Host> Leafset::getCopy() const
 {
-	std::vector<Host> ret;
-	for(size_t i = 0; i<this->nbLeavesClockwise; i++)
+	std::vector<Host> ret = leavesClockwise;
+
+	for(std::vector<Host>::const_iterator it = leavesCounterclockwise.begin();
+			it != leavesCounterclockwise.end();
+			it++)
 	{
-		ret.insert(ret.end(),this->leavesClockwise[i]);
-	}
-	for(size_t i = 0; i<this->nbLeavesCounterclockwise; i++)
-	{
-		ret.insert(ret.end(),this->leavesCounterclockwise[i]);
+		ret.insert(ret.end(),*it);
 	}
 	return ret;
 }
