@@ -70,7 +70,7 @@ private:
 	typedef std::map<int, PacketTypeList*> SockMap;
 	SockMap socks;    /**< contains all socks listened and the related packettypelist */
 	fd_set socks_fd_set;
-	int highsock;
+	int highsock; /** higher socket opened, used by select POSIX function */
 
 	HostsList hosts_list;
 	std::vector<ResendPacketJob*> resend_list;

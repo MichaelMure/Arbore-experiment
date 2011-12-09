@@ -66,7 +66,7 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const std::
 	pf_addr addr = pf_addr(bind_addr, port);
 	struct sockaddr saddr = addr.GetSockAddr();
 
-	/* create socket */
+	/* create an UDP socket */
 	int serv_sock = socket (saddr.sa_family, SOCK_DGRAM, 0);
 	if (serv_sock < 0)
 		throw CantOpenSock();
@@ -79,6 +79,7 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const std::
 		throw CantOpenSock();
 	}
 
+	/* attach the socket to the address and port */
 	if (bind (serv_sock, &saddr, sizeof (saddr)) < 0)
 	{
 		pf_log[W_ERR] << "Error in binding socket: " << strerror(errno);
@@ -88,6 +89,8 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const std::
 
 	socks[serv_sock] = packet_type_list;
 	FD_SET(serv_sock, &socks_fd_set);
+
+	/* update the highest socket number */
 	if(serv_sock > highsock)
 		highsock = serv_sock;
 
@@ -103,6 +106,7 @@ void Network::Loop()
 	fd_set tmp_read_set;
 	int events;
 
+	/* no socket open right now */
 	if(highsock < 0)
 		return;
 
@@ -110,6 +114,7 @@ void Network::Loop()
 	tmp_read_set = socks_fd_set;
 	Unlock();
 
+	/* see if at least one socket is ready to be read without blocking */
 	if((events = select(highsock + 1, &tmp_read_set, NULL, NULL, NULL)) < 0)
 	{
 		if(errno != EINTR)
@@ -118,11 +123,12 @@ void Network::Loop()
 			return;
 		}
 	}
-	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
+	else if(events > 0) /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		BlockLockMutex lock(this);
 		for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
+			/* if this socket is not ready, skip it */
 			if(!FD_ISSET(it->first, &tmp_read_set))
 				continue;
 
@@ -141,16 +147,19 @@ void Network::Loop()
 				pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
 				return;
 			}
+
 			if((size_t)size < Packet::GetHeaderSize())
 			{
 				pf_log[W_ERR] << "Received a packet too light "
 				              << "(size: " << size << " < " << Packet::GetHeaderSize() << ")";
+				/* No recover solution here, packet is lost. */
 				return;
 			}
+
 			try
 			{
 				Packet pckt(packet_type_list, data, size);
-				pf_addr address(from);
+				pf_addr address(from); /* /!\ port ! */
 				Host sender = hosts_list.GetHost(address);
 
 				if(!sender.GetKey())
@@ -306,4 +315,3 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	return true;
 }
-
