@@ -80,49 +80,53 @@ bool Leafset::add(const Host& entry)
 	if(me.GetKey() == entry.GetKey())
 		return false;
 
-	if(isInside(entry))
-		return false;
-
 	HostVector::iterator it;
 
-	/* Try clockwise first */
-	if(entry.GetKey().between(me.GetKey(), leavesCW.back().GetKey()))
+	if(entry.GetKey() > me.GetKey())
 	{
-		/* If needed, remove the last host clockwise */
-		if(leavesCW.size() == ONE_SIDE_LEAFSET_SIZE)
-			leavesCW.pop_back();
-
 		for(it = leavesCW.begin(); it != leavesCW.end(); it++)
 		{
-			if(entry.GetKey() < it->GetKey())
+			if(entry.GetKey() == it->GetKey())
+				return false;
+			else if(entry.GetKey() < it->GetKey())
 			{
 				leavesCW.insert(it, entry);
+				/* If needed, remove the last host clockwise */
+				if(leavesCW.size() > ONE_SIDE_LEAFSET_SIZE)
+					leavesCW.pop_back();
 				return true;
 			}
 		}
-		/* Insert in the last position */
-		leavesCW.push_back(entry);
-		return true;
+
+		/* Leafset is not full, add at the end. */
+		if(leavesCW.size() < ONE_SIDE_LEAFSET_SIZE)
+		{
+			leavesCW.push_back(entry);
+			return true;
+		}
 	}
-
-	/* Then counter-clockwise */
-	if(entry.GetKey().between(me.GetKey(), leavesCCW.back().GetKey()))
+	else
 	{
-		/* If needed, remove the last host clockwise */
-		if(leavesCCW.size() == ONE_SIDE_LEAFSET_SIZE)
-			leavesCCW.pop_back();
-
 		for(it = leavesCCW.begin(); it != leavesCCW.end(); it++)
 		{
-			if(entry.GetKey() > it->GetKey())
+			if(entry.GetKey() == it->GetKey())
+				return false;
+			else if(entry.GetKey() > it->GetKey())
 			{
 				leavesCCW.insert(it, entry);
+				/* If needed, remove the last host clockwise */
+				if(leavesCCW.size() > ONE_SIDE_LEAFSET_SIZE)
+					leavesCCW.pop_back();
 				return true;
 			}
 		}
-		/* Insert in the last position */
-		leavesCCW.push_back(entry);
-		return true;
+
+		/* Leafset is not full, add at the end. */
+		if(leavesCCW.size() < ONE_SIDE_LEAFSET_SIZE)
+		{
+			leavesCCW.push_back(entry);
+			return true;
+		}
 	}
 
 	return false;
