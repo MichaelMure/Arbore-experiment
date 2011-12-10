@@ -94,9 +94,10 @@ bool RoutingTable::add(const Host& entry)
 	//original code performs some leafset update... shoud not be needed anymore
 	//TODO see if we can remove this sanity check
 	//the entry has the same key as the local node, should never happen
-	pf_log[W_DEBUG] << "Added an entry in the routing table: " << entry;
+	pf_log[W_DEBUG] << "Trying to add an entry in the routing table: " << entry;
 	if(this->me.GetKey() == entry.GetKey())
 	{
+		pf_log[W_DEBUG] << "Adding myself in the routing table ?";
 		return false;
 	}
 	//get the coordinates where the entry should go
@@ -108,12 +109,14 @@ bool RoutingTable::add(const Host& entry)
 		//we found an empty space, add the entry
 		if (this->getEntry(i, j, k) == InvalidHost)
 		{
+			pf_log[W_DEBUG] << "Entry added.";
 			this->setEntry(i, j, k, entry);
 			found = true;
 		}
 		//entry is already in the routing table, simply return
 		else if (this->getEntry(i, j, k) != InvalidHost && this->getEntry(i, j, k).GetKey() == entry.GetKey())
 		{
+			pf_log[W_DEBUG] << "Entry already in the routing table.";
 			return false;
 		}
 
@@ -134,9 +137,10 @@ bool RoutingTable::remove(const Host& entry)
 	//original code performs some leafset update... shoud not be needed anymore
 	//TODO see if we can remove this sanity check
 	//the entry has the same key as the local node, should never happen
-	pf_log[W_DEBUG] << "Removed an entry from the routing table: " << entry;
+	pf_log[W_DEBUG] << "Trying to remove an entry from the routing table: " << entry;
 	if(this->me.GetKey() == entry.GetKey())
 	{
+		pf_log[W_DEBUG] << "Removing myself from the routing table ?";
 		return false;
 	}
 	//get the coordinates where the entry should go
@@ -146,6 +150,7 @@ bool RoutingTable::remove(const Host& entry)
 	{
 		if (this->getEntry(i, j, k) != InvalidHost && this->getEntry(i, j, k).GetKey() == entry.GetKey())
 		{
+			pf_log[W_DEBUG] << "Entry removed";
 			//when we find it, set the entry to null so that we don't use it anymore
 			this->setEntry(i, j, k, InvalidHost);
 			return true;
