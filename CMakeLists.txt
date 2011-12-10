@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(BIN_NAME dht_test)
 ADD_EXECUTABLE(${BIN_NAME}
-    dhttest/main.cpp
-    )
+               dhttest/main.cpp
+               )
 
 INCLUDE_DIRECTORIES(lib/)
 LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
@@ -45,6 +45,10 @@ ENDIF(CURL_FOUND)
 ########################### Library ###################
 
 SUBDIRS (lib)
+
+########################### Tests #####################
+
+SUBDIRS (tests)
 
 ########################### Bindings ##################
 
