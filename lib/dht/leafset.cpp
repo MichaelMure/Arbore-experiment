@@ -48,29 +48,6 @@ std::string Leafset::GetStr() const
 	return leafset_str;
 }
 
-bool Leafset::isInside(const Host& entry)
-{
-	HostVector::const_iterator it;
-
-	for (it = leavesCW.begin(); it != leavesCW.end(); ++it)
-	{
-		if(entry.GetKey() == it->GetKey())
-		{
-			pf_log[W_DEBUG] << " Already inside (clockwise) " << entry;
-			return true;
-		}
-	}
-	for (it = leavesCCW.begin(); it != leavesCCW.end(); ++it)
-	{
-		if(entry.GetKey() == it->GetKey())
-		{
-			pf_log[W_DEBUG] << " Already inside (countclockswise) " << entry;
-			return true;
-		}
-	}
-	return false;
-}
-
 bool Leafset::add(const Host& entry)
 {
 	pf_log[W_DEBUG] << "Trying to add an entry in the leafset: " << entry;
