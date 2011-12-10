@@ -157,7 +157,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
-			pf_log[W_DEBUG] << "Entry removed."
+			pf_log[W_DEBUG] << "Entry removed.";
 			leavesCW.erase(it);
 			return true;
 		}
@@ -166,7 +166,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
-			pf_log[W_DEBUG] << "Entry removed."
+			pf_log[W_DEBUG] << "Entry removed.";
 			leavesCCW.erase(it);
 			return true;
 		}
