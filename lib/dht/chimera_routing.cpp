@@ -74,6 +74,10 @@ Host ChimeraRouting::routeLookup(const Key& key) const
 {
 	BlockLockMutex lock(this);
 	bool b;
+	pf_log[W_DEBUG] << "Look if it's for me";
+	if(this->me.GetKey() == key)
+		return this->me;
+
 	pf_log[W_DEBUG] << "Lookup in the leafset table";
 	Host leafsetBest = this->leafset.routeLookup(key , &b);
 	if(b)
