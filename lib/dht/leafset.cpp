@@ -73,9 +73,12 @@ bool Leafset::isInside(const Host& entry)
 
 bool Leafset::add(const Host& entry)
 {
-	pf_log[W_DEBUG] << " Adding an entry in the leafset: " << entry;
+	pf_log[W_DEBUG] << "Trying to add an entry in the leafset: " << entry;
 	if(me.GetKey() == entry.GetKey())
+	{
+		pf_log[W_DEBUG] << "Trying to add myself in the leafset ?";
 		return false;
+	}
 
 	HostVector::iterator it;
 
@@ -84,9 +87,13 @@ bool Leafset::add(const Host& entry)
 		for(it = leavesCW.begin(); it != leavesCW.end(); it++)
 		{
 			if(entry.GetKey() == it->GetKey())
+			{
+				pf_log[W_DEBUG] << "Entry already in the leafset, clockwise.";
 				return false;
+			}
 			else if(entry.GetKey() < it->GetKey())
 			{
+				pf_log[W_DEBUG] << "Insert entry clockwise.";
 				leavesCW.insert(it, entry);
 				/* If needed, remove the last host clockwise */
 				if(leavesCW.size() > ONE_SIDE_LEAFSET_SIZE)
@@ -98,6 +105,7 @@ bool Leafset::add(const Host& entry)
 		/* Leafset is not full, add at the end. */
 		if(leavesCW.size() < ONE_SIDE_LEAFSET_SIZE)
 		{
+			pf_log[W_DEBUG] << "Insert entry clockwise.";
 			leavesCW.push_back(entry);
 			return true;
 		}
@@ -107,9 +115,13 @@ bool Leafset::add(const Host& entry)
 		for(it = leavesCCW.begin(); it != leavesCCW.end(); it++)
 		{
 			if(entry.GetKey() == it->GetKey())
+			{
+				pf_log[W_DEBUG] << "Entry already in the leafset, counter-clockwise.";
 				return false;
+			}
 			else if(entry.GetKey() > it->GetKey())
 			{
+				pf_log[W_DEBUG] << "Insert entry counter-clockwise.";
 				leavesCCW.insert(it, entry);
 				/* If needed, remove the last host clockwise */
 				if(leavesCCW.size() > ONE_SIDE_LEAFSET_SIZE)
@@ -121,6 +133,7 @@ bool Leafset::add(const Host& entry)
 		/* Leafset is not full, add at the end. */
 		if(leavesCCW.size() < ONE_SIDE_LEAFSET_SIZE)
 		{
+			pf_log[W_DEBUG] << "Insert entry counter-clockwise.";
 			leavesCCW.push_back(entry);
 			return true;
 		}
@@ -131,9 +144,12 @@ bool Leafset::add(const Host& entry)
 
 bool Leafset::remove(const Host& entry)
 {
-	pf_log[W_DEBUG] << "Removed an entry from the leafset: " << entry;
+	pf_log[W_DEBUG] << "Trying to remove an entry from the leafset: " << entry;
 	if(entry.GetKey() == this->me.GetKey())
+	{
+		pf_log[W_DEBUG] << "Trying to remove myself from the leafset ?";
 		return false;
+	}
 
 	HostVector::iterator it;
 
@@ -141,6 +157,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
+			pf_log[W_DEBUG] << "Entry removed."
 			leavesCW.erase(it);
 			return true;
 		}
@@ -149,6 +166,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
+			pf_log[W_DEBUG] << "Entry removed."
 			leavesCCW.erase(it);
 			return true;
 		}
