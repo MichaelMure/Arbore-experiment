@@ -191,7 +191,7 @@ Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 		if(!leavesCW.empty())
 			return leavesCW.back();
 	}
-	else
+	else if(key < me.GetKey())
 	{
 		if(!leavesCCW.empty())
 			return leavesCCW.back();
