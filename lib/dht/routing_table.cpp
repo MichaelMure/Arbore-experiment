@@ -54,31 +54,30 @@ void RoutingTable::clear()
 		*it = InvalidHost;
 }
 
-void RoutingTable::print() const
+std::string RoutingTable::GetStr() const
 {
-    size_t i, j, k;
-    bool b;
+	size_t i, j, k;
+	bool new_line;
+	std::string str = "------------------------ROUTING TABLE-------------------------------\n";
 
-    fprintf (stderr,
-             "------------------------------- TABLE-------------------------------\n");
-    for (i = 0; i < MAX_ROW; i++)
-        {
-            b = false;
+	for (i = 0; i < MAX_ROW; i++)
+	{
+		new_line = false;
 
-            for (j = 0; j < MAX_COL; j++)
-                {
-                    for (k = 0; k < MAX_ENTRY; k++)
-                        if (getEntry(i, j, k) != InvalidHost)
-			{
-                            fprintf (stderr, "%s ", getEntry(i, j,k).GetKey().GetStr().c_str());
-			    b = true;
-			}
-                }
-	    if(b)
-	            fprintf (stderr, "\n");
-        }
-    fprintf (stderr,
-             "----------------------------------------------------------------------\n");
+		for (j = 0; j < MAX_COL; j++)
+		{
+			for (k = 0; k < MAX_ENTRY; k++)
+				if (getEntry(i, j, k) != InvalidHost)
+				{
+					str += getEntry(i, j,k).GetKey().GetStr() + " ";
+					new_line = true;
+				}
+		}
+		if(new_line)
+			str += "\n";
+	}
+	str += "----------------------------------------------------------------------";
+	return str;
 }
 
 
@@ -229,7 +228,7 @@ size_t RoutingTable::hexalphaToInt(int c)
 
 Host RoutingTable::routeLookup(const Key& key , bool* perfectMatch) const
 {
-	print();
+	pf_log[W_DEBUG] << *this;
 	if(this->me.GetKey() == key)
 	{
 		return this->me;

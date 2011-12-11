@@ -58,7 +58,8 @@ public:
 	 */
 	RoutingTable(Host me);
 
-	void print() const;
+	/** @return a textual representation of the routing table. */
+	std::string GetStr() const;
 
 	/*! \brief Perfoms maintenance caused by a change in DHT key
 	 *
@@ -170,4 +171,12 @@ private:
 	static Host bestEntry(const Host e1, const Host e2, const Key& key);
 
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <RoutingTable> (RoutingTable routing_table)
+{
+	_str += routing_table.GetStr();
+	return *this;
+}
+
 #endif /* _CHIMERA_ROUTINGTABLE_H_ */
