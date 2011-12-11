@@ -52,18 +52,8 @@ public :
 	 * \param me the local node
 	 */
 	ChimeraRouting(Host me);
-	void KeyUpdate(Host me);
 
-	/*! \brief Updates the routing information by adding or removing a peer.
-	 *
-	 * When a peer joins or leaves the network, this function can add it
-	 * or remove it from the DHT neighbours that are used for routing.
-	 *
-	 * \deprecated use add and remove instead
-	 * \param host  the peer whose status is updated
-	 * \param joined  1 if the peer joined, 0 if he left
-	 */
-	void route_update(const Host& host, int joined);
+	void KeyUpdate(Host me);
 
 	/*! \brief Updates the routing information by adding a peer.
 	 *

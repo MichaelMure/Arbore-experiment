@@ -39,19 +39,6 @@ void ChimeraRouting::KeyUpdate(Host me)
 	this->routingTable.KeyUpdate(me);
 }
 
-void ChimeraRouting::route_update(const Host& host, int joined)
-{
-	BlockLockMutex lock(this);
-	if(joined == 1)
-	{
-		this->add(host);
-	}
-	else
-	{
-		this->remove(host);
-	}
-}
-
 bool ChimeraRouting::add(const Host& host)
 {
 	BlockLockMutex lock(this);
