@@ -30,7 +30,6 @@
 class Thread
 {
 private:
-	Mutex running_lock;
 	bool running;
 	pthread_t thread_id;
 	pthread_attr_t attr;

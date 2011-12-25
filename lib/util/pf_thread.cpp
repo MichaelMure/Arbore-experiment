@@ -91,8 +91,5 @@ void Thread::ThrowHandler()
 
 bool Thread::IsRunning()
 {
-	running_lock.Lock();
-	bool r = running;
-	running_lock.Unlock();
-	return r;
+	return running;
 }
