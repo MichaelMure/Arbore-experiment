@@ -176,17 +176,10 @@ void Network::Loop()
 						return;
 					}
 
-					job = *it;
 					sender.UpdateStat(1);
-					double latency = time::dtime() - job->GetTransmitTime();
-					if(latency > 0)
-					{
-						if(job->GetDestHost().GetLatency() == 0.0)
-							job->GetDestHost().SetLatency(latency);
-						else
-							job->GetDestHost().SetLatency((0.9 * job->GetDestHost().GetLatency())
-										    + (0.1 * latency));
-					}
+
+					job = *it;
+					job->GetDestHost().UpdateLatency(time::dtime() - job->GetTransmitTime());
 
 					resend_list.erase(it);
 					scheduler_queue.Cancel(job);

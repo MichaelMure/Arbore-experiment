@@ -76,7 +76,8 @@ public:
 
 	double GetFailureTime() const { return failuretime; }
 
-	void SetLatency(double l) { latency = l; }
+	/** Update the latency with a weight of 10% */
+	void UpdateLatency(double l);
 	double GetLatency() const { return latency; }
 
 	void SetFailureTime(double f) { failuretime = f; }
@@ -127,7 +128,17 @@ void _Host::UpdateStat (int success)
 	// printf("]   ");
 	this->success_avg = total / SUCCESS_WINDOW;
 	//  printf("Total: %f, avg: %f\n",total,this->success_avg);
+}
 
+void _Host::UpdateLatency (const double l)
+{
+	if(l < 0.0)
+		return;
+
+	if(latency < 0.00001)
+		latency = l;
+	else
+		latency = 0.9 * latency + 0.1 * l;
 }
 
 /*************************
@@ -252,12 +263,12 @@ double Host::GetFailureTime() const
 	return host->GetFailureTime();
 }
 
-void Host::SetLatency(const double f)
+void Host::UpdateLatency(const double l)
 {
 	if(this->host == NULL) return;
 
 	BlockLockMutex(this->host->GetMutex());
-	host->SetLatency(f);
+	host->UpdateLatency(l);
 }
 
 double Host::GetLatency() const

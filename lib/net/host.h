@@ -124,7 +124,7 @@ public:
 	void SetFailureTime(const double f);  /**< Set the failure time */
 
 	double GetLatency() const;            /**< Get the latency */
-	void SetLatency(const double l);      /**< Set the latency */
+	void UpdateLatency(const double l);   /**< Update the latency with a weight of 10% */
 
 	float GetSuccessAvg() const;          /**< Get the success average */
 
