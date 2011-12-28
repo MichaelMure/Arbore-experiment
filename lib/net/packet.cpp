@@ -151,11 +151,11 @@ char* Packet::DumpBuffer()
 uint32_t Packet::GetHeaderSize()
 {
 	return    Key::size                // src
-		+ Key::size                // dst
-		+ sizeof(uint32_t)         // type
-		+ sizeof(uint32_t)         // size of data
-		+ sizeof(uint32_t)         // sequence number
-		+ sizeof(uint32_t);        // flags
+	        + Key::size                // dst
+	        + sizeof(uint32_t)         // type
+	        + sizeof(uint32_t)         // size of data
+	        + sizeof(uint32_t)         // sequence number
+	        + sizeof(uint32_t);        // flags
 }
 
 uint32_t Packet::GetSize() const
