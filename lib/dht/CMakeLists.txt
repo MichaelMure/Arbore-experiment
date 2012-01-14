@@ -7,9 +7,15 @@ add_library(dht SHARED
     chimera_messages.cpp
     chimera_routing.h
     chimera_routing.cpp
+    data.h
+    data.cpp
+    datastring.h
+    datastring.cpp     
     leafset.h
     leafset.cpp
     routing_table.h
     routing_table.cpp
+    storage.h
+    storage.cpp
     )
 SET(PFLIBS ${PFLIBS} dht)
