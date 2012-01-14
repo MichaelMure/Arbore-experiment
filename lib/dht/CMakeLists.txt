@@ -7,8 +7,6 @@ add_library(dht SHARED
     chimera_messages.cpp
     chimera_routing.h
     chimera_routing.cpp
-    dolr.h
-    dolr.cpp
     leafset.h
     leafset.cpp
     routing_table.h
