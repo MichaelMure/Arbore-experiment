@@ -9,8 +9,10 @@ add_library(dht SHARED
     chimera_routing.cpp
     data.h
     data.cpp
+    datakey.h
+    datakey.cpp
     datastring.h
-    datastring.cpp     
+    datastring.cpp     	
     leafset.h
     leafset.cpp
     routing_table.h
