@@ -25,3 +25,50 @@
 
  #include "storage.h"
 
+	void Storage::addInfo(Key k, Key info)
+	{
+		//if(isKeyList(k))
+
+	}
+
+	void Storage::addInfo(Key k, std::string info)
+	{
+
+	}
+
+	void Storage::removeInfo(Key k, Key info)
+	{
+
+	}
+	void Storage::removeInfo(Key k, std::string info)
+	{
+
+	}
+	bool Storage::isKeyList(Key k) const
+	{
+		return dataMap_.find(k)->second->getDataType()==KEY_LIST;
+	}
+	bool Storage::isStringList(Key k) const
+	{
+		return dataMap_.find(k)->second->getDataType()==STRING_LIST;
+	}
+	void Storage::removeKey(Key k)
+	{
+
+	}
+	bool Storage::hasKey(Key k) const
+	{
+
+	}
+	Data* Storage::getInfo(Key k) const
+	{
+
+	}
+	void Storage::clean()
+	{
+
+	}
+	void Storage::clear()
+	{
+
+	}

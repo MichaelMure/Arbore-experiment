@@ -37,6 +37,7 @@ public:
 	void add(Key k);
 	void remove(Key k);
 	int getSize() const;
+	data_type getDataType() const;
 
 private:
 	std::set<Key> keyList_;

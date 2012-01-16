@@ -35,7 +35,7 @@ class Storage
 {
 public:
 
-	Storage();
+	Storage() {};
 	virtual ~Storage();
 	void addInfo(Key k, Key info);
 	void addInfo(Key k, std::string info);
@@ -45,12 +45,12 @@ public:
 	bool isStringList(Key k) const;
 	void removeKey(Key k);
 	bool hasKey(Key k) const;
-	Data getInfo(Key k) const;
+	Data* getInfo(Key k) const;
 	void clean();
 	void clear();
 
 private:
-	std::map<Key, Data> dataMap_;
+	std::map<Key, Data*> dataMap_;
 
 	};
 

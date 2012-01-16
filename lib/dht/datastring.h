@@ -37,6 +37,7 @@ public:
 	void add(std::string name);
 	void remove(std::string name);
 	int getSize() const;
+	data_type getDataType() const;
 
 private:
 	std::set<std::string> nameList_;

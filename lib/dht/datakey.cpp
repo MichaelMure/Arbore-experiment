@@ -44,3 +44,8 @@ int DataKey::getSize() const
 {
 	return keyList_.size();
 }
+
+data_type DataKey::getDataType() const
+{
+	return KEY_LIST;
+}

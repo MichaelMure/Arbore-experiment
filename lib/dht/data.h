@@ -26,12 +26,17 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <time.h>
+enum data_type
+{
+	STRING_LIST,
+	KEY_LIST
+};
 
 class Data
 {
 public:
 	virtual ~Data() {};
+	virtual data_type getDataType() const =0;
 
 protected:
 	Data();
