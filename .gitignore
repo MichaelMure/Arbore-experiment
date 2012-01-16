@@ -8,6 +8,6 @@ CMakeCache.txt
 CMakeFiles/
 Makefile
 cmake_install.cmake
-lib/*.so
+*.so
 dht_test
 doc/html/
