@@ -23,7 +23,7 @@
  *
  */
 
-#include "chimera_routing.h"
+#include "routing.h"
 
 ChimeraRouting::ChimeraRouting(Host _me)
 	: me(_me),

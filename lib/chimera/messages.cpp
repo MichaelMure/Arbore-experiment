@@ -30,8 +30,8 @@
 #include <net/packet_handler.h>
 #include <scheduler/scheduler_queue.h>
 
-#include "chimera_messages.h"
-#include "chimera_routing.h"
+#include "messages.h"
+#include "routing.h"
 #include "chimera.h"
 #include "check_leafset_job.h"
 

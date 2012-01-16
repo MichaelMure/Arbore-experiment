@@ -31,7 +31,7 @@
 #include <util/pf_log.h>
 #include <util/tools.h>
 #include <chimera/chimera.h>
-#include <chimera/chimera_messages.h>
+#include <chimera/messages.h>
 
 enum
 {
