@@ -27,11 +27,11 @@
 #include <net/network.h>
 #include <net/packet.h>
 #include <net/hosts_list.h>
-#include <dht/chimera.h>
 #include <scheduler/scheduler.h>
 #include <util/pf_log.h>
 #include <util/tools.h>
-#include <dht/chimera_messages.h>
+#include <chimera/chimera.h>
+#include <chimera/chimera_messages.h>
 
 enum
 {
