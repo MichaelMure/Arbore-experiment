@@ -43,14 +43,14 @@ public:
 	  * If not, an JOINACK is answered, with all the peer's addresses
 	  * that are in the leafset.
 	  */
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
 		double elapsed_time = time::dtime() - host.GetFailureTime();
 
-		if(elapsed_time < ChimeraDHT::GRACEPERIOD)
+		if(elapsed_time < Chimera::GRACEPERIOD)
 		{
 			Packet join_nack(ChimeraJoinNAckType, chimera.GetMe().GetKey(), host.GetKey());
 			join_nack.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
@@ -84,7 +84,7 @@ public:
 	  * and each host in the routing table.
 	  * TODO: don't handle this message after a succesfull join.
 	  */
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		AddrList addresses = pckt.GetArg<AddrList>(CHIMERA_JOIN_ACK_ADDRESSES);
 		std::vector<Host> hosts;
@@ -124,13 +124,13 @@ public:
 	/** A JOIN_NACK message trigger the sending of another JOIN message
 	  * after some times.
 	  */
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_NACK_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
 
 		pf_log[W_WARNING] << "JOIN request rejected from " << host;
-		sleep(ChimeraDHT::GRACEPERIOD);
+		sleep(Chimera::GRACEPERIOD);
 		pf_log[W_WARNING] << "Re-sending JOIN message to " << host;
 
 		chimera.Join(host);
@@ -143,7 +143,7 @@ public:
 	/** The Update message add the sender to the routing infrastructure
 	  * (leafset + routing table).
 	  */
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_UPDATE_ADDRESS);
 		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
@@ -155,7 +155,7 @@ class ChimeraPiggyMessage : public NetworkMessage
 {
 public:
 	/** We update the routing infrastructure with the given addresses */
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		AddrList address = pckt.GetArg<AddrList>(CHIMERA_PIGGY_ADDRESSES);
 		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
@@ -163,7 +163,7 @@ public:
 			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
 
 			/* After a peer failed, we wait some time before adding it back. */
-			if(time::dtime() - host.GetFailureTime() > ChimeraDHT::GRACEPERIOD)
+			if(time::dtime() - host.GetFailureTime() > Chimera::GRACEPERIOD)
 				chimera.GetRouting()->add(host);
 			else
 				pf_log[W_WARNING] << "Refused to add " << host << " to routing table";
@@ -177,7 +177,7 @@ class ChimeraPingMessage : public NetworkMessage
 	  * The ping is already ACKnoledged by the network, due to the REQUESTACK flag.
 	  */
 public:
-	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
 	}

@@ -33,7 +33,7 @@ class Network;
 class ChimeraRouting;
 class Packet;
 
-class ChimeraDHT : public PacketTypeList
+class Chimera : public PacketTypeList
 {
 	Network* network;
 	ChimeraRouting* routing;
@@ -48,9 +48,9 @@ public:
 	 */
 	static const unsigned int GRACEPERIOD = 30;		/* seconds */
 
-	/** Create the ChimeraDHT.
+	/** Create the Chimera.
 	 *
-	 * Create a new ChimeraDHT object to build all of the Distributed
+	 * Create a new Chimera object to build all of the Distributed
 	 * Hash Table which is used by Peerfuse to send messages to other
 	 * peers.
 	 *
@@ -59,7 +59,7 @@ public:
 	 * @param port  listened port
 	 * @param my_key  key used on the DHT network.
 	 */
-	ChimeraDHT(Network* network, uint16_t port, Key my_key);
+	Chimera(Network* network, uint16_t port, Key my_key);
 
 	/** @return  the Host object which represents me on network. */
 	Host GetMe() const { return me; }

@@ -28,7 +28,7 @@
 
 void NetworkMessage::operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 {
-	ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
+	Chimera& chimera = dynamic_cast<Chimera&>(pckt_type_list);
 
 	if(pckt.HasFlag(Packet::MUSTROUTE))
 	{

@@ -34,7 +34,7 @@
 #include "messages.h"
 #include "routing.h"
 
-ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
+Chimera::Chimera(Network* _network, uint16_t port, Key my_key)
 	: network(_network),
 	routing(NULL)
 
@@ -68,12 +68,12 @@ ChimeraDHT::ChimeraDHT(Network* _network, uint16_t port, Key my_key)
 	pf_log[W_INFO] << "Started Chimera with key " << my_key;
 }
 
-bool ChimeraDHT::Send(const Host& dest, const Packet& pckt)
+bool Chimera::Send(const Host& dest, const Packet& pckt)
 {
 	return network->Send(fd, dest, pckt);
 }
 
-bool ChimeraDHT::Ping(const Host& dest)
+bool Chimera::Ping(const Host& dest)
 {
 	Packet pckt(ChimeraPingType, me.GetKey(), dest.GetKey());
 	pckt.SetArg(CHIMERA_PING_ME, me.GetAddr());
@@ -81,7 +81,7 @@ bool ChimeraDHT::Ping(const Host& dest)
 	return Send(dest, pckt);
 }
 
-void ChimeraDHT::Join(const Host& bootstrap)
+void Chimera::Join(const Host& bootstrap)
 {
 	if(bootstrap == InvalidHost)
 	{
@@ -93,12 +93,12 @@ void ChimeraDHT::Join(const Host& bootstrap)
 	Packet pckt(ChimeraJoinType, GetMe().GetKey(), bootstrap.GetKey());
 	pckt.SetArg(CHIMERA_JOIN_ADDRESS, GetMe().GetAddr());
 	if(!Send(bootstrap, pckt))
-		pf_log[W_WARNING] << "ChimeraDHT::Join: failed to contact bootstrap host " << bootstrap;
+		pf_log[W_WARNING] << "Chimera::Join: failed to contact bootstrap host " << bootstrap;
 
 	/* TODO: lock here until join is done. */
 }
 
-bool ChimeraDHT::Route(const Packet& pckt)
+bool Chimera::Route(const Packet& pckt)
 {
 	pf_log[W_DEBUG] << "***** ROUTING ******";
 
@@ -150,7 +150,7 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	return true;
 }
 
-void ChimeraDHT::sendRowInfo(const Packet& pckt)
+void Chimera::sendRowInfo(const Packet& pckt)
 {
 	Host host = GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS));
 
@@ -165,12 +165,12 @@ void ChimeraDHT::sendRowInfo(const Packet& pckt)
 		pf_log[W_ERR] << "Sending row information to node " << host << " failed";
 }
 
-bool ChimeraDHT::Publish(Key key)
+bool Chimera::Publish(Key key)
 {
 	return true;
 }
 
-bool ChimeraDHT::Unpublish(Key key)
+bool Chimera::Unpublish(Key key)
 {
 	return true;
 }

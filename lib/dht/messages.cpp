@@ -37,7 +37,7 @@
 class DHTPublishMessage : public NetworkMessage
 {
 public:
-	void Handle (ChimeraDHT&, const Host&, const Packet&)
+	void Handle (Chimera&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}
@@ -46,7 +46,7 @@ public:
 class DHTUnpublishMessage : public NetworkMessage
 {
 public:
-	void Handle (ChimeraDHT&, const Host&, const Packet&)
+	void Handle (Chimera&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}

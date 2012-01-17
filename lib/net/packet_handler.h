@@ -26,7 +26,7 @@
 class Host;
 class Packet;
 class PacketTypeList;
-class ChimeraDHT;
+class Chimera;
 
 class PacketHandlerBase
 {
@@ -44,7 +44,7 @@ class NetworkMessage : public PacketHandlerBase
 public:
 	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt);
 
-	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
+	virtual void Handle (Chimera& chimera, const Host& sender, const Packet& pckt) = 0;
 };
 
 #endif /* PACKET_HANDLER_H */

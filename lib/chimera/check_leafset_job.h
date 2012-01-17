@@ -29,7 +29,7 @@
 #include <scheduler/job.h>
 #include <util/time.h>
 
-class ChimeraDHT;
+class Chimera;
 class ChimeraRouting;
 
 /** Class to make the update of the leafset of a Host
@@ -38,7 +38,7 @@ class ChimeraRouting;
  */
 class CheckLeafsetJob : public Job
 {
-	ChimeraDHT* chimera_;
+	Chimera* chimera_;
 	ChimeraRouting* routing_;
 	size_t count_;
 
@@ -46,7 +46,7 @@ class CheckLeafsetJob : public Job
 
 public:
 
-	CheckLeafsetJob(ChimeraDHT* chimera, ChimeraRouting* routing)
+	CheckLeafsetJob(Chimera* chimera, ChimeraRouting* routing)
 		: Job(time::dtime(), REPEAT_PERIODIC, 20.0),
 		  chimera_(chimera),
 		  routing_(routing),

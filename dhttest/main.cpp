@@ -42,7 +42,7 @@ enum
 class ChimeraChatMessage : public NetworkMessage
 {
 public:
-	void Handle(ChimeraDHT& chimera, const Host& sender, const Packet& pckt)
+	void Handle(Chimera& chimera, const Host& sender, const Packet& pckt)
 	{
 		std::string message = pckt.GetArg<std::string>(CHIMERA_CHAT_MESSAGE);
 		pf_log[W_INFO] << "CHAT[" << pckt.GetSrc() << "] " << message;
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 	Network net;
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	ChimeraDHT* dht = new ChimeraDHT(&net, StrToTyp<uint16_t>(argv[1]), me);
+	Chimera* dht = new Chimera(&net, StrToTyp<uint16_t>(argv[1]), me);
 	dht->RegisterType(ChimeraChatType);
 
 	std::cerr << "hosts_list pointer: " << dht->GetNetwork()->GetHostsList() << std::endl;
