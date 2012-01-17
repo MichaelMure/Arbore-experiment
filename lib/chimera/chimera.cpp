@@ -164,13 +164,3 @@ void Chimera::sendRowInfo(const Packet& pckt)
 	if(!Send(host, rowinfo))
 		pf_log[W_ERR] << "Sending row information to node " << host << " failed";
 }
-
-bool Chimera::Publish(Key key)
-{
-	return true;
-}
-
-bool Chimera::Unpublish(Key key)
-{
-	return true;
-}
