@@ -114,13 +114,13 @@ bool ChimeraDHT::Route(const Packet& pckt)
 	{
 		GetRouting()->remove(nextDest);
 		nextDest = GetRouting()->routeLookup(key);
-		pf_log[W_DEBUG] << "Heuuu, sorry, Routing to: " << nextDest;
+		pf_log[W_DEBUG] << "Routing the JOIN message to another host (host already know) " << nextDest;
 	}
 
 	/* if I am the only host or the closest host is me, deliver the message */
 	if(nextDest == GetMe())
 	{
-		pf_log[W_DEBUG] << "Shit, it's me";
+		pf_log[W_DEBUG] << "I'm the closest know host, deliver the message.";
 		pf_log[W_DEBUG] << "***** END OF ROUTING *****";
 		return false;
 	}
