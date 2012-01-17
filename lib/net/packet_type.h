@@ -31,6 +31,34 @@
 
 class PacketHandlerBase;
 
+
+/** This is list of all availables type messages.
+ *
+ * To prevent conflicts in message types numbers, we declare
+ * this list which contains all of the type and upcalls messages.
+ */
+enum
+{
+	CHIMERA_JOIN        = 1,
+	CHIMERA_JOIN_ACK    = 2,
+	CHIMERA_UPDATE      = 3,
+	CHIMERA_PIGGY       = 4,
+	CHIMERA_JOIN_NACK   = 5,
+	CIHMERA_PING        = 7,
+	CHIMERA_RESERVED1   = 8,
+	CHIMERA_RESERVED2   = 9,
+	CHIMERA_RESERVED3   = 10,
+	CHIMERA_RESERVED4   = 11,
+
+	DHT_PUBLISH         = 12,
+	DHT_UNPUBLISH       = 13,
+	DHT_GET             = 14,
+	DHT_RESERVED1       = 15,
+	DHT_RESERVED2       = 16,
+	DHT_RESERVED3       = 17,
+	DHT_RESERVED4       = 18,
+};
+
 class PacketType : public std::vector<PacketArgType>
 {
 	uint32_t type;

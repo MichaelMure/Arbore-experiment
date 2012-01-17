@@ -35,21 +35,7 @@
 #include "chimera.h"
 #include "check_leafset_job.h"
 
-void ChimeraBaseMessage::operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
-{
-	ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
-
-	if(pckt.HasFlag(Packet::MUSTROUTE))
-	{
-		if(chimera.Route(pckt))
-			return;
-	}
-
-	Handle(chimera, sender, pckt);
-}
-
-
-class ChimeraJoinMessage : public ChimeraBaseMessage
+class ChimeraJoinMessage : public NetworkMessage
 {
 public:
 	/** The JOIN message is answered by a JOINACK or a JOINNACK message.
@@ -89,7 +75,7 @@ public:
 	}
 };
 
-class ChimeraJoinAckMessage : public ChimeraBaseMessage
+class ChimeraJoinAckMessage : public NetworkMessage
 {
 public:
 	/** After receiving a JOINACK message, we add the received peers addresses
@@ -132,7 +118,7 @@ public:
 	}
 };
 
-class ChimeraJoinNAckMessage : public ChimeraBaseMessage
+class ChimeraJoinNAckMessage : public NetworkMessage
 {
 public:
 	/** A JOIN_NACK message trigger the sending of another JOIN message
@@ -151,7 +137,7 @@ public:
 	}
 };
 
-class ChimeraUpdateMessage : public ChimeraBaseMessage
+class ChimeraUpdateMessage : public NetworkMessage
 {
 public:
 	/** The Update message add the sender to the routing infrastructure
@@ -165,7 +151,7 @@ public:
 	}
 };
 
-class ChimeraPiggyMessage : public ChimeraBaseMessage
+class ChimeraPiggyMessage : public NetworkMessage
 {
 public:
 	/** We update the routing infrastructure with the given addresses */
@@ -185,7 +171,7 @@ public:
 	}
 };
 
-class ChimeraPingMessage : public ChimeraBaseMessage
+class ChimeraPingMessage : public NetworkMessage
 {
 	/** We handle a ping message by simply adding it in the host list.
 	  * The ping is already ACKnoledged by the network, due to the REQUESTACK flag.
@@ -194,24 +180,6 @@ public:
 	void Handle (ChimeraDHT& chimera, const Host&, const Packet& pckt)
 	{
 		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
-	}
-};
-
-class ChimeraPublishMessage : public ChimeraBaseMessage
-{
-public:
-	void Handle (ChimeraDHT&, const Host&, const Packet&)
-	{
-		/* TODO: unimplemented */
-	}
-};
-
-class ChimeraUnpublishMessage : public ChimeraBaseMessage
-{
-public:
-	void Handle (ChimeraDHT&, const Host&, const Packet&)
-	{
-		/* TODO: unimplemented */
 	}
 };
 
@@ -228,6 +196,3 @@ PacketType  ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage,  
                                                                                                                                                   T_END);
 PacketType      ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,      Packet::REQUESTACK,  "PING",                /* CHIMERA_PING_ME */ T_ADDR,
                                                                                                                                                   T_END);
-PacketType   ChimeraPublishType(CHIMERA_PUBLISH,   new ChimeraPublishMessage,   Packet::REQUESTACK,  "PUBLISH",                                   T_END);
-PacketType ChimeraUnpublishType(CHIMERA_UNPUBLISH, new ChimeraUnpublishMessage, Packet::REQUESTACK,  "UNPUBLISH",                                 T_END);
-

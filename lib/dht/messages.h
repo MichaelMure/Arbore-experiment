@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2012 Muré Michael <batolettre@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,33 +18,26 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
- */
-
-#ifndef PACKET_HANDLER_H
-#define PACKET_HANDLER_H
-
-class Host;
-class Packet;
-class PacketTypeList;
-class ChimeraDHT;
-
-class PacketHandlerBase
-{
-public:
-	virtual ~PacketHandlerBase() {}
-	virtual void operator()(PacketTypeList& pckt_type_list, const Host& sender, const Packet& packet) = 0;
-};
-
-/** Virtual class used to create handler on a network message.
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
  *
- * It routes message if the MUSTROUTE flag is set.
  */
-class NetworkMessage : public PacketHandlerBase
+
+#ifndef DHT_MESSAGES_H
+#define DHT_MESSAGES_H
+
+#include <net/packet_type.h>
+
+enum
 {
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt);
-
-	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
+	DHT_PUBLISH_ARG1
 };
+extern PacketType ChimeraPublishType;
 
-#endif /* PACKET_HANDLER_H */
+enum
+{
+	DHT_UNPUBLISH_ARG2
+};
+extern PacketType ChimeraUnpublishType;
+
+#endif /* CHIMERA_MESSAGES_H */

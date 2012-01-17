@@ -1,5 +1,6 @@
 /*
  * Copyright(C) 2008 Romain Bignon
+ * Copyright(C) 2012 Michael Muré <batolettre@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,46 +24,33 @@
  *
  */
 
-#ifndef CHIMERA_MESSAGES_H
-#define CHIMERA_MESSAGES_H
+#include <util/pf_log.h>
+#include <util/time.h>
+#include <net/network.h>
+#include <net/packet.h>
+#include <net/packet_handler.h>
+#include <scheduler/scheduler_queue.h>
+#include <chimera/chimera.h>
 
-#include <net/packet_type.h>
+#include "messages.h"
 
-enum
+class DHTPublishMessage : public NetworkMessage
 {
-	CHIMERA_JOIN_ADDRESS
-};
-extern PacketType ChimeraJoinType;
-
-enum
-{
-	CHIMERA_JOIN_ACK_ADDRESSES
-};
-extern PacketType ChimeraJoinAckType;
-
-enum
-{
-	CHIMERA_UPDATE_ADDRESS
-};
-extern PacketType ChimeraUpdateType;
-
-enum
-{
-	CHIMERA_PIGGY_ADDRESSES
+public:
+	void Handle (ChimeraDHT&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
 };
 
-extern PacketType ChimeraPiggyType;
-
-enum
+class DHTUnpublishMessage : public NetworkMessage
 {
-	CHIMERA_JOIN_NACK_ADDRESS
+public:
+	void Handle (ChimeraDHT&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
 };
-extern PacketType ChimeraJoinNAckType;
 
-enum
-{
-	CHIMERA_PING_ME
-};
-extern PacketType ChimeraPingType;
-
-#endif /* CHIMERA_MESSAGES_H */
+PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage,   Packet::REQUESTACK,  "PUBLISH",                                   T_END);
+PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK,  "UNPUBLISH",                                 T_END);

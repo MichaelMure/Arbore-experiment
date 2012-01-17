@@ -5,6 +5,8 @@ add_library(dht SHARED
     datakey.cpp
     datastring.h
     datastring.cpp
+    messages.h
+    messages.cpp
     storage.h
     storage.cpp
     )

@@ -26,6 +26,7 @@
 
 #include <net/network.h>
 #include <net/packet.h>
+#include <net/packet_handler.h>
 #include <net/hosts_list.h>
 #include <scheduler/scheduler.h>
 #include <util/pf_log.h>
@@ -38,7 +39,7 @@ enum
 	CHIMERA_CHAT_MESSAGE
 };
 
-class ChimeraChatMessage : public ChimeraBaseMessage
+class ChimeraChatMessage : public NetworkMessage
 {
 public:
 	void Handle(ChimeraDHT& chimera, const Host& sender, const Packet& pckt)

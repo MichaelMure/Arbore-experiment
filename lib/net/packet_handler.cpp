@@ -1,5 +1,6 @@
 /*
  * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2012 Muré Michael <batolettre@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,31 +21,20 @@
  *
  */
 
-#ifndef PACKET_HANDLER_H
-#define PACKET_HANDLER_H
+#include "packet_handler.h"
+#include <net/packet_type.h>
+#include <chimera/chimera.h>
+#include <net/packet.h>
 
-class Host;
-class Packet;
-class PacketTypeList;
-class ChimeraDHT;
-
-class PacketHandlerBase
+void NetworkMessage::operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt)
 {
-public:
-	virtual ~PacketHandlerBase() {}
-	virtual void operator()(PacketTypeList& pckt_type_list, const Host& sender, const Packet& packet) = 0;
-};
+	ChimeraDHT& chimera = dynamic_cast<ChimeraDHT&>(pckt_type_list);
 
-/** Virtual class used to create handler on a network message.
- *
- * It routes message if the MUSTROUTE flag is set.
- */
-class NetworkMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt);
+	if(pckt.HasFlag(Packet::MUSTROUTE))
+	{
+		if(chimera.Route(pckt))
+			return;
+	}
 
-	virtual void Handle (ChimeraDHT& chimera, const Host& sender, const Packet& pckt) = 0;
-};
-
-#endif /* PACKET_HANDLER_H */
+	Handle(chimera, sender, pckt);
+}
