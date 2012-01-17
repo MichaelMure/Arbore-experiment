@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _ROUTINGTABLE_H_
-#define _ROUTINGTABLE_H_
+#ifndef ROUTINGTABLE_H
+#define ROUTINGTABLE_H
 
 #include <net/hosts_list.h>
 #include <util/key.h>
@@ -179,4 +179,4 @@ inline Log::flux& Log::flux::operator<< <RoutingTable> (RoutingTable routing_tab
 	return *this;
 }
 
-#endif /* _ROUTINGTABLE_H_ */
+#endif /* ROUTINGTABLE_H */

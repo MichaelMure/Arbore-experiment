@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef CHIMERA_MESSAGES_H
-#define CHIMERA_MESSAGES_H
+#ifndef MESSAGES_H
+#define MESSAGES_H
 
 #include <net/packet_type.h>
 

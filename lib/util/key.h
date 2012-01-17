@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _CHIMERA_KEY_H_
-#define _CHIMERA_KEY_H_
+#ifndef KEY_H
+#define KEY_H
 
 #include <limits.h>
 #include <openssl/evp.h>
@@ -205,4 +205,4 @@ inline Log::flux& Log::flux::operator<< <Key> (Key key)
 
 typedef std::set<Key> KeyList;
 
-#endif /* _CHIMERA_KEY_H_ */
+#endif /* KEY_H */

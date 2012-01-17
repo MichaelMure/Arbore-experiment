@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _HOSTS_LIST_H_
-#define _HOSTS_LIST_H_
+#ifndef HOSTS_LIST_H
+#define HOSTS_LIST_H
 
 #include <exception>
 #include <map>
@@ -63,4 +63,4 @@ public:
 	Host DecodeHost (std::string s);
 };
 
-#endif /* _HOSTS_LIST_H */
+#endif /* HOSTS_LIST_H */

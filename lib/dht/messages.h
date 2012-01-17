@@ -40,4 +40,4 @@ enum
 };
 extern PacketType ChimeraUnpublishType;
 
-#endif /* CHIMERA_MESSAGES_H */
+#endif /* DHT_MESSAGES_H */

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _HOST_H_
-#define _HOST_H_
+#ifndef HOST_H
+#define HOST_H
 
 #include <netinet/in.h>
 
@@ -146,4 +146,4 @@ inline Log::flux& Log::flux::operator<< <Host> (Host host)
 
 extern const Host InvalidHost;
 
-#endif /* _HOST_H_ */
+#endif /* HOST_H */

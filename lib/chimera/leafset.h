@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _CHIMERA_LEAFSET_H_
-#define _CHIMERA_LEAFSET_H_
+#ifndef LEAFSET_H
+#define LEAFSET_H
 
 #define LEAFSET_SIZE 8		/* (must be even) excluding node itself */
 #define ONE_SIDE_LEAFSET_SIZE LEAFSET_SIZE/2
@@ -114,4 +114,4 @@ inline Log::flux& Log::flux::operator<< <Leafset> (Leafset leafset)
 	return *this;
 }
 
-#endif /* _CHIMERA_LEAFSET_H_ */
+#endif /* LEAFSET_H */

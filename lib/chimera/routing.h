@@ -22,8 +22,8 @@
  * written by CURRENT Lab, UCSB.
  *
  */
-#ifndef ROUTING_H_
-#define ROUTING_H_
+#ifndef ROUTING_H
+#define ROUTING_H
 #include <vector>
 #include <net/host.h>
 #include <util/mutex.h>
@@ -122,4 +122,4 @@ public :
 
 };
 
-#endif /* _ROUTING_H_ */
+#endif /* ROUTING_H */
