@@ -30,7 +30,7 @@
 #include <util/time.h>
 
 class Chimera;
-class ChimeraRouting;
+class Routing;
 
 /** Class to make the update of the leafset of a Host
  * When it's started by the scheduler, it will update delete bad link in the leafset and routing table
@@ -39,14 +39,14 @@ class ChimeraRouting;
 class CheckLeafsetJob : public Job
 {
 	Chimera* chimera_;
-	ChimeraRouting* routing_;
+	Routing* routing_;
 	size_t count_;
 
 	bool Start();
 
 public:
 
-	CheckLeafsetJob(Chimera* chimera, ChimeraRouting* routing)
+	CheckLeafsetJob(Chimera* chimera, Routing* routing)
 		: Job(time::dtime(), REPEAT_PERIODIC, 20.0),
 		  chimera_(chimera),
 		  routing_(routing),

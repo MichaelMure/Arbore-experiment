@@ -22,8 +22,8 @@
  * written by CURRENT Lab, UCSB.
  *
  */
-#ifndef _CHIMERA_ROUTING_H_
-#define _CHIMERA_ROUTING_H_
+#ifndef ROUTING_H_
+#define ROUTING_H_
 #include <vector>
 #include <net/host.h>
 #include <util/mutex.h>
@@ -37,7 +37,7 @@ class HostsList;
  * Find the best next host to send the packet according to the final destination
  *
  */
-class ChimeraRouting : protected Mutex
+class Routing : protected Mutex
 {
 private :
 	Host me;                    /*!< Local host descriptor */
@@ -51,7 +51,7 @@ public :
 	 *
 	 * \param me the local node
 	 */
-	ChimeraRouting(Host me);
+	Routing(Host me);
 
 	void KeyUpdate(Host me);
 
@@ -122,4 +122,4 @@ public :
 
 };
 
-#endif /* _CHIMERA_ROUTING_H_ */
+#endif /* _ROUTING_H_ */

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _CHIMERA_ROUTINGTABLE_H_
-#define _CHIMERA_ROUTINGTABLE_H_
+#ifndef _ROUTINGTABLE_H_
+#define _ROUTINGTABLE_H_
 
 #include <net/hosts_list.h>
 #include <util/key.h>
@@ -179,4 +179,4 @@ inline Log::flux& Log::flux::operator<< <RoutingTable> (RoutingTable routing_tab
 	return *this;
 }
 
-#endif /* _CHIMERA_ROUTINGTABLE_H_ */
+#endif /* _ROUTINGTABLE_H_ */

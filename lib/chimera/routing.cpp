@@ -25,21 +25,21 @@
 
 #include "routing.h"
 
-ChimeraRouting::ChimeraRouting(Host _me)
+Routing::Routing(Host _me)
 	: me(_me),
 	routingTable(_me),
 	leafset(_me)
 {
 }
 
-void ChimeraRouting::KeyUpdate(Host me)
+void Routing::KeyUpdate(Host me)
 {
 	BlockLockMutex lock(this);
 	this->leafset.KeyUpdate(me);
 	this->routingTable.KeyUpdate(me);
 }
 
-bool ChimeraRouting::add(const Host& host)
+bool Routing::add(const Host& host)
 {
 	BlockLockMutex lock(this);
 	bool added = this->leafset.add(host);
@@ -48,7 +48,7 @@ bool ChimeraRouting::add(const Host& host)
 	return added;
 }
 
-bool ChimeraRouting::remove(const Host& host)
+bool Routing::remove(const Host& host)
 {
 	BlockLockMutex lock(this);
 	bool removed = this->leafset.remove(host);
@@ -57,7 +57,7 @@ bool ChimeraRouting::remove(const Host& host)
 	return removed;
 }
 
-Host ChimeraRouting::routeLookup(const Key& key) const
+Host Routing::routeLookup(const Key& key) const
 {
 	BlockLockMutex lock(this);
 	bool b;

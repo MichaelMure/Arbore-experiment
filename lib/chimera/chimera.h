@@ -30,13 +30,13 @@
 #include <net/host.h>
 
 class Network;
-class ChimeraRouting;
+class Routing;
 class Packet;
 
 class Chimera : public PacketTypeList
 {
 	Network* network;
-	ChimeraRouting* routing;
+	Routing* routing;
 	Host me;
 	int fd;
 
@@ -67,13 +67,13 @@ public:
 	/** @return  the Network object. */
 	Network* GetNetwork() const { return network; }
 
-	/** Get the ChimeraRouting object.
+	/** Get the Routing object.
 	 *
 	 * TODO: it MUST be private!!
 	 *
-	 * @return  the ChimeraRouting pointer.
+	 * @return  the Routing pointer.
 	 */
-	ChimeraRouting* GetRouting() const { return routing; }
+	Routing* GetRouting() const { return routing; }
 
 	/** Join the DHT network.
 	 *

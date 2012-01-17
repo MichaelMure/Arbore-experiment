@@ -54,7 +54,7 @@ Chimera::Chimera(Network* _network, uint16_t port, Key my_key)
 	me = network->GetHostsList()->GetHost(he->h_name, port);
 	me.SetKey(my_key);
 
-	routing = new ChimeraRouting(me);
+	routing = new Routing(me);
 
 	RegisterType(ChimeraJoinType);
 	RegisterType(ChimeraJoinAckType);
