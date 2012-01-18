@@ -30,14 +30,35 @@
 
 enum
 {
-	DHT_PUBLISH_ARG1
+	DHT_PUBLISH_KEY,
+	DHT_PUBLISH_TYPE,
+	DHT_PUBLISH_DATA
 };
-extern PacketType ChimeraPublishType;
+extern PacketType DHTPublishType;
 
 enum
 {
-	DHT_UNPUBLISH_ARG2
+	DHT_UNPUBLISH_KEY,
+	DHT_UNPUBLISH_TYPE,
+	DHT_UNPUBLISH_DATA
 };
-extern PacketType ChimeraUnpublishType;
+extern PacketType DHTUnpublishType;
+
+enum
+{
+	DHT_GET_KEY
+};
+extern PacketType DHTGetType;
+
+enum
+{
+	DHT_GET_ACK_TYPE,
+	DHT_GET_ACK_DATA
+};
+extern PacketType DHTGetAckType;
+
+extern PacketType DHTGetNAckType;
+
+
 
 #endif /* DHT_MESSAGES_H */

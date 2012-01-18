@@ -32,6 +32,7 @@ enum PacketArgType
 	T_ADDR,
 	T_ADDRLIST,
 	T_CHUNK,
+	T_DATA,
 	T_END
 };
 

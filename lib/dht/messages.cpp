@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * This product includes cryptographic software written by Eric Young
- * (eay@cryptsoft.com).  This product includes software written by Tim
+ * (eay@cryptsoft.com). This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
  * This file contains some code from the Chimera's Distributed Hash Table,
@@ -52,5 +52,47 @@ public:
 	}
 };
 
-PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage,   Packet::REQUESTACK,  "PUBLISH",                                   T_END);
-PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK,  "UNPUBLISH",                                 T_END);
+class DHTGetMessage : public NetworkMessage
+{
+public:
+	void Handle (Chimera&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
+};
+
+class DHTGetAckMessage : public NetworkMessage
+{
+public:
+	void Handle (Chimera&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
+};
+
+class DHTGetNAckMessage : public NetworkMessage
+{
+public:
+	void Handle (Chimera&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
+};
+
+
+PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage, Packet::REQUESTACK, "PUBLISH",   /* DHT_PUBLISH_KEY */    T_KEY,
+                                                                                                      /* DHT_PUBLISH_TYPE */   T_UINT32,
+                                                                                                      /* DHT_PUBLISH_DATA */   T_DATA,
+                                                                                                                               T_END);
+PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH", /* DHT_UNPUBLISH_KEY */  T_KEY,
+                                                                                                      /* DHT_UNPUBLISH_TYPE */ T_UINT32,
+                                                                                                      /* DHT_UNPUBLISH_DATA */ T_DATA,
+                                                                                                                               T_END);
+PacketType       DHTGetType(DHT_GET,       new DHTGetMessage,     Packet::REQUESTACK, "GET",       /* DHT_GET_KEY */        T_KEY,
+                                                                                                                               T_END);
+PacketType    DHTGetAckType(DHT_GET_ACK,   new DHTGetAckMessage,    Packet::REQUESTACK, "GET_ACK",   /* DHT_GET_ACK_TYPE */ T_UINT32,
+                                                                                                      /* DHT_GET_ACK_DATA */   T_DATA,
+                                                                                                                               T_END);
+PacketType   DHTGetNAckType(DHT_GET_NACK, new DHTGetNAckMessage,   Packet::REQUESTACK,  "GET_NACK",                         T_END);
+
+

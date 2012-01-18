@@ -53,10 +53,12 @@ enum
 	DHT_PUBLISH         = 12,
 	DHT_UNPUBLISH       = 13,
 	DHT_GET             = 14,
-	DHT_RESERVED1       = 15,
-	DHT_RESERVED2       = 16,
-	DHT_RESERVED3       = 17,
-	DHT_RESERVED4       = 18,
+	DHT_GET_ACK         = 15,
+	DHT_GET_NACK        = 16,
+	DHT_RESERVED1       = 17,
+	DHT_RESERVED2       = 18,
+	DHT_RESERVED3       = 19,
+	DHT_RESERVED4       = 20
 };
 
 class PacketType : public std::vector<PacketArgType>
