@@ -30,4 +30,11 @@ Data::Data()
 	:updateTime_(time::dtime())
 {
 
-};
+}
+
+bool Data::isOld() const
+{
+		double current_time = time::dtime();
+		double diff = current_time-updateTime_;
+		return diff > 3600;
+}

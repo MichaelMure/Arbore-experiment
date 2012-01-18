@@ -23,52 +23,135 @@
  *
  */
 
- #include "storage.h"
+#include "storage.h"
+#include <util/time.h>
 
 	void Storage::addInfo(Key k, Key info)
 	{
-		//if(isKeyList(k))
+		if(!isKeyList(k))
+			throw WrongDataType();
 
+		std::map<Key,Data*>::iterator it;
+		it = dataMap_.find(k);
+		if(it!=dataMap_.end())
+		{
+			DataKey *data_key = (DataKey*) it->second;
+			data_key->add(info);
+		}
+		else
+		{
+			Data *data_info = new DataKey(info);
+			dataMap_[k] = data_info;
+		}
 	}
 
 	void Storage::addInfo(Key k, std::string info)
 	{
+		if(!isStringList(k))
+			throw WrongDataType();
 
+		std::map<Key,Data*>::iterator it;
+		it = dataMap_.find(k);
+		if(it!=dataMap_.end())
+		{
+			DataString *data_string = (DataString*) it->second;
+			data_string->add(info);
+		}
+		else
+		{
+			Data *data_info = new DataString(info);
+			dataMap_[k] = data_info;
+		}
 	}
 
 	void Storage::removeInfo(Key k, Key info)
 	{
+		if(!isKeyList(k))
+			throw WrongDataType();
 
+		std::map<Key,Data*>::iterator it;
+		it = dataMap_.find(k);
+		if(it!=dataMap_.end())
+		{
+			DataKey *data_key = (DataKey*) it->second;
+			data_key->remove(info);
+			if(data_key->isEmpty())
+				removeKey(k);
+		}
 	}
+
 	void Storage::removeInfo(Key k, std::string info)
 	{
+		if(!isStringList(k))
+			throw WrongDataType();
 
+		std::map<Key,Data*>::iterator it;
+		it = dataMap_.find(k);
+		if(it!=dataMap_.end())
+		{
+			DataString *data_string = (DataString*) it->second;
+			data_string->remove(info);
+			if(data_string->isEmpty())
+				removeKey(k);
+		}
 	}
+
 	bool Storage::isKeyList(Key k) const
 	{
 		return dataMap_.find(k)->second->getDataType()==KEY_LIST;
 	}
+
 	bool Storage::isStringList(Key k) const
 	{
 		return dataMap_.find(k)->second->getDataType()==STRING_LIST;
 	}
+
 	void Storage::removeKey(Key k)
 	{
+		if(!hasKey(k))
+			throw UnknowKey();
 
+		std::map<Key,Data*>::iterator it;
+		it = dataMap_.find(k);
+		if(it!=dataMap_.end())
+			dataMap_.erase(it);
 	}
+
 	bool Storage::hasKey(Key k) const
 	{
-
+		return dataMap_.count(k) > 0;
 	}
+
 	Data* Storage::getInfo(Key k) const
 	{
+		if(!hasKey(k))
+			throw UnknowKey();
 
+		std::map<Key,Data*>::const_iterator it;
+		it = dataMap_.find(k);
+		if(isKeyList(k))
+		{
+			DataKey *data_key = (DataKey*) it->second;
+			return data_key;
+		}
+		else
+		{
+			DataString *data_string = (DataString*) it->second;
+			return data_string;
+		}
 	}
+
 	void Storage::clean()
 	{
-
+		std::map<Key,Data*>::iterator it;
+		for (it=dataMap_.begin() ; it != dataMap_.end(); it++)
+		{
+			if(it->second->isOld())
+				dataMap_.erase(it);
+		}
 	}
+
 	void Storage::clear()
 	{
-
+		dataMap_.clear();
 	}

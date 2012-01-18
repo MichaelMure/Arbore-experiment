@@ -24,6 +24,7 @@
  */
 
 #include "datakey.h"
+#include <util/time.h>
 
 DataKey::DataKey(Key k):Data()
 {
@@ -33,6 +34,7 @@ DataKey::DataKey(Key k):Data()
 void DataKey::add(Key k)
 {
 	keyList_.insert(k);
+	updateTime_=time::dtime();
 }
 
 void DataKey::remove(Key k)
@@ -48,4 +50,9 @@ int DataKey::getSize() const
 data_type DataKey::getDataType() const
 {
 	return KEY_LIST;
+}
+
+bool DataKey::isEmpty() const
+{
+	return keyList_.empty();
 }

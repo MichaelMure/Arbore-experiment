@@ -38,6 +38,7 @@ public:
 	void remove(Key k);
 	int getSize() const;
 	data_type getDataType() const;
+	bool isEmpty() const;
 
 private:
 	std::set<Key> keyList_;

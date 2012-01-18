@@ -38,6 +38,8 @@ public:
 	void remove(std::string name);
 	int getSize() const;
 	data_type getDataType() const;
+	bool isEmpty() const;
+
 
 private:
 	std::set<std::string> nameList_;

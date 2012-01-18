@@ -26,6 +26,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+
 enum data_type
 {
 	STRING_LIST,
@@ -37,12 +38,13 @@ class Data
 public:
 	virtual ~Data() {};
 	virtual data_type getDataType() const =0;
+	virtual bool isEmpty() const =0;
+	bool isOld() const;
 
 protected:
 	Data();
-
-private:
 	double updateTime_;
+
 };
 
 #endif

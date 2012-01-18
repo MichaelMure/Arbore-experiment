@@ -28,6 +28,8 @@
 
 #include <map>
 #include "data.h"
+#include "datakey.h"
+#include "datastring.h"
 #include <string>
 #include <util/key.h>
 
@@ -48,6 +50,10 @@ public:
 	Data* getInfo(Key k) const;
 	void clean();
 	void clear();
+
+/*Exceptions */
+	class WrongDataType : public std::exception {};
+	class UnknowKey : public std::exception {};
 
 private:
 	std::map<Key, Data*> dataMap_;

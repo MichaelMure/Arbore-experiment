@@ -24,6 +24,7 @@
  */
 
 #include "datastring.h"
+#include <util/time.h>
 
 DataString::DataString(std::string name):Data()
 {
@@ -33,6 +34,7 @@ DataString::DataString(std::string name):Data()
 void DataString::add(std::string name)
 {
 	nameList_.insert(name);
+	updateTime_=time::dtime();
 }
 
 void DataString::remove(std::string name)
@@ -48,4 +50,9 @@ int DataString::getSize() const
 data_type DataString::getDataType() const
 {
 	return STRING_LIST;
+}
+
+bool DataString::isEmpty() const
+{
+	return nameList_.empty();
 }
