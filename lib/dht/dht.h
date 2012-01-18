@@ -29,14 +29,28 @@
 #include <chimera/chimera.h>
 #include <util/key.h>
 
+#include "data.h"
+#include "datakey.h"
+#include "datastring.h"
+
 class DHT
 {
 public:
 	DHT(Chimera* chimera);
-	virtual ~DHT();
+	virtual ~DHT() {}
 
-	/** Publish an object on DHT */
-	bool Publish(Key id);
+	/** Publish a string on DHT */
+	bool Publish(Key& id, std::string string) const;
+
+	/** Publish a list of string on DHT */
+	bool Publish(Key& id, DataString& strings) const;
+
+	/** Publish a key on DHT */
+	bool Publish(Key& id, Key& key) const;
+
+	/** Publish a list of keys on DHT */
+	bool Publish(Key& id, DataKey& keys) const;
+
 
 	/** Unpublish an object on DHT */
 	bool Unpublish(Key id);

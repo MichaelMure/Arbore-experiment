@@ -30,12 +30,22 @@ DHT::DHT(Chimera* chimera)
 {
 }
 
-bool DHT::Publish(Key key)
+bool DHT::Publish(Key& id, std::string string) const
 {
-	return true;
+	return false;
 }
 
-bool DHT::Unpublish(Key key)
+bool DHT::Publish(Key& id, DataString& strings) const
 {
-	return true;
+	return false;
+}
+
+bool DHT::Publish(Key& id, Key& key) const
+{
+	return false;
+}
+
+bool DHT::Publish(Key& id, DataKey& keys) const
+{
+	return false;
 }
