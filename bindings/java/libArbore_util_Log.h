@@ -9,43 +9,51 @@ extern "C" {
 #endif
 /*
  * Class:     libArbore_util_Log
- * Method:    SetLoggedFlags
- * Signature: (Ljava/lang/String;Z)V
+ * Method:    N_SetLoggedFlags
+ * Signature: (JLjava/lang/String;Z)V
  */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_SetLoggedFlags
-  (JNIEnv *, jobject, jstring, jboolean);
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
+  (JNIEnv *, jobject, jlong, jstring, jboolean);
 
 /*
  * Class:     libArbore_util_Log
- * Method:    LoggedFlags
- * Signature: ()I
+ * Method:    N_LoggedFlags
+ * Signature: (J)I
  */
-JNIEXPORT jint JNICALL Java_libArbore_util_Log_LoggedFlags
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_libArbore_util_Log_N_1LoggedFlags
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     libArbore_util_Log
- * Method:    ToSyslog
- * Signature: ()Z
+ * Method:    N_ToSyslog
+ * Signature: (J)Z
  */
-JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_ToSyslog
-  (JNIEnv *, jobject);
+JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_N_1ToSyslog
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     libArbore_util_Log
+ * Method:    N_print
+ * Signature: (JLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
+  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     libArbore_util_Log
  * Method:    initCppSide
- * Signature: ()V
+ * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_initCppSide
+JNIEXPORT jlong JNICALL Java_libArbore_util_Log_initCppSide
   (JNIEnv *, jobject);
 
 /*
  * Class:     libArbore_util_Log
  * Method:    destroyCppSide
- * Signature: ()V
+ * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_libArbore_util_Log_destroyCppSide
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }

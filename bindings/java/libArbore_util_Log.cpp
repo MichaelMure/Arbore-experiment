@@ -20,45 +20,72 @@
 
 /*
  * Class:     libArbore_util_Log
- * Method:    SetLoggedFlags
- * Signature: (Ljava/lang/String;Z)V
+ * Method:    N_SetLoggedFlags
+ * Signature: (JLjava/lang/String;Z)V
  */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_SetLoggedFlags
-  (JNIEnv * env, jobject javaObj, jstring s, jboolean to_syslog)
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
+  (JNIEnv * env, jobject, jlong instance, jstring s, jboolean to_syslog)
+{
+	Log* log = (Log*) instance;
+	std::string str = std::string(env->GetStringUTFChars(s, 0));
+	log->SetLoggedFlags(str, to_syslog);
+}
+
+/*
+ * Class:     libArbore_util_Log
+ * Method:    N_LoggedFlags
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_libArbore_util_Log_N_1LoggedFlags
+  (JNIEnv *, jobject, jlong)
 {
 
 }
 
 /*
  * Class:     libArbore_util_Log
- * Method:    LoggedFlags
- * Signature: ()I
+ * Method:    N_ToSyslog
+ * Signature: (J)Z
  */
-JNIEXPORT jint JNICALL Java_libArbore_util_Log_LoggedFlags
-  (JNIEnv *, jobject)
+JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_N_1ToSyslog
+  (JNIEnv *, jobject, jlong)
 {
 
 }
 
 /*
  * Class:     libArbore_util_Log
- * Method:    ToSyslog
- * Signature: ()Z
+ * Method:    N_print
+ * Signature: (JLjava/lang/String;)V
  */
-JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_ToSyslog
-  (JNIEnv *, jobject)
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
+  (JNIEnv *env, jobject, jlong instance, jstring s)
 {
-
+	Log* log = (Log*) instance;
+	std::string str = std::string(env->GetStringUTFChars(s, 0));
+	(*log)[W_ERR] << str;
 }
 
 /*
  * Class:     libArbore_util_Log
  * Method:    initCppSide
- * Signature: ()V
+ * Signature: ()J
  */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_initCppSide
-  (JNIEnv * env, jobject javaObj)
+JNIEXPORT jlong JNICALL Java_libArbore_util_Log_initCppSide
+  (JNIEnv *, jobject)
 {
+	return (jlong) &pf_log;
 	//unhand(javaObj)->logPtr_ = (long) &pf_log;
 	//javaObj->logPtr_ = (long) &pf_log;
+}
+
+/*
+ * Class:     libArbore_util_Log
+ * Method:    destroyCppSide
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_libArbore_util_Log_destroyCppSide
+  (JNIEnv *, jobject, jlong)
+{
+ /* nothing to destroy here */
 }

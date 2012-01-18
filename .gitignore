@@ -11,3 +11,4 @@ cmake_install.cmake
 *.so
 dht_test
 doc/html/
+bindings/java/bin/

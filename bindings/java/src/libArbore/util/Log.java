@@ -2,23 +2,40 @@ package libArbore.util;
 
 public class Log {
 
+	public void SetLoggedFlags(String s, boolean to_syslog) {
+		N_SetLoggedFlags(instance, s, to_syslog);
+	}
+	
+	public int LoggedFlags() {
+		return N_LoggedFlags(instance);
+	}
+	
+	public boolean ToSyslog() {
+		return N_ToSyslog(instance);
+	}
+	
+	public void print(String s) {
+		N_print(instance, s);
+	}
+	
 	static {
-        System.loadLibrary("util");
+		System.loadLibrary("javautil");
     }
 	
-	Log()  {
+	public Log()  {
         initCppSide();
     }
 	
 	public void finalize() {
-		destroyCppSide();
+		destroyCppSide(instance);
 	}
     
-	public native void SetLoggedFlags(String s, boolean to_syslog);
-	public native int LoggedFlags();
-	public native boolean ToSyslog();
+	private native void N_SetLoggedFlags(long instance, String s, boolean to_syslog);
+	private native int N_LoggedFlags(long instance);
+	private native boolean N_ToSyslog(long instance);
+	private native void N_print(long instance, String s);
 	
-	private native void initCppSide();
-	private native void destroyCppSide();
-    private long logPtr_;
+	private native long initCppSide();
+	private native void destroyCppSide(long instance);
+    private long instance;
 }
