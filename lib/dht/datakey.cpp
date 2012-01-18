@@ -56,3 +56,14 @@ bool DataKey::isEmpty() const
 {
 	return keyList_.empty();
 }
+
+std::string DataKey::GetStr() const
+{
+	std::string str;
+	std::set<Key>::const_iterator it;
+	for (it=keyList_.begin() ; it != keyList_.end(); it++)
+	{
+		str += "Key :" + it->GetStr() + " , ";
+	}
+	return str;
+}

@@ -26,6 +26,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <string>
 
 enum data_type
 {
@@ -40,6 +41,7 @@ public:
 	virtual data_type getDataType() const =0;
 	virtual bool isEmpty() const =0;
 	bool isOld() const;
+	virtual std::string GetStr() const =0;
 
 protected:
 	Data();

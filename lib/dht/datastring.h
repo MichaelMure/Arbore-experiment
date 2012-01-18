@@ -29,6 +29,7 @@
 #include "data.h"
 #include <set>
 #include <string>
+#include <util/pf_log.h>
 
 class DataString : public Data
 {
@@ -39,10 +40,18 @@ public:
 	int getSize() const;
 	data_type getDataType() const;
 	bool isEmpty() const;
+	std::string GetStr() const;
 
 
 private:
 	std::set<std::string> nameList_;
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <DataString> (DataString ds)
+{
+	_str += ds.GetStr();
+	return *this;
+}
 
 #endif

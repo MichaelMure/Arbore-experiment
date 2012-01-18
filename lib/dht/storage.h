@@ -32,6 +32,7 @@
 #include "datastring.h"
 #include <string>
 #include <util/key.h>
+#include <util/pf_log.h>
 
 class Storage
 {
@@ -50,6 +51,7 @@ public:
 	Data* getInfo(Key k) const;
 	void clean();
 	void clear();
+	std::string GetStr() const;
 
 /*Exceptions */
 	class WrongDataType : public std::exception {};
@@ -60,6 +62,11 @@ private:
 
 	};
 
-
+template<>
+inline Log::flux& Log::flux::operator<< <Storage> (Storage stor)
+{
+	_str += stor.GetStr();
+	return *this;
+}
 
 #endif

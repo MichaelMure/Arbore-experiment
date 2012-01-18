@@ -29,6 +29,7 @@
 #include "data.h"
 #include <set>
 #include <util/key.h>
+#include <util/pf_log.h>
 
 class DataKey : public Data
 {
@@ -39,9 +40,18 @@ public:
 	int getSize() const;
 	data_type getDataType() const;
 	bool isEmpty() const;
+	std::string GetStr() const;
 
 private:
 	std::set<Key> keyList_;
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <DataKey> (DataKey dk)
+{
+	_str += dk.GetStr();
+	return *this;
+}
+
 
 #endif

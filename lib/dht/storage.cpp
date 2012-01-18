@@ -155,3 +155,14 @@
 	{
 		dataMap_.clear();
 	}
+
+	std::string Storage::GetStr() const
+	{
+		std::string str;
+		std::map<Key,Data*>::const_iterator it;
+		for (it=dataMap_.begin() ; it != dataMap_.end(); it++)
+		{
+			str += "Key : " + it->first.GetStr() + it->second->GetStr();
+		}
+		return str;
+	}

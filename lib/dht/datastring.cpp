@@ -56,3 +56,14 @@ bool DataString::isEmpty() const
 {
 	return nameList_.empty();
 }
+
+std::string DataString::GetStr() const
+{
+	std::string str;
+	std::set<std::string>::const_iterator it;
+	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	{
+		str += "Name :" + *it + " , ";
+	}
+	return str;
+}
