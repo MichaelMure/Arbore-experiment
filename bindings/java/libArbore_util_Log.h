@@ -7,6 +7,22 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef libArbore_util_Log_DEBUG
+#define libArbore_util_Log_DEBUG 1L
+#undef libArbore_util_Log_WARNING
+#define libArbore_util_Log_WARNING 16L
+#undef libArbore_util_Log_ERROR
+#define libArbore_util_Log_ERROR 32L
+#undef libArbore_util_Log_INFO
+#define libArbore_util_Log_INFO 64L
+/*
+ * Class:     libArbore_util_Log
+ * Method:    N_print
+ * Signature: (JILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
+  (JNIEnv *, jobject, jlong, jint, jstring);
+
 /*
  * Class:     libArbore_util_Log
  * Method:    N_SetLoggedFlags
@@ -17,27 +33,11 @@ JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
 
 /*
  * Class:     libArbore_util_Log
- * Method:    N_LoggedFlags
- * Signature: (J)I
- */
-JNIEXPORT jint JNICALL Java_libArbore_util_Log_N_1LoggedFlags
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     libArbore_util_Log
  * Method:    N_ToSyslog
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_N_1ToSyslog
   (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     libArbore_util_Log
- * Method:    N_print
- * Signature: (JLjava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
-  (JNIEnv *, jobject, jlong, jstring);
 
 /*
  * Class:     libArbore_util_Log

@@ -20,26 +20,36 @@
 
 /*
  * Class:     libArbore_util_Log
- * Method:    N_SetLoggedFlags
- * Signature: (JLjava/lang/String;Z)V
+ * Method:    N_print
+ * Signature: (JILjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
-  (JNIEnv * env, jobject, jlong instance, jstring s, jboolean to_syslog)
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
+  (JNIEnv *env, jobject, jlong instance, jint level, jstring s)
 {
 	Log* log = (Log*) instance;
-	std::string str = std::string(env->GetStringUTFChars(s, 0));
-	log->SetLoggedFlags(str, to_syslog);
+	const char *nativeString = env->GetStringUTFChars(s, 0);
+
+	(*log)[level] << nativeString;
+
+	env->ReleaseStringUTFChars(s, nativeString);
 }
 
 /*
  * Class:     libArbore_util_Log
- * Method:    N_LoggedFlags
- * Signature: (J)I
+ * Method:    N_SetLoggedFlags
+ * Signature: (JLjava/lang/String;Z)V
  */
-JNIEXPORT jint JNICALL Java_libArbore_util_Log_N_1LoggedFlags
-  (JNIEnv *, jobject, jlong)
+JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
+  (JNIEnv *env, jobject, jlong instance, jstring s, jboolean to_syslog)
 {
+	Log* log = (Log*) instance;
+	const char *nativeString = env->GetStringUTFChars(s, 0);
+	unsigned char nativeBoolean = to_syslog;
 
+	(*log)[W_ERR] << nativeString;
+	log->SetLoggedFlags(std::string(nativeString), nativeBoolean);
+
+	env->ReleaseStringUTFChars(s, nativeString);
 }
 
 /*
@@ -48,22 +58,10 @@ JNIEXPORT jint JNICALL Java_libArbore_util_Log_N_1LoggedFlags
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_N_1ToSyslog
-  (JNIEnv *, jobject, jlong)
-{
-
-}
-
-/*
- * Class:     libArbore_util_Log
- * Method:    N_print
- * Signature: (JLjava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1print
-  (JNIEnv *env, jobject, jlong instance, jstring s)
+  (JNIEnv *, jobject, jlong instance)
 {
 	Log* log = (Log*) instance;
-	std::string str = std::string(env->GetStringUTFChars(s, 0));
-	(*log)[W_ERR] << str;
+	log->ToSyslog();
 }
 
 /*
@@ -75,8 +73,6 @@ JNIEXPORT jlong JNICALL Java_libArbore_util_Log_initCppSide
   (JNIEnv *, jobject)
 {
 	return (jlong) &pf_log;
-	//unhand(javaObj)->logPtr_ = (long) &pf_log;
-	//javaObj->logPtr_ = (long) &pf_log;
 }
 
 /*
