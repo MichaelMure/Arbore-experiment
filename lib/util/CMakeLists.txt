@@ -1,4 +1,4 @@
-add_library(util SHARED
+add_library(abutil SHARED
     key.h
     key.cpp
     mutex.h
@@ -18,4 +18,4 @@ add_library(util SHARED
     tools.h
     tools.cpp
     )
-SET(PFLIBS ${PFLIBS} util)
+SET(PFLIBS ${PFLIBS} abutil)

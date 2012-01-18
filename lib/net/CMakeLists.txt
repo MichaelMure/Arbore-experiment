@@ -1,4 +1,4 @@
-add_library(network SHARED
+add_library(abnetwork SHARED
     host.h
     host.cpp
     hosts_list.h
@@ -21,4 +21,4 @@ add_library(network SHARED
     pf_addr.h
     pf_addr.cpp
     )
-SET(PFLIBS ${PFLIBS} network)
+SET(PFLIBS ${PFLIBS} abnetwork)

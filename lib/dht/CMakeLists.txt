@@ -1,4 +1,4 @@
-add_library(dht SHARED
+add_library(abdht SHARED
     data.h
     data.cpp
     datakey.h
@@ -12,4 +12,4 @@ add_library(dht SHARED
     storage.h
     storage.cpp
     )
-SET(PFLIBS ${PFLIBS} dht)
+SET(PFLIBS ${PFLIBS} abdht)

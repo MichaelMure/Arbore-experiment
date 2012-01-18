@@ -14,12 +14,12 @@ INCLUDE_DIRECTORIES(lib/)
 LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
 TARGET_LINK_LIBRARIES(${BIN_NAME}
                       "-lpthread -lstdc++"
-                      chimera
-                      util
-                      scheduler
-                      network
-                      dht
-                      files)
+                      abchimera
+                      abutil
+                      abscheduler
+                      abnetwork
+                      abdht
+                      abfiles)
 
 ########################### Dependency #################
 

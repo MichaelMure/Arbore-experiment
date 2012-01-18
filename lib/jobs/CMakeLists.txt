@@ -1,5 +1,5 @@
 # When adding files here, remember to add "jobs" as a subdir in lib/CMakeList.txt
 
-add_library(jobs SHARED
+add_library(abjobs SHARED
     )
-SET(PFLIBS ${PFLIBS} jobs)
+SET(PFLIBS ${PFLIBS} abjobs)

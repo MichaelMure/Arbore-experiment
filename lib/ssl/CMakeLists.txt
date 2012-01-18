@@ -1,4 +1,4 @@
-add_library(ssl SHARED
+add_library(abssl SHARED
    #certificate.cpp
    connection.cpp
    connection_ssl.cpp
@@ -8,4 +8,4 @@ add_library(ssl SHARED
    #pf_ssl_nossl.cpp
    #private_key.cpp
    )
-SET(PFLIBS ${PFLIBS} ssl)
+SET(PFLIBS ${PFLIBS} abssl)

@@ -1,4 +1,4 @@
-add_library(files SHARED
+add_library(abfiles SHARED
     dir_entry.h
     dir_entry.cpp
     file_chunk.h
@@ -15,4 +15,4 @@ add_library(files SHARED
     hdd.h
     hdd.cpp
     )
-SET(PFLIBS ${PFLIBS} files)
+SET(PFLIBS ${PFLIBS} abfiles)

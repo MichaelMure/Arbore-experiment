@@ -1,4 +1,4 @@
-add_library(chimera SHARED
+add_library(abchimera SHARED
     check_leafset_job.h
     check_leafset_job.cpp
     chimera.h
@@ -12,4 +12,4 @@ add_library(chimera SHARED
     routing_table.h
     routing_table.cpp
     )
-SET(PFLIBS ${PFLIBS} chimera)
+SET(PFLIBS ${PFLIBS} abchimera)

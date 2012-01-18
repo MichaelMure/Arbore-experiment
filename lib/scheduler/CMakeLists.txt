@@ -1,4 +1,4 @@
-add_library(scheduler SHARED
+add_library(abscheduler SHARED
     job.h
     job.cpp
     scheduler.h
@@ -6,4 +6,4 @@ add_library(scheduler SHARED
     scheduler_queue.h
     scheduler_queue.cpp
     )
-SET(PFLIBS ${PFLIBS} scheduler)
+SET(PFLIBS ${PFLIBS} abscheduler)
