@@ -10,6 +10,10 @@ public class Key {
 		return new Key(N_GetRandomKey());
 	}
 	
+	public long GetInstance() {
+		return instance;
+	}
+	
 	/* ------------------------------------------------------------------ */
 
 	static {

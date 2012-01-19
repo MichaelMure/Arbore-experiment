@@ -13,18 +13,23 @@ TARGET_LINK_LIBRARIES(javautil
                       )
 
 add_library(javanetwork SHARED
+           libArbore_network_ChatPacket.h
+           libArbore_network_ChatPacket.cpp
            libArbore_network_Host.h
            libArbore_network_Host.cpp
 	   libArbore_network_Host_List.h
            libArbore_network_Host_List.cpp
            libArbore_network_Network.h
            libArbore_network_Network.cpp          
- )
+           libArbore_network_ChatPacket.h
+           libArbore_network_ChatPacket.cpp
+           )
 
 TARGET_LINK_LIBRARIES(javanetwork
                       abnetwork
                       abutil
                       abscheduler
+                      abchimera
                       )
 
 add_library(javascheduler SHARED
