@@ -17,6 +17,10 @@ public class Host_List {
         instance = initCppSide(size);
     }
 	
+	public Host_List(long hl) {
+		instance = hl;
+	}
+	
 	public void finalize() {
 		destroyCppSide(instance);
 	}
