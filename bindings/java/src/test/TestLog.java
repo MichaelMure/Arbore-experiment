@@ -17,7 +17,7 @@ public class TestLog {
 		Boolean to_syslog = log.ToSyslog();
 		log.info(to_syslog.toString());
 		
-		//log.SetLoggedFlags("ALL", true);
+		log.SetLoggedFlags("ALL", true);
 		
 		log.debug("hello DEBUG");
 		log.warning("hello WARNING");

@@ -44,10 +44,8 @@ JNIEXPORT void JNICALL Java_libArbore_util_Log_N_1SetLoggedFlags
 {
 	Log* log = (Log*) instance;
 	const char *nativeString = env->GetStringUTFChars(s, 0);
-	unsigned char nativeBoolean = to_syslog;
 
-	(*log)[W_ERR] << nativeString;
-	log->SetLoggedFlags(std::string(nativeString), nativeBoolean);
+	log->SetLoggedFlags(std::string(nativeString), to_syslog);
 
 	env->ReleaseStringUTFChars(s, nativeString);
 }
@@ -61,7 +59,7 @@ JNIEXPORT jboolean JNICALL Java_libArbore_util_Log_N_1ToSyslog
   (JNIEnv *, jobject, jlong instance)
 {
 	Log* log = (Log*) instance;
-	log->ToSyslog();
+	return log->ToSyslog();
 }
 
 /*

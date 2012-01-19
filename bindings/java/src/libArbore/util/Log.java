@@ -38,7 +38,7 @@ public class Log {
     }
 	
 	public Log()  {
-        initCppSide();
+        instance = initCppSide();
     }
 	
 	public void finalize() {
