@@ -11,6 +11,12 @@ public class Network {
 		return new Host_List((N_getHost_List(instance)));
 	}
 	
+	public Network(long net)
+	{
+		instance = net;
+	}
+	
+	
 	
 	/* ------------------------------------------------------------------ */
 
