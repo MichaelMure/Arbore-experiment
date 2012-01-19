@@ -15,6 +15,8 @@ TARGET_LINK_LIBRARIES(javautil
 add_library(javanetwork SHARED
            libArbore_network_Host.h
            libArbore_network_Host.cpp
+	   libArbore_network_Host_List.h
+           libArbore_network_Host_List.cpp
            )
 
 TARGET_LINK_LIBRARIES(javanetwork

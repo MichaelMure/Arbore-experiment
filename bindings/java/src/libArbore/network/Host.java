@@ -13,6 +13,11 @@ public class Host {
 		return new Key(N_getKey(instance));
 	}
 	
+	public Host(long host)
+	{
+		instance = host;
+	}
+	
 
 
 
