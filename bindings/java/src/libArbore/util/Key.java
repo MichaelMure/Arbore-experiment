@@ -16,6 +16,10 @@ public class Key {
         instance = initCppSide();
     }
 	
+	public Key(long key) {
+		instance = key;
+	}
+	
 	public void finalize() {
 		destroyCppSide(instance);
 	}

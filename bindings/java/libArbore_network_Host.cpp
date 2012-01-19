@@ -17,6 +17,23 @@
 
  #include "libArbore_network_Host.h"
  #include <net/host.h>
+ #include <util/key.h>
+
+
+/*
+ * Class:     libArbore_network_Host
+ * Method:    N_getKey
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_network_Host_N_1getKey
+  (JNIEnv *, jobject, jlong instance)
+
+	{
+		Host* host = (Host*) instance;
+		Key k = host->GetKey();
+		Key *copy = new Key(k);
+		return (long) copy;
+	}
 
 /*
  * Class:     libArbore_network_Host

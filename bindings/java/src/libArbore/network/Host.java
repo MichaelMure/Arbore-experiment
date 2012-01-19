@@ -1,4 +1,5 @@
 package libArbore.network;
+import libArbore.util.Key;
 
 public class Host {
 	
@@ -7,13 +8,14 @@ public class Host {
 		return N_toString(instance);
 	}
 	
-	/*public Key getKey()
+	public Key getKey()
 	{
-		return N_getKey(instance);
+		return new Key(N_getKey(instance));
 	}
-	*/
 	
-	
+
+
+
 	/* ------------------------------------------------------------------ */
 
 	static {
@@ -28,7 +30,7 @@ public class Host {
 		destroyCppSide(instance);
 	}
 	
-	//private native Key N_getKey(long instance);
+	private native long N_getKey(long instance);
 	private native String N_toString(long instance);
 	private native long initCppSide();
 	private native void destroyCppSide(long instance);

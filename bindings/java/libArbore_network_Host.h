@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     libArbore_network_Host
+ * Method:    N_getKey
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_network_Host_N_1getKey
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     libArbore_network_Host
  * Method:    N_toString
  * Signature: (J)Ljava/lang/String;
  */
