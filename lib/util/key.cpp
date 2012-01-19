@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <cstdlib>
 #include <cassert>
 #include <openssl/evp.h>
 #include "key.h"
@@ -33,6 +34,23 @@
 
 const Key Key::Key_Max = Init_Max();
 const Key Key::Key_Half = Init_Half();
+
+Key Key::GetRandomKey()
+{
+	uint32_t key[nlen];
+
+	for(int i = 0; i < nlen; ++i)
+	{
+		key[i] = 0;
+		for(int j = 0; j < 32; j++)
+		{
+			key[i] += (rand()%2) << j;
+		}
+	}
+
+	return Key(key);
+}
+
 
 Key::Key(uint32_t ul)
 {

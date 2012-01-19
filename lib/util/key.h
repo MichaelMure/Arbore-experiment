@@ -53,6 +53,12 @@ public:
 	static const Key Key_Max;
 	static const Key Key_Half;
 
+	/** Create and return a random key.
+	  * Be sure to have initialized the random number generator once
+	  * before, using srand(time(NULL))
+	  */
+	static Key GetRandomKey();
+
 	/** Create a Key from an uint32_t.
 	 *
 	 * @param ul this is the last 32 bits of the key
