@@ -13,6 +13,12 @@ public class TestKey {
 		Log log = new Log();
 		
 		log.info(key.toString());
+		
+		for(int i = 0; i < 10; i++)
+		{
+			key = Key.GetRandomKey();
+			log.info(key.toString());
+		}
 	}
 
 }

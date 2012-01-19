@@ -18,6 +18,7 @@
 #include "libArbore_util_Key.h"
 #include <util/key.h>
 #include <string>
+#include <ctime>
 
 /*
  * Class:     libArbore_util_Key
@@ -30,6 +31,18 @@ JNIEXPORT jstring JNICALL Java_libArbore_util_Key_N_1toString
 	Key* key = (Key*) instance;
 	std::string str = key->GetStr();
 	return env->NewStringUTF(str.c_str());
+}
+
+/*
+ * Class:     libArbore_util_Key
+ * Method:    N_GetRandomKey
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_util_Key_N_1GetRandomKey
+  (JNIEnv *, jclass)
+{
+	Key k = Key::GetRandomKey();
+	return (jlong) new Key(k);
 }
 
 /*
@@ -53,4 +66,15 @@ JNIEXPORT void JNICALL Java_libArbore_util_Key_destroyCppSide
 {
 	Key* key = (Key*) instance;
 	delete key;
+}
+
+/*
+ * Class:     libArbore_util_Key
+ * Method:    InitRandomNumberGenerator
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_libArbore_util_Key_InitRandomNumberGenerator
+  (JNIEnv *, jclass)
+{
+	srand(time(NULL));
 }

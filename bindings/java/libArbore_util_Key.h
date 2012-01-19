@@ -17,6 +17,14 @@ JNIEXPORT jstring JNICALL Java_libArbore_util_Key_N_1toString
 
 /*
  * Class:     libArbore_util_Key
+ * Method:    N_GetRandomKey
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_util_Key_N_1GetRandomKey
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     libArbore_util_Key
  * Method:    initCppSide
  * Signature: ()J
  */
@@ -30,6 +38,14 @@ JNIEXPORT jlong JNICALL Java_libArbore_util_Key_initCppSide
  */
 JNIEXPORT void JNICALL Java_libArbore_util_Key_destroyCppSide
   (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     libArbore_util_Key
+ * Method:    InitRandomNumberGenerator
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_libArbore_util_Key_InitRandomNumberGenerator
+  (JNIEnv *, jclass);
 
 #ifdef __cplusplus
 }

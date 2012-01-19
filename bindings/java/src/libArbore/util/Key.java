@@ -6,10 +6,15 @@ public class Key {
 		return N_toString(instance);
 	}
 	
+	public static Key GetRandomKey() {
+		return new Key(N_GetRandomKey());
+	}
+	
 	/* ------------------------------------------------------------------ */
 
 	static {
 		System.loadLibrary("javautil");
+		Key.InitRandomNumberGenerator();
     }
 	
 	public Key()  {
@@ -25,8 +30,10 @@ public class Key {
 	}
 	
 	private native String N_toString(long instance);
+	private static native long N_GetRandomKey();
 	
 	private native long initCppSide();
 	private native void destroyCppSide(long instance);
+	private static native void InitRandomNumberGenerator();
     private long instance;
 }
