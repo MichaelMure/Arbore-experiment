@@ -183,16 +183,29 @@ public:
 	}
 };
 
+class ChimeraChatMessage : public NetworkMessage
+{
+public:
+	void Handle(Chimera& chimera, const Host& sender, const Packet& pckt)
+	{
+		std::string message = pckt.GetArg<std::string>(CHIMERA_CHAT_MESSAGE);
+		pf_log[W_INFO] << "CHAT[" << pckt.GetSrc() << "] " << message;
+	}
+};
+
 PacketType      ChimeraJoinType(CHIMERA_JOIN,      new ChimeraJoinMessage,      Packet::REQUESTACK|
-                                                                                Packet::MUSTROUTE,   "JOIN",        /* CHIMERA_JOIN_ADDRESS */    T_ADDR,
+                                                                                Packet::MUSTROUTE,   "JOIN",           /* CHIMERA_JOIN_ADDRESS */ T_ADDR,
                                                                                                                                                   T_END);
 PacketType   ChimeraJoinAckType(CHIMERA_JOIN_ACK,  new ChimeraJoinAckMessage,   Packet::REQUESTACK,  "JOIN_ACK", /* CHIMERA_JOIN_ACK_ADDRESSES */ T_ADDRLIST,
                                                                                                                                                   T_END);
-PacketType    ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,    Packet::REQUESTACK,  "UPDATE",      /* CHIMERA_UPDATE_ADDRESS */  T_ADDR,
+PacketType    ChimeraUpdateType(CHIMERA_UPDATE,    new ChimeraUpdateMessage,    Packet::REQUESTACK,  "UPDATE",       /* CHIMERA_UPDATE_ADDRESS */ T_ADDR,
                                                                                                                                                   T_END);
 PacketType     ChimeraPiggyType(CHIMERA_PIGGY,     new ChimeraPiggyMessage,     Packet::REQUESTACK,  "PIGGY",       /* CHIMERA_PIGGY_ADDRESSES */ T_ADDRLIST,
                                                                                                                                                   T_END);
 PacketType  ChimeraJoinNAckType(CHIMERA_JOIN_NACK, new ChimeraJoinNAckMessage,  Packet::REQUESTACK,  "JOIN_NACK", /* CHIMERA_JOIN_NACK_ADDRESS */ T_ADDR,
                                                                                                                                                   T_END);
 PacketType      ChimeraPingType(CIHMERA_PING,      new ChimeraPingMessage,      Packet::REQUESTACK,  "PING",                /* CHIMERA_PING_ME */ T_ADDR,
+                                                                                                                                                  T_END);
+PacketType      ChimeraChatType(CHIMERA_CHAT,      new ChimeraChatMessage,      Packet::REQUESTACK|
+                                                                                Packet::MUSTROUTE,   "CHAT",           /* CHIMERA_CHAT_MESSAGE */ T_STR,
                                                                                                                                                   T_END);

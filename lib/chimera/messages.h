@@ -65,4 +65,10 @@ enum
 };
 extern PacketType ChimeraPingType;
 
+enum
+{
+	CHIMERA_CHAT_MESSAGE
+};
+extern PacketType ChimeraChatType;
+
 #endif /* CHIMERA_MESSAGES_H */

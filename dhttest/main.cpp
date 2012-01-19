@@ -34,25 +34,8 @@
 #include <chimera/chimera.h>
 #include <chimera/messages.h>
 
-enum
-{
-	CHIMERA_CHAT_MESSAGE
-};
-
-class ChimeraChatMessage : public NetworkMessage
-{
-public:
-	void Handle(Chimera& chimera, const Host& sender, const Packet& pckt)
-	{
-		std::string message = pckt.GetArg<std::string>(CHIMERA_CHAT_MESSAGE);
-		pf_log[W_INFO] << "CHAT[" << pckt.GetSrc() << "] " << message;
-	}
-};
-
 int main(int argc, char** argv)
 {
-	PacketType ChimeraChatType(15, new ChimeraChatMessage, Packet::REQUESTACK|Packet::MUSTROUTE, "CHAT", T_STR, T_END);
-
 	if(argc < 2)
 	{
 		std::cout << "Usage: " << argv[0] << " listen_port [boostrap_host:port]" << std::endl;
@@ -63,7 +46,6 @@ int main(int argc, char** argv)
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
 	Chimera* dht = new Chimera(&net, StrToTyp<uint16_t>(argv[1]), me);
-	dht->RegisterType(ChimeraChatType);
 
 	std::cerr << "hosts_list pointer: " << dht->GetNetwork()->GetHostsList() << std::endl;
 

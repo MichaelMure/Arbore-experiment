@@ -62,6 +62,7 @@ Chimera::Chimera(Network* _network, uint16_t port, Key my_key)
 	RegisterType(ChimeraPiggyType);
 	RegisterType(ChimeraJoinNAckType);
 	RegisterType(ChimeraPingType);
+	RegisterType(ChimeraChatType);
 
 	fd = network->Listen(this, port, "0.0.0.0");
 
