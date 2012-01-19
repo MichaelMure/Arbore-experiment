@@ -4,8 +4,20 @@ include_directories(${JNI_INCLUDE_DIRS})
 add_library(javautil SHARED
             libArbore_util_Log.h
             libArbore_util_Log.cpp
-            )
+ )
+
 
 TARGET_LINK_LIBRARIES(javautil
-                      abutil
-                      )
+                      abutil                                             
+ )
+
+add_library(javanetwork SHARED
+           libArbore_network_Host.h
+           libArbore_network_Host.cpp
+)
+
+TARGET_LINK_LIBRARIES(javanetwork
+                      abnetwork
+		      abutil
+                      abscheduler
+)
