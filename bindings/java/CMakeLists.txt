@@ -22,3 +22,13 @@ TARGET_LINK_LIBRARIES(javanetwork
                       abutil
                       abscheduler
                       )
+
+add_library(javascheduler SHARED
+            libArbore_scheduler_Scheduler.h
+            libArbore_scheduler_Scheduler.cpp
+            )
+
+TARGET_LINK_LIBRARIES(javascheduler
+                      abscheduler
+                      abutil
+                      )
