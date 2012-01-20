@@ -41,3 +41,13 @@ TARGET_LINK_LIBRARIES(javascheduler
                       abscheduler
                       abutil
                       )
+
+add_library(javachimera SHARED
+            libArbore_chimera_Chimera.h
+            libArbore_chimera_Chimera.cpp
+ )
+
+TARGET_LINK_LIBRARIES(javachimera
+		      abutil
+                      abnetwork	
+)

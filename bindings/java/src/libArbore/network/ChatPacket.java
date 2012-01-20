@@ -22,6 +22,10 @@ public class ChatPacket {
 		N_SetFlags(instance, flags);
 	}
 	
+	public long GetInstance() {
+		return instance;
+	}
+	
 	/* ------------------------------------------------------------------ */
 
 	static {

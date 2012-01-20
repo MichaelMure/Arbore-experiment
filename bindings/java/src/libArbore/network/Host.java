@@ -18,6 +18,9 @@ public class Host {
 		instance = host;
 	}
 	
+	public long GetInstance() {
+		return instance;
+	}
 
 
 

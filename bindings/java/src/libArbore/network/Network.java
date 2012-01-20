@@ -2,6 +2,10 @@ package libArbore.network;
 
 public class Network {
 	
+	public long GetInstance() {
+		return instance;
+	}
+	
 	public void Start() {
 		
 		N_Start(instance);
