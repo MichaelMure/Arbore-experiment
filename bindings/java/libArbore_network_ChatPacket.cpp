@@ -56,6 +56,7 @@ JNIEXPORT jlong JNICALL Java_libArbore_network_ChatPacket_initCppSide
 	Packet* packet = new Packet(ChimeraChatType, *((Key*)key_source), *((Key*)key_destination));
 
 	packet->SetArg(CHIMERA_CHAT_MESSAGE, std::string(nativeString));
+	packet->SetFlag(Packet::MUSTROUTE);
 	env->ReleaseStringUTFChars(s, nativeString);
 	return (jlong) packet;
 }
