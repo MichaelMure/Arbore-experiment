@@ -30,6 +30,7 @@ TARGET_LINK_LIBRARIES(javanetwork
                       abutil
                       abscheduler
                       abchimera
+                      javachimera
                       )
 
 add_library(javascheduler SHARED
@@ -47,6 +48,8 @@ add_library(javachimera SHARED
             libArbore_chimera_Chimera.cpp
             libArbore_chimera_Leafset.h
             libArbore_chimera_Leafset.cpp
+            JavaCallbackMessages.h
+            JavaCallbackMessages.cpp
             )
 
 TARGET_LINK_LIBRARIES(javachimera

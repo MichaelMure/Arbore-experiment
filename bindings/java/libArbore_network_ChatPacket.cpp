@@ -18,6 +18,7 @@
 #include "libArbore_network_ChatPacket.h"
 #include <net/packet.h>
 #include <chimera/messages.h>
+#include "JavaCallbackMessages.h"
 
 /*
  * Class:     libArbore_network_ChatPacket
@@ -53,9 +54,9 @@ JNIEXPORT jlong JNICALL Java_libArbore_network_ChatPacket_initCppSide
   (JNIEnv *env, jobject, jlong key_source, jlong key_destination, jstring s)
 {
 	const char *nativeString = env->GetStringUTFChars(s, 0);
-	Packet* packet = new Packet(ChimeraChatType, *((Key*)key_source), *((Key*)key_destination));
+	Packet* packet = new Packet(JavaCallbackChatType, *((Key*)key_source), *((Key*)key_destination));
 
-	packet->SetArg(CHIMERA_CHAT_MESSAGE, std::string(nativeString));
+	packet->SetArg(JAVA_CALLBACK_CHAT_MESSAGE, std::string(nativeString));
 	packet->SetFlag(Packet::MUSTROUTE);
 	env->ReleaseStringUTFChars(s, nativeString);
 	return (jlong) packet;

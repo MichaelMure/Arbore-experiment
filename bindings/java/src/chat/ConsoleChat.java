@@ -46,6 +46,7 @@ public class ConsoleChat {
 		
 		if(bootstrap != null) {
 			Host bootstrap_host = network.getHost_List().DecodeHost(bootstrap);
+			System.out.println("Joining host: " + bootstrap_host);
 			chimera.join(bootstrap_host);
 		}
 	}

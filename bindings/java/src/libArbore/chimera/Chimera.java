@@ -28,6 +28,10 @@ public class Chimera {
 	public Leafset getLeafset() {
 		return new Leafset(N_getLeafset(instance));
 	}
+	
+	public static void MessageCallback(String s) {
+		System.out.println("Message received: " + s);
+	}
 	/* ------------------------------------------------------------------ */
 
 	static {
@@ -41,7 +45,7 @@ public class Chimera {
 	public void finalize() {
 		destroyCppSide(instance);
 	}
-	
+
 	private native long N_getMe(long instance);
 	private native long N_getNetwork(long instance);
 	private native long N_getLeafset(long instance);
