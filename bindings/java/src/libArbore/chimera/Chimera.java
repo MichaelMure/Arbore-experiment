@@ -24,6 +24,10 @@ public class Chimera {
 	{
 		return N_route(instance, cp.GetInstance());
 	}
+	
+	public Leafset getLeafset() {
+		return new Leafset(N_getLeafset(instance));
+	}
 	/* ------------------------------------------------------------------ */
 
 	static {
@@ -40,6 +44,7 @@ public class Chimera {
 	
 	private native long N_getMe(long instance);
 	private native long N_getNetwork(long instance);
+	private native long N_getLeafset(long instance);
 	private native void N_join(long instance, long bootstrap);
 	private native boolean N_route(long instance, long cp);
 	private native long initCppSide(long network, int port, long key);

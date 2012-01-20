@@ -15,8 +15,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
- #include "libArbore_chimera_Chimera.h"
- #include <chimera/chimera.h>
+#include "libArbore_chimera_Chimera.h"
+#include <chimera/chimera.h>
+#include <chimera/routing.h>
 
 /*
  * Class:     libArbore_chimera_Chimera
@@ -42,6 +43,19 @@ JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_N_1getNetwork
 		Chimera* ch = (Chimera*) instance;
 		return (long) (ch->GetNetwork());
 	}
+
+/*
+ * Class:     libArbore_chimera_Chimera
+ * Method:    N_getLeafset
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_N_1getLeafset
+  (JNIEnv *, jobject, jlong instance)
+{
+	Chimera* ch = (Chimera*) instance;
+	std::vector<Host> leafset = ch->GetRouting()->getLeafset();
+	return (long) new std::vector<Host>(leafset);
+}
 
 /*
  * Class:     libArbore_chimera_Chimera

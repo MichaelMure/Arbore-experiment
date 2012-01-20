@@ -25,6 +25,14 @@ JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_N_1getNetwork
 
 /*
  * Class:     libArbore_chimera_Chimera
+ * Method:    N_getLeafset
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_N_1getLeafset
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     libArbore_chimera_Chimera
  * Method:    N_join
  * Signature: (JJ)V
  */
