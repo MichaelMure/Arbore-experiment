@@ -68,7 +68,7 @@ public class ChatWindow extends JFrame{
 		txtaera = new JScrollPane();
 		
 		// List
-		list = new JList(data);
+		list = new JList();
 		Border bd = BorderFactory.createLineBorder(Color.black);
 		list.setBorder(bd);
 		
