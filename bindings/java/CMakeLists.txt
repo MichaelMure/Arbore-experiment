@@ -45,6 +45,8 @@ TARGET_LINK_LIBRARIES(javascheduler
 add_library(javachimera SHARED
             libArbore_chimera_Chimera.h
             libArbore_chimera_Chimera.cpp
+            libArbore_chimera_Leafset.h
+            libArbore_chimera_Leafset.cpp
             )
 
 TARGET_LINK_LIBRARIES(javachimera
