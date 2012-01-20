@@ -155,13 +155,9 @@ public class ChatWindow extends JFrame{
 	    setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
-	 public void addItemQuitListener(ActionListener actLst) {
-	      quit.addActionListener(actLst);
-	  }
 	 
-	 public void addItemAboutListener(ActionListener actLst) {
-	      about.addActionListener(actLst);
+	 public void addOkButtonListener(ActionListener actLst) {
+	      portok.addActionListener(actLst);
 	  }
 	 
 	 public void addConnectButtonListener(ActionListener actLst) {
@@ -171,6 +167,10 @@ public class ChatWindow extends JFrame{
 	 public void addSendButtonListener(ActionListener actLst) {
 	      send.addActionListener(actLst);
 	  }
+	 
+	 public JTextField getPortField(){
+		 return port;
+	 }
 	 
 	 public JTextField getAdressField(){
 		 return adressfield;
@@ -186,6 +186,18 @@ public class ChatWindow extends JFrame{
 	 
 	 public JScrollPane getTxtAera() {
 		 return txtaera;
+	 }
+	 
+	 public void hidePortField(){
+		 port.setEnabled(false);
+		 portok.setEnabled(false);
+		 adressfield.setEnabled(true);
+		 connect.setEnabled(true);
+	 }
+	 
+	 public void hideConnectField(){
+		 adressfield.setEnabled(false);
+		 connect.setEnabled(false);
 	 }
 
 	
