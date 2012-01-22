@@ -28,17 +28,24 @@
 
 #include <string>
 
-enum data_type
+/* Time to live for data, 3600 secondes = 1h */
+#define DATA_TTL 3600.0
+
+enum DataType
 {
-	STRING_LIST,
-	KEY_LIST
+	STRING_LIST = 1,
+	KEY_LIST    = 2,
+	RESERVED1   = 3,
+	RESERVED2   = 4,
+	RESERVED3   = 5,
+	RESERVED4   = 6
 };
 
 class Data
 {
 public:
 	virtual ~Data() {};
-	virtual data_type getDataType() const = 0;
+	virtual DataType getDataType() const = 0;
 	virtual bool isEmpty() const = 0;
 	virtual int getSize() const = 0;
 	bool isOld() const;

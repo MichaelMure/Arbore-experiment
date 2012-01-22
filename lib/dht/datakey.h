@@ -38,7 +38,7 @@ public:
 	void add(Key k);
 	void remove(Key k);
 	int getSize() const;
-	data_type getDataType() const;
+	DataType getDataType() const;
 	bool isEmpty() const;
 	std::string GetStr() const;
 

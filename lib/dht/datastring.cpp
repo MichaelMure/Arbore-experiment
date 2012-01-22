@@ -47,7 +47,7 @@ int DataString::getSize() const
 	return nameList_.size();
 }
 
-data_type DataString::getDataType() const
+DataType DataString::getDataType() const
 {
 	return STRING_LIST;
 }

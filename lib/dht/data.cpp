@@ -34,7 +34,7 @@ Data::Data()
 
 bool Data::isOld() const
 {
-		double current_time = time::dtime();
-		double diff = current_time-updateTime_;
-		return diff > 3600;
+	double current_time = time::dtime();
+	double diff = current_time-updateTime_;
+	return diff > DATA_TTL;
 }

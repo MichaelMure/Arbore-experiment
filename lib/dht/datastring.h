@@ -38,7 +38,7 @@ public:
 	void add(std::string name);
 	void remove(std::string name);
 	int getSize() const;
-	data_type getDataType() const;
+	DataType getDataType() const;
 	bool isEmpty() const;
 	std::string GetStr() const;
 
