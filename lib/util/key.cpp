@@ -228,17 +228,6 @@ Key Key::distance(const Key& k2) const
 	return diff;
 }
 
-Key Key::intervalSize(const Key& upperBound) const
-{
-	//the 0 key is not between the 2 bounds, easy
-	if(*this < upperBound)
-	{
-		return upperBound - *this;
-	}
-	//0 key is between, split the interval into [lowerBound, keyMax][0,upperBound]
-	return (Key_Max - upperBound) + *this;
-}
-
 bool Key::between (const Key& left, const Key& right) const
 {
 	int complr = left < right;
@@ -265,17 +254,6 @@ bool Key::between (const Key& left, const Key& right) const
 			return true;
 		return false;
 	}
-}
-
-Key Key::midpoint () const
-{
-	Key mid;
-	if (*this < Key_Half)
-		mid = *this + Key_Half;
-	else
-		mid = *this - Key_Half;
-
-	return mid;
 }
 
 size_t Key::key_index (Key k) const

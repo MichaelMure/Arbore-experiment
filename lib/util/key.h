@@ -145,13 +145,6 @@ public:
 	*/
 	Key distance(const Key& k2) const;
 
-	/** Calculate the size of the interval starting from this to upperBound
-	 *
-	 * @param upperBound
-	 * @return size of the interval
-	 * */
-	Key intervalSize(const Key& upperBound) const;
-
 	/** Check if the key is between 2 others keys
 	*
 	* check to see if the value of this falls in the range from left clockwise
@@ -172,12 +165,6 @@ public:
 	 * @return true if the key is different than 0.
 	 */
 	operator bool() const;
-
-	/** Calculate the midpoint for this
-	 *
-	 * @return this +/- Key_Half
-	 */
-	Key midpoint () const;
 
 	/** Calculate the lenght of the longest prefix match between this and a key
 	*
