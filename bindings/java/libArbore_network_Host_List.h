@@ -15,22 +15,6 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_libArbore_network_Host_1List_N_1decodeHost
   (JNIEnv *, jobject, jlong, jstring);
 
-/*
- * Class:     libArbore_network_Host_List
- * Method:    initCppSide
- * Signature: (I)J
- */
-JNIEXPORT jlong JNICALL Java_libArbore_network_Host_1List_initCppSide
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     libArbore_network_Host_List
- * Method:    destroyCppSide
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_libArbore_network_Host_1List_destroyCppSide
-  (JNIEnv *, jobject, jlong);
-
 #ifdef __cplusplus
 }
 #endif
