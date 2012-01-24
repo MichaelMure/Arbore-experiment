@@ -3,7 +3,11 @@ package chat;
 import libArbore.chimera.ChatMessageListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.swing.JLabel;
 
@@ -26,7 +30,6 @@ public class ControllerChat {
 		initWindowListener();
 		Scheduler.StartSchedulers(5);
 		network.Start();
-
 	}
 
 	private void initChimeraListener() {
@@ -69,10 +72,10 @@ public class ControllerChat {
 			chimera.route(pack);
 			}
 			refreshHostList();
+
 			String fmsg = view.getChatText().getText();
-			GregorianCalendar now = new GregorianCalendar();
-			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg += "\n" + hour + "  ME  " + " - " + msg;
+			
+			fmsg += "\n" + getTime() + "  ME  " + " - " + msg;
 			view.getChatText().setText(fmsg);
 		}
 	}
@@ -94,9 +97,21 @@ public class ControllerChat {
 			String fmsg = view.getChatText().getText();
 			GregorianCalendar now = new GregorianCalendar();
 			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg += "\n" + hour + "  - from " + h.toString() + " - " + s;
+			fmsg += "\n" + getTime() + "  - from " + h.toString() + " - " + s;
 			view.getChatText().setText(fmsg);
 			refreshHostList();
 		}
+	}
+	
+	private String getTime() {
+		Calendar cal = new GregorianCalendar();
+
+		// Get the components of the time
+		Integer hour24 = cal.get(Calendar.HOUR_OF_DAY);
+		Integer min = cal.get(Calendar.MINUTE);
+		Integer sec = cal.get(Calendar.SECOND);
+		return "[" + String.format("%02d", hour24)
+				+ ":" + String.format("%02d", min)
+				+ ":" + String.format("%02d", sec) + "]";
 	}
 }
