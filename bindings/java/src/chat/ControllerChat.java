@@ -19,15 +19,22 @@ public class ControllerChat {
 	private ChatWindow view;
 	private Network network = new Network();
 	private Chimera chimera;
+	private Key me;
 
 	public ControllerChat(ChatWindow view){
 		this.view = view;
 		initWindowListener();
+		initChimeraListener();
 
 		Key me = Key.GetRandomKey();
 		Scheduler.StartSchedulers(5);
 		network.Start();
 
+	}
+
+	private void initChimeraListener() {
+		chimera.addListener(new ChatMsgListenImpl());
+		
 	}
 
 	/**
@@ -42,8 +49,14 @@ public class ControllerChat {
 	class OkButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			view.hidePortField();
+			int port = Integer.parseInt(view.getPortField().getText());
+			chimera = new Chimera(network, port, me);
+				Host bootstrap_host = network.getHost_List().DecodeHost(view.getAdressField().getText());
+				System.out.println("Joining host: " + bootstrap_host);
+				chimera.join(bootstrap_host);
+			}
+			
 		}
-	}
 
 	class SendButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
@@ -71,12 +84,12 @@ public class ControllerChat {
 	class ChatMsgListenImpl implements ChatMessageListener {
 
 		@Override
-		public void MessageReceived(String s) {
+		public void MessageReceived(String s, Host h) {
 			String fmsg = new String();
 			JLabel msg = new JLabel();
 			GregorianCalendar now = new GregorianCalendar();
 			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg = hour + " - " + s;
+			fmsg = hour + "  - from " + h.toString() + " - " + s;
 			msg.setText(fmsg);
 			view.getTextAera().add(msg);
 		}
