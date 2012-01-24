@@ -1,9 +1,13 @@
 package libArbore.chimera;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import libArbore.network.ChatPacket;
 import libArbore.network.Host;
 import libArbore.network.Network;
 import libArbore.util.Key;
+
 
 public class Chimera {
 
@@ -31,7 +35,16 @@ public class Chimera {
 	
 	public static void MessageCallback(String s) {
 		System.out.println("Message received: " + s);
+		for (ChatMessageListener cml : listeners)
+            cml.MessageReceived(s);
 	}
+
+    public static void addListener(ChatMessageListener toAdd) {
+        listeners.add(toAdd);
+    }
+    
+    private static List<ChatMessageListener> listeners = new ArrayList<ChatMessageListener>();
+	
 	/* ------------------------------------------------------------------ */
 
 	static {
