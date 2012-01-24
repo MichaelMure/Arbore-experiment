@@ -180,6 +180,10 @@ public class ChatWindow extends JFrame{
 		 return txtfield;
 	 }
 	 
+	 public JScrollPane getTextAera(){
+		 return txtaera;
+	 }
+	 
 	 public JList getList() {
 		 return list;
 	 }

@@ -1,7 +1,11 @@
 package chat;
 
+import libArbore.chimera.ChatMessageListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.GregorianCalendar;
+
+import javax.swing.JLabel;
 
 import libArbore.chimera.Chimera;
 import libArbore.network.ChatPacket;
@@ -44,14 +48,14 @@ public class ControllerChat {
 	class SendButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			String msg = view.getTextField().getText();
-			/*TODO boucle pour générer un paquet à tous les hosts sélectionnés dans la liste
-			 * for();
-			ChatPacket packet = new ChatPacket(chimera.getMe().getKey(),
+			int[] list = view.getList().getSelectedIndices();
+			for(int i=0; i<list.length; i++)
+			{
+			ChatPacket pack = new ChatPacket(chimera.getMe().getKey(),
 					chimera.getLeafset().getHost(i).getKey(),
 					msg);
-			chimera.route(packet);
+			chimera.route(pack);
 			}
-			 */
 		}
 	}
 
@@ -61,6 +65,20 @@ public class ControllerChat {
 			System.out.println("Joining host: " + bootstrap_host);
 			chimera.join(bootstrap_host);
 			view.hideConnectField();
+		}
+	}
+	
+	class ChatMsgListenImpl implements ChatMessageListener {
+
+		@Override
+		public void MessageReceived(String s) {
+			String fmsg = new String();
+			JLabel msg = new JLabel();
+			GregorianCalendar now = new GregorianCalendar();
+			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
+			fmsg = hour + " - " + s;
+			msg.setText(fmsg);
+			view.getTextAera().add(msg);
 		}
 	}
 }
