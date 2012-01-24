@@ -15,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
@@ -29,6 +30,7 @@ public class ChatWindow extends JFrame{
 	private JPanel main;
 	private JTextField adressfield;
 	private JTextField txtfield;
+	private JTextArea texte;
 	private JScrollPane txtaera;
 	private JList list;
 	private JButton send;
@@ -62,7 +64,9 @@ public class ChatWindow extends JFrame{
 		port = new JTextField("Enter the port to listen");
 		
 		// TextArea
-		txtaera = new JScrollPane();
+		texte = new JTextArea();
+		texte.setEditable(false);
+		txtaera = new JScrollPane(texte);
 		
 		// List
 		list = new JList();
@@ -177,8 +181,8 @@ public class ChatWindow extends JFrame{
 		 return txtfield;
 	 }
 	 
-	 public JScrollPane getTextAera(){
-		 return txtaera;
+	 public JTextArea getChatText(){
+		 return texte;
 	 }
 	 
 	 public JList getList() {

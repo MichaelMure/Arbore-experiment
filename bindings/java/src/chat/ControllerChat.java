@@ -19,14 +19,11 @@ public class ControllerChat {
 	private ChatWindow view;
 	private Network network = new Network();
 	private Chimera chimera;
-	private Key me;
+	private Key me = Key.GetRandomKey();
 
 	public ControllerChat(ChatWindow view){
 		this.view = view;
 		initWindowListener();
-		initChimeraListener();
-
-		Key me = Key.GetRandomKey();
 		Scheduler.StartSchedulers(5);
 		network.Start();
 
@@ -45,17 +42,19 @@ public class ControllerChat {
 		view.addSendButtonListener(new SendButtonListener());
 		view.addConnectButtonListener(new ConnectButtonListener());
 	}
+	
+	private void refreshHostList() {
+		view.getList().setModel(chimera.getLeafset().getHostsModel());
+		System.out.println("leafset " + chimera.getLeafset().toString());
+	}
 
 	class OkButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			view.hidePortField();
 			int port = Integer.parseInt(view.getPortField().getText());
 			chimera = new Chimera(network, port, me);
-				Host bootstrap_host = network.getHost_List().DecodeHost(view.getAdressField().getText());
-				System.out.println("Joining host: " + bootstrap_host);
-				chimera.join(bootstrap_host);
+			initChimeraListener();
 			}
-			
 		}
 
 	class SendButtonListener implements ActionListener {
@@ -69,6 +68,12 @@ public class ControllerChat {
 					msg);
 			chimera.route(pack);
 			}
+			refreshHostList();
+			String fmsg = view.getChatText().getText();
+			GregorianCalendar now = new GregorianCalendar();
+			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
+			fmsg += "\n" + hour + "  ME  " + " - " + msg;
+			view.getChatText().setText(fmsg);
 		}
 	}
 
@@ -78,6 +83,7 @@ public class ControllerChat {
 			System.out.println("Joining host: " + bootstrap_host);
 			chimera.join(bootstrap_host);
 			view.hideConnectField();
+			refreshHostList();
 		}
 	}
 	
@@ -85,13 +91,12 @@ public class ControllerChat {
 
 		@Override
 		public void MessageReceived(String s, Host h) {
-			String fmsg = new String();
-			JLabel msg = new JLabel();
+			String fmsg = view.getChatText().getText();
 			GregorianCalendar now = new GregorianCalendar();
 			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg = hour + "  - from " + h.toString() + " - " + s;
-			msg.setText(fmsg);
-			view.getTextAera().add(msg);
+			fmsg += "\n" + hour + "  - from " + h.toString() + " - " + s;
+			view.getChatText().setText(fmsg);
+			refreshHostList();
 		}
 	}
 }
