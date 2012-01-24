@@ -20,6 +20,7 @@
 #include <net/packet_type.h>
 #include <net/packet_handler.h>
 #include <net/packet.h>
+#include <net/host.h>
 
 JavaVM *javaVM = NULL;
 
@@ -35,6 +36,8 @@ public:
 		}
 
 		std::string message = pckt.GetArg<std::string>(JAVA_CALLBACK_CHAT_MESSAGE);
+		Host *host_copy = new Host(sender);
+
 
 		JNIEnv *env;
 		jint result = javaVM->AttachCurrentThread((void**)&env, NULL);
@@ -57,7 +60,7 @@ public:
 			pf_log[W_ERR] << "Cant find class Chimera";
 		}
 
-		jmethodID mid = env->GetStaticMethodID(cls, "MessageCallback", "(Ljava/lang/String;)V");
+		jmethodID mid = env->GetStaticMethodID(cls, "MessageCallback", "(Ljava/lang/String;J)V");
 
 		if (mid == NULL)
 		{
@@ -65,7 +68,7 @@ public:
 			return;
 		}
 
-		env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(message.c_str()));
+		env->CallStaticVoidMethod(cls, mid, env->NewStringUTF(message.c_str()), (jlong) host_copy);
 	}
 };
 

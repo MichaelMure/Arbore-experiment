@@ -33,10 +33,11 @@ public class Chimera {
 		return new Leafset(N_getLeafset(instance));
 	}
 	
-	public static void MessageCallback(String s) {
-		System.out.println("Message received: " + s);
+	public static void MessageCallback(String s, long host_instance) {
+		Host host = new Host(host_instance);
+		System.out.println("Message received from: " + host + "  -->  " + s);
 		for (ChatMessageListener cml : listeners)
-            cml.MessageReceived(s);
+            cml.MessageReceived(s, host);
 	}
 
     public static void addListener(ChatMessageListener toAdd) {
