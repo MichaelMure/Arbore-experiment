@@ -1,5 +1,7 @@
 package libArbore.chimera;
 
+import javax.swing.DefaultListModel;
+
 import libArbore.network.Host;
 
 public class Leafset {
@@ -12,6 +14,15 @@ public class Leafset {
 		return new Host(N_getHost(instance, index));
 	}
 
+	public DefaultListModel getHostsModel() {
+		DefaultListModel model = new DefaultListModel();
+		int number = N_getHostNumber(instance);
+		for(int x = 0; x < number; x++) {
+			model.addElement(new Host(N_getHost(instance, x)));
+		}
+		
+		return model;
+	}
 	/* ------------------------------------------------------------------ */
 
 	static {
@@ -28,6 +39,7 @@ public class Leafset {
 	
 	private native String N_toString(long instance);
 	private native long N_getHost(long instance, int index);
+	private native int N_getHostNumber(long instance);
 	private native void destroyCppSide(long instance);
     private long instance;
 }

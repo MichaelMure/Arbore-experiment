@@ -60,6 +60,19 @@ JNIEXPORT jlong JNICALL Java_libArbore_chimera_Leafset_N_1getHost
 
 /*
  * Class:     libArbore_chimera_Leafset
+ * Method:    N_getHostNumber
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_libArbore_chimera_Leafset_N_1getHostNumber
+  (JNIEnv *, jobject, jlong instance)
+{
+	std::vector<Host> *leafset = (std::vector<Host>*) instance;
+	return leafset->size();
+}
+
+
+/*
+ * Class:     libArbore_chimera_Leafset
  * Method:    destroyCppSide
  * Signature: (J)V
  */
