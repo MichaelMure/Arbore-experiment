@@ -89,7 +89,7 @@ public class ControllerChat {
 		@Override
 		public void MessageReceived(String s, Host h) {
 			String fmsg = view.getChatText().getText();
-			fmsg += "\n" + getTime() + "  - from " + h.toString() + " - " + s;
+			fmsg += "\n" + getTime() + " from " + h.toString() + " ~ " + s;
 			view.getChatText().setText(fmsg);
 			refreshHostList();
 		}
