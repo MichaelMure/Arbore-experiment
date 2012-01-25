@@ -84,6 +84,7 @@ public class ConsoleChat {
 		System.out.println(chimera.getLeafset().toString());
 	}
 	
+	@SuppressWarnings(value = { "unused" })
 	private Log log = new Log();
 	private Network network = new Network();
 	private Chimera chimera;

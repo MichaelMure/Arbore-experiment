@@ -3,13 +3,8 @@ package chat;
 import libArbore.chimera.ChatMessageListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
-
-import javax.swing.JLabel;
 
 import libArbore.chimera.Chimera;
 import libArbore.network.ChatPacket;
@@ -32,6 +27,7 @@ public class ControllerChat {
 		network.Start();
 	}
 
+	@SuppressWarnings(value = { "static-access" })
 	private void initChimeraListener() {
 		chimera.addListener(new ChatMsgListenImpl());
 		
@@ -93,9 +89,7 @@ public class ControllerChat {
 		@Override
 		public void MessageReceived(String s, Host h) {
 			String fmsg = view.getChatText().getText();
-			GregorianCalendar now = new GregorianCalendar();
-			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg += "\n" + getTime() + " from " + h.toString() + " ~ " + s;
+			fmsg += "\n" + getTime() + "  - from " + h.toString() + " - " + s;
 			view.getChatText().setText(fmsg);
 			refreshHostList();
 		}

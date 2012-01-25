@@ -20,7 +20,9 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 public class ChatWindow extends JFrame{
-	
+
+	private static final long serialVersionUID = 973231576934060635L;
+
 	private JMenuBar menubar;
 	private JMenu file;
 	private JMenu edit;
