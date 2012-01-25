@@ -64,18 +64,16 @@ public class ControllerChat {
 		public void actionPerformed(ActionEvent arg0) {
 			String msg = view.getTextField().getText();
 			int[] list = view.getList().getSelectedIndices();
+			String fmsg = view.getChatText().getText();
 			for(int i=0; i<list.length; i++)
 			{
 			ChatPacket pack = new ChatPacket(chimera.getMe().getKey(),
 					chimera.getLeafset().getHost(i).getKey(),
 					msg);
+			fmsg += "\n" + getTime() + " to " + chimera.getLeafset().getHost(i).toString() +" ~ " + msg;
 			chimera.route(pack);
 			}
 			refreshHostList();
-
-			String fmsg = view.getChatText().getText();
-			
-			fmsg += "\n" + getTime() + "  ME  " + " - " + msg;
 			view.getChatText().setText(fmsg);
 		}
 	}
@@ -97,7 +95,7 @@ public class ControllerChat {
 			String fmsg = view.getChatText().getText();
 			GregorianCalendar now = new GregorianCalendar();
 			String hour = String.valueOf(now.getMaximum(GregorianCalendar.HOUR_OF_DAY));
-			fmsg += "\n" + getTime() + "  - from " + h.toString() + " - " + s;
+			fmsg += "\n" + getTime() + " from " + h.toString() + " ~ " + s;
 			view.getChatText().setText(fmsg);
 			refreshHostList();
 		}
