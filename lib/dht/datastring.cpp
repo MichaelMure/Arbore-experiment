@@ -42,7 +42,7 @@ void DataString::remove(std::string name)
 	nameList_.erase(name);
 }
 
-int DataString::getSize() const
+size_t DataString::getSize() const
 {
 	return nameList_.size();
 }

@@ -37,7 +37,7 @@ public:
 	DataKey(Key k);
 	void add(Key k);
 	void remove(Key k);
-	int getSize() const;
+	size_t getSize() const;
 	DataType getDataType() const;
 	bool isEmpty() const;
 	std::string GetStr() const;

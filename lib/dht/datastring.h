@@ -37,7 +37,7 @@ public:
 	DataString(std::string name);
 	void add(std::string name);
 	void remove(std::string name);
-	int getSize() const;
+	size_t getSize() const;
 	DataType getDataType() const;
 	bool isEmpty() const;
 	std::string GetStr() const;

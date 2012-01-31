@@ -43,7 +43,7 @@ void DataKey::remove(Key k)
 	keyList_.erase(k);
 }
 
-int DataKey::getSize() const
+size_t DataKey::getSize() const
 {
 	return keyList_.size();
 }
