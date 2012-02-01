@@ -29,7 +29,7 @@ JNIEXPORT jstring JNICALL Java_libArbore_network_ChatPacket_N_1toString
   (JNIEnv *env, jobject, jlong instance)
 {
 	Packet *packet = (Packet*) instance;
-	std::string str = packet->GetPacketInfo();
+	std::string str = packet->GetStr();
 	return env->NewStringUTF(str.c_str());
 }
 
