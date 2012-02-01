@@ -176,11 +176,5 @@ void pf_addr::dump(char* p)
 	memcpy(p, &nport, sizeof(nport));
 	p += sizeof(nport);
 
-	const uint32_t* array = key.GetArray();
-	for(size_t i = 0; i < Key::nlen; ++i)
-	{
-		uint32_t nbr = htonl(array[i]);
-		memcpy(p, &nbr, sizeof(nbr));
-		p += sizeof(nbr);
-	}
+	key.dump(p);
 }

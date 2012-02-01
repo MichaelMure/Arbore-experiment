@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <openssl/evp.h>
+#include <arpa/inet.h>
 #include "key.h"
 #include <util/pf_log.h>
 
@@ -59,6 +60,16 @@ Key::Key(uint32_t ul)
 		this->t[i] = 0;
 	this->t[0] = ul;
 
+	set_key_str();
+}
+
+Key::Key(const char* buf)
+{
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		t[i] = ntohl(*(uint32_t*)buf);
+		buf += sizeof(t[i]);
+	}
 	set_key_str();
 }
 
@@ -276,6 +287,16 @@ size_t Key::key_index (Key k) const
 	pf_log[W_DEBUG] << "lookup_key:" << k;
 
 	return (i);
+}
+
+void Key::dump(char* p)
+{
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		uint32_t nbr = htonl(t[i]);
+		memcpy(p, &nbr, sizeof(nbr));
+		p += sizeof(nbr);
+	}
 }
 
 Key Key::Init_Max ()

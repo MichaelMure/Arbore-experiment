@@ -65,6 +65,12 @@ public:
 	 */
 	Key(uint32_t ul = 0);
 
+	/** Create a Key from a serialized key
+	 *
+	 * @param buf is the key serialized
+	 */
+	Key(const char* buf);
+
 	/** Create a Key from a uint32_t[nlen] */
 	explicit Key(uint32_t key[nlen]);
 
@@ -172,6 +178,9 @@ public:
 	* @return size of the prefix match
 	*/
 	size_t key_index (Key k) const;
+
+	/** Serialyze the key in binary format */
+	void dump(char* buf);
 
 private:
 	uint32_t t[nlen];
