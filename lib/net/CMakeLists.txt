@@ -7,6 +7,8 @@ add_library(abnetwork SHARED
     job_handle_packet.cpp
     job_resend_packet.h
     job_resend_packet.cpp
+    netutil.h
+    netutil.cpp
     network.h
     network.cpp
     packet.h
