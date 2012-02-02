@@ -27,6 +27,7 @@
 
 #include "host.h"
 #include "packet.h"
+#include <chimera/chimera.h>
 
 /** Call the packet handler.
  *
@@ -36,16 +37,16 @@
  */
 class HandlePacketJob : public Job
 {
-	Host sender;
-	Packet pckt;
-	PacketTypeList& pckt_type_list;
+	Chimera *chimera_;
+	Host sender_;
+	Packet pckt_;
 
 	bool Start();
 
 public:
-	HandlePacketJob(PacketTypeList& _pckt_type_list,
-									const Host&     _sender,
-									const Packet&   _pckt);
+	HandlePacketJob(Chimera        *chimera,
+	                const Host&     sender,
+	                const Packet&   pckt);
 };
 
 #endif // HANDLEPACKETJOB_H

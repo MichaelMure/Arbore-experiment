@@ -13,7 +13,6 @@ add_library(abnetwork SHARED
     packet.cpp
     packet_arg.h
     packet_handler.h
-    packet_handler.cpp
     packet_type.h
     packet_type.cpp
     packet_type_list.h

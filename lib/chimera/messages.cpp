@@ -35,7 +35,7 @@
 #include "chimera.h"
 #include "check_leafset_job.h"
 
-class ChimeraJoinMessage : public NetworkMessage
+class ChimeraJoinMessage : public ChimeraMessage
 {
 public:
 	/** The JOIN message is answered by a JOINACK or a JOINNACK message.
@@ -75,7 +75,7 @@ public:
 	}
 };
 
-class ChimeraJoinAckMessage : public NetworkMessage
+class ChimeraJoinAckMessage : public ChimeraMessage
 {
 public:
 	/** After receiving a JOINACK message, we add the received peers addresses
@@ -118,7 +118,7 @@ public:
 	}
 };
 
-class ChimeraJoinNAckMessage : public NetworkMessage
+class ChimeraJoinNAckMessage : public ChimeraMessage
 {
 public:
 	/** A JOIN_NACK message trigger the sending of another JOIN message
@@ -137,7 +137,7 @@ public:
 	}
 };
 
-class ChimeraUpdateMessage : public NetworkMessage
+class ChimeraUpdateMessage : public ChimeraMessage
 {
 public:
 	/** The Update message add the sender to the routing infrastructure
@@ -151,7 +151,7 @@ public:
 	}
 };
 
-class ChimeraPiggyMessage : public NetworkMessage
+class ChimeraPiggyMessage : public ChimeraMessage
 {
 public:
 	/** We update the routing infrastructure with the given addresses */
@@ -171,7 +171,7 @@ public:
 	}
 };
 
-class ChimeraPingMessage : public NetworkMessage
+class ChimeraPingMessage : public ChimeraMessage
 {
 	/** We handle a ping message by simply adding it in the host list.
 	  * The ping is already ACKnoledged by the network, due to the REQUESTACK flag.
@@ -183,10 +183,10 @@ public:
 	}
 };
 
-class ChimeraChatMessage : public NetworkMessage
+class ChimeraChatMessage : public ChimeraMessage
 {
 public:
-	void Handle(Chimera& chimera, const Host& sender, const Packet& pckt)
+	void Handle(Chimera&, const Host&, const Packet& pckt)
 	{
 		std::string message = pckt.GetArg<std::string>(CHIMERA_CHAT_MESSAGE);
 		pf_log[W_INFO] << "CHAT[" << pckt.GetSrc() << "] " << message;

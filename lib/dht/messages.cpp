@@ -30,50 +30,50 @@
 #include <net/packet.h>
 #include <net/packet_handler.h>
 #include <scheduler/scheduler_queue.h>
-#include <chimera/chimera.h>
 
 #include "messages.h"
+#include "dht.h"
 
-class DHTPublishMessage : public NetworkMessage
+class DHTPublishMessage : public DHTMessage
 {
 public:
-	void Handle (Chimera&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}
 };
 
-class DHTUnpublishMessage : public NetworkMessage
+class DHTUnpublishMessage : public DHTMessage
 {
 public:
-	void Handle (Chimera&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}
 };
 
-class DHTGetMessage : public NetworkMessage
+class DHTGetMessage : public DHTMessage
 {
 public:
-	void Handle (Chimera&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}
 };
 
-class DHTGetAckMessage : public NetworkMessage
+class DHTGetAckMessage : public DHTMessage
 {
 public:
-	void Handle (Chimera&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}
 };
 
-class DHTGetNAckMessage : public NetworkMessage
+class DHTGetNAckMessage : public DHTMessage
 {
 public:
-	void Handle (Chimera&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet&)
 	{
 		/* TODO: unimplemented */
 	}

@@ -61,7 +61,7 @@ Packet::Packet(const Packet& p)
 		arg_lst.push_back((*it)->clone());
 }
 
-Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
+Packet::Packet(char* header, size_t datasize)
 			: type(0, NULL, 0, "NONE", T_END),
 			size(0),
 			data(NULL)
@@ -84,7 +84,7 @@ Packet::Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize)
 
 	try
 	{
-		type = pckt_type_list->GetPacketType(type_i);
+		type = packet_type_list.GetPacketType(type_i);
 	}
 	catch(PacketTypeList::UnknowType& e)
 	{
@@ -201,11 +201,6 @@ void Packet::SetContent(const char* buf, size_t _size)
 	memcpy(data, buf, GetDataSize());
 
 	BuildArgsFromData();
-}
-
-void Packet::Handle(PacketTypeList& pckt_type_list, const Host& sender) const
-{
-	(*type.GetHandler()) (pckt_type_list, sender, *this);
 }
 
 void Packet::BuildArgsFromData()

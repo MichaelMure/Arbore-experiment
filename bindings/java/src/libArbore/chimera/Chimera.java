@@ -19,6 +19,10 @@ public class Chimera {
 			return new Network(N_getNetwork(instance));
 	}
 	
+	public long getInstance() {
+		return instance;
+	}
+	
 	public void join(Host bootstrap)
 	{
 		N_join(instance, bootstrap.GetInstance());
@@ -52,8 +56,8 @@ public class Chimera {
 		System.loadLibrary("javachimera");
     }
 
-	public Chimera(Network net, int port, Key k)  {
-        instance = initCppSide(net.GetInstance(), port, k.GetInstance());
+	public Chimera(int port, Key k)  {
+        instance = initCppSide(port, k.GetInstance());
     }
 	
 	public void finalize() {
@@ -65,7 +69,7 @@ public class Chimera {
 	private native long N_getLeafset(long instance);
 	private native void N_join(long instance, long bootstrap);
 	private native boolean N_route(long instance, long cp);
-	private native long initCppSide(long network, int port, long key);
+	private native long initCppSide(int port, long key);
 	private native void destroyCppSide(long instance);
     private long instance;
 }

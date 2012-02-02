@@ -15,20 +15,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
- #include "libArbore_network_Network.h"
- #include <net/network.h>
-
-/*
- * Class:     libArbore_network_Network
- * Method:    N_Start
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_libArbore_network_Network_N_1Start
-  (JNIEnv *, jobject, jlong instance)
-	{
-		Network* net = (Network*) instance;
-		net->Start();
-	}
+#include "libArbore_network_Network.h"
+#include <net/network.h>
+#include <chimera/chimera.h>
 
 /*
  * Class:     libArbore_network_Network
@@ -49,9 +38,10 @@ JNIEXPORT jlong JNICALL Java_libArbore_network_Network_N_1getHost_1List
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL Java_libArbore_network_Network_initCppSide
-  (JNIEnv *, jobject)
+  (JNIEnv *, jobject, jlong chimera_instance)
 	{
-		return (jlong) new Network();
+		Chimera* chimera = (Chimera*) chimera_instance;
+		return (jlong) new Network(chimera);
 	}
 
 /*

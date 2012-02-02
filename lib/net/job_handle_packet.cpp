@@ -24,13 +24,13 @@
 
 bool HandlePacketJob::Start()
 {
-	pckt.Handle(pckt_type_list, sender);
+	chimera_->HandleMessage(sender_, pckt_);
 	return false;
 }
 
-HandlePacketJob::HandlePacketJob(PacketTypeList& _pckt_type_list, const Host& _sender, const Packet& _pckt)
+HandlePacketJob::HandlePacketJob(Chimera *chimera, const Host& sender, const Packet& pckt)
 	: Job(0.0, REPEAT_NONE),
-		sender(_sender),
-		pckt(_pckt),
-		pckt_type_list(_pckt_type_list)
+		chimera_(chimera),
+		sender_(sender),
+		pckt_(pckt)
 {}

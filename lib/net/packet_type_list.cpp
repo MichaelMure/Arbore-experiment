@@ -26,6 +26,8 @@
 
 #include "packet_type_list.h"
 
+PacketTypeList packet_type_list;
+
 void PacketTypeList::RegisterType(PacketType type)
 {
 	BlockLockMutex lock(this);

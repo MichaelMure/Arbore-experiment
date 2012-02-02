@@ -26,7 +26,16 @@
 #ifndef DHT_MESSAGES_H
 #define DHT_MESSAGES_H
 
-#include <net/packet_type.h>
+#include <net/packet_handler.h>
+
+class DHT;
+
+class DHTMessage : public PacketHandlerBase
+{
+public:
+	virtual void Handle (DHT& dht, const Host& sender, const Packet& pckt) = 0;
+	HandlerType getType() { return HANDLER_TYPE_DHT; }
+};
 
 enum
 {

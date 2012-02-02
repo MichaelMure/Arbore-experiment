@@ -1,14 +1,11 @@
 package libArbore.network;
 
+import libArbore.chimera.Chimera;
+
 public class Network {
 	
 	public long GetInstance() {
 		return instance;
-	}
-	
-	public void Start() {
-		
-		N_Start(instance);
 	}
 	
 	public Host_List getHost_List() {
@@ -28,17 +25,22 @@ public class Network {
 		System.loadLibrary("javanetwork");
     }
 
-	public Network()  {
-        instance = initCppSide();
+	public Network(Chimera c)  {
+		long chimera_instance;
+		if(c == null)
+			chimera_instance = 0;
+		else
+			chimera_instance = c.getInstance();
+		
+        instance = initCppSide(chimera_instance);
     }
 	
 	public void finalize() {
 		destroyCppSide(instance);
 	}
 	
-	private native void N_Start(long instance);
 	private native long N_getHost_List(long instance);
-	private native long initCppSide();
+	private native long initCppSide(long chimera_instance);
 	private native void destroyCppSide(long instance);
     private long instance;
 }

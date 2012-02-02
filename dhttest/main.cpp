@@ -42,22 +42,19 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	Network net;
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	Chimera* dht = new Chimera(&net, StrToTyp<uint16_t>(argv[1]), me);
-
-	std::cerr << "hosts_list pointer: " << dht->GetNetwork()->GetHostsList() << std::endl;
+	Chimera* chimera = new Chimera(NULL, StrToTyp<uint16_t>(argv[1]), me);
+	Network *net = chimera->GetNetwork();
 
 	pf_log.SetLoggedFlags("ALL", false);
 	Scheduler::StartSchedulers(5);
-	net.Start();
 
 	if(argc > 2)
 	{
-		Host host = net.GetHostsList()->DecodeHost(argv[2]);
+		Host host = net->GetHostsList()->DecodeHost(argv[2]);
 		pf_log[W_INFO] << "Connecting to " << host;
-		dht->Join(host);
+		chimera->Join(host);
 	}
 
 	std::string s;
@@ -67,11 +64,11 @@ int main(int argc, char** argv)
 		Key key;
 		key = keystr;
 
-		Packet pckt(ChimeraChatType, dht->GetMe().GetKey(), key);
+		Packet pckt(ChimeraChatType, chimera->GetMe().GetKey(), key);
 		pckt.SetFlag(Packet::MUSTROUTE);
 		pckt.SetArg(CHIMERA_CHAT_MESSAGE, s);
 		pf_log[W_INFO] << "CHAT[" << key << "] " << s;
-		dht->Route(pckt);
+		chimera->Route(pckt);
 	}
 
 	return 0;

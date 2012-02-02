@@ -23,28 +23,17 @@
 #ifndef PACKET_HANDLER_H
 #define PACKET_HANDLER_H
 
-class Host;
-class Packet;
-class PacketTypeList;
-class Chimera;
+enum HandlerType
+{
+	HANDLER_TYPE_CHIMERA,
+	HANDLER_TYPE_DHT
+};
 
 class PacketHandlerBase
 {
 public:
 	virtual ~PacketHandlerBase() {}
-	virtual void operator()(PacketTypeList& pckt_type_list, const Host& sender, const Packet& packet) = 0;
-};
-
-/** Virtual class used to create handler on a network message.
- *
- * It routes message if the MUSTROUTE flag is set.
- */
-class NetworkMessage : public PacketHandlerBase
-{
-public:
-	void operator() (PacketTypeList& pckt_type_list, const Host& sender, const Packet& pckt);
-
-	virtual void Handle (Chimera& chimera, const Host& sender, const Packet& pckt) = 0;
+	virtual HandlerType getType() = 0;
 };
 
 #endif /* PACKET_HANDLER_H */

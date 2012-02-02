@@ -26,11 +26,10 @@
 #include <exception>
 #include <fcntl.h>
 #include <list>
-#include <map>
-#include <time.h>
 #include <vector>
 
 #include <util/pf_thread.h>
+#include <chimera/chimera.h>
 
 #include "hosts_list.h"
 #include "pf_addr.h"
@@ -38,7 +37,6 @@
 
 class MyConfig;
 class ResendPacketJob;
-class PacketTypeList;
 
 class Network : public Thread, protected Mutex
 {
@@ -67,14 +65,15 @@ public:
 
 private:
 
-	typedef std::map<int, PacketTypeList*> SockMap;
-	SockMap socks;    /**< contains all socks listened and the related packettypelist */
+	typedef std::set<int> SockSet;
+	SockSet socks;    /**< contains all socks listened */
 	fd_set socks_fd_set;
 	int highsock;
 
 	HostsList hosts_list;
 	std::vector<ResendPacketJob*> resend_list;
 	uint32_t seqend;
+	Chimera *chimera_;
 
 	void CloseAll();
 	void Loop();
@@ -82,18 +81,20 @@ private:
 
 public:
 
-	Network();
+	/** Constructor of network.
+	 * @param chimera an instance of the Chimera routing layer.
+	 */
+	Network(Chimera *chimera);
 	~Network();
 
 	/** Listen an UDP port.
 	 *
-	 * @param packet_type_list  this is the object which describes the packet types and
-	 *                          them handlers.
+	 * @param chimera the Chimera routing layer
 	 * @param port  the listened port
 	 * @param bind_addr  the listened address
 	 * @return  the file descriptor
 	 */
-	int Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr);
+	int Listen(uint16_t port, const char* bind_addr);
 
 	/** @return a pointer to the Host list */
 	HostsList* GetHostsList();

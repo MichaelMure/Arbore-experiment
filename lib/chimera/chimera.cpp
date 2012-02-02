@@ -29,16 +29,20 @@
 #include <net/network.h>
 #include <scheduler/scheduler_queue.h>
 #include <util/key.h>
+#include <dht/dht.h>
+
 #include "check_leafset_job.h"
 #include "chimera.h"
 #include "messages.h"
 #include "routing.h"
 
-Chimera::Chimera(Network* _network, uint16_t port, Key my_key)
-	: network(_network),
+Chimera::Chimera(DHT *dht, uint16_t port, const Key my_key)
+	: network(new Network(this)),
+	dht_(dht),
 	routing(NULL)
-
 {
+	network->Start();
+
 	char name[256];
 	struct hostent* he;
 
@@ -56,15 +60,15 @@ Chimera::Chimera(Network* _network, uint16_t port, Key my_key)
 
 	routing = new Routing(me);
 
-	RegisterType(ChimeraJoinType);
-	RegisterType(ChimeraJoinAckType);
-	RegisterType(ChimeraUpdateType);
-	RegisterType(ChimeraPiggyType);
-	RegisterType(ChimeraJoinNAckType);
-	RegisterType(ChimeraPingType);
-	RegisterType(ChimeraChatType);
+	packet_type_list.RegisterType(ChimeraJoinType);
+	packet_type_list.RegisterType(ChimeraJoinAckType);
+	packet_type_list.RegisterType(ChimeraUpdateType);
+	packet_type_list.RegisterType(ChimeraPiggyType);
+	packet_type_list.RegisterType(ChimeraJoinNAckType);
+	packet_type_list.RegisterType(ChimeraPingType);
+	packet_type_list.RegisterType(ChimeraChatType);
 
-	fd = network->Listen(this, port, "0.0.0.0");
+	fd = network->Listen(port, "0.0.0.0");
 
 	pf_log[W_INFO] << "Started Chimera with key " << my_key;
 }
@@ -80,6 +84,30 @@ bool Chimera::Ping(const Host& dest)
 	pckt.SetArg(CHIMERA_PING_ME, me.GetAddr());
 
 	return Send(dest, pckt);
+}
+
+void Chimera::HandleMessage(const Host& sender, const Packet& pckt)
+{
+	if(pckt.HasFlag(Packet::MUSTROUTE))
+	{
+		if(Route(pckt))
+			return;
+	}
+
+	/* Route() returned false, so we are likely the destination of the message. */
+
+	PacketHandlerBase *handler_base = pckt.GetPacketType().GetHandler();
+	if(handler_base->getType() == HANDLER_TYPE_CHIMERA)
+	{
+		ChimeraMessage *handler = (ChimeraMessage*) handler_base;
+		handler->Handle(*this, sender, pckt);
+	}
+	else
+	{
+		/* If the message is not aimed to chimera, we chain up the message to the DHT, if any. */
+		if(dht_ != NULL)
+			dht_->HandleMessage(sender, pckt);
+	}
 }
 
 void Chimera::Join(const Host& bootstrap)

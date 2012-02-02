@@ -16,7 +16,7 @@ import libArbore.util.Key;
 public class ControllerChat {
 
 	private ChatWindow view;
-	private Network network = new Network();
+	private Network network;
 	private Chimera chimera;
 	private Key me = Key.GetRandomKey();
 
@@ -24,13 +24,11 @@ public class ControllerChat {
 		this.view = view;
 		initWindowListener();
 		Scheduler.StartSchedulers(5);
-		network.Start();
 	}
 
 	@SuppressWarnings(value = { "static-access" })
 	private void initChimeraListener() {
 		chimera.addListener(new ChatMsgListenImpl());
-		
 	}
 
 	/**
@@ -51,7 +49,8 @@ public class ControllerChat {
 		public void actionPerformed(ActionEvent arg0) {
 			view.hidePortField();
 			int port = Integer.parseInt(view.getPortField().getText());
-			chimera = new Chimera(network, port, me);
+			chimera = new Chimera(port, me);
+			network = chimera.getNetwork();
 			initChimeraListener();
 			}
 		}

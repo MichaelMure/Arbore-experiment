@@ -19,6 +19,8 @@
 #include <chimera/chimera.h>
 #include <chimera/routing.h>
 #include <chimera/messages.h>
+#include <net/packet_type_list.h>
+
 #include "JavaCallbackMessages.h"
 
 /*
@@ -91,18 +93,17 @@ JNIEXPORT jboolean JNICALL Java_libArbore_chimera_Chimera_N_1route
  * Signature: (JIJ)J
  */
 JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_initCppSide
-  (JNIEnv *env, jobject ob, jlong network, jint port, jlong key)
+  (JNIEnv *env, jobject ob, jint port, jlong key)
 	{
 		jint result = env->GetJavaVM(&javaVM);
 		if (result < 0) {
 			pf_log[W_ERR] << "Error retrieving Java VM";
 		}
 
-		Network* net = (Network*) network;
 		Key mykey = (Key) key;
-		Chimera *chimera = new Chimera(net,port,mykey);
+		Chimera *chimera = new Chimera(NULL,port,mykey);
 
-		chimera->RegisterType(JavaCallbackChatType);
+		packet_type_list.RegisterType(JavaCallbackChatType);
 
 		return (jlong) chimera;
 	}

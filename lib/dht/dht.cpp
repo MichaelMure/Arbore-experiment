@@ -25,8 +25,12 @@
 
 #include "dht.h"
 
-DHT::DHT(Chimera* chimera)
-	: chimera_(chimera)
+#include <net/packet.h>
+
+#include "messages.h"
+
+DHT::DHT(uint16_t port, const Key key)
+	: chimera_(new Chimera(this, port, key))
 {
 }
 
@@ -48,4 +52,19 @@ bool DHT::Publish(Key& id, Key& key) const
 bool DHT::Publish(Key& id, DataKey& keys) const
 {
 	return false;
+}
+
+void DHT::HandleMessage(const Host& sender, const Packet& pckt)
+{
+	PacketHandlerBase *handler_base = pckt.GetPacketType().GetHandler();
+	if(handler_base->getType() == HANDLER_TYPE_DHT)
+	{
+		DHTMessage *handler = (DHTMessage*) handler_base;
+		handler->Handle(*this, sender, pckt);
+	}
+}
+
+Chimera* DHT::GetChimera() const
+{
+	return chimera_;
 }

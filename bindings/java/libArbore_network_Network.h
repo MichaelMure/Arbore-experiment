@@ -9,14 +9,6 @@ extern "C" {
 #endif
 /*
  * Class:     libArbore_network_Network
- * Method:    N_Start
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_libArbore_network_Network_N_1Start
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     libArbore_network_Network
  * Method:    N_getHost_List
  * Signature: (J)J
  */
@@ -26,10 +18,10 @@ JNIEXPORT jlong JNICALL Java_libArbore_network_Network_N_1getHost_1List
 /*
  * Class:     libArbore_network_Network
  * Method:    initCppSide
- * Signature: ()J
+ * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL Java_libArbore_network_Network_initCppSide
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jlong);
 
 /*
  * Class:     libArbore_network_Network

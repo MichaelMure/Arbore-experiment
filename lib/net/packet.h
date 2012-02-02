@@ -37,7 +37,6 @@
 
 typedef std::vector<pf_addr> AddrList;
 
-class PacketTypeList;
 class Host;
 
 /** \brief the Packet's representation class.
@@ -111,12 +110,9 @@ public:
 	 * It gets the packet's header, find the type and wait for
 	 * the \b SetContent method call to fill args.
 	 *
-	 * @param pckt_type_list  This is the PacketTypeList object pointer which
-	 *                        is used to get the PacketType object from type
-	 *                        contained in header.
 	 * @param header  the header data (size must be GetHeaderSize()).
 	 */
-	Packet(PacketTypeList* pckt_type_list, char* header, size_t datasize);
+	Packet(char* header, size_t datasize);
 
 	/** Copy operator.
 	 *
@@ -142,13 +138,6 @@ public:
 	 * @param _size  size of buffer. It *must* be GetDataSize().
 	 */
 	void SetContent(const char* buf, size_t _size);
-
-	/** Call the handler method.
-	 *
-	 * @param pckt_type_list  the PacketTypeList or derived object.
-	 * @param sender  this is the sender's Host object
-	 */
-	void Handle(PacketTypeList& pckt_type_list, const Host& sender) const;
 
 	/** Returns the header's size.
 	 *

@@ -36,7 +36,11 @@
 class DHT
 {
 public:
-	DHT(Chimera* chimera);
+	/* DHT constructor.
+	 * @param port the port that we listen on
+	 * @param key the key used on the routing layer
+	 */
+	DHT(uint16_t port, const Key key);
 	virtual ~DHT() {}
 
 	/** Publish a string on DHT */
@@ -57,6 +61,12 @@ public:
 
 	/** Send message to owners on an object. */
 	bool SendToObj(Key id, const Packet& pckt);
+
+	/** Handle a network message. */
+	void HandleMessage(const Host& sender, const Packet& pckt);
+
+	/** @return the chimera routing layer */
+	Chimera* GetChimera() const;
 
 private:
 	Chimera* chimera_;

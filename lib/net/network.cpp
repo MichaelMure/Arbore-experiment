@@ -45,11 +45,12 @@
 #include "job_resend_packet.h"
 #include "network.h"
 
-Network::Network()
+Network::Network(Chimera *chimera)
 	: Mutex(RECURSIVE_MUTEX),
 	highsock(-1),
 	hosts_list(64), /* TODO: magic number, change it. */
-	seqend(0)
+	seqend(0),
+	chimera_(chimera)
 {
 	FD_ZERO(&socks_fd_set);
 }
@@ -59,7 +60,7 @@ Network::~Network()
 	CloseAll();
 }
 
-int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char* bind_addr)
+int Network::Listen(uint16_t port, const char* bind_addr)
 {
 	BlockLockMutex lock(this);
 	struct sockaddr_in saddr;
@@ -86,7 +87,7 @@ int Network::Listen(PacketTypeList* packet_type_list, uint16_t port, const char*
 		throw CantListen(port);
 	}
 
-	socks[serv_sock] = packet_type_list;
+	socks.insert(serv_sock);
 	FD_SET(serv_sock, &socks_fd_set);
 	if(serv_sock > highsock)
 		highsock = serv_sock;
@@ -121,13 +122,12 @@ void Network::Loop()
 	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		BlockLockMutex lock(this);
-		for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
+		for(SockSet::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
-			if(!FD_ISSET(it->first, &tmp_read_set))
+			int sock = *it;
+			if(!FD_ISSET(sock, &tmp_read_set))
 				continue;
 
-			int sock = it->first;
-			PacketTypeList* packet_type_list = it->second;
 			static char data[PACKET_MAX_SIZE];
 			struct sockaddr_in from;
 			ssize_t size;
@@ -149,7 +149,7 @@ void Network::Loop()
 			}
 			try
 			{
-				Packet pckt(packet_type_list, data, size);
+				Packet pckt(data, size);
 				pf_addr address(from.sin_addr.s_addr, ntohs(from.sin_port));
 				Host sender = hosts_list.GetHost(address);
 
@@ -195,7 +195,7 @@ void Network::Loop()
 					Send(sock, sender, ack);
 				}
 
-				scheduler_queue.Queue(new HandlePacketJob(*packet_type_list, sender, pckt));
+				scheduler_queue.Queue(new HandlePacketJob(chimera_, sender, pckt));
 			}
 			catch(Packet::Malformated &e)
 			{
@@ -216,10 +216,10 @@ void Network::CloseAll()
 {
 	BlockLockMutex lock(this);
 
-	for(SockMap::iterator it = socks.begin(); it != socks.end(); ++it)
+	for(SockSet::iterator it = socks.begin(); it != socks.end(); ++it)
 	{
-		shutdown(it->first, SHUT_RDWR);
-		close(it->first);
+		shutdown(*it, SHUT_RDWR);
+		close(*it);
 	}
 	socks.clear();
 }

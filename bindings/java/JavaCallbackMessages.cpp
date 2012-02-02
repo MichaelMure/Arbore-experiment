@@ -21,10 +21,11 @@
 #include <net/packet_handler.h>
 #include <net/packet.h>
 #include <net/host.h>
+#include <chimera/messages.h>
 
 JavaVM *javaVM = NULL;
 
-class JavaCallbackChatMessage : public NetworkMessage
+class JavaCallbackChatMessage : public ChimeraMessage
 {
 public:
 	void Handle(Chimera& chimera, const Host& sender, const Packet& pckt)

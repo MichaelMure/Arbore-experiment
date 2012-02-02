@@ -30,12 +30,14 @@
 #include <net/host.h>
 
 class Network;
+class DHT;
 class Routing;
 class Packet;
 
-class Chimera : public PacketTypeList
+class Chimera
 {
 	Network* network;
+	DHT* dht_;
 	Routing* routing;
 	Host me;
 	int fd;
@@ -48,18 +50,13 @@ public:
 	 */
 	static const unsigned int GRACEPERIOD = 30;		/* seconds */
 
-	/** Create the Chimera.
+	/** Create the Chimera routing layer
 	 *
-	 * Create a new Chimera object to build all of the Distributed
-	 * Hash Table which is used by Peerfuse to send messages to other
-	 * peers.
-	 *
-	 * @param network  the Network object used to create a new UDP
-	 *                 socket, send and receive messages.
+	 * @param dht a pointer to an instance of DHT. Can be null if Chimera is used alone.
 	 * @param port  listened port
-	 * @param my_key  key used on the DHT network.
+	 * @param my_key  key used on the routing layer network.
 	 */
-	Chimera(Network* network, uint16_t port, Key my_key);
+	Chimera(DHT* dht, uint16_t port, const Key my_key);
 
 	/** @return  the Host object which represents me on network. */
 	Host GetMe() const { return me; }
@@ -108,6 +105,13 @@ public:
 	 * @return  true if the host is up.
 	 */
 	bool Ping(const Host& dest);
+
+	/** Handle a network message.
+	 * If the MUSTROUTE flag is set, chimera try to route this message,
+	 * and deliver it if we are the closest node know.
+	 * If the message is aimed to DHT layer or above, the message is chained up.
+	 */
+	void HandleMessage(const Host& sender, const Packet& pckt);
 };
 
 #endif /* CHIMERA_H */

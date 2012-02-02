@@ -38,11 +38,11 @@ public class ConsoleChat {
 	private ConsoleChat(int port, String bootstrap) {
 		Key me = Key.GetRandomKey();
 		
-		chimera = new Chimera(network, port, me);
+		chimera = new Chimera(port, me);
+		network = chimera.getNetwork();
 		
 		//log.SetLoggedFlags("ALL", false);
 		Scheduler.StartSchedulers(5);
-		network.Start();
 		
 		if(bootstrap != null) {
 			Host bootstrap_host = network.getHost_List().DecodeHost(bootstrap);
@@ -86,6 +86,6 @@ public class ConsoleChat {
 	
 	@SuppressWarnings(value = { "unused" })
 	private Log log = new Log();
-	private Network network = new Network();
+	private Network network;
 	private Chimera chimera;
 }

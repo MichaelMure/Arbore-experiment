@@ -55,4 +55,7 @@ private:
 	typedef PacketTypeMap::value_type value_type;
 };
 
+/* Singleton */
+extern PacketTypeList packet_type_list;
+
 #endif /* PACKET_TYPE_LIST_H */

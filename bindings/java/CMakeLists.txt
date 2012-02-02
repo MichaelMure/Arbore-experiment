@@ -56,4 +56,5 @@ TARGET_LINK_LIBRARIES(javachimera
                       abutil
                       abnetwork
                       abchimera
+                      abscheduler
                       )

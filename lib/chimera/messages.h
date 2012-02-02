@@ -26,7 +26,16 @@
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
-#include <net/packet_type.h>
+#include <net/packet_handler.h>
+
+class Chimera;
+
+class ChimeraMessage : public PacketHandlerBase
+{
+public:
+	virtual void Handle (Chimera& chimera, const Host& sender, const Packet& pckt) = 0;
+	HandlerType getType() { return HANDLER_TYPE_CHIMERA; }
+};
 
 enum
 {

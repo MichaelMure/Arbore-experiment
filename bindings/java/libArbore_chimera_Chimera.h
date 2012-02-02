@@ -50,10 +50,10 @@ JNIEXPORT jboolean JNICALL Java_libArbore_chimera_Chimera_N_1route
 /*
  * Class:     libArbore_chimera_Chimera
  * Method:    initCppSide
- * Signature: (JIJ)J
+ * Signature: (IJ)J
  */
 JNIEXPORT jlong JNICALL Java_libArbore_chimera_Chimera_initCppSide
-  (JNIEnv *, jobject, jlong, jint, jlong);
+  (JNIEnv *, jobject, jint, jlong);
 
 /*
  * Class:     libArbore_chimera_Chimera

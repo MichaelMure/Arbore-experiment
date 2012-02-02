@@ -49,10 +49,10 @@ class ResendPacketJob : public Job
 public:
 
 	ResendPacketJob(Network* _network,
-								  int _sock,
-									const Host& _desthost,
-									const Packet& _packet,
-									double transmit_time);
+	                int _sock,
+	                const Host& _desthost,
+	                const Packet& _packet,
+	                double transmit_time);
 
 	const Packet& GetPacket() const;
 	double GetTransmitTime() const;
