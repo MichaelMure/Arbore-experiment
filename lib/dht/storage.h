@@ -39,7 +39,7 @@ class Storage
 public:
 
 	Storage() {};
-	virtual ~Storage();
+	virtual ~Storage() {};
 	void addInfo(Key k, Key info);
 	void addInfo(Key k, std::string info);
 	void removeInfo(Key k, Key info);
@@ -59,8 +59,7 @@ public:
 
 private:
 	std::map<Key, Data*> dataMap_;
-
-	};
+};
 
 template<>
 inline Log::flux& Log::flux::operator<< <Storage> (Storage stor)
