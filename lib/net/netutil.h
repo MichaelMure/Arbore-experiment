@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef DATA_H
-#define DATA_H
+#ifndef NETUTIL_H
+#define NETUTIL_H
 
 #include <stdint.h>
 #include <arpa/inet.h>

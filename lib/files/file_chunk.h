@@ -25,6 +25,7 @@
 #define FILE_CHUNK_H
 
 #include <time.h>
+#include <net/netutil.h>
 #include "file_chunk_desc.h"
 
 /** Specialisation of FileChunkDesc to actually hold data of a chunk */
@@ -37,6 +38,12 @@ class FileChunk : public FileChunkDesc
 public:
 	FileChunk();
 	FileChunk(const char* _data, off_t _offset, size_t _size);
+
+	/** Create a Chunk from a serialized chunk
+	 *
+	 * @param buff is the chunk serialized
+	 */
+	FileChunk (char* buff);
 
 	/** Copy constructor */
 	FileChunk(const FileChunk &other);
@@ -71,5 +78,8 @@ public:
 
 	/** @return a FilChunk that hold the data of the common part of this and chunk_desc */
 	FileChunk GetPart(FileChunkDesc chunk_desc);
+
+	/** Serialyze the chunk in binary format */
+	void dump(char* buff) const;
 };
 #endif						  /* FILE_CHUNK_H */

@@ -46,6 +46,15 @@ FileChunk::FileChunk(const char* _data, off_t _offset, size_t _size)
 		data = NULL;
 }
 
+FileChunk::FileChunk(char* buff)
+{
+	this->offset = Netutil::ReadInt64(buff);
+	buff += sizeof(offset);
+	this->size = Netutil::ReadInt32(buff);
+	buff += sizeof(size);
+	memcpy(buff, data, size);
+}
+
 FileChunk::FileChunk(const FileChunk& other)
  : FileChunkDesc(other), access_time(other.access_time), hdd_synced(other.hdd_synced)
 {
@@ -176,4 +185,14 @@ FileChunk FileChunk::GetPart(FileChunkDesc chunk_desc)
 	if(hdd_synced)
 		chunk.SetHddSynced(true);
 	return chunk;
+}
+
+
+void FileChunk::dump(char* buff) const
+{
+	Netutil::dump((uint64_t) offset, buff);
+	buff += sizeof(uint64_t);
+	Netutil::dump((uint32_t) size, buff);
+	buff += sizeof(uint32_t);
+	memcpy(buff, data, size);
 }
