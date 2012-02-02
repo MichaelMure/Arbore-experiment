@@ -222,27 +222,32 @@ void Packet::BuildArgsFromData()
 				throw Malformated();
 		}
 	}
-	if(data)
+
+	if((p-data) < size)
 		pf_log[W_WARNING] << "There are some unread data in packet: " << *this;
+
+	delete[] data;
 }
 
 void Packet::BuildDataFromArgs()
 {
 	if(data)
 		return;
+
+	data = new char[size];
 	char* p = data;
 	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
 	{
 		size_t arg_no = it - type.begin();
 		switch(*it)
 		{
-			case T_UINT32: Netutil::dump(GetArg<uint32_t>(arg_no), p); break;
-			case T_UINT64: Netutil::dump(GetArg<uint64_t>(arg_no), p); break;
-			case T_KEY: GetArg<Key>(arg_no).dump(p); break;
-			case T_STR: Netutil::dump(GetArg<std::string>(arg_no), p); break;
-			case T_ADDRLIST: GetArg<addr_list>(arg_no).dump(p); break;
-			case T_ADDR: GetArg<pf_addr>(arg_no).dump(p); break;
-			case T_CHUNK: GetArg<FileChunk>(arg_no).dump(p); break;
+			case T_UINT32: Netutil::dump(GetArg<uint32_t>(arg_no), p); p += sizeof(uint32_t); break;
+			case T_UINT64: Netutil::dump(GetArg<uint64_t>(arg_no), p); p += sizeof(uint64_t); break;
+			case T_KEY: GetArg<Key>(arg_no).dump(p); p += Key::size; break;
+			case T_STR: {std::string s = GetArg<std::string>(arg_no); Netutil::dump(s, p); p += s.size();} break;
+			case T_ADDRLIST: {addr_list addl = GetArg<addr_list>(arg_no); addl.dump(p); p += addl.size();} break;
+			case T_ADDR: {pf_addr addr = GetArg<pf_addr>(arg_no); addr.dump(p); p += addr.size;} break;
+			case T_CHUNK: { FileChunk fc = GetArg<FileChunk>(arg_no); fc.dump(p); p += fc.getSerialisedSize();} break;
 			case T_END:
 			default:
 				throw Malformated();
