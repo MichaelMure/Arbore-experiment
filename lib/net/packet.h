@@ -129,16 +129,6 @@ public:
 	 */
 	char* DumpBuffer();
 
-	/** Set content of packet.
-	 *
-	 * It *must* be used after use of the constructor which
-	 * asks a header buffer.
-	 *
-	 * @param buf  content buffer of packet.
-	 * @param _size  size of buffer. It *must* be GetDataSize().
-	 */
-	void SetContent(const char* buf, size_t _size);
-
 	/** Returns the header's size.
 	 *
 	 * The header's size is constant, so this is a static method.
@@ -218,6 +208,16 @@ public:
 	}
 
 private:
+
+	/** Set content of packet.
+	 *
+	 * It *must* be used after use of the constructor which
+	 * asks a header buffer.
+	 *
+	 * @param buf  content buffer of packet.
+	 * @param _size  size of buffer. It *must* be GetDataSize().
+	 */
+	void SetContent(const char* buf, size_t _size);
 
 	void BuildArgsFromData();
 	void BuildDataFromArgs();
