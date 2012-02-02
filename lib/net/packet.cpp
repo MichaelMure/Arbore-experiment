@@ -212,11 +212,11 @@ void Packet::BuildArgsFromData()
 		{
 			case T_UINT32: SetArg(arg_no, Netutil::ReadInt32(p)); p += sizeof(uint32_t); break;
 			case T_UINT64: SetArg(arg_no, Netutil::ReadInt64(p)); p += sizeof(uint32_t); break;
-			case T_KEY: SetArg(arg_no, Key::Key(p)); p += Key::size; break;
+			case T_KEY: SetArg(arg_no, Key(p)); p += Key::size; break;
 			case T_STR:  {std::string s = Netutil::ReadStr(p); p += s.size(); SetArg(arg_no, s);} break;
-			case T_ADDRLIST: {addr_list addl =  addr_list::addr_list(p); p += addl.size(); SetArg(arg_no, addl);} break;
-			case T_ADDR: SetArg(arg_no, pf_addr::pf_addr(p)); p += pf_addr::size; break;
-			case T_CHUNK: {FileChunk fc = FileChunk::FileChunk(p); p += fc.getSerialisedSize(); SetArg(arg_no, fc);} break;
+			case T_ADDRLIST: {addr_list addl =  addr_list(p); p += addl.size(); SetArg(arg_no, addl);} break;
+			case T_ADDR: SetArg(arg_no, pf_addr(p)); p += pf_addr::size; break;
+			case T_CHUNK: {FileChunk fc = FileChunk(p); p += fc.getSerialisedSize(); SetArg(arg_no, fc);} break;
 			case T_END:
 			default:
 				throw Malformated();
