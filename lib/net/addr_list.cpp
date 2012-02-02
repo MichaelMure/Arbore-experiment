@@ -33,7 +33,8 @@ addr_list::addr_list(char* buff)
 
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
-		this->push_back(pf_addr::pf_addr(buff));
+		pf_addr addr = pf_addr(buff);
+		this->push_back(addr);
 		buff += pf_addr::size;
 	}
 }
