@@ -56,7 +56,7 @@ public:
 	pf_addr(std::string hostname, uint16_t port);
 	~pf_addr() {}
 
-	void dump(char* buf);
+	void dump(char* buf) const;
 
 	/** Comparaison between two pf_addr
 	 *

@@ -289,7 +289,7 @@ size_t Key::key_index (Key k) const
 	return (i);
 }
 
-void Key::dump(char* p)
+void Key::dump(char* p) const
 {
 	for(size_t i = 0; i < Key::nlen; ++i)
 	{

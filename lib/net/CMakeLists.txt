@@ -1,4 +1,6 @@
 add_library(abnetwork SHARED
+    addr_list.h
+    addr_list.cpp
     host.h
     host.cpp
     hosts_list.h

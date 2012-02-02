@@ -163,7 +163,7 @@ std::string pf_addr::GetStr() const
 	return ret;
 }
 
-void pf_addr::dump(char* p)
+void pf_addr::dump(char* p) const
 {
 	for(size_t i = 0; i < ip_t_len; ++i)
 	{

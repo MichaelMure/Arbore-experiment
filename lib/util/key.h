@@ -180,7 +180,7 @@ public:
 	size_t key_index (Key k) const;
 
 	/** Serialyze the key in binary format */
-	void dump(char* buf);
+	void dump(char* buf) const;
 
 private:
 	uint32_t t[nlen];
