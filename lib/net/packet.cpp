@@ -101,8 +101,12 @@ Packet::Packet(char* header, size_t datasize)
 	flags = ntohl(*p++);
 
 	ASSERT(datasize >= GetHeaderSize());
+	ASSERT(size == datasize - GetHeaderSize());
 
-	SetContent((char*)p, datasize - GetHeaderSize());
+	data = new char [size];
+	memcpy(data, p, size);
+
+	BuildArgsFromData();
 }
 
 char* Packet::DumpBuffer()
@@ -191,16 +195,6 @@ Packet::~Packet()
 
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
-}
-
-void Packet::SetContent(const char* buf, size_t _size)
-{
-	ASSERT(GetDataSize() == _size);
-
-	data = new char [GetDataSize()];
-	memcpy(data, buf, GetDataSize());
-
-	BuildArgsFromData();
 }
 
 void Packet::BuildArgsFromData()
