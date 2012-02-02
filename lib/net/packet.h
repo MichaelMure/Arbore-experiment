@@ -34,8 +34,9 @@
 #include "packet_type.h"
 #include "packet_type_list.h"
 #include "pf_addr.h"
+#include "netutil.h"
+#include "addr_list.h"
 
-typedef std::vector<pf_addr> AddrList;
 
 class Host;
 
@@ -211,26 +212,6 @@ private:
 
 	void BuildArgsFromData();
 	void BuildDataFromArgs();
-
-	// Writing to buffer functions
-	Packet& Write(uint32_t nbr);
-	Packet& Write(uint64_t nbr);
-	Packet& Write(Key nbr);
-	Packet& Write(pf_addr addr);
-	Packet& Write(const std::string& str);
-	Packet& Write(const AddrList& addr_list);
-	Packet& Write(FileChunk chunk);
-
-	// Reading from buffer functions
-	uint32_t ReadInt32();
-	uint64_t ReadInt64();
-	Key ReadKey();
-	pf_addr ReadAddr();
-	std::string ReadStr();
-	AddrList ReadAddrList();
-	FileChunk ReadChunk();
-
-
 };
 
 template<>

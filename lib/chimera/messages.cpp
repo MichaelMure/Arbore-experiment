@@ -27,6 +27,7 @@
 #include <util/time.h>
 #include <net/network.h>
 #include <net/packet.h>
+#include <net/addr_list.h>
 #include <net/packet_handler.h>
 #include <scheduler/scheduler_queue.h>
 
@@ -62,7 +63,7 @@ public:
 		}
 
 		std::vector<Host> leafset = chimera.GetRouting()->getLeafset();
-		AddrList addresses;
+		addr_list addresses;
 		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 			addresses.push_back(it->GetAddr());
 		addresses.push_back(chimera.GetMe().GetAddr());
@@ -86,10 +87,10 @@ public:
 	  */
 	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
-		AddrList addresses = pckt.GetArg<AddrList>(CHIMERA_JOIN_ACK_ADDRESSES);
+		addr_list addresses = pckt.GetArg<addr_list>(CHIMERA_JOIN_ACK_ADDRESSES);
 		std::vector<Host> hosts;
 
-		for(AddrList::iterator it = addresses.begin(); it != addresses.end(); ++it)
+		for(addr_list::iterator it = addresses.begin(); it != addresses.end(); ++it)
 		{
 			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
 			chimera.GetRouting()->add(host);
@@ -157,8 +158,8 @@ public:
 	/** We update the routing infrastructure with the given addresses */
 	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
-		AddrList address = pckt.GetArg<AddrList>(CHIMERA_PIGGY_ADDRESSES);
-		for(AddrList::iterator it = address.begin(); it != address.end(); ++it)
+		addr_list address = pckt.GetArg<addr_list>(CHIMERA_PIGGY_ADDRESSES);
+		for(addr_list::iterator it = address.begin(); it != address.end(); ++it)
 		{
 			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
 

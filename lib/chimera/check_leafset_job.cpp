@@ -23,6 +23,7 @@
  *
  */
 
+#include <net/addr_list.h>
 #include <net/packet.h>
 #include <util/pf_log.h>
 #include "check_leafset_job.h"
@@ -74,7 +75,7 @@ bool CheckLeafsetJob::Start()
 		leafset.push_back(chimera_->GetMe());
 		count_ = 0;
 
-		AddrList addrlist;
+		addr_list addrlist;
 		for(std::vector<Host>::iterator it = leafset.begin(); it != leafset.end(); ++it)
 			addrlist.push_back(it->GetAddr());
 

@@ -79,6 +79,9 @@ public:
 	/** @return a FilChunk that hold the data of the common part of this and chunk_desc */
 	FileChunk GetPart(FileChunkDesc chunk_desc);
 
+/** @return the size of a chunk serialized **/
+size_t getSerialisedSize();
+
 	/** Serialyze the chunk in binary format */
 	void dump(char* buff) const;
 };

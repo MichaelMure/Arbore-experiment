@@ -37,6 +37,7 @@
 class addr_list : public std::vector<pf_addr>
 {
 public:
+	addr_list() {};
 	addr_list(char* buff);
 	void dump(char* buff);
 };

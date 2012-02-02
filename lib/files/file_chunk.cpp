@@ -187,6 +187,10 @@ FileChunk FileChunk::GetPart(FileChunkDesc chunk_desc)
 	return chunk;
 }
 
+size_t FileChunk::getSerialisedSize()
+{
+	return sizeof(uint64_t) + sizeof(uint32_t) + size;
+}
 
 void FileChunk::dump(char* buff) const
 {
