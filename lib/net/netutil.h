@@ -40,9 +40,9 @@ public:
 	static void dump(uint64_t nbr, char* buff);
 	static void dump(const std::string& str, char* buff);
 
-	static size_t size(uint32_t nbr);
-	static size_t size(uint64_t nbr);
-	static size_t size(std::string str);
+	static size_t getSerialisedSize(uint32_t nbr);
+	static size_t getSerialisedSize(uint64_t nbr);
+	static size_t getSerialisedSize(std::string str);
 
 	// Reading from buffer functions
 	static uint32_t ReadInt32(char* buff);

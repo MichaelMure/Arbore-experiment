@@ -29,7 +29,7 @@ addr_list::addr_list(char* buff)
 {
 	uint32_t list_size = Netutil::ReadInt32(buff);
 
-	buff += Netutil::size(list_size);
+	buff += Netutil::getSerialisedSize(list_size);
 
 	for(uint32_t i = 0; i < list_size; ++i)
 	{
@@ -44,11 +44,17 @@ void addr_list::dump(char* buff)
 	uint32_t s = (uint32_t)this->size();
 	Netutil::dump(s, buff);
 
-	buff += Netutil::size(s);
+	buff += Netutil::getSerialisedSize(s);
 
 	for(addr_list::const_iterator it = this->begin(); it != this->end(); ++it)
 	{
 		it->dump(buff);
 		buff += pf_addr::size;
 	}
+}
+
+size_t addr_list::getSerialisedSize()
+{
+	return sizeof(uint32_t)
+	     + size() * pf_addr::size;
 }

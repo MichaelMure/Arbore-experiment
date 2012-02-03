@@ -55,9 +55,9 @@ Packet::Packet(const Packet& p)
 			seqnum(p.seqnum),
 			data(NULL)
 {
-	if(size)
+	if(size && p.data)
 	{
-		data = new char [size];
+		data = (char*) malloc(size);
 		memcpy(data, p.data, size);
 	}
 	for(std::vector<PacketArgBase*>::const_iterator it = p.arg_lst.begin(); it != p.arg_lst.end(); ++it)
@@ -106,7 +106,7 @@ Packet::Packet(char* header, size_t datasize)
 	ASSERT(datasize >= GetHeaderSize());
 	ASSERT(size == datasize - GetHeaderSize());
 
-	data = new char [size];
+	data = (char*) malloc(size);
 	memcpy(data, p, size);
 
 	BuildArgsFromData();
@@ -168,7 +168,6 @@ uint32_t Packet::GetSize() const
 	return size + GetHeaderSize();
 }
 
-
 Packet& Packet::operator=(const Packet& p)
 {
 	type = p.type;
@@ -194,7 +193,10 @@ Packet& Packet::operator=(const Packet& p)
 Packet::~Packet()
 {
 	if(data)
-		delete []data;
+	{
+		free(data);
+		data = NULL;
+	}
 
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
@@ -210,13 +212,43 @@ void Packet::BuildArgsFromData()
 		size_t arg_no = it - type.begin();
 		switch(*it)
 		{
-			case T_UINT32: SetArg(arg_no, Netutil::ReadInt32(p)); p += sizeof(uint32_t); break;
-			case T_UINT64: SetArg(arg_no, Netutil::ReadInt64(p)); p += sizeof(uint32_t); break;
-			case T_KEY: SetArg(arg_no, Key(p)); p += Key::size; break;
-			case T_STR:  {std::string s = Netutil::ReadStr(p); p += s.size(); SetArg(arg_no, s);} break;
-			case T_ADDRLIST: {addr_list addl =  addr_list(p); p += addl.size(); SetArg(arg_no, addl);} break;
-			case T_ADDR: SetArg(arg_no, pf_addr(p)); p += pf_addr::size; break;
-			case T_CHUNK: {FileChunk fc = FileChunk(p); p += fc.getSerialisedSize(); SetArg(arg_no, fc);} break;
+			case T_UINT32:
+				SetArg(arg_no, Netutil::ReadInt32(p));
+				p += sizeof(uint32_t);
+				break;
+			case T_UINT64:
+				SetArg(arg_no, Netutil::ReadInt64(p));
+				p += sizeof(uint64_t);
+				break;
+			case T_KEY:
+				SetArg(arg_no, Key(p));
+				p += Key::size;
+				break;
+			case T_STR:
+				{
+					std::string s = Netutil::ReadStr(p);
+					p += Netutil::getSerialisedSize(s);
+					SetArg(arg_no, s);
+				}
+				break;
+			case T_ADDRLIST:
+				{
+					addr_list addl =  addr_list(p);
+					p += addl.getSerialisedSize();
+					SetArg(arg_no, addl);
+				}
+				break;
+			case T_ADDR:
+				SetArg(arg_no, pf_addr(p));
+				p += pf_addr::size;
+				break;
+			case T_CHUNK:
+				{
+					FileChunk fc = FileChunk(p);
+					p += fc.getSerialisedSize();
+					SetArg(arg_no, fc);
+				}
+				break;
 			case T_END:
 			default:
 				throw Malformated();
@@ -226,7 +258,9 @@ void Packet::BuildArgsFromData()
 	if((p-data) < size)
 		pf_log[W_WARNING] << "There are some unread data in packet: " << *this;
 
-	delete[] data;
+	free(data);
+	data = NULL;
+	size = 0;
 }
 
 void Packet::BuildDataFromArgs()
@@ -234,20 +268,55 @@ void Packet::BuildDataFromArgs()
 	if(data)
 		return;
 
-	data = new char[size];
-	char* p = data;
 	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
 	{
 		size_t arg_no = it - type.begin();
 		switch(*it)
 		{
-			case T_UINT32: Netutil::dump(GetArg<uint32_t>(arg_no), p); p += sizeof(uint32_t); break;
-			case T_UINT64: Netutil::dump(GetArg<uint64_t>(arg_no), p); p += sizeof(uint64_t); break;
-			case T_KEY: GetArg<Key>(arg_no).dump(p); p += Key::size; break;
-			case T_STR: {std::string s = GetArg<std::string>(arg_no); Netutil::dump(s, p); p += s.size();} break;
-			case T_ADDRLIST: {addr_list addl = GetArg<addr_list>(arg_no); addl.dump(p); p += addl.size();} break;
-			case T_ADDR: {pf_addr addr = GetArg<pf_addr>(arg_no); addr.dump(p); p += addr.size;} break;
-			case T_CHUNK: { FileChunk fc = GetArg<FileChunk>(arg_no); fc.dump(p); p += fc.getSerialisedSize();} break;
+			case T_UINT32:
+				data = (char*) realloc(data, size+sizeof(uint32_t));
+				Netutil::dump(GetArg<uint32_t>(arg_no), data+size);
+				size += sizeof(uint32_t);
+				break;
+			case T_UINT64:
+				data = (char*) realloc(data, size+sizeof(uint64_t));
+				Netutil::dump(GetArg<uint64_t>(arg_no), data+size);
+				size += sizeof(uint64_t);
+				break;
+			case T_KEY:
+				data = (char*) realloc(data, size + Key::size);
+				GetArg<Key>(arg_no).dump(data+size);
+				size += Key::size;
+				break;
+			case T_STR:
+				{
+					std::string s = GetArg<std::string>(arg_no);
+					data = (char*) realloc(data, size + Netutil::getSerialisedSize(s));
+					Netutil::dump(s, data+size);
+					size += Netutil::getSerialisedSize(s);
+				}
+				break;
+			case T_ADDRLIST:
+				{
+					addr_list addl = GetArg<addr_list>(arg_no);
+					data = (char*) realloc(data, size + addl.getSerialisedSize());
+					addl.dump(data+size);
+					size += addl.getSerialisedSize();
+				}
+				break;
+			case T_ADDR:
+				data = (char*) realloc(data, size + pf_addr::size);
+				GetArg<pf_addr>(arg_no).dump(data+size);
+				size += pf_addr::size;
+				break;
+			case T_CHUNK:
+				{
+					FileChunk fc = GetArg<FileChunk>(arg_no);
+					data = (char*) realloc(data, size + fc.getSerialisedSize());
+					fc.dump(data+size);
+					size += fc.getSerialisedSize();
+				}
+				break;
 			case T_END:
 			default:
 				throw Malformated();

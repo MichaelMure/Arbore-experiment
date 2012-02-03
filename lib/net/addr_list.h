@@ -40,6 +40,7 @@ public:
 	addr_list() {};
 	addr_list(char* buff);
 	void dump(char* buff);
+	size_t getSerialisedSize();
 };
 
 #endif
