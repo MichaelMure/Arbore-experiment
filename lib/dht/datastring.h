@@ -35,6 +35,8 @@ class DataString : public Data
 {
 public:
 	DataString(std::string name);
+		/** Create a DataString from a serialized one */
+	DataString(char* buff);
 	/** Add a name in the nameList and update the updateTime parameter */
 	void add(std::string name);
 	/** Remove a name frome the nameList */

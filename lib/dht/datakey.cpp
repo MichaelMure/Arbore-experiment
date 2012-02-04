@@ -25,11 +25,23 @@
 
 #include "datakey.h"
 #include <util/time.h>
+#include <net/netutil.h>
 
 DataKey::DataKey(Key k)
 	: Data()
 {
 	keyList_.insert(k);
+}
+
+DataKey::DataKey(char* buff)
+{
+	uint32_t s = Netutil::ReadInt32(buff);
+	buff += Netutil::getSerialisedSize(s);
+	for (uint32_t i=0 ; i < s+1; i++)
+	{
+		Key k = Key::Key(buff);
+		keyList_.insert(k);
+	}
 }
 
 void DataKey::add(Key k)
@@ -60,6 +72,9 @@ bool DataKey::isEmpty() const
 
 void DataKey::dump(char* buff) const
 {
+	uint32_t s = (uint32_t) this->getSize();
+	Netutil::dump(s, buff);
+	buff += Netutil::getSerialisedSize(s);
 	std::set<Key>::const_iterator it;
 	for (it=keyList_.begin() ; it != keyList_.end(); it++)
 	{

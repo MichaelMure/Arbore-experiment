@@ -32,6 +32,18 @@ DataString::DataString(std::string name):Data()
 	nameList_.insert(name);
 }
 
+DataString::DataString(char* buff)
+{
+	uint32_t s = Netutil::ReadInt32(buff);
+	buff += Netutil::getSerialisedSize(s);
+	for (uint32_t i=0 ; i < s+1; i++)
+	{
+		std::string str = Netutil::ReadStr(buff);
+		nameList_.insert(str);
+		buff += Netutil::getSerialisedSize(str);
+	}
+}
+
 void DataString::add(std::string name)
 {
 	nameList_.insert(name);
@@ -60,6 +72,9 @@ bool DataString::isEmpty() const
 
 void DataString::dump(char* buff) const
 {
+	uint32_t s = (uint32_t) this->getSize();
+	Netutil::dump(s, buff);
+	buff += Netutil::getSerialisedSize(s);
 	std::set<std::string>::const_iterator it;
 	for (it=nameList_.begin() ; it != nameList_.end(); it++)
 	{

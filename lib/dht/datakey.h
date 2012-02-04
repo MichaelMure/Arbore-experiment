@@ -35,6 +35,8 @@ class DataKey : public Data
 {
 public:
 	DataKey(Key k);
+	/** Create a DataKey from a serialized one */
+	DataKey(char* buff);
 	/** Add a key in the keyList and update the updateTime parameter */
 	void add(Key k);
 	/** Remove a key from the keyList */
