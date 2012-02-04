@@ -58,6 +58,15 @@ bool DataKey::isEmpty() const
 	return keyList_.empty();
 }
 
+void DataKey::dump(char* buff) const
+{
+	std::set<Key>::const_iterator it;
+	for (it=keyList_.begin() ; it != keyList_.end(); it++)
+	{
+		it->dump(buff);
+	}
+}
+
 std::string DataKey::GetStr() const
 {
 	std::string str;

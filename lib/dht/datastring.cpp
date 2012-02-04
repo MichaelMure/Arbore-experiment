@@ -25,6 +25,7 @@
 
 #include "datastring.h"
 #include <util/time.h>
+#include <net/netutil.h>
 
 DataString::DataString(std::string name):Data()
 {
@@ -55,6 +56,16 @@ DataType DataString::getDataType() const
 bool DataString::isEmpty() const
 {
 	return nameList_.empty();
+}
+
+void DataString::dump(char* buff) const
+{
+	std::set<std::string>::const_iterator it;
+	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	{
+		Netutil::dump(*it, buff);
+		buff += Netutil::getSerialisedSize(*it);
+	}
 }
 
 std::string DataString::GetStr() const

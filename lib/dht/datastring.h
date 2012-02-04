@@ -45,6 +45,8 @@ public:
 	DataType getDataType() const;
 	/** @return true if the data is empty */
 	bool isEmpty() const;
+	/** Serialize the nameList in binary format */
+	void dump(char* buff) const;
 	std::string GetStr() const;
 
 
