@@ -35,10 +35,15 @@ class DataString : public Data
 {
 public:
 	DataString(std::string name);
+	/** Add a name in the nameList and update the updateTime parameter */
 	void add(std::string name);
+	/** Remove a name frome the nameList */
 	void remove(std::string name);
+	/** @return the number of elements in the data */
 	size_t getSize() const;
+	/** @return the type of the data */
 	DataType getDataType() const;
+	/** @return true if the data is empty */
 	bool isEmpty() const;
 	std::string GetStr() const;
 

@@ -34,26 +34,76 @@
 #include <util/key.h>
 #include <util/pf_log.h>
 
+/** The storage aim is to store the DHT data.
+ * There are 2 types of data : keyList or stringList
+ * keys are used for filechunks
+ * strings are used for directories and files
+ */
+
 class Storage
 {
 public:
 
 	Storage() {};
 	virtual ~Storage() {};
+
+	/** Add information (key) in the dataMap
+	 *
+	 * If there is already an entry with the key k,
+	 * add the information in the data.
+	 * If not, a entry is created in dataMap with the key k and the info.
+	 */
 	void addInfo(Key k, Key info);
+
+	/** Add information (string) in the dataMap
+	 *
+	 * If there is already an entry with the key k,
+	 * add the information in the data.
+	 * If not, a entry is created in dataMap with the key k and the info.
+	 */
 	void addInfo(Key k, std::string info);
+
+	/** Remove the info (key) from the dataMap
+	 *
+	 * If the information was the last one for the associated key,
+	 * the dataMap entry is also removed
+	 */
+
 	void removeInfo(Key k, Key info);
+
+		/** Remove the info (string) from the dataMap
+	 *
+	 * If the information was the last one for the associated key,
+	 * the dataMap entry is also removed
+	 */
 	void removeInfo(Key k, std::string info);
+
+/** @return true if the data associated with the @param key is a DataKey */
 	bool isKeyList(Key k) const;
+
+/** @return true if the data associated with the @param key is a DataString */
 	bool isStringList(Key k) const;
+
+/** Remove an entry from the dataMap
+ *
+ * key and associated data are removed
+ */
 	void removeKey(Key k);
+
+/** @return true if the dataMap have an entry for this key */
 	bool hasKey(Key k) const;
+
+/** @return the dataList associated with the key */
 	Data* getInfo(Key k) const;
+
+/** Removed all entries from de the dataMap which are obsolete */
 	void clean();
+
+/** Removed all entries from the dataMap */
 	void clear();
 	std::string GetStr() const;
 
-/*Exceptions */
+/* Exceptions */
 	class WrongDataType : public std::exception {};
 	class UnknowKey : public std::exception {};
 

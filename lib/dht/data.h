@@ -45,9 +45,13 @@ class Data
 {
 public:
 	virtual ~Data() {};
+	/** @return the type of the data */
 	virtual DataType getDataType() const = 0;
+	/** @return true if the data is empty */
 	virtual bool isEmpty() const = 0;
+	/** @return the number of elements in the data */
 	virtual size_t getSize() const = 0;
+	/** @return true if the TTL is expired */
 	bool isOld() const;
 	virtual std::string GetStr() const =0;
 

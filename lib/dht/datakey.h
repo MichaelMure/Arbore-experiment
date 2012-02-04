@@ -35,10 +35,15 @@ class DataKey : public Data
 {
 public:
 	DataKey(Key k);
+	/** Add a key in the keyList and update the updateTime parameter */
 	void add(Key k);
+	/** Remove a key from the keyList */
 	void remove(Key k);
+	/** @return the number of elements in the data */
 	size_t getSize() const;
+	/** @return the type of the data */
 	DataType getDataType() const;
+	/** @return true if the data is empty */
 	bool isEmpty() const;
 	std::string GetStr() const;
 
