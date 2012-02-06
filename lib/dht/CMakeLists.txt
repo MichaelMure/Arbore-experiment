@@ -1,4 +1,6 @@
 add_library(abdht SHARED
+    clean_storage_job.h
+    clean_storage_job.cpp
     data.h
     data.cpp
     datakey.h
