@@ -40,7 +40,6 @@ public:
 enum
 {
 	DHT_PUBLISH_KEY,
-	DHT_PUBLISH_TYPE,
 	DHT_PUBLISH_DATA
 };
 extern PacketType DHTPublishType;
@@ -48,7 +47,6 @@ extern PacketType DHTPublishType;
 enum
 {
 	DHT_UNPUBLISH_KEY,
-	DHT_UNPUBLISH_TYPE,
 	DHT_UNPUBLISH_DATA
 };
 extern PacketType DHTUnpublishType;

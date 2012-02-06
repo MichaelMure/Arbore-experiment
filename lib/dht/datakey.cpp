@@ -73,6 +73,9 @@ bool DataKey::isEmpty() const
 
 void DataKey::dump(char* buff) const
 {
+	uint32_t type = (uint32_t) this->getDataType();
+	Netutil::dump(type, buff);
+	buff += Netutil::getSerialisedSize(type);
 	uint32_t s = (uint32_t) this->getSize();
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);

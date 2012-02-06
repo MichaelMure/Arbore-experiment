@@ -25,11 +25,29 @@
 
  #include <util/time.h>
  #include "data.h"
+ #include <net/netutil.h>
+ #include "datastring.h"
+ #include "datakey.h"
 
 Data::Data()
 	:updateTime_(time::dtime())
 {
 
+}
+
+Data* Data::createData(char* buff)
+{
+	uint32_t type = Netutil::ReadInt32(buff);
+	buff += Netutil::getSerialisedSize(type);
+	DataType t = (DataType) type;
+	if(t == STRING_LIST)
+	{
+		return new DataString(buff);
+	}
+	else
+	{
+		return new DataKey(buff);
+	}
 }
 
 bool Data::isOld() const
