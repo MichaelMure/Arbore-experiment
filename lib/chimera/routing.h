@@ -22,6 +22,7 @@
  * written by CURRENT Lab, UCSB.
  *
  */
+
 #ifndef ROUTING_H
 #define ROUTING_H
 #include <vector>
@@ -40,12 +41,12 @@ class HostsList;
 class Routing : protected Mutex
 {
 private :
-	Host me;                    /*!< Local host descriptor */
-	RoutingTable routingTable;  /*!< DHT routing table */
-	Leafset	leafset;            /*!< DHT leafset */
+	Host me;                    /** Local host descriptor */
+	RoutingTable routingTable;  /** DHT routing table */
+	Leafset leafset;            /** DHT leafset */
 
 public :
-	/*! \brief Constructor
+	/** \brief Constructor
 	 *
 	 * Constructor, a new chimera routing system
 	 *
@@ -55,7 +56,7 @@ public :
 
 	void KeyUpdate(Host me);
 
-	/*! \brief Updates the routing information by adding a peer.
+	/** \brief Updates the routing information by adding a peer.
 	 *
 	 * When a peer joins the network, this function can add it or remove
 	 * it from the DHT neighbours that are used for routing.
@@ -65,7 +66,7 @@ public :
 	 */
 	bool add(const Host& entry);
 
-	/*! \brief Updates the routing information by removing a peer.
+	/** \brief Updates the routing information by removing a peer.
 	 *
 	 * When a peer leaves the network, this function removes it from the
 	 * DHT neighbours that are used for routing.
@@ -75,7 +76,7 @@ public :
 	 */
 	bool remove(const Host& entry);
 
-	/*! \brief Finds the next routing destination
+	/** \brief Finds the next routing destination
 	 *
 	 * Finds the best destination for the next step of routing to key.
 	 * First we look for a final destination in the leafset, then, if its
@@ -87,7 +88,7 @@ public :
 	 */
 	Host routeLookup(const Key& key) const;
 
-	/* Finds the row in the routing table
+	/** Finds the row in the routing table
 	 *
 	 * @param key  key we're looking for
 	 * @return row  row which matches the longest prefix with key.
@@ -99,26 +100,19 @@ public :
 		return this->routingTable.getRow(lineNum);
 	}
 
-	/* Returns all the entries in the leafset */
+	/** Returns all the entries in the leafset */
 	inline std::vector<Host> getLeafset() const
 	{
 		BlockLockMutex lock(this);
 		return this->leafset.getCopy();
 	}
 
-/* Returns all the entries in the routing table */
+	/** Returns all the entries in the routing table */
 	inline std::vector<Host> getRoutingTable() const
 	{
 		BlockLockMutex lock(this);
 		return this->routingTable.getCopy();
 	}
-
-	//Host* route_get_table();
-
-	//Host* route_get_leafset();
-
-	//void printTable () const;
-
 
 };
 
