@@ -35,7 +35,7 @@ class DataString : public Data
 {
 public:
 	DataString(std::string name);
-		/** Create a DataString from a serialized one */
+	/** Create a DataString from a serialized one */
 	DataString(char* buff);
 	/** Add a name in the nameList and update the updateTime parameter */
 	void add(std::string name);
@@ -49,6 +49,8 @@ public:
 	bool isEmpty() const;
 	/** Serialize the nameList in binary format */
 	void dump(char* buff) const;
+	/** @return the size of the seralised data */
+	size_t getSerialisedSize() const;
 	std::string GetStr() const;
 
 

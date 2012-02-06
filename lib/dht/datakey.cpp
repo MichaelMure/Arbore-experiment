@@ -37,10 +37,11 @@ DataKey::DataKey(char* buff)
 {
 	uint32_t s = Netutil::ReadInt32(buff);
 	buff += Netutil::getSerialisedSize(s);
-	for (uint32_t i=0 ; i < s+1; i++)
+	for (uint32_t i=0 ; i < s; i++)
 	{
 		Key k = Key::Key(buff);
 		keyList_.insert(k);
+		buff += Key::size;
 	}
 }
 
@@ -79,7 +80,16 @@ void DataKey::dump(char* buff) const
 	for (it=keyList_.begin() ; it != keyList_.end(); it++)
 	{
 		it->dump(buff);
+		buff += Key::size;
 	}
+}
+
+size_t DataKey::getSerialisedSize() const
+{
+	uint32_t len = (uint32_t) this->getSize();
+	size_t s = Netutil::getSerialisedSize(len);
+	s += (keyList_.size() * Key::size);
+	return s;
 }
 
 std::string DataKey::GetStr() const

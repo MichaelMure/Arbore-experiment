@@ -49,6 +49,8 @@ public:
 	bool isEmpty() const;
 	/** Serialize the keyList in binary format */
 	void dump(char* buff) const;
+	/** @return the size of the seralised data */
+	size_t getSerialisedSize() const;
 	std::string GetStr() const;
 
 private:

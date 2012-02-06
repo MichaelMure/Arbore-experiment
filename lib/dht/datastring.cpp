@@ -36,7 +36,7 @@ DataString::DataString(char* buff)
 {
 	uint32_t s = Netutil::ReadInt32(buff);
 	buff += Netutil::getSerialisedSize(s);
-	for (uint32_t i=0 ; i < s+1; i++)
+	for (uint32_t i=0 ; i < s; i++)
 	{
 		std::string str = Netutil::ReadStr(buff);
 		nameList_.insert(str);
@@ -81,6 +81,18 @@ void DataString::dump(char* buff) const
 		Netutil::dump(*it, buff);
 		buff += Netutil::getSerialisedSize(*it);
 	}
+}
+
+size_t DataString::getSerialisedSize() const
+{
+	uint32_t len = (uint32_t) this->getSize();
+	size_t s = Netutil::getSerialisedSize(len);
+	std::set<std::string>::const_iterator it;
+	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	{
+		s += Netutil::getSerialisedSize(*it);
+	}
+	return s;
 }
 
 std::string DataString::GetStr() const

@@ -44,15 +44,19 @@ enum DataType
 class Data
 {
 public:
-	virtual ~Data() {};
+ 	virtual ~Data() {};
 	/** @return the type of the data */
-	virtual DataType getDataType() const = 0;
+	virtual DataType getDataType() const =0;
 	/** @return true if the data is empty */
-	virtual bool isEmpty() const = 0;
+	virtual bool isEmpty() const =0;
 	/** @return the number of elements in the data */
-	virtual size_t getSize() const = 0;
+	virtual size_t getSize() const =0;
 	/** @return true if the TTL is expired */
 	bool isOld() const;
+	/** @return the size of the seralised data */
+	virtual size_t getSerialisedSize() const=0;
+	/** Serialize the data in binary format */
+	virtual void dump(char* buff) const =0;
 	virtual std::string GetStr() const =0;
 
 protected:
