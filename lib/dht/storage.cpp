@@ -143,12 +143,17 @@
 
 	void Storage::clean()
 	{
+		uint32_t count = 0;
 		std::map<Key,Data*>::iterator it;
 		for (it=dataMap_.begin() ; it != dataMap_.end(); it++)
 		{
 			if(it->second->isOld())
+			{
 				dataMap_.erase(it);
+				count++;
+			}
 		}
+		pf_log[W_DEBUG] << "Storage: " << count << " value(s) cleaned.";
 	}
 
 	void Storage::clear()
