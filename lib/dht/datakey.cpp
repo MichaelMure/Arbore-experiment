@@ -39,7 +39,7 @@ DataKey::DataKey(char* buff)
 	buff += Netutil::getSerialisedSize(s);
 	for (uint32_t i=0 ; i < s; i++)
 	{
-		Key k = Key::Key(buff);
+		Key k = Key(buff);
 		keyList_.insert(k);
 		buff += Key::size;
 	}
