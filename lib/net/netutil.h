@@ -42,7 +42,7 @@ public:
 
 	static size_t getSerialisedSize(uint32_t nbr);
 	static size_t getSerialisedSize(uint64_t nbr);
-	static size_t getSerialisedSize(std::string str);
+	static size_t getSerialisedSize(std::string& str);
 
 	// Reading from buffer functions
 	static uint32_t ReadInt32(char* buff);

@@ -116,7 +116,7 @@ char* Packet::DumpBuffer()
 {
 	BuildDataFromArgs();
 
-	char* dump = new char [GetSize()];
+	char* dump = (char*) malloc(GetSize());
 	uint32_t _type = htonl(type.GetType());
 	uint32_t _size = htonl(size);
 	uint32_t _seqnum = htonl(seqnum);
@@ -172,17 +172,22 @@ Packet& Packet::operator=(const Packet& p)
 {
 	type = p.type;
 	size = p.size;
+	src = p.src;
+	dst = p.dst;
+	flags = p.flags;
+	seqnum = p.seqnum;
 
 	if(data)
-		delete []data;
-
-	if(size)
 	{
-		data = new char [size];
+		free(data);
+		data = NULL;
+	}
+
+	if(size && p.data)
+	{
+		data = (char*) malloc(size);
 		memcpy(data, p.data, size);
 	}
-	else
-		data = NULL;
 
 	for(std::vector<PacketArgBase*>::const_iterator it = p.arg_lst.begin(); it != p.arg_lst.end(); ++it)
 		arg_lst.push_back((*it)->clone());
@@ -260,13 +265,14 @@ void Packet::BuildArgsFromData()
 
 	free(data);
 	data = NULL;
-	size = 0;
 }
 
 void Packet::BuildDataFromArgs()
 {
 	if(data)
 		return;
+
+	size = 0;
 
 	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
 	{

@@ -55,7 +55,7 @@ void Netutil::dump(const std::string& str, char* buff)
 	memcpy(buff + getSerialisedSize(str_len), str.c_str(), str.size());
 }
 
-size_t Netutil::getSerialisedSize(std::string str)
+size_t Netutil::getSerialisedSize(std::string& str)
 {
 	return str.size() + sizeof(uint32_t);
 }
@@ -75,9 +75,10 @@ uint64_t Netutil::ReadInt64(char* buff)
 std::string Netutil::ReadStr(char* buff)
 {
 	uint32_t str_size = ReadInt32(buff);
+	buff += getSerialisedSize(str_size);
+
 	char* str = new char [str_size+1];
 	memcpy(str, buff, str_size);
 	str[str_size] = '\0';
-	std::string val = std::string(str);
-	return val;
+	return std::string(str);
 }

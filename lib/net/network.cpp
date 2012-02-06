@@ -273,9 +273,9 @@ bool Network::Send(int sock, Host host, Packet pckt)
 
 	pf_log[W_PARSE] << "S(" << host << ") - " << pckt;
 
-	const char* s = pckt.DumpBuffer();
+	char* s = pckt.DumpBuffer();
 	ret = sendto (sock, s, pckt.GetSize(), 0, (struct sockaddr *) &to, sizeof (to));
-	delete [] s;
+	free(s);
 
 	if (ret < 0)
 	{
