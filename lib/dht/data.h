@@ -44,7 +44,7 @@ enum DataType
 class Data
 {
 public:
-	Data* createData(char* buff);
+	static Data* createData(char* buff);
 	virtual ~Data() {};
 	/** @return the type of the data */
 	virtual DataType getDataType() const =0;

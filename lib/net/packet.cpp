@@ -28,6 +28,7 @@
 #include "packet_arg.h"
 #include "packet_handler.h"
 #include "packet_type_list.h"
+#include <dht/data.h>
 
 #ifdef DEBUG
 #define ASSERT assert
@@ -254,13 +255,20 @@ void Packet::BuildArgsFromData()
 					SetArg(arg_no, fc);
 				}
 				break;
+			case T_DATA:
+				{
+					Data* d = Data::createData(p);
+					p += d->getSerialisedSize();
+					SetArg(arg_no, d);
+				}
+				break;
 			case T_END:
 			default:
 				throw Malformated();
 		}
 	}
 
-	if((p-data) < size)
+	if((uint32_t) (p-data) < size)
 		pf_log[W_WARNING] << "There are some unread data in packet: " << *this;
 
 	free(data);
@@ -323,6 +331,14 @@ void Packet::BuildDataFromArgs()
 					size += fc.getSerialisedSize();
 				}
 				break;
+			case T_DATA:
+				{
+					Data* d = GetArg<Data*>(arg_no);
+					data = (char*) realloc(data, size + d->getSerialisedSize());
+					d->dump(data+size);
+					size += d->getSerialisedSize();
+				}
+				break;
 			case T_END:
 			default:
 				throw Malformated();
@@ -375,6 +391,9 @@ std::string Packet::GetStr() const
 			case T_CHUNK:
 				s += "chunk(off:" + TypToStr(GetArg<FileChunk>(arg_no).GetOffset())
 					+ " size:" +  TypToStr(GetArg<FileChunk>(arg_no).GetSize()) + ")";
+				break;
+			case T_DATA:
+				s += "data(" + GetArg<Data*>(arg_no)->GetStr() + ")";
 				break;
 			case T_END:
 			default:

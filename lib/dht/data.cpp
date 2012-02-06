@@ -28,6 +28,7 @@
  #include <net/netutil.h>
  #include "datastring.h"
  #include "datakey.h"
+ #include <net/packet.h>
 
 Data::Data()
 	:updateTime_(time::dtime())
@@ -40,13 +41,20 @@ Data* Data::createData(char* buff)
 	uint32_t type = Netutil::ReadInt32(buff);
 	buff += Netutil::getSerialisedSize(type);
 	DataType t = (DataType) type;
-	if(t == STRING_LIST)
+	switch(t)
 	{
-		return new DataString(buff);
-	}
-	else
-	{
-		return new DataKey(buff);
+		case STRING_LIST:
+			return new DataString(buff);
+			break;
+		case KEY_LIST:
+			return new DataKey(buff);
+			break;
+		case RESERVED1:
+		case RESERVED2:
+		case RESERVED3:
+		case RESERVED4:
+		default:
+			throw Packet::Malformated();
 	}
 }
 
