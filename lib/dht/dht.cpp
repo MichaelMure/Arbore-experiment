@@ -126,7 +126,7 @@ bool DHT::Unpublish(const Key& id, const DataKey& keys) const
 bool DHT::RequestData(const Key& id) const
 {
 	/* Send a Get packet to the owner of the key */
-	Packet pckt(DHTGetMessage, me_, id);
+	Packet pckt(DHTGetType, me_, id);
 	pckt.SetArg(DHT_GET_KEY, id);
 
 	return chimera_->Route(pckt);
