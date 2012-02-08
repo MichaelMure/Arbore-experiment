@@ -3,25 +3,9 @@ cmake_minimum_required(VERSION 2.6)
 
 #SET(CMAKE_BUILD_TYPE "Debug")
 
-########################## Target #####################
-
-SET(BIN_NAME dht_test)
-ADD_EXECUTABLE(${BIN_NAME}
-    dhttest/main.cpp
-    )
+########################### Dependency #################
 
 INCLUDE_DIRECTORIES(lib/)
-LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
-TARGET_LINK_LIBRARIES(${BIN_NAME}
-                      "-lpthread -lstdc++"
-                      abchimera
-                      abutil
-                      abscheduler
-                      abnetwork
-                      abdht
-                      abfiles)
-
-########################### Dependency #################
 
 ## OpenSSL
 SET(OpenSSL_FIND_REQUIRED TRUE)
@@ -29,8 +13,6 @@ FIND_PACKAGE(OpenSSL)
 IF(OPENSSL_FOUND)
   INCLUDE_DIRECTORIES(${OPENSSL_INCLUDE_DIR})
   LINK_DIRECTORIES(${OPENSSL_LIB_DIR})
-  TARGET_LINK_LIBRARIES(${BIN_NAME}
-                        ${OPENSSL_LIBRARIES})
 ENDIF(OPENSSL_FOUND)
 
 ## LibCurl
@@ -39,9 +21,28 @@ FIND_PACKAGE(CURL)
 IF(CURL_FOUND)
   INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
   LINK_DIRECTORIES(${CURL_LIB_DIR})
-  TARGET_LINK_LIBRARIES(${BIN_NAME}
-                        ${CURL_LIBRARIES})
 ENDIF(CURL_FOUND)
+
+SET(arbore_lib
+    ${OPENSSL_LIBRARIES}
+    ${CURL_LIBRARIES}
+    "-lpthread -lstdc++"
+    abchimera
+    abutil
+    abscheduler
+    abnetwork
+    abdht
+    abfiles)
+
+########################## Targets ####################
+
+ADD_EXECUTABLE(chat_test
+               tests/chat_test.cpp)
+TARGET_LINK_LIBRARIES(chat_test ${arbore_lib})
+
+
+##LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
+
 
 ########################### Library ###################
 
