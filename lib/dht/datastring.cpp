@@ -29,7 +29,7 @@
 
 DataString::DataString(std::string name):Data()
 {
-	nameList_.insert(name);
+	nameSet_.insert(name);
 }
 
 DataString::DataString(char* buff)
@@ -39,25 +39,25 @@ DataString::DataString(char* buff)
 	for (uint32_t i=0 ; i < s; i++)
 	{
 		std::string str = Netutil::ReadStr(buff);
-		nameList_.insert(str);
+		nameSet_.insert(str);
 		buff += Netutil::getSerialisedSize(str);
 	}
 }
 
 void DataString::add(std::string name)
 {
-	nameList_.insert(name);
+	nameSet_.insert(name);
 	updateTime_=time::dtime();
 }
 
 void DataString::remove(std::string name)
 {
-	nameList_.erase(name);
+	nameSet_.erase(name);
 }
 
 size_t DataString::getSize() const
 {
-	return nameList_.size();
+	return nameSet_.size();
 }
 
 DataType DataString::getDataType() const
@@ -67,7 +67,7 @@ DataType DataString::getDataType() const
 
 bool DataString::isEmpty() const
 {
-	return nameList_.empty();
+	return nameSet_.empty();
 }
 
 void DataString::dump(char* buff) const
@@ -79,7 +79,7 @@ void DataString::dump(char* buff) const
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);
 	std::set<std::string>::const_iterator it;
-	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
 		Netutil::dump(*it, buff);
 		buff += Netutil::getSerialisedSize(*it);
@@ -91,7 +91,7 @@ size_t DataString::getSerialisedSize() const
 	uint32_t len = (uint32_t) this->getSize();
 	size_t s = Netutil::getSerialisedSize(len);
 	std::set<std::string>::const_iterator it;
-	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
 		s += Netutil::getSerialisedSize(*it);
 	}
@@ -102,19 +102,19 @@ std::string DataString::GetStr() const
 {
 	std::string str;
 	std::set<std::string>::const_iterator it;
-	for (it=nameList_.begin() ; it != nameList_.end(); it++)
+	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
 		str += "Name :" + *it + " , ";
 	}
 	return str;
 }
 
-DataString::NameList::const_iterator DataString::begin() const
+DataString::NameSet::const_iterator DataString::begin() const
 {
-	return nameList_.begin();
+	return nameSet_.begin();
 }
 
-DataString::NameList::const_iterator DataString::end() const
+DataString::NameSet::const_iterator DataString::end() const
 {
-	return nameList_.end();
+	return nameSet_.end();
 }

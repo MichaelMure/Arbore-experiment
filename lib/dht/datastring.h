@@ -34,7 +34,7 @@
 class DataString : public Data
 {
 public:
-	typedef std::set<std::string> NameList;
+	typedef std::set<std::string> NameSet;
 
 	DataString(std::string name);
 	/** Create a DataString from a serialized one */
@@ -56,12 +56,12 @@ public:
 	std::string GetStr() const;
 
 	/** @return a const iterator at the beginning of the string collection */
-	NameList::const_iterator begin() const;
+	NameSet::const_iterator begin() const;
 	/** @return a const iterator at the end of the string collection */
-	NameList::const_iterator end() const;
+	NameSet::const_iterator end() const;
 
 private:
-	NameList nameList_;
+	NameSet nameSet_;
 };
 
 template<>
