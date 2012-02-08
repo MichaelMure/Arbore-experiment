@@ -56,7 +56,7 @@ public:
 	 * @param port  listened port
 	 * @param my_key  key used on the routing layer network.
 	 */
-	Chimera(DHT* dht, uint16_t port, const Key my_key);
+	Chimera(DHT* dht, uint16_t port, const Key& my_key);
 
 	/** @return  the Host object which represents me on network. */
 	Host GetMe() const { return me; }

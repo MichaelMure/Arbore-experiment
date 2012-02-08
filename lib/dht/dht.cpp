@@ -29,27 +29,56 @@
 
 #include "messages.h"
 
-DHT::DHT(uint16_t port, const Key key)
-	: chimera_(new Chimera(this, port, key))
+DHT::DHT(uint16_t port, const Key& me)
+	: me_(me),
+		chimera_(new Chimera(this, port, me)),
+		storage_(new Storage())
 {
 }
 
-bool DHT::Publish(Key& id, std::string string) const
+bool DHT::Publish(const Key& id, const std::string string) const
+{
+	DataString d = DataString(string);
+	return Publish(id, d);
+}
+
+bool DHT::Publish(const Key& id, const DataString& strings) const
+{
+	/* Store the value locally. */
+	try {
+		DataString::NameSet::const_iterator it;
+		for (it = strings.begin(); it != strings.end(); it++)
+			storage_->addInfo(id, *it);
+	}
+	catch(Storage::WrongDataType e)
+	{
+		pf_log[W_DEBUG] << "Received wrong data type to store in the DHT";
+	}
+
+	/* Send a Publish packet to the owner of the key */
+	Packet pckt(DHTPublishType, me_, id);
+	pckt.SetArg(DHT_PUBLISH_KEY, id);
+	pckt.SetArg(DHT_PUBLISH_DATA, new DataString(strings));
+
+	return chimera_->Route(pckt);
+}
+
+bool DHT::Publish(const Key& id, const Key& key) const
 {
 	return false;
 }
 
-bool DHT::Publish(Key& id, DataString& strings) const
+bool DHT::Publish(const Key& id, const DataKey& keys) const
 {
 	return false;
 }
 
-bool DHT::Publish(Key& id, Key& key) const
+bool DHT::Unpublish(const Key& id)
 {
 	return false;
 }
 
-bool DHT::Publish(Key& id, DataKey& keys) const
+bool DHT::RequestData(const Key& id)
 {
 	return false;
 }
@@ -67,4 +96,9 @@ void DHT::HandleMessage(const Host& sender, const Packet& pckt)
 Chimera* DHT::GetChimera() const
 {
 	return chimera_;
+}
+
+Storage* DHT::GetStorage() const
+{
+	return storage_;
 }

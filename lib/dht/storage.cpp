@@ -26,7 +26,7 @@
 #include "storage.h"
 #include <util/time.h>
 
-	void Storage::addInfo(Key k, Key info)
+	void Storage::addInfo(const Key& k, const Key& info)
 	{
 		if(!isKeyList(k))
 			throw WrongDataType();
@@ -45,7 +45,7 @@
 		}
 	}
 
-	void Storage::addInfo(Key k, std::string info)
+	void Storage::addInfo(const Key& k, const std::string& info)
 	{
 		if(!isStringList(k))
 			throw WrongDataType();

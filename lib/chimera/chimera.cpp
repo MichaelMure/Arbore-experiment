@@ -36,7 +36,7 @@
 #include "messages.h"
 #include "routing.h"
 
-Chimera::Chimera(DHT *dht, uint16_t port, const Key my_key)
+Chimera::Chimera(DHT *dht, uint16_t port, const Key& my_key)
 	: network(new Network(this)),
 	dht_(dht),
 	routing(NULL)
@@ -132,6 +132,14 @@ bool Chimera::Route(const Packet& pckt)
 	pf_log[W_DEBUG] << "***** ROUTING ******";
 
 	Key key = pckt.GetDst();
+
+	if(key == me.GetKey())
+	{
+		pf_log[W_DEBUG] << "I'm the destination, deliver the message.";
+		pf_log[W_DEBUG] << "***** END OF ROUTING *****";
+		return false;
+	}
+
 	Host nextDest = GetRouting()->routeLookup(key);
 
 	pf_log[W_DEBUG] << "Routing to: " << nextDest;

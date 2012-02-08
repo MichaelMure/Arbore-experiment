@@ -32,35 +32,35 @@
 #include "data.h"
 #include "datakey.h"
 #include "datastring.h"
+#include "storage.h"
 
 class DHT
 {
 public:
 	/* DHT constructor.
 	 * @param port the port that we listen on
-	 * @param key the key used on the routing layer
+	 * @param me the key used on the routing layer
 	 */
-	DHT(uint16_t port, const Key key);
+	DHT(uint16_t port, const Key& me);
 	virtual ~DHT() {}
 
 	/** Publish a string on DHT */
-	bool Publish(Key& id, std::string string) const;
+	bool Publish(const Key& id, const std::string string) const;
 
 	/** Publish a list of string on DHT */
-	bool Publish(Key& id, DataString& strings) const;
+	bool Publish(const Key& id, const DataString& strings) const;
 
 	/** Publish a key on DHT */
-	bool Publish(Key& id, Key& key) const;
+	bool Publish(const Key& id, const Key& key) const;
 
 	/** Publish a list of keys on DHT */
-	bool Publish(Key& id, DataKey& keys) const;
-
+	bool Publish(const Key& id, const DataKey& keys) const;
 
 	/** Unpublish an object on DHT */
-	bool Unpublish(Key id);
+	bool Unpublish(const Key& id);
 
-	/** Send message to owners on an object. */
-	bool SendToObj(Key id, const Packet& pckt);
+	/* Request a value in the DHT */
+	bool RequestData(const Key& id);
 
 	/** Handle a network message. */
 	void HandleMessage(const Host& sender, const Packet& pckt);
@@ -68,8 +68,13 @@ public:
 	/** @return the chimera routing layer */
 	Chimera* GetChimera() const;
 
+	/** @return the DHT storage object */
+	Storage* GetStorage() const;
+
 private:
-	Chimera* chimera_;
+	const Key& me_;
+	Chimera *chimera_;
+	Storage *storage_;
 };
 
 #endif

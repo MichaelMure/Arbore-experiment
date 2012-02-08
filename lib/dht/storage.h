@@ -53,7 +53,7 @@ public:
 	 * add the information in the data.
 	 * If not, a entry is created in dataMap with the key k and the info.
 	 */
-	void addInfo(Key k, Key info);
+	void addInfo(const Key& k, const Key& info);
 
 	/** Add information (string) in the dataMap
 	 *
@@ -61,7 +61,7 @@ public:
 	 * add the information in the data.
 	 * If not, a entry is created in dataMap with the key k and the info.
 	 */
-	void addInfo(Key k, std::string info);
+	void addInfo(const Key& k, const std::string& info);
 
 	/** Remove the info (key) from the dataMap
 	 *
