@@ -72,21 +72,21 @@ class Packet
 	/** all arguments */
 	std::vector<PacketArgBase*> arg_lst;
 
-	PacketType type;                  /**< packet type */
-	uint32_t size;                    /**< size of the msg (excluding header) */
-	Key src;                          /**< sender's key */
-	Key dst;                          /**< destination's key */
-	uint32_t flags;                   /**< flags */
-	uint32_t seqnum;                  /**< sequence number */
-	char* data;                       /**< data buffer */
+	PacketType type;                  /** packet type */
+	uint32_t size;                    /** size of the msg (excluding header) */
+	Key src;                          /** sender's key */
+	Key dst;                          /** destination's key */
+	uint32_t flags;                   /** flags */
+	uint32_t seqnum;                  /** sequence number */
+	char* data;                       /** data buffer */
 
 public:
 
 	enum flags_t
 	{
-		REQUESTACK    = 1 << 0,         /**< This packet request an acknoledge answer. */
-		ACK           = 1 << 1,         /**< This is an acknowledge answer. */
-		MUSTROUTE     = 1 << 2         /**< This packet must be routed. */
+		REQUESTACK    = 1 << 0,         /** This packet request an acknoledge answer. */
+		ACK           = 1 << 1,         /** This is an acknowledge answer. */
+		MUSTROUTE     = 1 << 2          /** This packet must be routed. */
 	};
 
 	/** Exception raised when the packet is malformated */
