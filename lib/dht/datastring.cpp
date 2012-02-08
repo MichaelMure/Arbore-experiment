@@ -108,3 +108,13 @@ std::string DataString::GetStr() const
 	}
 	return str;
 }
+
+DataString::NameList::const_iterator DataString::begin() const
+{
+	return nameList_.begin();
+}
+
+DataString::NameList::const_iterator DataString::end() const
+{
+	return nameList_.end();
+}
