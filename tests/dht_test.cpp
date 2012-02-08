@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2012 Michael Muré <batolettre@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,13 @@
 #include <string>
 #include <iostream>
 
-#include <net/packet.h>
-#include <net/packet_handler.h>
+#include <dht/dht.h>
+#include <dht/messages.h>
+#include <chimera/chimera.h>
 #include <net/hosts_list.h>
+#include <net/network.h>
 #include <scheduler/scheduler.h>
 #include <util/pf_log.h>
-#include <util/tools.h>
-#include <chimera/chimera.h>
-#include <chimera/messages.h>
 
 int main(int argc, char** argv)
 {
@@ -43,7 +42,7 @@ int main(int argc, char** argv)
 
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	Chimera* chimera = new Chimera(NULL, StrToTyp<uint16_t>(argv[1]), me);
+	DHT* dht = new DHT(StrToTyp<uint16_t>(argv[1]), me);
 
 	pf_log.SetLoggedFlags("ALL", false);
 	Scheduler::StartSchedulers(5);
@@ -52,21 +51,12 @@ int main(int argc, char** argv)
 	{
 		Host host = hosts_list.DecodeHost(argv[2]);
 		pf_log[W_INFO] << "Connecting to " << host;
-		chimera->Join(host);
+		dht->GetChimera()->Join(host);
 	}
 
 	std::string s;
 	while(std::getline(std::cin, s))
 	{
-		std::string keystr = stringtok(s, " ");
-		Key key;
-		key = keystr;
-
-		Packet pckt(ChimeraChatType, chimera->GetMe().GetKey(), key);
-		pckt.SetFlag(Packet::MUSTROUTE);
-		pckt.SetArg(CHIMERA_CHAT_MESSAGE, s);
-		pf_log[W_INFO] << "CHAT[" << key << "] " << s;
-		chimera->Route(pckt);
 	}
 
 	return EXIT_SUCCESS;

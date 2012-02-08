@@ -41,7 +41,9 @@ ADD_EXECUTABLE(chat_test
 TARGET_LINK_LIBRARIES(chat_test ${arbore_lib})
 
 
-##LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
+ADD_EXECUTABLE(dht_test
+               tests/dht_test.cpp)
+TARGET_LINK_LIBRARIES(dht_test ${arbore_lib})
 
 
 ########################### Library ###################
