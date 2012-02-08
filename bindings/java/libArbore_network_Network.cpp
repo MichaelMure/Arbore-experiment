@@ -17,6 +17,7 @@
 
 #include "libArbore_network_Network.h"
 #include <net/network.h>
+#include <net/hosts_list.h>
 #include <chimera/chimera.h>
 
 /*
@@ -28,8 +29,7 @@ JNIEXPORT jlong JNICALL Java_libArbore_network_Network_N_1getHost_1List
   (JNIEnv *, jobject, jlong instance)
 	{
 		Network* net = (Network*) instance;
-		HostsList* hl = net->GetHostsList();
-		return (long) hl;
+		return (long) &hosts_list;
 	}
 
 /*

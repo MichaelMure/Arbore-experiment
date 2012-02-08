@@ -37,13 +37,11 @@ class HostsList : public Mutex
 {
 	typedef std::map<pf_addr, Host> HostMap;
 	HostMap hosts;
-	size_t max;
 
 public:
 
-	/** Initialize a host struct with a size element cache.
-	 */
-	HostsList(size_t size);
+	/** Default constructor */
+	HostsList();
 
 	/** Gets a host entry for the given host, getting it from the cache if
 	 ** possible, or alocates memory for it
@@ -62,5 +60,8 @@ public:
 	 */
 	Host DecodeHost (std::string s);
 };
+
+/* Singleton */
+extern HostsList hosts_list;
 
 #endif /* HOSTS_LIST_H */

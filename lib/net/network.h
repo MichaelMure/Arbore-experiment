@@ -31,7 +31,6 @@
 #include <util/pf_thread.h>
 #include <chimera/chimera.h>
 
-#include "hosts_list.h"
 #include "pf_addr.h"
 #include "packet.h"
 
@@ -70,7 +69,6 @@ private:
 	fd_set socks_fd_set;
 	int highsock;     /** higher socket opened, used by select POSIX function */
 
-	HostsList hosts_list;
 	std::vector<ResendPacketJob*> resend_list;
 	uint32_t seqend;
 	Chimera *chimera_;
@@ -95,9 +93,6 @@ public:
 	 * @return  the file descriptor
 	 */
 	int Listen(uint16_t port, const char* bind_addr);
-
-	/** @return a pointer to the Host list */
-	HostsList* GetHostsList();
 
 	/* Read configuration and start listener, and connect to other servers */
 	virtual void StartNetwork(MyConfig* conf);

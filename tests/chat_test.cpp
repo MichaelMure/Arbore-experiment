@@ -24,7 +24,6 @@
 #include <string>
 #include <iostream>
 
-#include <net/network.h>
 #include <net/packet.h>
 #include <net/packet_handler.h>
 #include <net/hosts_list.h>
@@ -45,14 +44,13 @@ int main(int argc, char** argv)
 	Key me(StrToTyp<uint32_t>(argv[1]));
 
 	Chimera* chimera = new Chimera(NULL, StrToTyp<uint16_t>(argv[1]), me);
-	Network *net = chimera->GetNetwork();
 
 	pf_log.SetLoggedFlags("ALL", false);
 	Scheduler::StartSchedulers(5);
 
 	if(argc > 2)
 	{
-		Host host = net->GetHostsList()->DecodeHost(argv[2]);
+		Host host = hosts_list.DecodeHost(argv[2]);
 		pf_log[W_INFO] << "Connecting to " << host;
 		chimera->Join(host);
 	}

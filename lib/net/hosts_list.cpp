@@ -23,15 +23,15 @@
  *
  */
 
-
-
 #include <util/tools.h>
 #include "host.h"
 #include "hosts_list.h"
 
-HostsList::HostsList(size_t _size)
-	: Mutex(RECURSIVE_MUTEX),
-	  max(_size)
+/* Singleton */
+HostsList hosts_list;
+
+HostsList::HostsList()
+	: Mutex(RECURSIVE_MUTEX)
 {
 }
 

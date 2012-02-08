@@ -31,8 +31,6 @@
 #include <sys/socket.h>
 #include <time.h>
 
-#include <net/packet.h>
-#include <net/host.h>
 #include <scheduler/job.h>
 #include <scheduler/scheduler_queue.h>
 #include <util/time.h>
@@ -41,6 +39,9 @@
 #include <util/pf_thread.h>
 #include <util/tools.h>
 
+#include "packet.h"
+#include "host.h"
+#include "hosts_list.h"
 #include "job_handle_packet.h"
 #include "job_resend_packet.h"
 #include "network.h"
@@ -48,7 +49,6 @@
 Network::Network(Chimera *chimera)
 	: Mutex(RECURSIVE_MUTEX),
 	highsock(-1),
-	hosts_list(64), /* TODO: magic number, change it. */
 	seqend(0),
 	chimera_(chimera)
 {
@@ -229,11 +229,6 @@ void Network::CloseAll()
 		close(*it);
 	}
 	socks.clear();
-}
-
-HostsList* Network::GetHostsList()
-{
-	return &hosts_list;
 }
 
 void Network::StartNetwork(MyConfig* conf)

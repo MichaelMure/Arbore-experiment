@@ -47,7 +47,7 @@ public:
 	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS);
-		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
+		Host host = hosts_list.GetHost(addr);
 
 		double elapsed_time = time::dtime() - host.GetFailureTime();
 
@@ -92,7 +92,7 @@ public:
 
 		for(addr_list::iterator it = addresses.begin(); it != addresses.end(); ++it)
 		{
-			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
+			Host host = hosts_list.GetHost(*it);
 			chimera.GetRouting()->add(host);
 
 			Packet update(ChimeraUpdateType, chimera.GetMe().GetKey(), host.GetKey());
@@ -128,7 +128,7 @@ public:
 	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_NACK_ADDRESS);
-		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
+		Host host = hosts_list.GetHost(addr);
 
 		pf_log[W_WARNING] << "JOIN request rejected from " << host;
 		sleep(Chimera::GRACEPERIOD);
@@ -147,7 +147,7 @@ public:
 	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
 	{
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_UPDATE_ADDRESS);
-		Host host = chimera.GetNetwork()->GetHostsList()->GetHost(addr);
+		Host host = hosts_list.GetHost(addr);
 		chimera.GetRouting()->add(host);
 	}
 };
@@ -161,7 +161,7 @@ public:
 		addr_list address = pckt.GetArg<addr_list>(CHIMERA_PIGGY_ADDRESSES);
 		for(addr_list::iterator it = address.begin(); it != address.end(); ++it)
 		{
-			Host host = chimera.GetNetwork()->GetHostsList()->GetHost(*it);
+			Host host = hosts_list.GetHost(*it);
 
 			/* After a peer failed, we wait some time before adding it back. */
 			if(time::dtime() - host.GetFailureTime() > Chimera::GRACEPERIOD)
@@ -178,9 +178,9 @@ class ChimeraPingMessage : public ChimeraMessage
 	  * The ping is already ACKnoledged by the network, due to the REQUESTACK flag.
 	  */
 public:
-	void Handle (Chimera& chimera, const Host&, const Packet& pckt)
+	void Handle (Chimera&, const Host&, const Packet& pckt)
 	{
-		chimera.GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
+		hosts_list.GetHost(pckt.GetArg<pf_addr>(CHIMERA_PING_ME));
 	}
 };
 

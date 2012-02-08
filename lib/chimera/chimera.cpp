@@ -27,6 +27,7 @@
 #include <netdb.h>
 
 #include <net/network.h>
+#include <net/hosts_list.h>
 #include <scheduler/scheduler_queue.h>
 #include <util/key.h>
 #include <dht/dht.h>
@@ -55,7 +56,7 @@ Chimera::Chimera(DHT *dht, uint16_t port, const Key& my_key)
 		return;
 	}
 	pf_log[W_INFO] << he->h_name;
-	me = network->GetHostsList()->GetHost(he->h_name, port);
+	me = hosts_list.GetHost(he->h_name, port);
 	me.SetKey(my_key);
 
 	routing = new Routing(me);
@@ -189,7 +190,7 @@ bool Chimera::Route(const Packet& pckt)
 
 void Chimera::sendRowInfo(const Packet& pckt)
 {
-	Host host = GetNetwork()->GetHostsList()->GetHost(pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS));
+	Host host = hosts_list.GetHost(pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS));
 
 	std::vector<Host> rowset = GetRouting()->rowLookup(host.GetKey());
 	std::vector<pf_addr> addresses;
