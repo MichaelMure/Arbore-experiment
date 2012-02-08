@@ -44,25 +44,32 @@ public:
 	DHT(uint16_t port, const Key& me);
 	virtual ~DHT() {}
 
-	/** Publish a string on DHT */
+	/** Publish a string on DHT
+	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const std::string string) const;
 
-	/** Publish a list of string on DHT */
+	/** Publish a list of string on DHT
+	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const DataString& strings) const;
 
-	/** Publish a key on DHT */
+	/** Publish a key on DHT
+	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const Key& key) const;
 
-	/** Publish a list of keys on DHT */
+	/** Publish a list of keys on DHT
+	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const DataKey& keys) const;
 
-	/** Unpublish an object on DHT */
+	/** Unpublish an object on DHT
+	 * @return true if the request was send successfully, false otherwise. */
 	bool Unpublish(const Key& id);
 
-	/* Request a value in the DHT */
-	bool RequestData(const Key& id);
+	/* Request a value in the DHT
+	 * @return true if the request was send successfully, false otherwise. */
+	bool RequestData(const Key& id) const;
 
-	/** Handle a network message. */
+	/** Handle a network message.
+	 * @return true if the request was send successfully, false otherwise. */
 	void HandleMessage(const Host& sender, const Packet& pckt);
 
 	/** @return the chimera routing layer */

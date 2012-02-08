@@ -95,7 +95,7 @@ bool DHT::Unpublish(const Key& id)
 	return false;
 }
 
-bool DHT::RequestData(const Key& id)
+bool DHT::RequestData(const Key& id) const
 {
 	return false;
 }
