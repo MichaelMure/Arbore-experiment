@@ -30,7 +30,7 @@
 DataKey::DataKey(Key k)
 	: Data()
 {
-	keyList_.insert(k);
+	keySet_.insert(k);
 }
 
 DataKey::DataKey(char* buff)
@@ -40,25 +40,25 @@ DataKey::DataKey(char* buff)
 	for (uint32_t i=0 ; i < s; i++)
 	{
 		Key k = Key(buff);
-		keyList_.insert(k);
+		keySet_.insert(k);
 		buff += Key::size;
 	}
 }
 
 void DataKey::add(Key k)
 {
-	keyList_.insert(k);
+	keySet_.insert(k);
 	updateTime_=time::dtime();
 }
 
 void DataKey::remove(Key k)
 {
-	keyList_.erase(k);
+	keySet_.erase(k);
 }
 
 size_t DataKey::getSize() const
 {
-	return keyList_.size();
+	return keySet_.size();
 }
 
 DataType DataKey::getDataType() const
@@ -68,7 +68,7 @@ DataType DataKey::getDataType() const
 
 bool DataKey::isEmpty() const
 {
-	return keyList_.empty();
+	return keySet_.empty();
 }
 
 void DataKey::dump(char* buff) const
@@ -80,7 +80,7 @@ void DataKey::dump(char* buff) const
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);
 	std::set<Key>::const_iterator it;
-	for (it=keyList_.begin() ; it != keyList_.end(); it++)
+	for (it=keySet_.begin() ; it != keySet_.end(); it++)
 	{
 		it->dump(buff);
 		buff += Key::size;
@@ -91,7 +91,7 @@ size_t DataKey::getSerialisedSize() const
 {
 	uint32_t len = (uint32_t) this->getSize();
 	size_t s = Netutil::getSerialisedSize(len);
-	s += (keyList_.size() * Key::size);
+	s += (keySet_.size() * Key::size);
 	return s;
 }
 
@@ -99,9 +99,19 @@ std::string DataKey::GetStr() const
 {
 	std::string str;
 	std::set<Key>::const_iterator it;
-	for (it=keyList_.begin() ; it != keyList_.end(); it++)
+	for (it=keySet_.begin() ; it != keySet_.end(); it++)
 	{
 		str += "Key :" + it->GetStr() + " , ";
 	}
 	return str;
+}
+
+DataKey::KeySet::const_iterator DataKey::begin() const
+{
+	return keySet_.begin();
+}
+
+DataKey::KeySet::const_iterator DataKey::end() const
+{
+	return keySet_.end();
 }

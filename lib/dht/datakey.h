@@ -34,6 +34,8 @@
 class DataKey : public Data
 {
 public:
+	typedef std::set<Key> KeySet;
+
 	DataKey(Key k);
 	/** Create a DataKey from a serialized one */
 	DataKey(char* buff);
@@ -53,8 +55,13 @@ public:
 	size_t getSerialisedSize() const;
 	std::string GetStr() const;
 
+	/** @return a const iterator at the beginning of the key collection */
+	KeySet::const_iterator begin() const;
+	/** @return a const iterator at the end of the key collection */
+	KeySet::const_iterator end() const;
+
 private:
-	std::set<Key> keyList_;
+	KeySet keySet_;
 };
 
 template<>
