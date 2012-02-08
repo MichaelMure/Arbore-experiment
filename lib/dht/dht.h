@@ -44,6 +44,8 @@ public:
 	DHT(uint16_t port, const Key& me);
 	virtual ~DHT() {}
 
+	/* PUBLISH */
+
 	/** Publish a string on DHT
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const std::string string) const;
@@ -60,9 +62,24 @@ public:
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const DataKey& keys) const;
 
-	/** Unpublish an object on DHT
+	/* UNPUBLISH */
+
+	/** Unpublish a string on DHT
 	 * @return true if the request was send successfully, false otherwise. */
-	bool Unpublish(const Key& id);
+	bool Unpublish(const Key& id, const std::string string) const;
+
+	/** Unpublish a list of string on DHT
+	 * @return true if the request was send successfully, false otherwise. */
+	bool Unpublish(const Key& id, const DataString& strings) const;
+
+	/** Unpublish a key on DHT
+	 * @return true if the request was send successfully, false otherwise. */
+	bool Unpublish(const Key& id, const Key& key) const;
+
+	/** Unpublish a list of keys on DHT
+	 * @return true if the request was send successfully, false otherwise. */
+	bool Unpublish(const Key& id, const DataKey& keys) const;
+
 
 	/* Request a value in the DHT
 	 * @return true if the request was send successfully, false otherwise. */

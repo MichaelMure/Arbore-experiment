@@ -90,14 +90,46 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 	return chimera_->Route(pckt);
 }
 
-bool DHT::Unpublish(const Key& id)
+
+bool DHT::Unpublish(const Key& id, const std::string string) const
 {
-	return false;
+	DataString d = DataString(string);
+	return Unpublish(id, d);
+}
+
+bool DHT::Unpublish(const Key& id, const DataString& strings) const
+{
+	/* Send a Unpublish packet to the owner of the key */
+	Packet pckt(DHTUnpublishType, me_, id);
+	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
+	pckt.SetArg(DHT_UNPUBLISH_DATA, new DataString(strings));
+
+	return chimera_->Route(pckt);
+}
+
+bool DHT::Unpublish(const Key& id, const Key& key) const
+{
+	DataKey d = DataKey(key);
+	return Unpublish(id, d);
+}
+
+bool DHT::Unpublish(const Key& id, const DataKey& keys) const
+{
+	/* Send a Unpublish packet to the owner of the key */
+	Packet pckt(DHTUnpublishType, me_, id);
+	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
+	pckt.SetArg(DHT_UNPUBLISH_DATA, new DataKey(keys));
+
+	return chimera_->Route(pckt);
 }
 
 bool DHT::RequestData(const Key& id) const
 {
-	return false;
+	/* Send a Get packet to the owner of the key */
+	Packet pckt(DHTGetMessage, me_, id);
+	pckt.SetArg(DHT_GET_KEY, id);
+
+	return chimera_->Route(pckt);
 }
 
 void DHT::HandleMessage(const Host& sender, const Packet& pckt)
