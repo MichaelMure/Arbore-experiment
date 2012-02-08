@@ -65,12 +65,29 @@ bool DHT::Publish(const Key& id, const DataString& strings) const
 
 bool DHT::Publish(const Key& id, const Key& key) const
 {
-	return false;
+	DataKey d = DataKey(key);
+	return Publish(id, d);
 }
 
 bool DHT::Publish(const Key& id, const DataKey& keys) const
 {
-	return false;
+	/* Store the value locally. */
+	try {
+		DataKey::KeySet::const_iterator it;
+		for (it = keys.begin(); it != keys.end(); it++)
+			storage_->addInfo(id, *it);
+	}
+	catch(Storage::WrongDataType e)
+	{
+		pf_log[W_DEBUG] << "Received wrong data type to store in the DHT";
+	}
+
+	/* Send a Publish packet to the owner of the key */
+	Packet pckt(DHTPublishType, me_, id);
+	pckt.SetArg(DHT_PUBLISH_KEY, id);
+	pckt.SetArg(DHT_PUBLISH_DATA, new DataKey(keys));
+
+	return chimera_->Route(pckt);
 }
 
 bool DHT::Unpublish(const Key& id)
