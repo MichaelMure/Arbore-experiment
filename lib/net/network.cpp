@@ -66,7 +66,7 @@ int Network::Listen(uint16_t port, const char* bind_addr)
 	struct sockaddr_in saddr;
 	int one = 0;
 
-	/* create socket */
+	/* create an UDP socket */
 	int serv_sock = socket (AF_INET, SOCK_DGRAM, 0);
 	if (serv_sock < 0)
 		throw CantOpenSock();
@@ -77,7 +77,7 @@ int Network::Listen(uint16_t port, const char* bind_addr)
 		throw CantOpenSock();
 	}
 
-	/* attach socket to #port#. */
+	/* attach the socket to the address and port */
 	saddr.sin_family = AF_INET;
 	saddr.sin_addr.s_addr = inet_addr(bind_addr);
 	saddr.sin_port = htons (port);
@@ -89,6 +89,8 @@ int Network::Listen(uint16_t port, const char* bind_addr)
 
 	socks.insert(serv_sock);
 	FD_SET(serv_sock, &socks_fd_set);
+
+	/* update the highest socket number */
 	if(serv_sock > highsock)
 		highsock = serv_sock;
 
@@ -104,6 +106,7 @@ void Network::Loop()
 	fd_set tmp_read_set;
 	int events;
 
+	/* no socket open right now */
 	if(highsock < 0)
 		return;
 
@@ -111,6 +114,7 @@ void Network::Loop()
 	tmp_read_set = socks_fd_set;
 	Unlock();
 
+	/* see if at least one socket is ready to be read without blocking */
 	if((events = select(highsock + 1, &tmp_read_set, NULL, NULL, NULL)) < 0)
 	{
 		if(errno != EINTR)
@@ -119,12 +123,13 @@ void Network::Loop()
 			return;
 		}
 	}
-	else if(events > 0)			  /* events = 0 means that there isn't any event (but timeout expired) */
+	else if(events > 0) /* events = 0 means that there isn't any event (but timeout expired) */
 	{
 		BlockLockMutex lock(this);
 		for(SockSet::iterator it = socks.begin(); it != socks.end(); ++it)
 		{
 			int sock = *it;
+			/* if this socket is not ready, skip it */
 			if(!FD_ISSET(sock, &tmp_read_set))
 				continue;
 
@@ -141,10 +146,12 @@ void Network::Loop()
 				pf_log[W_ERR] << "Error in recvfrom(): #" << errno << " " << strerror(errno);
 				return;
 			}
+
 			if((size_t)size < Packet::GetHeaderSize())
 			{
 				pf_log[W_ERR] << "Received a packet too light "
 				              << "(size: " << size << " < " << Packet::GetHeaderSize() << ")";
+				/* No recover solution here, packet is lost. */
 				return;
 			}
 			try

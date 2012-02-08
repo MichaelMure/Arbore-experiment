@@ -68,7 +68,7 @@ private:
 	typedef std::set<int> SockSet;
 	SockSet socks;    /**< contains all socks listened */
 	fd_set socks_fd_set;
-	int highsock;
+	int highsock;     /** higher socket opened, used by select POSIX function */
 
 	HostsList hosts_list;
 	std::vector<ResendPacketJob*> resend_list;
