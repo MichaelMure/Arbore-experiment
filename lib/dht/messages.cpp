@@ -81,11 +81,9 @@ public:
 
 
 PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage, Packet::REQUESTACK, "PUBLISH",   /* DHT_PUBLISH_KEY */    T_KEY,
-                                                                                                      /* DHT_PUBLISH_TYPE */   T_UINT32,
                                                                                                       /* DHT_PUBLISH_DATA */   T_DATA,
                                                                                                                                T_END);
 PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH", /* DHT_UNPUBLISH_KEY */  T_KEY,
-                                                                                                      /* DHT_UNPUBLISH_TYPE */ T_UINT32,
                                                                                                       /* DHT_UNPUBLISH_DATA */ T_DATA,
                                                                                                                                T_END);
 PacketType       DHTGetType(DHT_GET,       new DHTGetMessage,     Packet::REQUESTACK, "GET",       /* DHT_GET_KEY */        T_KEY,
