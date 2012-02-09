@@ -53,6 +53,23 @@ int main(int argc, char** argv)
 	std::string s;
 	while(std::getline(std::cin, s))
 	{
+		std::string command_str = stringtok(s, " ");
+		Key k;
+
+		if(command_str.length() == 0)
+			continue;
+
+		switch(command_str[0])
+		{
+			case 'p':
+			case 'P':
+				k.MakeHash(s);
+				pf_log[W_INFO] << "Publish " << s << " with key " << k;
+				dht->Publish(k, s);
+				break;
+			default:
+				pf_log[W_ERR] << "Command not recognized.";
+		}
 	}
 
 	return EXIT_SUCCESS;
