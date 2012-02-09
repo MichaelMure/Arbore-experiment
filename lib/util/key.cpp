@@ -38,7 +38,7 @@ Key Key::GetRandomKey()
 {
 	uint32_t key[nlen];
 
-	for(int i = 0; i < nlen; ++i)
+	for(size_t i = 0; i < nlen; ++i)
 	{
 		key[i] = 0;
 		for(int j = 0; j < 32; j++)
