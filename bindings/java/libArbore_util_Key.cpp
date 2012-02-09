@@ -19,6 +19,7 @@
 #include <util/key.h>
 #include <string>
 #include <ctime>
+#include <cstdlib>
 
 /*
  * Class:     libArbore_util_Key

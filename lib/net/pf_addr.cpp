@@ -25,6 +25,8 @@
 
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <cstdio>
+#include <string.h>
 
 #include "pf_addr.h"
 

@@ -27,13 +27,10 @@
 #define KEY_H
 
 #include <limits.h>
-#include <openssl/evp.h>
 #include <set>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "util/pf_log.h"
+#include <string>
+#include <util/pf_log.h>
 
 /** Size of the Key in bits */
 #define KEY_SIZE 160

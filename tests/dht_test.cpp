@@ -28,7 +28,6 @@
 #include <dht/messages.h>
 #include <chimera/chimera.h>
 #include <net/hosts_list.h>
-#include <net/network.h>
 #include <scheduler/scheduler.h>
 #include <util/pf_log.h>
 

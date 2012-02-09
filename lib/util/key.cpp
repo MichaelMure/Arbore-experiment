@@ -23,10 +23,8 @@
  *
  */
 
-#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include <cstdlib>
 #include <cassert>
 #include <openssl/evp.h>
 #include <arpa/inet.h>
