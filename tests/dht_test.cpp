@@ -38,6 +38,9 @@ int main(int argc, char** argv)
 		std::cout << "Usage: " << argv[0] << " listen_port [boostrap_host:port]" << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	srand(time(NULL));
+
 	DHT* dht = new DHT(StrToTyp<uint16_t>(argv[1]));
 
 	pf_log.SetLoggedFlags("ALL", false);
