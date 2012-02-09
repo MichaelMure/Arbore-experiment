@@ -293,24 +293,24 @@ void Packet::BuildDataFromArgs()
 			case T_UINT32:
 				data = (char*) realloc(data, size+sizeof(uint32_t));
 				Netutil::dump(GetArg<uint32_t>(arg_no), data+size);
-				size += sizeof(uint32_t);
+				size += (uint32_t) sizeof(uint32_t);
 				break;
 			case T_UINT64:
 				data = (char*) realloc(data, size+sizeof(uint64_t));
 				Netutil::dump(GetArg<uint64_t>(arg_no), data+size);
-				size += sizeof(uint64_t);
+				size += (uint32_t) sizeof(uint64_t);
 				break;
 			case T_KEY:
 				data = (char*) realloc(data, size + Key::size);
 				GetArg<Key>(arg_no).dump(data+size);
-				size += Key::size;
+				size += (uint32_t) Key::size;
 				break;
 			case T_STR:
 				{
 					std::string s = GetArg<std::string>(arg_no);
 					data = (char*) realloc(data, size + Netutil::getSerialisedSize(s));
 					Netutil::dump(s, data+size);
-					size += Netutil::getSerialisedSize(s);
+					size += (uint32_t) Netutil::getSerialisedSize(s);
 				}
 				break;
 			case T_ADDRLIST:
@@ -318,20 +318,20 @@ void Packet::BuildDataFromArgs()
 					addr_list addl = GetArg<addr_list>(arg_no);
 					data = (char*) realloc(data, size + addl.getSerialisedSize());
 					addl.dump(data+size);
-					size += addl.getSerialisedSize();
+					size += (uint32_t) addl.getSerialisedSize();
 				}
 				break;
 			case T_ADDR:
 				data = (char*) realloc(data, size + pf_addr::size);
 				GetArg<pf_addr>(arg_no).dump(data+size);
-				size += pf_addr::size;
+				size += (uint32_t) pf_addr::size;
 				break;
 			case T_CHUNK:
 				{
 					FileChunk fc = GetArg<FileChunk>(arg_no);
 					data = (char*) realloc(data, size + fc.getSerialisedSize());
 					fc.dump(data+size);
-					size += fc.getSerialisedSize();
+					size += (uint32_t) fc.getSerialisedSize();
 				}
 				break;
 			case T_DATA:
@@ -339,7 +339,7 @@ void Packet::BuildDataFromArgs()
 					Data* d = GetArg<Data*>(arg_no);
 					data = (char*) realloc(data, size + d->getSerialisedSize());
 					d->dump(data+size);
-					size += d->getSerialisedSize();
+					size += (uint32_t) d->getSerialisedSize();
 				}
 				break;
 			case T_END:
