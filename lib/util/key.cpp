@@ -52,15 +52,12 @@ Key Key::GetRandomKey()
 	return Key(key);
 }
 
-
 Key::Key(uint32_t ul)
 {
 	size_t i;
 	for (i = 1; i < nlen; i++)
 		this->t[i] = 0;
 	this->t[0] = ul;
-
-	set_key_str();
 }
 
 Key::Key(const char* buf)
@@ -70,7 +67,6 @@ Key::Key(const char* buf)
 		t[i] = ntohl(*(uint32_t*)buf);
 		buf += sizeof(t[i]);
 	}
-	set_key_str();
 }
 
 Key::Key(uint32_t key[Key::nlen])
@@ -78,8 +74,6 @@ Key::Key(uint32_t key[Key::nlen])
 	size_t i;
 	for(i = 0; i < nlen; ++i)
 		this->t[i] = key[i];
-
-	set_key_str();
 }
 
 Key::Key(std::string str)
@@ -92,8 +86,6 @@ Key::Key(const Key& k2)
 	size_t i;
 	for (i = 0; i < nlen; i++)
 		this->t[i] = k2.t[i];
-
-	set_key_str();
 }
 
 Key& Key::operator= (const char *strOrig)
@@ -140,8 +132,6 @@ Key& Key::operator= (const char *strOrig)
 	for (i = 0; i < nlen; i++)
 		sscanf (key_str + (i * 8 * sizeof (char)), "%08x", &(this->t[(nlen-1 - i)]));
 
-	set_key_str();
-
 	return *this;
 }
 
@@ -155,8 +145,6 @@ Key& Key::operator=(const Key& k2)
 	size_t i;
 	for (i = 0; i < nlen; i++)
 		this->t[i] = k2.t[i];
-
-	set_key_str();
 
 	return *this;
 }
@@ -201,6 +189,19 @@ bool Key::operator<(const Key& k2) const
 			return false;
 	}
 	return false;
+}
+
+std::string Key::GetStr() const
+{
+	char keystr[HEXA_KEYLENGTH + 1] = {0};
+	/*
+	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
+		    (unsigned int) this->t[4], (unsigned int) this->t[3],
+		    (unsigned int) this->t[2], (unsigned int) this->t[1],
+		    (unsigned int) this->t[0]);*/
+	sprintf(keystr, "0x%08x", this->t[0]);
+
+	return std::string(keystr);
 }
 
 Key::operator bool() const
@@ -306,7 +307,6 @@ Key Key::Init_Max ()
 	{
 		max.t[i] = UINT_MAX;
 	}
-	max.set_key_str();
 	return max;
 }
 
@@ -318,7 +318,6 @@ Key Key::Init_Half ()
 		half.t[i] = UINT_MAX;
 	}
 	half.t[nlen-1] = half.t[nlen-1] / 2;
-	half.set_key_str();
 	return half;
 }
 
@@ -360,7 +359,7 @@ Key Key::operator-(const Key & op2) const
 
 	if (*this < op2)
 	{
-		pf_log[W_ERR] << "key_sub: Operation is not allowed " << this->key_str << " < " << op2.key_str;
+		pf_log[W_ERR] << "key_sub: Operation is not allowed " << GetStr() << " < " << op2.GetStr();
 		return result;
 	}
 
@@ -384,7 +383,6 @@ Key Key::operator-(const Key & op2) const
 	}
 	return result;
 }
-
 
 static void convert_base16 (unsigned char num, char *out)
 {
@@ -437,17 +435,3 @@ void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
 
 	tmp = '\0';
 }
-
-void Key::set_key_str()
-{
-	char keystr[HEXA_KEYLENGTH + 1] = {0};
-	/*
-	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
-		    (unsigned int) this->t[4], (unsigned int) this->t[3],
-		    (unsigned int) this->t[2], (unsigned int) this->t[1],
-		    (unsigned int) this->t[0]);*/
-	sprintf(keystr, "0x%08x", this->t[0]);
-
-	this->key_str = keystr;
-}
-

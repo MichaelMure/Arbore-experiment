@@ -127,7 +127,7 @@ public:
 	bool operator<(const Key& k2) const;
 
 	/** Return the string hexadecimal representation of key. */
-	std::string GetStr() const { return key_str; }
+	std::string GetStr() const;
 
 	const uint32_t* GetArray() const { return t; }
 
@@ -184,7 +184,6 @@ public:
 
 private:
 	uint32_t t[nlen];
-	std::string key_str;
 
 	/** Static function which initialize the maximum and half keys. */
 	static Key Init_Max();
@@ -192,8 +191,6 @@ private:
 
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;
-
-	void set_key_str ();
 
 	void sha1_keygen (const char *key, size_t digest_size, char *digest) const;
 };
