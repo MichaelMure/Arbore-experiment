@@ -28,7 +28,7 @@
 
 	void Storage::addInfo(const Key& k, const Key& info)
 	{
-		if(!isKeyList(k))
+		if(hasKey(k) && !isKeyList(k))
 			throw WrongDataType();
 
 		std::map<Key,Data*>::iterator it;
@@ -47,7 +47,7 @@
 
 	void Storage::addInfo(const Key& k, const std::string& info)
 	{
-		if(!isStringList(k))
+		if(hasKey(k) && !isStringList(k))
 			throw WrongDataType();
 
 		std::map<Key,Data*>::iterator it;
@@ -66,7 +66,7 @@
 
 	void Storage::removeInfo(Key k, Key info)
 	{
-		if(!isKeyList(k))
+		if(hasKey(k) && !isKeyList(k))
 			throw WrongDataType();
 
 		std::map<Key,Data*>::iterator it;
@@ -82,7 +82,7 @@
 
 	void Storage::removeInfo(Key k, std::string info)
 	{
-		if(!isStringList(k))
+		if(hasKey(k) && !isStringList(k))
 			throw WrongDataType();
 
 		std::map<Key,Data*>::iterator it;
@@ -98,12 +98,18 @@
 
 	bool Storage::isKeyList(Key k) const
 	{
-		return dataMap_.find(k)->second->getDataType()==KEY_LIST;
+		DataMap::const_iterator it = dataMap_.find(k);
+		if(it == dataMap_.end())
+			return false;
+		return it->second->getDataType()==KEY_LIST;
 	}
 
 	bool Storage::isStringList(Key k) const
 	{
-		return dataMap_.find(k)->second->getDataType()==STRING_LIST;
+		DataMap::const_iterator it = dataMap_.find(k);
+		if(it == dataMap_.end())
+			return false;
+		return it->second->getDataType()==STRING_LIST;
 	}
 
 	void Storage::removeKey(Key k)

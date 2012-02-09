@@ -108,7 +108,8 @@ public:
 	class UnknowKey : public std::exception {};
 
 private:
-	std::map<Key, Data*> dataMap_;
+	typedef std::map<Key, Data*> DataMap;
+	DataMap dataMap_;
 };
 
 template<>
