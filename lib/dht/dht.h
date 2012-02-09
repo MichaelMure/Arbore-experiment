@@ -41,7 +41,7 @@ public:
 	 * @param port the port that we listen on
 	 * @param me the key used on the routing layer
 	 */
-	DHT(uint16_t port, const Key& me);
+	DHT(uint16_t port, const Key& me = Key::GetRandomKey());
 	virtual ~DHT() {}
 
 	/* PUBLISH */
