@@ -23,10 +23,12 @@
  *
  */
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <cassert>
-#include <openssl/evp.h>
+#include <openssl/sha.h>
 #include <arpa/inet.h>
 #include "key.h"
 #include <util/pf_log.h>
@@ -213,14 +215,22 @@ Key::operator bool() const
 void Key::MakeHash (std::string s)
 {
 	MakeHash(s.c_str(), s.size());
-	pf_log[W_DEBUG] << "key_makehash: HASH( " << s << "  ) = [" << *this << "]";
+	pf_log[W_DEBUG] << "Key::MakeHash: HASH(" << s << ") = [" << *this << "]";
 }
 
 void Key::MakeHash (const char *s, size_t size)
 {
-	char digest[HEXA_KEYLENGTH + 1];
-	sha1_keygen (s, size, digest);
-	*this = digest;
+	unsigned char *digest = new unsigned char[SHA_DIGEST_LENGTH];
+
+	SHA1((const unsigned char*) s, size, digest);
+
+	unsigned char *p = digest;
+	for(size_t i = 0; i < Key::nlen; ++i)
+	{
+		t[i] = ntohl(*(uint32_t*)p);
+		p += sizeof(t[i]);
+	}
+	delete[] digest;
 }
 
 Key Key::distance(const Key& k2) const
@@ -380,56 +390,4 @@ Key Key::operator-(const Key & op2) const
 		result.t[i] = (uint32_t) tmp;
 	}
 	return result;
-}
-
-static void convert_base16 (unsigned char num, char *out)
-{
-    unsigned char mask = 15;
-    int i = 0;
-    for (i = 1; i >= 0; i--)
-	{
-	    int digit = num >> (i * 4);
-	    sprintf (out, "%x", digit & mask);
-	    out++;
-	}
-    *out = '\0';
-}
-
-void Key::sha1_keygen (const char *key, size_t digest_size, char *digest) const
-{
-	EVP_MD_CTX mdctx;
-	const EVP_MD *md;
-	unsigned char *md_value;
-	unsigned int md_len;
-	size_t i;
-	char digit[10];
-	char *tmp;
-
-	md_value = (unsigned char *) malloc (EVP_MAX_MD_SIZE);
-
-	OpenSSL_add_all_digests ();
-
-	md = EVP_get_digestbyname ("sha1");
-
-	EVP_MD_CTX_init (&mdctx);
-	EVP_DigestInit_ex (&mdctx, md, NULL);
-	EVP_DigestUpdate (&mdctx, key, digest_size);
-	EVP_DigestFinal_ex (&mdctx, md_value, &md_len);
-	EVP_MD_CTX_cleanup (&mdctx);
-
-	digest = (char *) malloc (HEXA_KEYLENGTH + 1);
-
-	tmp = digest;
-	*tmp = '\0';
-	for (i = 0; i < md_len; i++)
-	{
-		convert_base16 (md_value[i], digit);
-
-		strcat (tmp, digit);
-		tmp = tmp + strlen (digit);
-	}
-
-	free (md_value);
-
-	tmp = '\0';
 }

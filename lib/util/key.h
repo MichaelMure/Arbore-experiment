@@ -188,8 +188,6 @@ private:
 
 	Key operator+(const Key& op2) const;
 	Key operator-(const Key& k2) const;
-
-	void sha1_keygen (const char *key, size_t digest_size, char *digest) const;
 };
 
 template<>
