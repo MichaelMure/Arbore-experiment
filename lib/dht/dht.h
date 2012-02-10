@@ -95,6 +95,9 @@ public:
 	/** @return the DHT storage object */
 	Storage* GetStorage() const;
 
+	/** @return the key used as id on the network */
+	const Key& GetMe() const;
+
 private:
 	const Key& me_;
 	Chimera *chimera_;

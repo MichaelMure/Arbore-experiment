@@ -151,3 +151,8 @@ Storage* DHT::GetStorage() const
 {
 	return storage_;
 }
+
+const Key& DHT::GetMe() const
+{
+	return me_;
+}
