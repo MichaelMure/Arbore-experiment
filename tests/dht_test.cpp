@@ -70,6 +70,21 @@ int main(int argc, char** argv)
 				pf_log[W_INFO] << "Publish " << s << " with key " << k;
 				dht->Publish(k, s);
 				break;
+			case 'u':
+			case 'U':
+				k = stringtok(s, " ");
+				pf_log[W_INFO] << "Unublish " << s << " with key " << k;
+				dht->Unpublish(k, s);
+				break;
+			case 'g':
+			case 'G':
+				k = s;
+				pf_log[W_INFO] << "Request data with key " << k;
+				dht->RequestData(k);
+				break;
+			case 'q':
+			case 'Q':
+				return EXIT_SUCCESS;
 			default:
 				pf_log[W_ERR] << "Command not recognized.";
 		}
