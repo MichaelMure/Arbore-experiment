@@ -34,6 +34,11 @@ DHT::DHT(uint16_t port, const Key& me)
 		chimera_(new Chimera(this, port, me)),
 		storage_(new Storage())
 {
+	packet_type_list.RegisterType(DHTPublishType);
+	packet_type_list.RegisterType(DHTUnpublishType);
+	packet_type_list.RegisterType(DHTGetType);
+	packet_type_list.RegisterType(DHTGetAckType);
+	packet_type_list.RegisterType(DHTGetNAckType);
 }
 
 bool DHT::Publish(const Key& id, const std::string string) const
