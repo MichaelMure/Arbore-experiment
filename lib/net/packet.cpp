@@ -95,7 +95,7 @@ Packet::Packet(char* header, size_t datasize)
 	}
 	catch(PacketTypeList::UnknowType& e)
 	{
-		throw Malformated();
+		ASSERT(false);
 	}
 
 	/* Size */
@@ -267,7 +267,7 @@ void Packet::BuildArgsFromData()
 				break;
 			case T_END:
 			default:
-				throw Malformated();
+				ASSERT(false);
 		}
 	}
 
@@ -344,7 +344,7 @@ void Packet::BuildDataFromArgs()
 				break;
 			case T_END:
 			default:
-				throw Malformated();
+				ASSERT(false);
 		}
 	}
 }
@@ -400,7 +400,7 @@ std::string Packet::GetStr() const
 				break;
 			case T_END:
 			default:
-				throw Malformated();
+				ASSERT(false);
 		}
 	}
 
