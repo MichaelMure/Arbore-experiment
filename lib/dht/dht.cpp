@@ -58,7 +58,7 @@ bool DHT::Publish(const Key& id, const DataString& strings) const
 	/* Send a Publish packet to the owner of the key */
 	Packet pckt(DHTPublishType, me_, id);
 	pckt.SetArg(DHT_PUBLISH_KEY, id);
-	pckt.SetArg(DHT_PUBLISH_DATA, new DataString(strings));
+	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataString(strings));
 
 	return chimera_->Route(pckt);
 }
@@ -85,7 +85,7 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 	/* Send a Publish packet to the owner of the key */
 	Packet pckt(DHTPublishType, me_, id);
 	pckt.SetArg(DHT_PUBLISH_KEY, id);
-	pckt.SetArg(DHT_PUBLISH_DATA, new DataKey(keys));
+	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataKey(keys));
 
 	return chimera_->Route(pckt);
 }
@@ -102,7 +102,7 @@ bool DHT::Unpublish(const Key& id, const DataString& strings) const
 	/* Send a Unpublish packet to the owner of the key */
 	Packet pckt(DHTUnpublishType, me_, id);
 	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
-	pckt.SetArg(DHT_UNPUBLISH_DATA, new DataString(strings));
+	pckt.SetArg(DHT_UNPUBLISH_DATA, (Data*) new DataString(strings));
 
 	return chimera_->Route(pckt);
 }
@@ -118,7 +118,7 @@ bool DHT::Unpublish(const Key& id, const DataKey& keys) const
 	/* Send a Unpublish packet to the owner of the key */
 	Packet pckt(DHTUnpublishType, me_, id);
 	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
-	pckt.SetArg(DHT_UNPUBLISH_DATA, new DataKey(keys));
+	pckt.SetArg(DHT_UNPUBLISH_DATA, (Data*) new DataKey(keys));
 
 	return chimera_->Route(pckt);
 }
