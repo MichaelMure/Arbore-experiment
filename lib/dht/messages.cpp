@@ -79,18 +79,21 @@ public:
 class DHTGetAckMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_GET_ACK_KEY);
+		pf_log[W_INFO] << "Received data with key " << k;
+		pf_log[W_INFO] << pckt.GetArg<Data*>(DHT_GET_ACK_DATA)->GetStr();
 	}
 };
 
 class DHTGetNAckMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT&, const Host&, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_GET_NACK_KEY);
+		pf_log[W_INFO] << "Received NACK for data with key " << k;
 	}
 };
 
