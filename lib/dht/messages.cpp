@@ -80,17 +80,18 @@ public:
 };
 
 
-PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage, Packet::REQUESTACK, "PUBLISH",   /* DHT_PUBLISH_KEY */    T_KEY,
+PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage,   Packet::REQUESTACK, "PUBLISH",    /* DHT_PUBLISH_KEY */    T_KEY,
                                                                                                       /* DHT_PUBLISH_DATA */   T_DATA,
                                                                                                                                T_END);
-PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH", /* DHT_UNPUBLISH_KEY */  T_KEY,
+PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH",  /* DHT_UNPUBLISH_KEY */  T_KEY,
                                                                                                       /* DHT_UNPUBLISH_DATA */ T_DATA,
                                                                                                                                T_END);
-PacketType       DHTGetType(DHT_GET,       new DHTGetMessage,     Packet::REQUESTACK, "GET",       /* DHT_GET_KEY */        T_KEY,
+PacketType       DHTGetType(DHT_GET,       new DHTGetMessage,       Packet::REQUESTACK, "GET",        /* DHT_GET_KEY */        T_KEY,
                                                                                                                                T_END);
-PacketType    DHTGetAckType(DHT_GET_ACK,   new DHTGetAckMessage,    Packet::REQUESTACK, "GET_ACK",   /* DHT_GET_ACK_TYPE */ T_UINT32,
+PacketType    DHTGetAckType(DHT_GET_ACK,   new DHTGetAckMessage,    Packet::REQUESTACK, "GET_ACK",    /* DHT_GET_ACK_KEY */    T_KEY,
                                                                                                       /* DHT_GET_ACK_DATA */   T_DATA,
                                                                                                                                T_END);
-PacketType   DHTGetNAckType(DHT_GET_NACK, new DHTGetNAckMessage,   Packet::REQUESTACK,  "GET_NACK",                         T_END);
+PacketType   DHTGetNAckType(DHT_GET_NACK,  new DHTGetNAckMessage,   Packet::REQUESTACK, "GET_NACK",   /* DHT_GET_NACK_KEY */   T_KEY,
+                                                                                                                               T_END);
 
 

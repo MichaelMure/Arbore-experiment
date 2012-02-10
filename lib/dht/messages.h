@@ -59,11 +59,15 @@ extern PacketType DHTGetType;
 
 enum
 {
-	DHT_GET_ACK_TYPE,
+	DHT_GET_ACK_KEY,
 	DHT_GET_ACK_DATA
 };
 extern PacketType DHTGetAckType;
 
+enum
+{
+	DHT_GET_NACK_KEY
+};
 extern PacketType DHTGetNAckType;
 
 
