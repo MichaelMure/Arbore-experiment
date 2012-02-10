@@ -78,7 +78,7 @@ void DataString::dump(char* buff) const
 	uint32_t s = (uint32_t) this->getSize();
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);
-	std::set<std::string>::const_iterator it;
+	NameSet::const_iterator it;
 	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
 		Netutil::dump(*it, buff);
@@ -90,7 +90,7 @@ size_t DataString::getSerialisedSize() const
 {
 	uint32_t len = (uint32_t) this->getSize();
 	size_t s = Netutil::getSerialisedSize(len);
-	std::set<std::string>::const_iterator it;
+	NameSet::const_iterator it;
 	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
 		s += Netutil::getSerialisedSize(*it);
@@ -101,12 +101,14 @@ size_t DataString::getSerialisedSize() const
 std::string DataString::GetStr() const
 {
 	std::string str;
-	std::set<std::string>::const_iterator it;
+	NameSet::const_iterator it;
 	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
-		str += "Name :" + *it + " , ";
+		if(str.size())
+			str += ",";
+		str += *it;
 	}
-	return str;
+	return "Strings[" + str + "]";
 }
 
 DataString::NameSet::const_iterator DataString::begin() const
