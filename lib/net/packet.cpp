@@ -207,6 +207,11 @@ Packet::~Packet()
 		data = NULL;
 	}
 
+	/* DATA arg need to be freed, because they are pointer, unlike the others arg type. */
+	for(PacketType::iterator it = type.begin(); it != type.end(); ++it)
+		if(*it == T_DATA)
+			delete GetArg<Data*>(it - type.begin());
+
 	for(std::vector<PacketArgBase*>::iterator it = arg_lst.begin(); it != arg_lst.end(); ++it)
 		delete *it;
 }
