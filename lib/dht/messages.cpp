@@ -55,9 +55,24 @@ public:
 class DHTGetMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT& dht, const Host& host, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_GET_KEY);
+		if(dht.GetStorage()->hasKey(k))
+		{
+			Packet get_ack(DHTGetAckType, dht.GetMe(), host.GetKey());
+			get_ack.SetArg(DHT_GET_ACK_KEY, k);
+			get_ack.SetArg(DHT_GET_ACK_DATA, dht.GetStorage()->getInfo(k));
+			if(!dht.GetChimera()->Send(host, get_ack))
+				pf_log[W_WARNING] << "Send get ACK message failed!";
+		}
+		else
+		{
+			Packet get_nack(DHTGetNAckType, dht.GetMe(), host.GetKey());
+			get_nack.SetArg(DHT_GET_NACK_KEY, k);
+			if(!dht.GetChimera()->Send(host, get_nack))
+				pf_log[W_WARNING] << "Send get NACK message failed!";
+		}
 	}
 };
 
