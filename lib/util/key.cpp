@@ -90,54 +90,34 @@ Key::Key(const Key& k2)
 
 Key& Key::operator= (const char *strOrig)
 {
-	size_t i, len;
-	char key_str[HEXA_KEYLENGTH + 1];
-
-	char str[HEXA_KEYLENGTH + 1];
-
-	// This loop below is required, though Patrik L. from sparta recommended against it
-	for (i = 0; i < HEXA_KEYLENGTH + 1; i++)
-		key_str[i] = '0';
-	memset (str, 0, HEXA_KEYLENGTH + 1);
-	if (strlen (strOrig) < HEXA_KEYLENGTH)
-	{
-		strcpy (str, strOrig);
-	}
-	else
-	{
-		strncpy (str, strOrig, HEXA_KEYLENGTH);
-		str[HEXA_KEYLENGTH] = '\0';
-	}
-
-	// By now, the string should be in base 16
-	len = strlen (str);
-	if (len == 0)
-	{
-		pf_log[W_ERR] << "str_to_key: Warning:Empty input string";
-	}
-	else if (len > HEXA_KEYLENGTH)
-	{
-		strncpy (key_str, str, HEXA_KEYLENGTH);
-		//  key_str[KEY_SIZE/BASE_B]='\0';
-	}
-
-	else if (len <= HEXA_KEYLENGTH)
-	{
-		for (i = 0; i < len; i++)
-			key_str[i + (HEXA_KEYLENGTH) - len] = str[i];
-	}
-
-	key_str[HEXA_KEYLENGTH] = '\0';
-
-	for (i = 0; i < nlen; i++)
-		sscanf (key_str + (i * 8 * sizeof (char)), "%08x", &(this->t[(nlen-1 - i)]));
-
-	return *this;
+	return Key::operator=(std::string(strOrig));
 }
 
 Key& Key::operator=(std::string str)
 {
-	return Key::operator=(str.c_str());
+	if(str.find("0x") != std::string::npos)
+		str = str.substr(2);
+
+	size_t i = 0;
+	while(i < nlen && str.size() > 0)
+	{
+		if(str.size() > 8)
+		{
+			std::string str_number = str.substr(str.size() - 8, 8);
+			std::istringstream iss(str_number);
+			iss >> std::hex >> t[i];
+			str.erase(str.end() - 8, str.end());
+		}
+		else
+		{
+			std::istringstream iss(str);
+			iss >> std::hex >> t[i];
+			str = "";
+		}
+		i++;
+	}
+
+	return *this;
 }
 
 Key& Key::operator=(const Key& k2)

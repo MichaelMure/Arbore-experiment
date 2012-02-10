@@ -80,18 +80,10 @@ public:
 	 */
 	Key(const Key& k2);
 
-	/** Copy a key from a string
-	 *
-	 * @param str take the hexadecimal string to create the key.
-	 * @return a new Key object.
-	 */
+	/** Parse a key from an hexa string (0x1123456ABE and 1123456ABE supported) */
 	Key& operator=(const char* str);
 
-	/** Copy a key from a string
-	 *
-	 * @param str take the hexadecimal string to create the key.
-	 * @return a new Key object.
-	 */
+	/** Parse a key from an hexa string (0x1123456ABE and 1123456ABE supported) */
 	Key& operator=(std::string str);
 
 	/** Copy a key from an other key
