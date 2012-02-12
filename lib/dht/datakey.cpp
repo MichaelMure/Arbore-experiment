@@ -73,12 +73,17 @@ bool DataKey::isEmpty() const
 
 void DataKey::dump(char* buff) const
 {
+	/* Type */
 	uint32_t type = (uint32_t) this->getDataType();
 	Netutil::dump(type, buff);
 	buff += Netutil::getSerialisedSize(type);
+
+	/* Number of keys */
 	uint32_t s = (uint32_t) this->getSize();
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);
+
+	/* Keys */
 	KeySet::const_iterator it;
 	for (it=keySet_.begin() ; it != keySet_.end(); it++)
 	{
@@ -89,10 +94,9 @@ void DataKey::dump(char* buff) const
 
 size_t DataKey::getSerialisedSize() const
 {
-	uint32_t len = (uint32_t) this->getSize();
-	size_t s = Netutil::getSerialisedSize(len);
-	s += (keySet_.size() * Key::size);
-	return s;
+	return sizeof(uint32_t) /* Type */
+	     + sizeof(uint32_t) /* Number of keys */
+	     + keySet_.size() * Key::size; /* Keys */
 }
 
 std::string DataKey::GetStr() const

@@ -72,12 +72,17 @@ bool DataString::isEmpty() const
 
 void DataString::dump(char* buff) const
 {
+	/* Type */
 	uint32_t type = (uint32_t) this->getDataType();
 	Netutil::dump(type, buff);
 	buff += Netutil::getSerialisedSize(type);
+
+	/* Number of strings */
 	uint32_t s = (uint32_t) this->getSize();
 	Netutil::dump(s, buff);
 	buff += Netutil::getSerialisedSize(s);
+
+	/* Strings */
 	NameSet::const_iterator it;
 	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
 	{
@@ -88,13 +93,14 @@ void DataString::dump(char* buff) const
 
 size_t DataString::getSerialisedSize() const
 {
-	uint32_t len = (uint32_t) this->getSize();
-	size_t s = Netutil::getSerialisedSize(len);
+	size_t s = sizeof(uint32_t); /* Type */
+	s += sizeof(uint32_t); /* Number of strings */
+
+	/* Strings */
 	NameSet::const_iterator it;
 	for (it=nameSet_.begin() ; it != nameSet_.end(); it++)
-	{
 		s += Netutil::getSerialisedSize(*it);
-	}
+
 	return s;
 }
 
