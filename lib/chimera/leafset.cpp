@@ -50,10 +50,10 @@ std::string Leafset::GetStr() const
 
 bool Leafset::add(const Host& entry)
 {
-	pf_log[W_DEBUG] << "Trying to add an entry in the leafset: " << entry;
+	pf_log[W_ROUTING] << "Trying to add an entry in the leafset: " << entry;
 	if(me.GetKey() == entry.GetKey())
 	{
-		pf_log[W_DEBUG] << "Trying to add myself in the leafset ?";
+		pf_log[W_ROUTING] << "Trying to add myself in the leafset ?";
 		return false;
 	}
 
@@ -65,12 +65,12 @@ bool Leafset::add(const Host& entry)
 		{
 			if(entry.GetKey() == it->GetKey())
 			{
-				pf_log[W_DEBUG] << "Entry already in the leafset, clockwise.";
+				pf_log[W_ROUTING] << "Entry already in the leafset, clockwise.";
 				return false;
 			}
 			else if(entry.GetKey() < it->GetKey())
 			{
-				pf_log[W_DEBUG] << "Insert entry clockwise.";
+				pf_log[W_ROUTING] << "Insert entry clockwise.";
 				leavesCW.insert(it, entry);
 				/* If needed, remove the last host clockwise */
 				if(leavesCW.size() > ONE_SIDE_LEAFSET_SIZE)
@@ -82,7 +82,7 @@ bool Leafset::add(const Host& entry)
 		/* Leafset is not full, add at the end. */
 		if(leavesCW.size() < ONE_SIDE_LEAFSET_SIZE)
 		{
-			pf_log[W_DEBUG] << "Insert entry clockwise.";
+			pf_log[W_ROUTING] << "Insert entry clockwise.";
 			leavesCW.push_back(entry);
 			return true;
 		}
@@ -93,12 +93,12 @@ bool Leafset::add(const Host& entry)
 		{
 			if(entry.GetKey() == it->GetKey())
 			{
-				pf_log[W_DEBUG] << "Entry already in the leafset, counter-clockwise.";
+				pf_log[W_ROUTING] << "Entry already in the leafset, counter-clockwise.";
 				return false;
 			}
 			else if(entry.GetKey() > it->GetKey())
 			{
-				pf_log[W_DEBUG] << "Insert entry counter-clockwise.";
+				pf_log[W_ROUTING] << "Insert entry counter-clockwise.";
 				leavesCCW.insert(it, entry);
 				/* If needed, remove the last host clockwise */
 				if(leavesCCW.size() > ONE_SIDE_LEAFSET_SIZE)
@@ -110,7 +110,7 @@ bool Leafset::add(const Host& entry)
 		/* Leafset is not full, add at the end. */
 		if(leavesCCW.size() < ONE_SIDE_LEAFSET_SIZE)
 		{
-			pf_log[W_DEBUG] << "Insert entry counter-clockwise.";
+			pf_log[W_ROUTING] << "Insert entry counter-clockwise.";
 			leavesCCW.push_back(entry);
 			return true;
 		}
@@ -121,10 +121,10 @@ bool Leafset::add(const Host& entry)
 
 bool Leafset::remove(const Host& entry)
 {
-	pf_log[W_DEBUG] << "Trying to remove an entry from the leafset: " << entry;
+	pf_log[W_ROUTING] << "Trying to remove an entry from the leafset: " << entry;
 	if(entry.GetKey() == this->me.GetKey())
 	{
-		pf_log[W_DEBUG] << "Trying to remove myself from the leafset ?";
+		pf_log[W_ROUTING] << "Trying to remove myself from the leafset ?";
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
-			pf_log[W_DEBUG] << "Entry removed.";
+			pf_log[W_ROUTING] << "Entry removed.";
 			leavesCW.erase(it);
 			return true;
 		}
@@ -143,7 +143,7 @@ bool Leafset::remove(const Host& entry)
 	{
 		if(entry.GetKey() == it->GetKey())
 		{
-			pf_log[W_DEBUG] << "Entry removed.";
+			pf_log[W_ROUTING] << "Entry removed.";
 			leavesCCW.erase(it);
 			return true;
 		}
@@ -167,7 +167,7 @@ void Leafset::KeyUpdate(Host _me)
 
 Host Leafset::routeLookup(const Key& key , bool* inLeafset) const
 {
-	pf_log[W_DEBUG] << "Leafset contains " << *this;
+	pf_log[W_ROUTING] << "Leafset contains " << *this;
 
 	HostVector::const_iterator it;
 	*inLeafset = true;

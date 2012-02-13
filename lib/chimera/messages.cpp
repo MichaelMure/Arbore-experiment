@@ -57,7 +57,7 @@ public:
 			join_nack.SetArg(CHIMERA_JOIN_NACK_ADDRESS, addr);
 			chimera.Send(host, join_nack);
 
-			pf_log[W_WARNING] << "JOIN request from node " << host << " rejected, "
+			pf_log[W_ROUTING] << "JOIN request from node " << host << " rejected, "
 			                  << "elapsed time since failure = " << elapsed_time << " sec";
 			return;
 		}
@@ -72,7 +72,7 @@ public:
 		join_ack.SetArg(CHIMERA_JOIN_ACK_ADDRESSES, addresses);
 
 		if(!chimera.Send(host, join_ack))
-			pf_log[W_WARNING] << "Send join ACK message failed!";
+			pf_log[W_ROUTING] << "Send join ACK message failed!";
 	}
 };
 
@@ -99,7 +99,7 @@ public:
 			update.SetArg(CHIMERA_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
 
 			if(!chimera.Send(host, update))
-				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
+				pf_log[W_ROUTING] << "ChimeraJoinAck: failed to update " << host;
 		}
 
 		/* why do we do this ? - Michael */
@@ -111,7 +111,7 @@ public:
 
 			update.SetArg(CHIMERA_UPDATE_ADDRESS, chimera.GetMe().GetAddr());
 			if(!chimera.Send(host, update))
-				pf_log[W_WARNING] << "ChimeraJoinAck: failed to update " << host;
+				pf_log[W_ROUTING] << "ChimeraJoinAck: failed to update " << host;
 		}
 
 		/* Start the check of leafset repeated job. */
@@ -130,9 +130,9 @@ public:
 		pf_addr addr = pckt.GetArg<pf_addr>(CHIMERA_JOIN_NACK_ADDRESS);
 		Host host = hosts_list.GetHost(addr);
 
-		pf_log[W_WARNING] << "JOIN request rejected from " << host;
+		pf_log[W_ROUTING] << "JOIN request rejected from " << host;
 		sleep(Chimera::GRACEPERIOD);
-		pf_log[W_WARNING] << "Re-sending JOIN message to " << host;
+		pf_log[W_ROUTING] << "Re-sending JOIN message to " << host;
 
 		chimera.Join(host);
 	}
@@ -167,7 +167,7 @@ public:
 			if(time::dtime() - host.GetFailureTime() > Chimera::GRACEPERIOD)
 				chimera.GetRouting()->add(host);
 			else
-				pf_log[W_WARNING] << "Refused to add " << host << " to routing table";
+				pf_log[W_ROUTING] << "Refused to add " << host << " to routing table";
 		}
 	}
 };

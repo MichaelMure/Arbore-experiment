@@ -55,7 +55,7 @@ Chimera::Chimera(DHT *dht, uint16_t port, const Key& my_key)
 	{
 		return;
 	}
-	pf_log[W_INFO] << he->h_name;
+	pf_log[W_ROUTING] << he->h_name;
 	me = hosts_list.GetHost(he->h_name, port);
 	me.SetKey(my_key);
 
@@ -130,20 +130,20 @@ void Chimera::Join(const Host& bootstrap)
 
 bool Chimera::Route(const Packet& pckt)
 {
-	pf_log[W_DEBUG] << "***** ROUTING ******";
+	pf_log[W_ROUTING] << "***** ROUTING ******";
 
 	Key key = pckt.GetDst();
 
 	if(key == me.GetKey())
 	{
-		pf_log[W_DEBUG] << "I'm the destination, deliver the message.";
-		pf_log[W_DEBUG] << "***** END OF ROUTING *****";
+		pf_log[W_ROUTING] << "I'm the destination, deliver the message.";
+		pf_log[W_ROUTING] << "***** END OF ROUTING *****";
 		return false;
 	}
 
 	Host nextDest = GetRouting()->routeLookup(key);
 
-	pf_log[W_DEBUG] << "Routing to: " << nextDest;
+	pf_log[W_ROUTING] << "Routing to: " << nextDest;
 
 	/* this is to avoid sending JOIN request to the node that
 	 * its information is already in the routing table
@@ -152,14 +152,14 @@ bool Chimera::Route(const Packet& pckt)
 	{
 		GetRouting()->remove(nextDest);
 		nextDest = GetRouting()->routeLookup(key);
-		pf_log[W_DEBUG] << "Routing the JOIN message to another host (host already know) " << nextDest;
+		pf_log[W_ROUTING] << "Routing the JOIN message to another host (host already know) " << nextDest;
 	}
 
 	/* if I am the only host or the closest host is me, deliver the message */
 	if(nextDest == GetMe())
 	{
-		pf_log[W_DEBUG] << "I'm the closest know host, deliver the message.";
-		pf_log[W_DEBUG] << "***** END OF ROUTING *****";
+		pf_log[W_ROUTING] << "I'm the closest know host, deliver the message.";
+		pf_log[W_ROUTING] << "***** END OF ROUTING *****";
 		return false;
 	}
 
@@ -167,7 +167,7 @@ bool Chimera::Route(const Packet& pckt)
 	while(!Send(nextDest, pckt))
 	{
 		nextDest.SetFailureTime(time::dtime());
-		pf_log[W_WARNING] << "message sent to host: " << nextDest
+		pf_log[W_ROUTING] << "message sent to host: " << nextDest
 		                  << " at time: " << nextDest.GetFailureTime()
 		                  << " failed!";
 
@@ -176,7 +176,7 @@ bool Chimera::Route(const Packet& pckt)
 			GetRouting()->remove(nextDest);
 
 		nextDest = GetRouting()->routeLookup(key);
-		pf_log[W_WARNING] << "rerouting through " << nextDest;
+		pf_log[W_ROUTING] << "rerouting through " << nextDest;
 	}
 
 	/* in each hop in the way to the key root nodes
@@ -184,7 +184,7 @@ bool Chimera::Route(const Packet& pckt)
 	if(pckt.GetPacketType() == ChimeraJoinType)
 		sendRowInfo(pckt);
 
-	pf_log[W_DEBUG] << "******* END OF ROUTING *******";
+	pf_log[W_ROUTING] << "******* END OF ROUTING *******";
 	return true;
 }
 

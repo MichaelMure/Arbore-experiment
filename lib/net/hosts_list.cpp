@@ -63,27 +63,27 @@ Host HostsList::GetHost(const pf_addr& address)
 	BlockLockMutex lock(this);
 	HostMap::iterator it = hosts.find(address);
 
-	pf_log[W_DEBUG] << "Try to get " << address;
+	pf_log[W_ROUTING] << "Try to get " << address;
 
 	/* if the node is not in the cache, create an entry and allocate a host */
 	if (it == hosts.end())
 	{
 		it = hosts.insert(std::pair<pf_addr, Host>(address, Host(this, address))).first;
-		pf_log[W_DEBUG] << "added";
+		pf_log[W_ROUTING] << "added";
 	}
 
-	pf_log[W_DEBUG] << "host entries:";
+	pf_log[W_ROUTING] << "host entries:";
 	for(HostMap::iterator free_it = hosts.begin();
 	    /*hosts.size() > max && */free_it != hosts.end();
 	    ++free_it)
 	{
-		pf_log[W_DEBUG] << "  " << free_it->second;
+		pf_log[W_ROUTING] << "  " << free_it->second;
 
 /*		if(free_it->second.GetReference() == 1 && it != free_it)
 			hosts.erase(free_it);*/
 	}
 
-	pf_log[W_DEBUG] << "returned " << it->second;
+	pf_log[W_ROUTING] << "returned " << it->second;
 
 	return it->second;
 }
