@@ -54,6 +54,15 @@ public:
 	}
 };
 
+class DHTReplicateMessage : public DHTMessage
+{
+public:
+	void Handle (DHT&, const Host&, const Packet&)
+	{
+
+	}
+};
+
 class DHTUnpublishMessage : public DHTMessage
 {
 public:
@@ -114,6 +123,9 @@ public:
 
 PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage,   Packet::REQUESTACK, "PUBLISH",    /* DHT_PUBLISH_KEY */    T_KEY,
                                                                                                       /* DHT_PUBLISH_DATA */   T_DATA,
+                                                                                                                               T_END);
+PacketType DHTReplicateType(DHT_REPLICATE, new DHTReplicateMessage, Packet::REQUESTACK, "REPLICATE",  /* DHT_REPLICATE_KEY */  T_KEY,
+                                                                                                      /* DHT_REPLICATE_DATA */ T_DATA,
                                                                                                                                T_END);
 PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH",  /* DHT_UNPUBLISH_KEY */  T_KEY,
                                                                                                       /* DHT_UNPUBLISH_DATA */ T_DATA,

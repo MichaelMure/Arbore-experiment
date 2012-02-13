@@ -51,14 +51,14 @@ enum
 	CHIMERA_RESERVED4   = 11,
 
 	DHT_PUBLISH         = 12,
-	DHT_UNPUBLISH       = 13,
-	DHT_GET             = 14,
-	DHT_GET_ACK         = 15,
-	DHT_GET_NACK        = 16,
-	DHT_RESERVED1       = 17,
-	DHT_RESERVED2       = 18,
-	DHT_RESERVED3       = 19,
-	DHT_RESERVED4       = 20
+	DHT_REPLICATE       = 13,
+	DHT_UNPUBLISH       = 14,
+	DHT_GET             = 15,
+	DHT_GET_ACK         = 16,
+	DHT_GET_NACK        = 17,
+	DHT_RESERVED1       = 18,
+	DHT_RESERVED2       = 19,
+	DHT_RESERVED3       = 20
 };
 
 class PacketType : public std::vector<PacketArgType>

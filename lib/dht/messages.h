@@ -46,6 +46,13 @@ extern PacketType DHTPublishType;
 
 enum
 {
+	DHT_REPLICATE_KEY,
+	DHT_REPLICATE_DATA
+};
+extern PacketType DHTReplicateType;
+
+enum
+{
 	DHT_UNPUBLISH_KEY,
 	DHT_UNPUBLISH_DATA
 };
