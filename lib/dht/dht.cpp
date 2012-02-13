@@ -48,19 +48,19 @@ DHT::DHT(uint16_t port, const Key& me)
 	scheduler_queue.Queue(new CleanStorageJob(storage_));
 }
 
-bool DHT::Publish(const Key& id, const std::string string) const
+void DHT::Publish(const Key& id, const std::string string) const
 {
 	Data *d = (Data*) new DataString(string);
 	return Publish(id, d);
 }
 
-bool DHT::Publish(const Key& id, const Key& key) const
+void DHT::Publish(const Key& id, const Key& key) const
 {
 	Data *d = (Data*) new DataKey(key);
 	return Publish(id, d);
 }
 
-bool DHT::Publish(const Key& id, Data* data) const
+void DHT::Publish(const Key& id, Data* data) const
 {
 	assert(data);
 
@@ -80,23 +80,31 @@ bool DHT::Publish(const Key& id, Data* data) const
 	/* TODO: This Data memory is currently leaked. */
 	pckt.SetArg(DHT_PUBLISH_DATA, data);
 
-	return chimera_->Route(pckt);
+	if(!chimera_->Route(pckt))
+	{
+		/* We are the owner, so we replicate data */
+		Packet replicate(DHTRepeatPType, me_);
+		replicate.SetArg(DHT_REPEAT_P_KEY, id);
+		/* TODO: This Data memory is currently leaked. */
+		replicate.SetArg(DHT_REPEAT_P_DATA, data);
+		chimera_->SendToNeighbours(REDONDANCY, replicate);
+	}
 }
 
 
-bool DHT::Unpublish(const Key& id, const std::string string) const
+void DHT::Unpublish(const Key& id, const std::string string) const
 {
 	Data *d = (Data*) new DataString(string);
 	return Unpublish(id, d);
 }
 
-bool DHT::Unpublish(const Key& id, const Key& key) const
+void DHT::Unpublish(const Key& id, const Key& key) const
 {
 	Data *d = (Data*) new DataKey(key);
 	return Unpublish(id, d);
 }
 
-bool DHT::Unpublish(const Key& id, Data* data) const
+void DHT::Unpublish(const Key& id, Data* data) const
 {
 	/* Remove the value locally. */
 	try {
