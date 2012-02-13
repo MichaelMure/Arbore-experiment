@@ -37,6 +37,12 @@
 class DHT
 {
 public:
+
+	/** Number of host on which data are replicated in each direction.
+	 * For instance, a redondancy of 2 means that 5 hosts know the data (including me).
+	 */
+	static const uint32_t REDONDANCY = 1;
+
 	/* DHT constructor.
 	 * @param port the port that we listen on
 	 * @param me the key used on the routing layer

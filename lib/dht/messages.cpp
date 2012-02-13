@@ -50,16 +50,35 @@ public:
 		}
 		catch(Storage::WrongDataType e) {
 			pf_log[W_DHT] << "Asked to store wrong data type, data not stored.";
+			return;
 		}
+
+		/* Replicate data */
+		Packet replicate(DHTReplicateType, dht.GetMe(), Key());
+		replicate.SetArg(DHT_REPLICATE_KEY, k);
+		replicate.SetArg(DHT_REPLICATE_DATA, data);
+		dht.GetChimera()->SendToNeighbours(dht.REDONDANCY, replicate);
 	}
 };
 
 class DHTReplicateMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
+		Key k = pckt.GetArg<Key>(DHT_REPLICATE_KEY);
+		pf_log[W_DHT] << "Got Replicate message for key " << k;
 
+		Data *data = pckt.GetArg<Data*>(DHT_REPLICATE_DATA);
+		pf_log[W_DHT] << "Data: " << data->GetStr();
+
+		try {
+			dht.GetStorage()->addInfo(k, data);
+		}
+		catch(Storage::WrongDataType e) {
+			pf_log[W_DHT] << "Asked to store wrong data type, data not stored.";
+			return;
+		}
 	}
 };
 
