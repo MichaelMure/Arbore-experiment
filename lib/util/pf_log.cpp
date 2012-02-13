@@ -41,7 +41,9 @@ static struct
 	{ W_DESYNCH,    LOG_WARNING, "DESYNCH"    },
 	{ W_WARNING,    LOG_WARNING, "WARNING"    },
 	{ W_ERR,        LOG_ERR,     "ERR"        },
-	{ W_INFO,       LOG_NOTICE,  "INFO"       }
+	{ W_INFO,       LOG_NOTICE,  "INFO"       },
+	{ W_DHT,        LOG_DEBUG,   "DHT"        },
+	{ W_FILE,       LOG_NOTICE,  "FILE"       }
 };
 
 Log::flux::~flux()

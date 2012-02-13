@@ -31,13 +31,15 @@
 
 enum
 {
-	W_DEBUG      = 1 << 0,			  /* Debug */
-	W_PARSE      = 1 << 1,			  /* Show parsing */
-	W_ROUTING    = 1 << 2,                    /* Routing information */
-	W_DESYNCH    = 1 << 3,			  /* Desynchronization */
-	W_WARNING    = 1 << 4,			  /* Warnings */
-	W_ERR        = 1 << 5,			  /* Errors */
-	W_INFO       = 1 << 6			  /* Info */
+	W_DEBUG      = 1 << 0,    /* Debug */
+	W_PARSE      = 1 << 1,    /* Show parsing */
+	W_ROUTING    = 1 << 2,    /* Routing information */
+	W_DESYNCH    = 1 << 3,    /* Desynchronization */
+	W_WARNING    = 1 << 4,    /* Warnings */
+	W_ERR        = 1 << 5,    /* Errors */
+	W_INFO       = 1 << 6,    /* Info */
+	W_DHT        = 1 << 7,    /* DHT informations */
+	W_FILE       = 1 << 8     /* File sharing app message */
 };
 
 #define DEFAULT_LOGGED_FLAGS (W_DESYNCH|W_WARNING|W_ERR|W_INFO)
