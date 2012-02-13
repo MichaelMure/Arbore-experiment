@@ -66,7 +66,8 @@ int main(int argc, char** argv)
 		pckt.SetFlag(Packet::MUSTROUTE);
 		pckt.SetArg(CHIMERA_CHAT_MESSAGE, s);
 		pf_log[W_INFO] << "CHAT[" << key << "] " << s;
-		chimera->Route(pckt);
+		if(!chimera->Route(pckt))
+			pf_log[W_INFO] << "Either I'm the destination, or we failed to send the packet.";
 	}
 
 	return EXIT_SUCCESS;
