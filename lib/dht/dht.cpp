@@ -44,42 +44,23 @@ DHT::DHT(uint16_t port, const Key& me)
 
 bool DHT::Publish(const Key& id, const std::string string) const
 {
-	DataString d = DataString(string);
+	Data *d = (Data*) new DataString(string);
 	return Publish(id, d);
-}
-
-bool DHT::Publish(const Key& id, const DataString& strings) const
-{
-	/* Store the value locally. */
-	try {
-		storage_->addInfo(id, &strings);
-	}
-	catch(Storage::WrongDataType e)
-	{
-		pf_log[W_DHT] << "Publish wrong data type in the DHT";
-		return false;
-	}
-
-	/* Send a Publish packet to the owner of the key */
-	Packet pckt(DHTPublishType, me_, id);
-	pckt.SetArg(DHT_PUBLISH_KEY, id);
-	/* TODO: This Data memory is currently leaked. */
-	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataString(strings));
-
-	return chimera_->Route(pckt);
 }
 
 bool DHT::Publish(const Key& id, const Key& key) const
 {
-	DataKey d = DataKey(key);
+	Data *d = (Data*) new DataKey(key);
 	return Publish(id, d);
 }
 
-bool DHT::Publish(const Key& id, const DataKey& keys) const
+bool DHT::Publish(const Key& id, Data* data) const
 {
+	assert(data);
+
 	/* Store the value locally. */
 	try {
-		storage_->addInfo(id, &keys);
+		storage_->addInfo(id, data);
 	}
 	catch(Storage::WrongDataType e)
 	{
@@ -91,7 +72,7 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 	Packet pckt(DHTPublishType, me_, id);
 	pckt.SetArg(DHT_PUBLISH_KEY, id);
 	/* TODO: This Data memory is currently leaked. */
-	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataKey(keys));
+	pckt.SetArg(DHT_PUBLISH_DATA, data);
 
 	return chimera_->Route(pckt);
 }
@@ -99,42 +80,21 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 
 bool DHT::Unpublish(const Key& id, const std::string string) const
 {
-	DataString d = DataString(string);
+	Data *d = (Data*) new DataString(string);
 	return Unpublish(id, d);
-}
-
-bool DHT::Unpublish(const Key& id, const DataString& strings) const
-{
-	/* Remove the value locally. */
-	try {
-		storage_->removeInfo(id, &strings);
-	}
-	catch(Storage::WrongDataType e)
-	{
-		pf_log[W_DHT] << "Unpublish wrong data type in the DHT";
-		return false;
-	}
-
-	/* Send a Unpublish packet to the owner of the key */
-	Packet pckt(DHTUnpublishType, me_, id);
-	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
-	/* TODO: This Data memory is currently leaked. */
-	pckt.SetArg(DHT_UNPUBLISH_DATA, (Data*) new DataString(strings));
-
-	return chimera_->Route(pckt);
 }
 
 bool DHT::Unpublish(const Key& id, const Key& key) const
 {
-	DataKey d = DataKey(key);
+	Data *d = (Data*) new DataKey(key);
 	return Unpublish(id, d);
 }
 
-bool DHT::Unpublish(const Key& id, const DataKey& keys) const
+bool DHT::Unpublish(const Key& id, Data* data) const
 {
 	/* Remove the value locally. */
 	try {
-		storage_->removeInfo(id, &keys);
+		storage_->removeInfo(id, data);
 	}
 	catch(Storage::WrongDataType e)
 	{
@@ -146,7 +106,7 @@ bool DHT::Unpublish(const Key& id, const DataKey& keys) const
 	Packet pckt(DHTUnpublishType, me_, id);
 	pckt.SetArg(DHT_UNPUBLISH_KEY, id);
 	/* TODO: This Data memory is currently leaked. */
-	pckt.SetArg(DHT_UNPUBLISH_DATA, (Data*) new DataKey(keys));
+	pckt.SetArg(DHT_UNPUBLISH_DATA, data);
 
 	return chimera_->Route(pckt);
 }

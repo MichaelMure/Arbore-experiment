@@ -52,21 +52,17 @@ public:
 
 	/* PUBLISH */
 
-	/** Publish a string on DHT
+	/** Publish a string on the DHT
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const std::string string) const;
 
-	/** Publish a list of string on DHT
-	 * @return true if the request was send successfully, false otherwise. */
-	bool Publish(const Key& id, const DataString& strings) const;
-
-	/** Publish a key on DHT
+	/** Publish a key on the DHT
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Publish(const Key& id, const Key& key) const;
 
-	/** Publish a list of keys on DHT
+	/** Publish a Data on the DHT
 	 * @return true if the request was send successfully, false otherwise. */
-	bool Publish(const Key& id, const DataKey& keys) const;
+	bool Publish(const Key& id, Data* data) const;
 
 	/* UNPUBLISH */
 
@@ -74,17 +70,13 @@ public:
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Unpublish(const Key& id, const std::string string) const;
 
-	/** Unpublish a list of string on DHT
-	 * @return true if the request was send successfully, false otherwise. */
-	bool Unpublish(const Key& id, const DataString& strings) const;
-
 	/** Unpublish a key on DHT
 	 * @return true if the request was send successfully, false otherwise. */
 	bool Unpublish(const Key& id, const Key& key) const;
 
 	/** Unpublish a list of keys on DHT
 	 * @return true if the request was send successfully, false otherwise. */
-	bool Unpublish(const Key& id, const DataKey& keys) const;
+	bool Unpublish(const Key& id, Data* data) const;
 
 
 	/* Request a value in the DHT
