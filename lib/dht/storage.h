@@ -47,6 +47,13 @@ public:
 	Storage() {};
 	virtual ~Storage() {};
 
+	/** Add information (arbitrary data)
+	 * If there is already information stored in this key, and this
+	 * information is of another type, a WrongDataType exception is
+	 * throw.
+	 */
+	void addInfo(const Key&, const Data* data);
+
 	/** Add information (key) in the dataMap
 	 *
 	 * If there is already an entry with the key k,

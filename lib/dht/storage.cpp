@@ -26,6 +26,25 @@
 #include "storage.h"
 #include <util/time.h>
 
+void Storage::addInfo(const Key& k, const Data* data)
+{
+	if(!data)
+		return;
+
+	if(data->getDataType() == STRING_LIST)
+	{
+		DataString *ds = (DataString*) data;
+		for(DataString::NameSet::const_iterator it = ds->begin(); it != ds->end(); it++)
+			addInfo(k,*it);
+	}
+	else if(data->getDataType() == KEY_LIST)
+	{
+		DataKey *dk = (DataKey*) data;
+		for(DataKey::KeySet::const_iterator it = dk->begin(); it != dk->end(); it++)
+			addInfo(k,*it);
+	}
+}
+
 	void Storage::addInfo(const Key& k, const Key& info)
 	{
 		if(hasKey(k) && !isKeyList(k))
