@@ -173,7 +173,7 @@ bool Key::operator<(const Key& k2) const
 
 std::string Key::GetStr() const
 {
-	char keystr[HEXA_KEYLENGTH + 1] = {0};
+	char keystr[HEXA_KEYLENGTH + 3] = {0};
 
 	sprintf (keystr, "0x%08x%08x%08x%08x%08x",
 		    (unsigned int) this->t[4], (unsigned int) this->t[3],
