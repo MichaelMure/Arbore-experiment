@@ -58,20 +58,23 @@ public:
 	void Handle (DHT& dht, const Host& host, const Packet& pckt)
 	{
 		Key k = pckt.GetArg<Key>(DHT_GET_KEY);
+		pf_log[W_DHT] << "Get received with key " << k;
 		if(dht.GetStorage()->hasKey(k))
 		{
+			pf_log[W_DHT] << "Answer with data " << dht.GetStorage()->getInfo(k);
 			Packet get_ack(DHTGetAckType, dht.GetMe(), host.GetKey());
 			get_ack.SetArg(DHT_GET_ACK_KEY, k);
 			get_ack.SetArg(DHT_GET_ACK_DATA, dht.GetStorage()->getInfo(k));
 			if(!dht.GetChimera()->Send(host, get_ack))
-				pf_log[W_WARNING] << "Send get ACK message failed!";
+				pf_log[W_DHT] << "Send get ACK message failed!";
 		}
 		else
 		{
+			pf_log[W_DHT] << "Data unknow, answer with GET_NACK.";
 			Packet get_nack(DHTGetNAckType, dht.GetMe(), host.GetKey());
 			get_nack.SetArg(DHT_GET_NACK_KEY, k);
 			if(!dht.GetChimera()->Send(host, get_nack))
-				pf_log[W_WARNING] << "Send get NACK message failed!";
+				pf_log[W_DHT] << "Send get NACK message failed!";
 		}
 	}
 };
@@ -82,8 +85,8 @@ public:
 	void Handle (DHT&, const Host&, const Packet& pckt)
 	{
 		Key k = pckt.GetArg<Key>(DHT_GET_ACK_KEY);
-		pf_log[W_INFO] << "Received data with key " << k;
-		pf_log[W_INFO] << pckt.GetArg<Data*>(DHT_GET_ACK_DATA)->GetStr();
+		pf_log[W_DHT] << "Received data with key " << k;
+		pf_log[W_DHT] << pckt.GetArg<Data*>(DHT_GET_ACK_DATA)->GetStr();
 	}
 };
 
@@ -93,7 +96,7 @@ public:
 	void Handle (DHT&, const Host&, const Packet& pckt)
 	{
 		Key k = pckt.GetArg<Key>(DHT_GET_NACK_KEY);
-		pf_log[W_INFO] << "Received NACK for data with key " << k;
+		pf_log[W_DHT] << "Received NACK for data with key " << k;
 	}
 };
 

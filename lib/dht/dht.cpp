@@ -57,7 +57,7 @@ bool DHT::Publish(const Key& id, const DataString& strings) const
 	}
 	catch(Storage::WrongDataType e)
 	{
-		pf_log[W_DEBUG] << "Received wrong data type to store in the DHT";
+		pf_log[W_DHT] << "Received wrong data type to store in the DHT";
 	}
 
 	/* Send a Publish packet to the owner of the key */
@@ -84,7 +84,7 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 	}
 	catch(Storage::WrongDataType e)
 	{
-		pf_log[W_DEBUG] << "Received wrong data type to store in the DHT";
+		pf_log[W_DHT] << "Received wrong data type to store in the DHT";
 	}
 
 	/* Send a Publish packet to the owner of the key */

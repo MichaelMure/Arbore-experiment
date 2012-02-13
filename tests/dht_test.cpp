@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
 	DHT* dht = new DHT(StrToTyp<uint16_t>(argv[1]));
 
-	pf_log.SetLoggedFlags("ALL", false);
+	pf_log.SetLoggedFlags("DESYNCH WARNING ERR INFO DHT", false);
 	Scheduler::StartSchedulers(5);
 
 	if(argc > 2)
@@ -67,19 +67,19 @@ int main(int argc, char** argv)
 			case 'p':
 			case 'P':
 				k.MakeHash(s);
-				pf_log[W_INFO] << "Publish " << s << " with key " << k;
+				pf_log[W_DHT] << "Publish " << s << " with key " << k;
 				dht->Publish(k, s);
 				break;
 			case 'u':
 			case 'U':
 				k = stringtok(s, " ");
-				pf_log[W_INFO] << "Unublish " << s << " with key " << k;
+				pf_log[W_DHT] << "Unublish " << s << " with key " << k;
 				dht->Unpublish(k, s);
 				break;
 			case 'g':
 			case 'G':
 				k = s;
-				pf_log[W_INFO] << "Request data with key " << k;
+				pf_log[W_DHT] << "Request data with key " << k;
 				dht->RequestData(k);
 				break;
 			case 'q':

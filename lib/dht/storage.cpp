@@ -159,7 +159,7 @@
 				count++;
 			}
 		}
-		pf_log[W_DEBUG] << "Storage: " << count << " value(s) cleaned.";
+		pf_log[W_DHT] << "Storage: " << count << " value(s) cleaned.";
 	}
 
 	void Storage::clear()
