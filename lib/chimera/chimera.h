@@ -48,7 +48,7 @@ public:
 	/** GRACEPERIOD is the time that has to be elapsed before a node
 	 ** can be accepted to the network again after last send to it failed
 	 */
-	static const unsigned int GRACEPERIOD = 30;		/* seconds */
+	static const unsigned int GRACEPERIOD = 30;  /* seconds */
 
 	/** Create the Chimera routing layer
 	 *
@@ -58,34 +58,29 @@ public:
 	 */
 	Chimera(DHT* dht, uint16_t port, const Key& my_key);
 
-	/** @return  the Host object which represents me on network. */
+	/** @return the Host object which represents me on network. */
 	Host GetMe() const { return me; }
 
-	/** @return  the Network object. */
+	/** @return the Network object. */
 	Network* GetNetwork() const { return network; }
 
 	/** Get the Routing object.
 	 *
 	 * TODO: it MUST be private!!
-	 *
 	 * @return  the Routing pointer.
 	 */
 	Routing* GetRouting() const { return routing; }
 
-	/** Join the DHT network.
-	 *
-	 * It tries to connect to a peer to join a
-	 * DHT network.
-	 *
-	 * @param bootstrap  the peer I try to contact.
+	/** Join the Chimera network.
+	 * It tries to connect to a peer to join a Chimera network.
+	 * @param bootstrap  the peer to bootstrap on
 	 */
 	void Join(const Host& bootstrap);
 
-	/** Send a message to a peer.
-	 *
+	/** Send a message directly to a peer.
 	 * @param destination  this is peer which will receive message.
 	 * @param pckt  the Packet which describes all of the message.
-	 * @return  true if it success, false if it fails.
+	 * @return  true if the packet is successfully sent, false otherwise.
 	 */
 	bool Send(const Host& destination, const Packet& pckt);
 
@@ -103,7 +98,6 @@ public:
 	bool ClosestTo(const Key& key) const;
 
 	/** Route a packet on the DHT.
-	 *
 	 * It looks for the destination Key in Packet header,
 	 * find a peer in his routing table to route the packet.
 	 *
@@ -113,9 +107,8 @@ public:
 	bool Route(const Packet& pckt);
 
 	/** Ping a peer.
-	 *
 	 * @param dest  the destination host.
-	 * @return  true if the host is up.
+	 * @return  true if the ping is correctly sent.
 	 */
 	bool Ping(const Host& dest);
 
