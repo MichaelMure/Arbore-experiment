@@ -58,7 +58,10 @@ enum
 	DHT_GET_NACK        = 17,
 	DHT_RESERVED1       = 18,
 	DHT_RESERVED2       = 19,
-	DHT_RESERVED3       = 20
+	DHT_RESERVED3       = 20,
+
+	FILE_CHUNK_SEND     = 21
+
 };
 
 class PacketType : public std::vector<PacketArgType>

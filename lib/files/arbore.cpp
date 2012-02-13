@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2012 Benoît Saccomano
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,26 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
  */
 
-#ifndef PACKET_HANDLER_H
-#define PACKET_HANDLER_H
+#include "arbore.h"
+#include "messages.h"
 
-enum HandlerType
+#include <net/packet.h>
+
+Arbore::Arbore(uint16_t port)
+	:dht_(new DHT(port))
 {
-	HANDLER_TYPE_CHIMERA,
-	HANDLER_TYPE_DHT,
-	HANDLER_TYPE_ARBORE
-};
+	packet_type_list.RegisterType(ArboreChunkSendType);
+}
 
-class PacketHandlerBase
+bool Arbore::Send(const Key& id, const FileChunk& chunk) const
 {
-public:
-	virtual ~PacketHandlerBase() {}
-	virtual HandlerType getType() = 0;
-};
-
-#endif /* PACKET_HANDLER_H */
+	Packet pckt(ArboreChunkSendType, dht_->GetMe(), id);
+	pckt.SetArg(ARBORE_CHUNK_SEND, id);
+	pckt.SetArg(ARBORE_CHUNK_SEND, (FileChunk*) new FileChunk(chunk));
+	return dht_->GetChimera()->Route(pckt);
+}

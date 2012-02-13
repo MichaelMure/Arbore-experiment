@@ -1,4 +1,6 @@
 add_library(abfiles SHARED
+    arbore.h
+    arbore.cpp
     dir_entry.h
     dir_entry.cpp
     file_chunk.h
@@ -14,5 +16,7 @@ add_library(abfiles SHARED
     file_perms.cpp
     hdd.h
     hdd.cpp
+    messages.h
+    messages.cpp
     )
 SET(PFLIBS ${PFLIBS} abfiles)

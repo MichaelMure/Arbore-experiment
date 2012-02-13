@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2008 Laurent Defert, Romain Bignon
+ * Copyright(C) 2012 Benoît Saccomano
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,31 @@
  * (eay@cryptsoft.com).  This product includes software written by Tim
  * Hudson (tjh@cryptsoft.com).
  *
+ * This file contains some code from the Chimera's Distributed Hash Table,
+ * written by CURRENT Lab, UCSB.
+ *
  */
 
-#ifndef PACKET_HANDLER_H
-#define PACKET_HANDLER_H
+#ifndef ARBORE_H
+#define ARBORE_H
 
-enum HandlerType
-{
-	HANDLER_TYPE_CHIMERA,
-	HANDLER_TYPE_DHT,
-	HANDLER_TYPE_ARBORE
-};
+#include <dht/dht.h>
+#include "file_chunk.h"
 
-class PacketHandlerBase
+class Arbore
 {
 public:
-	virtual ~PacketHandlerBase() {}
-	virtual HandlerType getType() = 0;
+
+	Arbore(uint16_t port);
+	virtual ~Arbore() {}
+
+	/** Send a chunk
+	 * @return true if the chunk was sent successfully, false otherwise. */
+	bool Send(const Key& id, const FileChunk& chunk) const;
+
+private:
+	DHT *dht_;
 };
 
-#endif /* PACKET_HANDLER_H */
+
+#endif /* ARBORE_H */
