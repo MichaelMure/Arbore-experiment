@@ -37,9 +37,20 @@
 class DHTPublishMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_PUBLISH_KEY);
+		pf_log[W_DHT] << "Got Publish message for key " << k;
+
+		Data *data = pckt.GetArg<Data*>(DHT_PUBLISH_DATA);
+		pf_log[W_DHT] << "Data: " << data->GetStr();
+
+		try {
+			dht.GetStorage()->addInfo(k, data);
+		}
+		catch(Storage::WrongDataType e) {
+			pf_log[W_DHT] << "Asked to store wrong data type, data not stored.";
+		}
 	}
 };
 
@@ -61,7 +72,7 @@ public:
 		pf_log[W_DHT] << "Get received with key " << k;
 		if(dht.GetStorage()->hasKey(k))
 		{
-			pf_log[W_DHT] << "Answer with data " << dht.GetStorage()->getInfo(k);
+			pf_log[W_DHT] << "Answer with data " << dht.GetStorage()->getInfo(k)->GetStr();
 			Packet get_ack(DHTGetAckType, dht.GetMe(), host.GetKey());
 			get_ack.SetArg(DHT_GET_ACK_KEY, k);
 			get_ack.SetArg(DHT_GET_ACK_DATA, dht.GetStorage()->getInfo(k));
