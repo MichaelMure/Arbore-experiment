@@ -51,18 +51,18 @@ bool DHT::Publish(const Key& id, const DataString& strings) const
 {
 	/* Store the value locally. */
 	try {
-		DataString::NameSet::const_iterator it;
-		for (it = strings.begin(); it != strings.end(); it++)
-			storage_->addInfo(id, *it);
+		storage_->addInfo(id, &strings);
 	}
 	catch(Storage::WrongDataType e)
 	{
-		pf_log[W_DHT] << "Received wrong data type to store in the DHT";
+		pf_log[W_DHT] << "Publish wrong data type in the DHT";
+		return false;
 	}
 
 	/* Send a Publish packet to the owner of the key */
 	Packet pckt(DHTPublishType, me_, id);
 	pckt.SetArg(DHT_PUBLISH_KEY, id);
+	/* TODO: This Data memory is currently leaked. */
 	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataString(strings));
 
 	return chimera_->Route(pckt);
@@ -78,18 +78,18 @@ bool DHT::Publish(const Key& id, const DataKey& keys) const
 {
 	/* Store the value locally. */
 	try {
-		DataKey::KeySet::const_iterator it;
-		for (it = keys.begin(); it != keys.end(); it++)
-			storage_->addInfo(id, *it);
+		storage_->addInfo(id, &keys);
 	}
 	catch(Storage::WrongDataType e)
 	{
-		pf_log[W_DHT] << "Received wrong data type to store in the DHT";
+		pf_log[W_DHT] << "Publish wrong data type in the DHT";
+		return false;
 	}
 
 	/* Send a Publish packet to the owner of the key */
 	Packet pckt(DHTPublishType, me_, id);
 	pckt.SetArg(DHT_PUBLISH_KEY, id);
+	/* TODO: This Data memory is currently leaked. */
 	pckt.SetArg(DHT_PUBLISH_DATA, (Data*) new DataKey(keys));
 
 	return chimera_->Route(pckt);
