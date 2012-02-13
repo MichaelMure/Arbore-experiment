@@ -79,6 +79,34 @@ bool Chimera::Send(const Host& dest, const Packet& pckt)
 	return network->Send(fd, dest, pckt);
 }
 
+bool Chimera::SendToNeighbours(const uint32_t number, const Packet& pckt)
+{
+	bool success = false;
+	std::vector<Host>::const_iterator it;
+	uint32_t i = 0;
+
+	std::vector<Host> leafsetCW = routing->getCWLeafset();
+	for(it= leafsetCW.begin();
+	    it != leafsetCW.end() && i < number;
+	    it++, i++)
+	{
+		if(Send(*it, pckt))
+			success = true;
+	}
+
+	i = 0;
+	std::vector<Host> leafsetCCW = routing->getCCWLeafset();
+	for(it= leafsetCCW.begin();
+	    it != leafsetCCW.end() && i < number;
+	    it++, i++)
+	{
+		if(Send(*it, pckt))
+			success = true;
+	}
+
+	return success;
+}
+
 bool Chimera::Ping(const Host& dest)
 {
 	Packet pckt(ChimeraPingType, me.GetKey(), dest.GetKey());

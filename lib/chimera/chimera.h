@@ -89,6 +89,13 @@ public:
 	 */
 	bool Send(const Host& destination, const Packet& pckt);
 
+	/** Send a message to a set of the closest neighbour.
+	 * @param number the number of peers to send to in each direction
+	 * @param pckt the packet to send.
+	 * @return true if it success, false if all the send fail.
+	 */
+	bool SendToNeighbours(const uint32_t number, const Packet& pckt);
+
 	/** Route a packet on the DHT.
 	 *
 	 * It looks for the destination Key in Packet header,
