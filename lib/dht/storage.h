@@ -82,32 +82,32 @@ public:
 	 * If the information was the last one for the associated key,
 	 * the dataMap entry is also removed
 	 */
-	void removeInfo(Key k, Key info);
+	void removeInfo(const Key& k, const Key& info);
 
 		/** Remove the info (string) from the dataMap
 	 *
 	 * If the information was the last one for the associated key,
 	 * the dataMap entry is also removed
 	 */
-	void removeInfo(Key k, std::string info);
+	void removeInfo(const Key& k, const std::string& info);
 
 /** @return true if the data associated with the @param key is a DataKey */
-	bool isKeyList(Key k) const;
+	bool isKeyList(const Key& k) const;
 
 /** @return true if the data associated with the @param key is a DataString */
-	bool isStringList(Key k) const;
+	bool isStringList(const Key& k) const;
 
 /** Remove an entry from the dataMap
  *
  * key and associated data are removed
  */
-	void removeKey(Key k);
+	void removeKey(const Key& k);
 
 /** @return true if the dataMap have an entry for this key */
-	bool hasKey(Key k) const;
+	bool hasKey(const Key& k) const;
 
 /** @return the dataList associated with the key */
-	Data* getInfo(Key k) const;
+	Data* getInfo(const Key& k) const;
 
 /** Removed all entries from de the dataMap which are obsolete */
 	void clean();
