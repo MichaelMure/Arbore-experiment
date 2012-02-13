@@ -70,12 +70,18 @@ public:
 	 */
 	void addInfo(const Key& k, const std::string& info);
 
+	/** Remove information (arbitrary data)
+	 * If there is already information stored in this key, and this
+	 * information is of another type, a WrongDataType exception is
+	 * throw.
+	 */
+	void removeInfo(const Key& k, const Data* data);
+
 	/** Remove the info (key) from the dataMap
 	 *
 	 * If the information was the last one for the associated key,
 	 * the dataMap entry is also removed
 	 */
-
 	void removeInfo(Key k, Key info);
 
 		/** Remove the info (string) from the dataMap
