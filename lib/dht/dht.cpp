@@ -37,8 +37,9 @@ DHT::DHT(uint16_t port, const Key& me)
 		storage_(new Storage())
 {
 	packet_type_list.RegisterType(DHTPublishType);
-	packet_type_list.RegisterType(DHTReplicateType);
+	packet_type_list.RegisterType(DHTRepeatPType);
 	packet_type_list.RegisterType(DHTUnpublishType);
+	packet_type_list.RegisterType(DHTRepeatUType);
 	packet_type_list.RegisterType(DHTGetType);
 	packet_type_list.RegisterType(DHTGetAckType);
 	packet_type_list.RegisterType(DHTGetNAckType);

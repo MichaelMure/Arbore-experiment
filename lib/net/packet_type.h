@@ -51,14 +51,14 @@ enum
 	CHIMERA_RESERVED4   = 11,
 
 	DHT_PUBLISH         = 12,
-	DHT_REPLICATE       = 13,
+	DHT_REPEAT_P        = 13,
 	DHT_UNPUBLISH       = 14,
-	DHT_GET             = 15,
-	DHT_GET_ACK         = 16,
-	DHT_GET_NACK        = 17,
-	DHT_RESERVED1       = 18,
-	DHT_RESERVED2       = 19,
-	DHT_RESERVED3       = 20,
+	DHT_REPEAT_U        = 15,
+	DHT_GET             = 16,
+	DHT_GET_ACK         = 17,
+	DHT_GET_NACK        = 18,
+	DHT_RESERVED1       = 19,
+	DHT_RESERVED2       = 20,
 
 	FILE_CHUNK_SEND     = 21
 

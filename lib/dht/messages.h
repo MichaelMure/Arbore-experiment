@@ -46,10 +46,10 @@ extern PacketType DHTPublishType;
 
 enum
 {
-	DHT_REPLICATE_KEY,
-	DHT_REPLICATE_DATA
+	DHT_REPEAT_P_KEY,
+	DHT_REPEAT_P_DATA
 };
-extern PacketType DHTReplicateType;
+extern PacketType DHTRepeatPType;
 
 enum
 {
@@ -57,6 +57,13 @@ enum
 	DHT_UNPUBLISH_DATA
 };
 extern PacketType DHTUnpublishType;
+
+enum
+{
+	DHT_REPEAT_U_KEY,
+	DHT_REPEAT_U_DATA
+};
+extern PacketType DHTRepeatUType;
 
 enum
 {

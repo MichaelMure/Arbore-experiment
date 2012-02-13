@@ -54,22 +54,22 @@ public:
 		}
 
 		/* Replicate data */
-		Packet replicate(DHTReplicateType, dht.GetMe(), Key());
-		replicate.SetArg(DHT_REPLICATE_KEY, k);
-		replicate.SetArg(DHT_REPLICATE_DATA, data);
+		Packet replicate(DHTRepeatPType, dht.GetMe());
+		replicate.SetArg(DHT_REPEAT_P_KEY, k);
+		replicate.SetArg(DHT_REPEAT_P_DATA, data);
 		dht.GetChimera()->SendToNeighbours(dht.REDONDANCY, replicate);
 	}
 };
 
-class DHTReplicateMessage : public DHTMessage
+class DHTRepeatPMessage : public DHTMessage
 {
 public:
 	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
-		Key k = pckt.GetArg<Key>(DHT_REPLICATE_KEY);
+		Key k = pckt.GetArg<Key>(DHT_REPEAT_P_KEY);
 		pf_log[W_DHT] << "Got Replicate message for key " << k;
 
-		Data *data = pckt.GetArg<Data*>(DHT_REPLICATE_DATA);
+		Data *data = pckt.GetArg<Data*>(DHT_REPEAT_P_DATA);
 		pf_log[W_DHT] << "Data: " << data->GetStr();
 
 		try {
@@ -83,6 +83,15 @@ public:
 };
 
 class DHTUnpublishMessage : public DHTMessage
+{
+public:
+	void Handle (DHT&, const Host&, const Packet&)
+	{
+		/* TODO: unimplemented */
+	}
+};
+
+class DHTRepeatUMessage : public DHTMessage
 {
 public:
 	void Handle (DHT&, const Host&, const Packet&)
@@ -162,11 +171,14 @@ public:
 PacketType   DHTPublishType(DHT_PUBLISH,   new DHTPublishMessage,   Packet::REQUESTACK, "PUBLISH",    /* DHT_PUBLISH_KEY */    T_KEY,
                                                                                                       /* DHT_PUBLISH_DATA */   T_DATA,
                                                                                                                                T_END);
-PacketType DHTReplicateType(DHT_REPLICATE, new DHTReplicateMessage, Packet::REQUESTACK, "REPLICATE",  /* DHT_REPLICATE_KEY */  T_KEY,
-                                                                                                      /* DHT_REPLICATE_DATA */ T_DATA,
+PacketType   DHTRepeatPType(DHT_REPEAT_P,  new DHTRepeatPMessage,   Packet::REQUESTACK, "REPEAT_P",   /* DHT_REPEAT_P_KEY */   T_KEY,
+                                                                                                      /* DHT_REPEAT_P_DATA */  T_DATA,
                                                                                                                                T_END);
 PacketType DHTUnpublishType(DHT_UNPUBLISH, new DHTUnpublishMessage, Packet::REQUESTACK, "UNPUBLISH",  /* DHT_UNPUBLISH_KEY */  T_KEY,
                                                                                                       /* DHT_UNPUBLISH_DATA */ T_DATA,
+                                                                                                                               T_END);
+PacketType   DHTRepeatUType(DHT_REPEAT_U,  new DHTRepeatUMessage,   Packet::REQUESTACK, "REPEAT_U",   /* DHT_REPEAT_U_KEY */   T_KEY,
+                                                                                                      /* DHT_REPEAT_U_DATA */  T_DATA,
                                                                                                                                T_END);
 PacketType       DHTGetType(DHT_GET,       new DHTGetMessage,       Packet::REQUESTACK, "GET",        /* DHT_GET_KEY */        T_KEY,
                                                                                                                                T_END);
