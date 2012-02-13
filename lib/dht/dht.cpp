@@ -26,8 +26,10 @@
 #include "dht.h"
 
 #include <net/packet.h>
+#include <scheduler/scheduler_queue.h>
 
 #include "messages.h"
+#include "clean_storage_job.h"
 
 DHT::DHT(uint16_t port, const Key& me)
 	: me_(me),
@@ -40,6 +42,9 @@ DHT::DHT(uint16_t port, const Key& me)
 	packet_type_list.RegisterType(DHTGetType);
 	packet_type_list.RegisterType(DHTGetAckType);
 	packet_type_list.RegisterType(DHTGetNAckType);
+
+	/* Start a clean storage job */
+	scheduler_queue.Queue(new CleanStorageJob(storage_));
 }
 
 bool DHT::Publish(const Key& id, const std::string string) const
