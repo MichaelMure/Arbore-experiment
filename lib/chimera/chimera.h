@@ -108,7 +108,7 @@ public:
 	 * find a peer in his routing table to route the packet.
 	 *
 	 * @param pckt  Packet I try to route.
-	 * @return  \b true if it success, \b false if it fails.
+	 * @return true if the packet is sent, false if I'm the best know destination.
 	 */
 	bool Route(const Packet& pckt);
 
