@@ -100,7 +100,7 @@ public:
 	 * @param key the key to check
 	 * @return true if I'm the closest of the key
 	 */
-	bool ClosestTo(const Key& key);
+	bool ClosestTo(const Key& key) const;
 
 	/** Route a packet on the DHT.
 	 *

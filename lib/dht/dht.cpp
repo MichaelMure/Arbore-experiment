@@ -153,6 +153,16 @@ bool DHT::Unpublish(const Key& id, const DataKey& keys) const
 
 bool DHT::RequestData(const Key& id) const
 {
+	if(chimera_->ClosestTo(id))
+	{
+		if(storage_->hasKey(id))
+		{
+			/* TODO: Send data to the upper layer */
+			return true;
+		}
+		return false;
+	}
+
 	/* Send a Get packet to the owner of the key */
 	Packet pckt(DHTGetType, me_, id);
 	pckt.SetArg(DHT_GET_KEY, id);

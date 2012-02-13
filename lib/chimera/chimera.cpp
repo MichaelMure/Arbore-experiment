@@ -107,7 +107,7 @@ bool Chimera::SendToNeighbours(const uint32_t number, const Packet& pckt)
 	return success;
 }
 
-bool Chimera::ClosestTo(const Key& key)
+bool Chimera::ClosestTo(const Key& key) const
 {
 	std::vector<Host> leafsetCW = routing->getCWLeafset();
 	std::vector<Host> leafsetCCW = routing->getCCWLeafset();
