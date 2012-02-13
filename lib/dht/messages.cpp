@@ -98,6 +98,7 @@ public:
 	{
 		Key k = pckt.GetArg<Key>(DHT_GET_KEY);
 		pf_log[W_DHT] << "Get received with key " << k;
+
 		if(dht.GetStorage()->hasKey(k))
 		{
 			pf_log[W_DHT] << "Answer with data " << dht.GetStorage()->getInfo(k)->GetStr();
@@ -106,26 +107,44 @@ public:
 			get_ack.SetArg(DHT_GET_ACK_DATA, dht.GetStorage()->getInfo(k));
 			if(!dht.GetChimera()->Send(host, get_ack))
 				pf_log[W_DHT] << "Send get ACK message failed!";
+			return;
 		}
-		else
+
+		if(dht.GetChimera()->ClosestTo(k))
 		{
-			pf_log[W_DHT] << "Data unknow, answer with GET_NACK.";
+			pf_log[W_DHT] << "I'm the owner and the key is unknow, answer with GET_NACK.";
 			Packet get_nack(DHTGetNAckType, dht.GetMe(), host.GetKey());
 			get_nack.SetArg(DHT_GET_NACK_KEY, k);
 			if(!dht.GetChimera()->Send(host, get_nack))
 				pf_log[W_DHT] << "Send get NACK message failed!";
+			return;
 		}
+
+		pf_log[W_DHT] << "Data not in cache, relay to a closest host.";
+		dht.GetChimera()->Route(pckt);
 	}
 };
 
 class DHTGetAckMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet& pckt)
+	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
 		Key k = pckt.GetArg<Key>(DHT_GET_ACK_KEY);
+		Data *data = pckt.GetArg<Data*>(DHT_GET_ACK_DATA);
 		pf_log[W_DHT] << "Received data with key " << k;
-		pf_log[W_DHT] << pckt.GetArg<Data*>(DHT_GET_ACK_DATA)->GetStr();
+		pf_log[W_DHT] << data->GetStr();
+
+		try {
+			dht.GetStorage()->addInfo(k, data);
+		}
+		catch(Storage::WrongDataType e) {
+			pf_log[W_DHT] << "Asked to store wrong data type, data not stored.";
+			return;
+		}
+		pf_log[W_DHT] << "Data stored locally.";
+
+		/* TODO: send data to upper layer. */
 	}
 };
 
