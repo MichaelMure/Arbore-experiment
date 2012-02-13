@@ -107,6 +107,25 @@ bool Chimera::SendToNeighbours(const uint32_t number, const Packet& pckt)
 	return success;
 }
 
+bool Chimera::ClosestTo(const Key& key)
+{
+	std::vector<Host> leafsetCW = routing->getCWLeafset();
+	std::vector<Host> leafsetCCW = routing->getCCWLeafset();
+
+	bool ownerCW = true;
+	bool ownerCCW = true;
+
+	if(!leafsetCW.empty())
+		if(key.distance(me.GetKey()) > key.distance(leafsetCW.at(0).GetKey()))
+			ownerCW = false;
+
+	if(!leafsetCCW.empty())
+		if(key.distance(me.GetKey()) >= key.distance(leafsetCCW.at(0).GetKey()))
+			ownerCCW = false;
+
+	return ownerCW && ownerCCW;
+}
+
 bool Chimera::Ping(const Host& dest)
 {
 	Packet pckt(ChimeraPingType, me.GetKey(), dest.GetKey());

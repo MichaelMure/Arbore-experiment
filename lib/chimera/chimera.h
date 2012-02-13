@@ -96,6 +96,12 @@ public:
 	 */
 	bool SendToNeighbours(const uint32_t number, const Packet& pckt);
 
+	/** Check if I'm the closest know host of a key in the key space.
+	 * @param key the key to check
+	 * @return true if I'm the closest of the key
+	 */
+	bool ClosestTo(const Key& key);
+
 	/** Route a packet on the DHT.
 	 *
 	 * It looks for the destination Key in Packet header,
