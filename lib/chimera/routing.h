@@ -54,6 +54,7 @@ public :
 	 */
 	Routing(Host me);
 
+	/** Change the id Key used on the network. */
 	void KeyUpdate(Host me);
 
 	/** \brief Updates the routing information by adding a peer.
@@ -105,6 +106,20 @@ public :
 	{
 		BlockLockMutex lock(this);
 		return this->leafset.getCopy();
+	}
+
+	/** Returns clockwise entries in the leafset */
+	inline std::vector<Host> getCWLeafset() const
+	{
+		BlockLockMutex lock(this);
+		return this->leafset.getCWSide();
+	}
+
+	/** Returns counter-clockwise entries in the leafset */
+	inline std::vector<Host> getCCWLeafset() const
+	{
+		BlockLockMutex lock(this);
+		return this->leafset.getCCWSide();
 	}
 
 	/** Returns all the entries in the routing table */
