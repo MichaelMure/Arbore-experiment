@@ -28,6 +28,7 @@
 
 #include <net/network.h>
 #include <net/hosts_list.h>
+#include <net/addr_list.h>
 #include <scheduler/scheduler_queue.h>
 #include <util/key.h>
 #include <dht/dht.h>
@@ -240,7 +241,7 @@ void Chimera::sendRowInfo(const Packet& pckt)
 	Host host = hosts_list.GetHost(pckt.GetArg<pf_addr>(CHIMERA_JOIN_ADDRESS));
 
 	std::vector<Host> rowset = GetRouting()->rowLookup(host.GetKey());
-	std::vector<pf_addr> addresses;
+	addr_list addresses;
 	for(std::vector<Host>::iterator it = rowset.begin(); it != rowset.end(); ++it)
 		addresses.push_back(it->GetAddr());
 
