@@ -99,6 +99,12 @@ public :
 	/** @return a copy of all the host stored in the leafset. */
 	std::vector<Host> getCopy() const;
 
+	/** @return a copy of the clockwise side of the leafset. */
+	std::vector<Host> getCWSide() const;
+
+	/** @return a copy of the counter-clockwise side of the leafset. */
+	std::vector<Host> getCCWSide() const;
+
 private :
 	/** \brief Clears the leafset
 	 *

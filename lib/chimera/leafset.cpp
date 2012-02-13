@@ -212,3 +212,13 @@ std::vector<Host> Leafset::getCopy() const
 	}
 	return ret;
 }
+
+std::vector<Host> Leafset::getCWSide() const
+{
+	return leavesCW;
+}
+
+std::vector<Host> Leafset::getCCWSide() const
+{
+	return leavesCCW;
+}
