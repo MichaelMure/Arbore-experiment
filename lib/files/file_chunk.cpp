@@ -52,7 +52,8 @@ FileChunk::FileChunk(char* buff)
 	buff += sizeof(offset);
 	this->size = Netutil::ReadInt32(buff);
 	buff += sizeof(size);
-	memcpy(buff, data, size);
+	data = new char[size];
+	memcpy(data, buff, size);
 }
 
 FileChunk::FileChunk(const FileChunk& other)
@@ -199,4 +200,12 @@ void FileChunk::dump(char* buff) const
 	Netutil::dump((uint32_t) size, buff);
 	buff += sizeof(uint32_t);
 	memcpy(buff, data, size);
+}
+
+std::string FileChunk::GetStr() const
+{
+	std::string filechunk_str;
+	filechunk_str += "File Chunk Content : ";
+	filechunk_str += data;
+	return filechunk_str;
 }

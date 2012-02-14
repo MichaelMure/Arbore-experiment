@@ -26,6 +26,7 @@
 
 #include <time.h>
 #include <net/netutil.h>
+#include <util/pf_log.h>
 #include "file_chunk_desc.h"
 
 /** Specialisation of FileChunkDesc to actually hold data of a chunk */
@@ -84,5 +85,17 @@ size_t getSerialisedSize();
 
 	/** Serialyze the chunk in binary format */
 	void dump(char* buff) const;
+
+	/** @return the string representation of the chunk */
+	std::string GetStr() const;
 };
+
+template<>
+inline Log::flux& Log::flux::operator<< <FileChunk> (FileChunk fc)
+{
+	_str += fc.GetStr();
+	return *this;
+}
+
+
 #endif						  /* FILE_CHUNK_H */
