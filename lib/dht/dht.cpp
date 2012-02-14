@@ -137,13 +137,13 @@ bool DHT::RequestData(const Key& id) const
 {
 	if(storage_->hasKey(id))
 	{
-		pf_log[W_DHT] << "Data already in storage, or i'm the owner.";
+		pf_log[W_DHT] << "Data already in storage.";
 		return false;
 	}
 
 	if(chimera_->ClosestTo(id))
 	{
-		pf_log[W_DHT] << "Data already in storage, or i'm the owner.";
+		pf_log[W_DHT] << "I'm the owner of the data, and no data is present.";
 		return false;
 	}
 
