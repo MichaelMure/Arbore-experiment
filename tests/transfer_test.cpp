@@ -1,5 +1,5 @@
 /*
- * Copyright(C) 2012 Michael Muré <batolettre@gmail.com>
+ * Copyright(C) 2012 Benoît Saccomano
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@
 #include <string>
 #include <iostream>
 
-#include <dht/dht.h>
+#include <files/arbore.h>
 #include <dht/messages.h>
+#include <files/file_chunk.h>
 #include <chimera/chimera.h>
 #include <net/hosts_list.h>
 #include <scheduler/scheduler.h>
@@ -41,16 +42,18 @@ int main(int argc, char** argv)
 
 	srand(time(NULL));
 
-	DHT* dht = new DHT(NULL, StrToTyp<uint16_t>(argv[1]));
+	Key me(StrToTyp<uint32_t>(argv[1]));
 
-	pf_log.SetLoggedFlags("DESYNCH WARNING ERR INFO DHT", false);
+	Arbore* arbore = new Arbore(StrToTyp<uint16_t>(argv[1]));
+
+	pf_log.SetLoggedFlags("DESYNCH WARNING ERR INFO DHT FILE", false);
 	Scheduler::StartSchedulers(5);
 
 	if(argc > 2)
 	{
 		Host host = hosts_list.DecodeHost(argv[2]);
 		pf_log[W_INFO] << "Connecting to " << host;
-		dht->GetChimera()->Join(host);
+		arbore->GetDHT()->GetChimera()->Join(host);
 	}
 
 	std::string s;
@@ -64,28 +67,18 @@ int main(int argc, char** argv)
 
 		switch(command_str[0])
 		{
-			case 'l':
-			case 'L':
-				pf_log[W_DHT] << dht->GetStorage()->GetStr();
-				break;
-			case 'p':
-			case 'P':
-				k.MakeHash(s);
-				pf_log[W_DHT] << "Publish " << s << " with key " << k;
-				dht->Publish(k, s);
-				break;
-			case 'u':
-			case 'U':
-				k = stringtok(s, " ");
-				pf_log[W_DHT] << "Unublish " << s << " with key " << k;
-				dht->Unpublish(k, s);
-				break;
-			case 'g':
-			case 'G':
+			case 's':
+			case 'S':
+			{
+				pf_log[W_FILE] << "Try to create a chunk";
+				char chaine[10]={ 'B', 'o', 'n', 'j', 'o', 'u', 'r', '\0' };
+				char *data = (char*) &chaine;
+				FileChunk* fc = new FileChunk(data, 0, sizeof(chaine));
 				k = s;
-				pf_log[W_DHT] << "Request data with key " << k;
-				dht->RequestData(k);
+				pf_log[W_FILE] << "Try to send the chunk" << " with key " << k;
+				arbore->Send(k, *fc);
 				break;
+			}
 			case 'q':
 			case 'Q':
 				return EXIT_SUCCESS;
@@ -93,6 +86,7 @@ int main(int argc, char** argv)
 				pf_log[W_ERR] << "Command not recognized.";
 		}
 	}
+
 
 	return EXIT_SUCCESS;
 }

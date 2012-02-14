@@ -45,9 +45,9 @@ ADD_EXECUTABLE(dht_test
                tests/dht_test.cpp)
 TARGET_LINK_LIBRARIES(dht_test ${arbore_lib})
 
-#ADD_EXECUTABLE(transfer_test
-#               tests/transfer_test.cpp)
-#TARGET_LINK_LIBRARIES(transfer_test ${arbore_lib})
+ADD_EXECUTABLE(transfer_test
+               tests/transfer_test.cpp)
+TARGET_LINK_LIBRARIES(transfer_test ${arbore_lib})
 
 ########################### Library ###################
 
