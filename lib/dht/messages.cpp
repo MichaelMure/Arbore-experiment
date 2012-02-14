@@ -53,7 +53,7 @@ public:
 			return;
 		}
 
-		/* Replicate data */
+		/* Repeat publish on redondancy hosts */
 		Packet replicate(DHTRepeatPType, dht.GetMe());
 		replicate.SetArg(DHT_REPEAT_P_KEY, k);
 		replicate.SetArg(DHT_REPEAT_P_DATA, data);
@@ -67,7 +67,7 @@ public:
 	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
 		Key k = pckt.GetArg<Key>(DHT_REPEAT_P_KEY);
-		pf_log[W_DHT] << "Got Replicate message for key " << k;
+		pf_log[W_DHT] << "Got Repeat publisg message for key " << k;
 
 		Data *data = pckt.GetArg<Data*>(DHT_REPEAT_P_DATA);
 		pf_log[W_DHT] << "Data: " << data->GetStr();
@@ -85,18 +85,48 @@ public:
 class DHTUnpublishMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_UNPUBLISH_KEY);
+		pf_log[W_DHT] << "Got Unpublish message for key " << k;
+
+		Data *data = pckt.GetArg<Data*>(DHT_UNPUBLISH_DATA);
+		pf_log[W_DHT] << "Data: " << data->GetStr();
+
+		try {
+			dht.GetStorage()->removeInfo(k, data);
+		}
+		catch(Storage::WrongDataType e) {
+			pf_log[W_DHT] << "Asked to remove wrong data type, abord.";
+			return;
+		}
+
+		/* Repeat unpublish on redondancy hosts */
+		Packet replicate(DHTRepeatUType, dht.GetMe());
+		replicate.SetArg(DHT_REPEAT_U_KEY, k);
+		replicate.SetArg(DHT_REPEAT_U_DATA, data);
+		dht.GetChimera()->SendToNeighbours(dht.REDONDANCY, replicate);
 	}
 };
 
 class DHTRepeatUMessage : public DHTMessage
 {
 public:
-	void Handle (DHT&, const Host&, const Packet&)
+	void Handle (DHT& dht, const Host&, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		Key k = pckt.GetArg<Key>(DHT_REPEAT_U_KEY);
+		pf_log[W_DHT] << "Got Repeat unpublish message for key " << k;
+
+		Data *data = pckt.GetArg<Data*>(DHT_REPEAT_U_DATA);
+		pf_log[W_DHT] << "Data: " << data->GetStr();
+
+		try {
+			dht.GetStorage()->removeInfo(k, data);
+		}
+		catch(Storage::WrongDataType e) {
+			pf_log[W_DHT] << "Asked to remove wrong data type, abord.";
+			return;
+		}
 	}
 };
 

@@ -123,7 +123,14 @@ void DHT::Unpublish(const Key& id, Data* data) const
 	/* TODO: This Data memory is currently leaked. */
 	pckt.SetArg(DHT_UNPUBLISH_DATA, data);
 
-	return chimera_->Route(pckt);
+	if(!chimera_->Route(pckt))
+	{
+		/* We are the owner, so we replicate data */
+		Packet replicate(DHTRepeatUType, me_);
+		replicate.SetArg(DHT_REPEAT_U_KEY, id);
+		replicate.SetArg(DHT_REPEAT_U_DATA, data);
+		chimera_->SendToNeighbours(REDONDANCY, replicate);
+	}
 }
 
 bool DHT::RequestData(const Key& id) const
