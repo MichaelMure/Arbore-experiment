@@ -32,7 +32,9 @@ class ArboreChunkSendMessage : public ArboreMessage
 public:
 	void Handle (Arbore& arbore, const Host& host, const Packet& pckt)
 	{
-		/* TODO: unimplemented */
+		pf_log[W_FILE] << "Chunk received";
+		FileChunk fc = pckt.GetArg<FileChunk>(ARBORE_CHUNK_SEND_CHUNK);
+		pf_log[W_FILE] << fc;
 	}
 };
 

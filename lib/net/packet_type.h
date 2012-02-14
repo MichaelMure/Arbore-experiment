@@ -60,7 +60,7 @@ enum
 	DHT_RESERVED1       = 19,
 	DHT_RESERVED2       = 20,
 
-	FILE_CHUNK_SEND     = 21
+	ARBORE_CHUNK_SEND     = 21
 
 };
 

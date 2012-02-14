@@ -40,11 +40,19 @@ public:
 	 * @return true if the chunk was sent successfully, false otherwise. */
 	bool Send(const Key& id, const FileChunk& chunk) const;
 
+	/** @return the DHT layer */
+	DHT* GetDHT() const;
+
+	/** Handle a network message.
+	 * @return true if the request was send successfully, false otherwise. */
+	void HandleMessage(const Host& sender, const Packet& pckt);
+
 	/** Callback used by the DHT, to give result of a GET request.
 	 * @param id the key of the data
 	 * @param data the data requested
 	 */
 	void DataCallback(const Key& id, const Data* data);
+
 
 private:
 	DHT *dht_;

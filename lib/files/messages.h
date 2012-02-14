@@ -38,7 +38,7 @@ public:
 
 enum
 {
-	ARBORE_CHUNK_SEND
+	ARBORE_CHUNK_SEND_CHUNK
 };
 extern PacketType ArboreChunkSendType;
 

@@ -31,8 +31,9 @@
 #include "messages.h"
 #include "clean_storage_job.h"
 
-DHT::DHT(uint16_t port, const Key& me)
-	: me_(me),
+DHT::DHT(Arbore* arbore, uint16_t port, const Key& me)
+	: arbore_(arbore),
+		me_(me),
 		chimera_(new Chimera(this, port, me)),
 		storage_(new Storage())
 {
@@ -152,6 +153,11 @@ void DHT::HandleMessage(const Host& sender, const Packet& pckt)
 		DHTMessage *handler = (DHTMessage*) handler_base;
 		handler->Handle(*this, sender, pckt);
 	}
+	else
+	{
+		if(arbore_ != NULL)
+		arbore_->HandleMessage(sender, pckt);
+	}
 }
 
 Chimera* DHT::GetChimera() const
@@ -168,3 +174,10 @@ const Key& DHT::GetMe() const
 {
 	return me_;
 }
+
+const Arbore* DHT::GetArbore() const
+{
+	return arbore_;
+}
+
+

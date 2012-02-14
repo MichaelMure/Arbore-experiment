@@ -33,6 +33,9 @@
 #include "datakey.h"
 #include "datastring.h"
 #include "storage.h"
+#include <files/arbore.h>
+
+class Arbore;
 
 class DHT
 {
@@ -47,7 +50,7 @@ public:
 	 * @param port the port that we listen on
 	 * @param me the key used on the routing layer
 	 */
-	DHT(uint16_t port, const Key& me = Key::GetRandomKey());
+	DHT(Arbore* arbore, uint16_t port, const Key& me = Key::GetRandomKey());
 	virtual ~DHT() {}
 
 	/* PUBLISH */
@@ -96,7 +99,11 @@ public:
 	/** @return the key used as id on the network */
 	const Key& GetMe() const;
 
+	/** @return the Arbore above */
+	const Arbore* GetArbore() const;
+
 private:
+	Arbore *arbore_;
 	const Key& me_;
 	Chimera *chimera_;
 	Storage *storage_;
