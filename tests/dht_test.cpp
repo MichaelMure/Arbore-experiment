@@ -27,6 +27,9 @@
 #include <dht/dht.h>
 #include <dht/messages.h>
 #include <chimera/chimera.h>
+#include <chimera/routing.h>
+#include <chimera/leafset.h>
+#include <chimera/routing_table.h>
 #include <net/hosts_list.h>
 #include <scheduler/scheduler.h>
 #include <util/pf_log.h>
@@ -64,9 +67,17 @@ int main(int argc, char** argv)
 
 		switch(command_str[0])
 		{
+			case 's':
+			case 'S':
+				pf_log[W_DHT] << dht->GetStorage()->GetStr();
+				break;
 			case 'l':
 			case 'L':
-				pf_log[W_DHT] << dht->GetStorage()->GetStr();
+				pf_log[W_DHT] << dht->GetChimera()->GetRouting()->GetLeafset()->GetStr();
+				break;
+			case 'r':
+			case 'R':
+				pf_log[W_DHT] << dht->GetChimera()->GetRouting()->GetRoutingTable()->GetStr();
 				break;
 			case 'p':
 			case 'P':

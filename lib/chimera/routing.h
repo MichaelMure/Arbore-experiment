@@ -129,6 +129,12 @@ public :
 		return this->routingTable.getCopy();
 	}
 
+	/** @return the leafset */
+	const Leafset* GetLeafset() const;
+
+	/** @return the routing table */
+	const RoutingTable* GetRoutingTable() const;
+
 };
 
 #endif /* ROUTING_H */

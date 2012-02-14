@@ -95,3 +95,13 @@ Host Routing::routeLookup(const Key& key) const
 	}
 	return routingTableBest;
 }
+
+const Leafset* Routing::GetLeafset() const
+{
+	return &leafset;
+}
+
+const RoutingTable* Routing::GetRoutingTable() const
+{
+	return &routingTable;
+}
