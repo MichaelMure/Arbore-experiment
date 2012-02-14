@@ -27,6 +27,7 @@
 #include "messages.h"
 
 #include <net/packet.h>
+#include <util/pf_log.h>
 
 Arbore::Arbore(uint16_t port)
 	:dht_(new DHT(port))
@@ -41,3 +42,10 @@ bool Arbore::Send(const Key& id, const FileChunk& chunk) const
 	pckt.SetArg(ARBORE_CHUNK_SEND, (FileChunk*) new FileChunk(chunk));
 	return dht_->GetChimera()->Route(pckt);
 }
+
+void DataCallback(const Key& id, const Data* data)
+{
+	pf_log[W_FILE] << "Received data with key " << id;
+	pf_log[W_FILE] << data->GetStr();
+}
+
