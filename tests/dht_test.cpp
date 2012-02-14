@@ -64,6 +64,10 @@ int main(int argc, char** argv)
 
 		switch(command_str[0])
 		{
+			case 'l':
+			case 'L':
+				pf_log[W_DHT] << dht->GetStorage()->GetStr();
+				break;
 			case 'p':
 			case 'P':
 				k.MakeHash(s);
