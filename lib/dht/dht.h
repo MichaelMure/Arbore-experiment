@@ -81,9 +81,11 @@ public:
 	 * @return true if the request was send successfully, false otherwise. */
 	void Unpublish(const Key& id, Data* data) const;
 
-
 	/* Request a value in the DHT
-	 * @return true if the request was send successfully, false otherwise. */
+	 * @return true if a request need to be sent, false otherwise.
+	 * If false is returned, it does not mean that the data is available,
+	 * because the data may just not exist.
+	 */
 	bool RequestData(const Key& id) const;
 
 	/** Handle a network message.
@@ -100,7 +102,7 @@ public:
 	const Key& GetMe() const;
 
 	/** @return the Arbore above */
-	const Arbore* GetArbore() const;
+	Arbore* GetArbore() const;
 
 private:
 	Arbore *arbore_;

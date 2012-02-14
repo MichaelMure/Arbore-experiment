@@ -135,13 +135,15 @@ void DHT::Unpublish(const Key& id, Data* data) const
 
 bool DHT::RequestData(const Key& id) const
 {
+	if(storage_->hasKey(id))
+	{
+		pf_log[W_DHT] << "Data already in storage, or i'm the owner.";
+		return false;
+	}
+
 	if(chimera_->ClosestTo(id))
 	{
-		if(storage_->hasKey(id))
-		{
-			/* TODO: Send data to the upper layer */
-			return true;
-		}
+		pf_log[W_DHT] << "Data already in storage, or i'm the owner.";
 		return false;
 	}
 
@@ -149,7 +151,9 @@ bool DHT::RequestData(const Key& id) const
 	Packet pckt(DHTGetType, me_, id);
 	pckt.SetArg(DHT_GET_KEY, id);
 
-	return chimera_->Route(pckt);
+	if(!chimera_->Route(pckt))
+		pf_log[W_DHT] << "Failed to send a request data message.";
+	return true;
 }
 
 void DHT::HandleMessage(const Host& sender, const Packet& pckt)
@@ -182,9 +186,7 @@ const Key& DHT::GetMe() const
 	return me_;
 }
 
-const Arbore* DHT::GetArbore() const
+Arbore* DHT::GetArbore() const
 {
 	return arbore_;
 }
-
-

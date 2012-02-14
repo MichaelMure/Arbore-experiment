@@ -183,7 +183,8 @@ public:
 		}
 		pf_log[W_DHT] << "Data stored locally.";
 
-		/* TODO: send data to upper layer. */
+		/* Send data to upper layer. */
+		dht.GetArbore()->DataCallback(k, data);
 	}
 };
 

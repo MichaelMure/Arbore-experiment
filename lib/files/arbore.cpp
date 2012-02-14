@@ -58,7 +58,7 @@ void Arbore::HandleMessage(const Host& sender, const Packet& pckt)
 	}
 }
 
-void DataCallback(const Key& id, const Data* data)
+void Arbore::DataCallback(const Key& id, const Data* data)
 {
 	pf_log[W_FILE] << "Received data with key " << id;
 	pf_log[W_FILE] << data->GetStr();
