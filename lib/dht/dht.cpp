@@ -72,7 +72,7 @@ void DHT::Publish(const Key& id, Data* data) const
 	catch(Storage::WrongDataType e)
 	{
 		pf_log[W_DHT] << "Publish wrong data type in the DHT";
-		return false;
+		return;
 	}
 
 	/* Send a Publish packet to the owner of the key */
@@ -114,7 +114,7 @@ void DHT::Unpublish(const Key& id, Data* data) const
 	catch(Storage::WrongDataType e)
 	{
 		pf_log[W_DHT] << "Unpublish wrong data type in the DHT";
-		return false;
+		return;
 	}
 
 	/* Send a Unpublish packet to the owner of the key */
