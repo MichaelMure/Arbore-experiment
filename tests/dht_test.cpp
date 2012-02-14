@@ -95,7 +95,9 @@ int main(int argc, char** argv)
 			case 'G':
 				k = s;
 				pf_log[W_DHT] << "Request data with key " << k;
-				dht->RequestData(k);
+				if(!dht->RequestData(k))
+					if(dht->GetStorage()->hasKey(k))
+						pf_log[W_DHT] << dht->GetStorage()->getInfo(k)->GetStr();
 				break;
 			case 'q':
 			case 'Q':
