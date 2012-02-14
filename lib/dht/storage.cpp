@@ -207,11 +207,11 @@ void Storage::removeInfo(const Key& k, const Data* data)
 
 	std::string Storage::GetStr() const
 	{
-		std::string str;
+		std::string str = "Storage:";
 		std::map<Key,Data*>::const_iterator it;
 		for (it=dataMap_.begin() ; it != dataMap_.end(); it++)
 		{
-			str += "Key : " + it->first.GetStr() + it->second->GetStr();
+			str += "\n" + it->first.GetStr() + " --> " + it->second->GetStr();
 		}
 		return str;
 	}
