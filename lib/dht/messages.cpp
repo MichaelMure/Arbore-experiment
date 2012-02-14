@@ -160,7 +160,8 @@ public:
 		}
 
 		pf_log[W_DHT] << "Data not in cache, relay to a closest host.";
-		dht.GetChimera()->Route(pckt);
+		if(!dht.GetChimera()->Route(pckt))
+			pf_log[W_DHT] << "Failed to relay.";
 	}
 };
 
